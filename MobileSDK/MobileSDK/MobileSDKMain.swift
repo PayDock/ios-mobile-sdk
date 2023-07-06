@@ -8,11 +8,11 @@
 import Foundation
 
 public class MobileSDKMain {
-    
+
     public init() { }
-    
+
     public func printSuccess() {
         print("Success")
     }
-    
+
 }
