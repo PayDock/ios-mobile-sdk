@@ -11,7 +11,7 @@
 		2889B7B72A5582CD00D6C7BE /* MobileSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2889B7AC2A5582CD00D6C7BE /* MobileSDK.framework */; };
 		2889B7BC2A5582CD00D6C7BE /* MobileSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7BB2A5582CD00D6C7BE /* MobileSDKTests.swift */; };
 		2889B7BD2A5582CD00D6C7BE /* MobileSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = 2889B7AF2A5582CD00D6C7BE /* MobileSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2889B7C72A55834500D6C7BE /* MobileSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7C62A55834500D6C7BE /* MobileSDK.swift */; };
+		2889B7C72A55834500D6C7BE /* MobileSDKMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7C62A55834500D6C7BE /* MobileSDKMain.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +30,7 @@
 		2889B7B02A5582CD00D6C7BE /* MobileSDK.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = MobileSDK.docc; sourceTree = "<group>"; };
 		2889B7B62A5582CD00D6C7BE /* MobileSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MobileSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7BB2A5582CD00D6C7BE /* MobileSDKTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSDKTests.swift; sourceTree = "<group>"; };
-		2889B7C62A55834500D6C7BE /* MobileSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSDK.swift; sourceTree = "<group>"; };
+		2889B7C62A55834500D6C7BE /* MobileSDKMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSDKMain.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +75,7 @@
 			children = (
 				2889B7AF2A5582CD00D6C7BE /* MobileSDK.h */,
 				2889B7B02A5582CD00D6C7BE /* MobileSDK.docc */,
-				2889B7C62A55834500D6C7BE /* MobileSDK.swift */,
+				2889B7C62A55834500D6C7BE /* MobileSDKMain.swift */,
 			);
 			path = MobileSDK;
 			sourceTree = "<group>";
@@ -197,7 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2889B7C72A55834500D6C7BE /* MobileSDK.swift in Sources */,
+				2889B7C72A55834500D6C7BE /* MobileSDKMain.swift in Sources */,
 				2889B7B12A5582CD00D6C7BE /* MobileSDK.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

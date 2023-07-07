@@ -7,7 +7,9 @@
 
 import Foundation
 
-public class MobileSDK {
+public class MobileSDKMain {
+    
+    public init() { }
     
     public func printSuccess() {
         print("Success")
