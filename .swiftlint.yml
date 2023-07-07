@@ -1,8 +1,5 @@
 disabled_rules:
-  - line_length
-  - function_body_length
   - nesting
-  - identifier_name
   - large_tuple
   - todo
   - inclusive_language
