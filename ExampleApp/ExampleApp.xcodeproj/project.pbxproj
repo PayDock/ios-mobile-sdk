@@ -47,6 +47,7 @@
 		2889B7EC2A558F1A00D6C7BE /* ExampleAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7F02A558F1A00D6C7BE /* ExampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITests.swift; sourceTree = "<group>"; };
 		2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		28EA57112A5B487A0003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +78,7 @@
 		2889B7C82A558F1800D6C7BE = {
 			isa = PBXGroup;
 			children = (
+				28EA57102A5B487A0003774F /* Packages */,
 				2889B7D32A558F1800D6C7BE /* ExampleApp */,
 				2889B7E52A558F1A00D6C7BE /* ExampleAppTests */,
 				2889B7EF2A558F1A00D6C7BE /* ExampleAppUITests */,
@@ -138,6 +140,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		28EA57102A5B487A0003774F /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				28EA57112A5B487A0003774F /* MobileSDK */,
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
