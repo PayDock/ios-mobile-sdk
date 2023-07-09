@@ -10,14 +10,14 @@ import MobileSDK
 
 class ContentVM: ObservableObject {
     
-    private let mobileSDKMain: MobileSDKMain
+    private let mobileSDK: MobileSDK
     
-    init(mobileSDKMain: MobileSDKMain = MobileSDKMain()) {
-        self.mobileSDKMain = mobileSDKMain
+    init(mobileSDK: MobileSDK = MobileSDK()) {
+        self.mobileSDK = mobileSDK
     }
     
     func doSomething() {
-        mobileSDKMain.printSuccess()
+        mobileSDK.printSuccess()
     }
     
 }

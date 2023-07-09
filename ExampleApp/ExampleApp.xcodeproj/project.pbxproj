@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		285920A72A5B49E700EA42D7 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 285920A62A5B49E700EA42D7 /* MobileSDK */; };
 		28850E572A559A6D00C39A9D /* ContentViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* ContentViewVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleAppApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* ContentView.swift */; };
@@ -47,7 +48,7 @@
 		2889B7EC2A558F1A00D6C7BE /* ExampleAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7F02A558F1A00D6C7BE /* ExampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITests.swift; sourceTree = "<group>"; };
 		2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		28EA57112A5B487A0003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
+		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				285920A72A5B49E700EA42D7 /* MobileSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,7 +147,7 @@
 		28EA57102A5B487A0003774F /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				28EA57112A5B487A0003774F /* MobileSDK */,
+				28EA57122A5B48C70003774F /* MobileSDK */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -166,6 +168,9 @@
 			dependencies = (
 			);
 			name = ExampleApp;
+			packageProductDependencies = (
+				285920A62A5B49E700EA42D7 /* MobileSDK */,
+			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
 			productType = "com.apple.product-type.application";
@@ -646,6 +651,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		285920A62A5B49E700EA42D7 /* MobileSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MobileSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2889B7C92A558F1800D6C7BE /* Project object */;
 }
