@@ -9,10 +9,23 @@ import Foundation
 
 public class MobileSDK {
 
-    public init() { }
+    public static let shared = MobileSDK()
+    var config: MobileSDKConfig?
 
-    public func printSuccess() {
-        print("Success")
+    // MARK: - Initialisation
+
+    private init() { }
+
+    public func configureMobileSDK(config: MobileSDKConfig) {
+        self.config = config
+    }
+
+    public func printCurrentEnvironment() {
+        guard let config = config else {
+            print("No environment set!")
+            return
+        }
+        print(config.environment)
     }
 
 }
