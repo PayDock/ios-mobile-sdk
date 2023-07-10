@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class MobileSDKMain {
+public class MobileSDK {
 
     public init() { }
 
