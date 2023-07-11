@@ -18,7 +18,7 @@ struct Constants {
         switch environment {
         case .production: return "https://api.paydock.com"
         case .sandbox: return "https://api-sandbox.paydock.com"
-        case .staging: return "https://api-sandbox.paydock.com"
+        case .staging: return "https://apista.paydock.com"
         }
     }
 }
