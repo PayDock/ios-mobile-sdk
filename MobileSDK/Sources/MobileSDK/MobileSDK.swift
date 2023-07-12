@@ -11,10 +11,13 @@ public class MobileSDK {
 
     public static let shared = MobileSDK()
     var config: MobileSDKConfig?
+    private let moviesService: MoviesService
 
     // MARK: - Initialisation
 
-    private init(mob) { }
+    private init(moviesService: MoviesService = MoviesServiceImpl()) {
+        self.moviesService = moviesService
+    }
 
     public func configureMobileSDK(config: MobileSDKConfig) {
         self.config = config
