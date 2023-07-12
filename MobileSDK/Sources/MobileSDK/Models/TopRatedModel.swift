@@ -12,7 +12,7 @@ struct TopRated: Codable {
     let page: Int
     let totalPages: Int
     let totalResults: Int
-    let results: [Movie]
+    let results: [MovieModel]
 
     enum CodingKeys: String, CodingKey {
         case page

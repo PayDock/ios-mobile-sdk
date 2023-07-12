@@ -14,7 +14,7 @@ public class MobileSDK {
 
     // MARK: - Initialisation
 
-    private init() { }
+    private init(mob) { }
 
     public func configureMobileSDK(config: MobileSDKConfig) {
         self.config = config
