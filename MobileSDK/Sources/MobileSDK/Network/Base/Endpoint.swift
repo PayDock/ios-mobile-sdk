@@ -25,9 +25,7 @@ extension Endpoint {
     }
 
     var host: String {
-    // TODO: - Move to proper base URL after testing
-        return "api.themoviedb.org"
-        //return Constants.baseURL
+        return Constants.baseURL
     }
 
 }
