@@ -1,5 +1,5 @@
 //
-//  MoviesEndpoint.swift
+//  ExampleEndpoint.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 12.07.2023..
@@ -7,36 +7,32 @@
 
 import Foundation
 
-enum MoviesEndpoint {
+enum ExampleEndpoint {
 
-    case topRated
-    case movieDetail(id: Int)
+    case example(id: Int)
 
 }
 
-extension MoviesEndpoint: Endpoint {
+extension ExampleEndpoint: Endpoint {
 
     var path: String {
         switch self {
-        case .topRated:
-            return "/3/movie/top_rated"
-        case .movieDetail(let id):
-            return "/3/movie/\(id)"
+        case .example(let id):
+            return "/something/example/\(id)"
         }
     }
 
     var method: RequestMethod {
         switch self {
-        case .topRated, .movieDetail:
-            return .get
+        case .example: return .get
         }
     }
 
     var header: [String: String]? {
         // Access Token to use in Bearer header
-        let accessToken = "insert your access token here -> https://www.themoviedb.org/settings/api"
+        let accessToken = "some token"
         switch self {
-        case .topRated, .movieDetail:
+        case .example:
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -46,8 +42,7 @@ extension MoviesEndpoint: Endpoint {
 
     var body: [String: String]? {
         switch self {
-        case .topRated, .movieDetail:
-            return nil
+        case .example: return nil
         }
     }
     
