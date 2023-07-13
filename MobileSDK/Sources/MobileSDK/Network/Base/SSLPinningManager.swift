@@ -28,7 +28,7 @@ final class SSLPinningManager: NSObject {
 
         return Data(hash).base64EncodedString()
     }
-    
+
 }
 
 // MARK: - URLSessionDelegate
@@ -36,29 +36,27 @@ final class SSLPinningManager: NSObject {
 extension SSLPinningManager: URLSessionDelegate {
 
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
-        guard let serverTrust = challenge.protectionSpace.serverTrust else {
+        // TODO: - Replace this with SecTrustCopyCertificateChain when testing on real API
+        guard let serverTrust = challenge.protectionSpace.serverTrust,
+              let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 1) else {
             completionHandler(.cancelAuthenticationChallenge, nil);
             return
         }
 
-        if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 1) {
-            // For Leaf 0, For Intermediate 1, For Root 2
-            let serverPublicKey = SecCertificateCopyKey(serverCertificate)
-            let serverPublicKeyData = SecKeyCopyExternalRepresentation(serverPublicKey!, nil )!
-            let data: Data = serverPublicKeyData as Data
-            let serverHashKey = sha256(data: data)
-            let publickKeyLocal = publicKeyHash
+        let serverPublicKey = SecCertificateCopyKey(serverCertificate)
+        let serverPublicKeyData = SecKeyCopyExternalRepresentation(serverPublicKey!, nil )!
+        let data: Data = serverPublicKeyData as Data
+        let serverHashKey = sha256(data: data)
+        let publicKeyLocal = publicKeyHash
 
-            if (serverHashKey == publickKeyLocal) {
-                print("SSL Pinning with Public key successfully completed.")
-                completionHandler(.useCredential, URLCredential(trust:serverTrust))
-                return
+        if (serverHashKey == publicKeyLocal) {
+            print("SSL Pinning with Public key successfully completed.")
+            completionHandler(.useCredential, URLCredential(trust:serverTrust))
+            return
 
-            } else {
-                completionHandler(.cancelAuthenticationChallenge,nil)
-                print("SSL Pinning with Public key has failed.")
-            }
+        } else {
+            completionHandler(.cancelAuthenticationChallenge,nil)
+            print("SSL Pinning with Public key has failed.")
         }
     }
 
