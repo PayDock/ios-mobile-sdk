@@ -1,6 +1,6 @@
 //
 //  Mockable.swift
-//  MobileSDK
+//  MobileSDKTests
 //
 //  Created by Domagoj Grizelj on 12.07.2023..
 //
