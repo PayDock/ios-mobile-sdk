@@ -43,26 +43,19 @@ extension SSLPinningManager: URLSessionDelegate {
         }
 
         if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 1) {
-            // For Leaf 0, For Intermediate 1, For Root 2(In this tutorial we have used Leaf Certificate)
-            // Server public key
+            // For Leaf 0, For Intermediate 1, For Root 2
             let serverPublicKey = SecCertificateCopyKey(serverCertificate)
-
-            // Server public key Data
             let serverPublicKeyData = SecKeyCopyExternalRepresentation(serverPublicKey!, nil )!
-            let data:Data = serverPublicKeyData as Data
-
-            // Server Hash key
+            let data: Data = serverPublicKeyData as Data
             let serverHashKey = sha256(data: data)
-            // Local Hash Key
             let publickKeyLocal = publicKeyHash
 
             if (serverHashKey == publickKeyLocal) {
-                print("SSL Pinnign with Public key successfully completed.")
+                print("SSL Pinning with Public key successfully completed.")
                 completionHandler(.useCredential, URLCredential(trust:serverTrust))
                 return
-            }
 
-            else {
+            } else {
                 completionHandler(.cancelAuthenticationChallenge,nil)
                 print("SSL Pinning with Public key has failed.")
             }
