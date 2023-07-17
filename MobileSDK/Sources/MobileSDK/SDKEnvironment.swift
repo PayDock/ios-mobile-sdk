@@ -8,6 +8,10 @@
 import Foundation
 
 public enum SDKEnvironment: String {
-    case production, sandbox, staging
+
+    case production
+    case sandbox
+    case staging
+    
 }
 

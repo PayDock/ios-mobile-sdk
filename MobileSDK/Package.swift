@@ -26,6 +26,9 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "MobileSDKTests",
-            dependencies: ["MobileSDK"]),
+            dependencies: ["MobileSDK"],
+            resources: [
+            .copy("Resources/JSON/example_response.json")]
+        ),
     ]
 )
