@@ -12,12 +12,22 @@ class ContentVM: ObservableObject {
     
     private let mobileSDK: MobileSDK
     
-    init(mobileSDK: MobileSDK = MobileSDK()) {
+    init(mobileSDK: MobileSDK = MobileSDK.shared) {
         self.mobileSDK = mobileSDK
+
+        initialiseMobileSDK()
     }
-    
-    func doSomething() {
-        mobileSDK.printSuccess()
+
+    private func initialiseMobileSDK() {
+        var config: MobileSDKConfig
+        switch ProjectEnvironment.shared.environment {
+        case .production: config = MobileSDKConfig(environment: .production)
+        case .sandbox: config = MobileSDKConfig(environment: .sandbox)
+        case .staging: config = MobileSDKConfig(environment: .staging)
+        }
+
+        mobileSDK.configureMobileSDK(config: config)
+        mobileSDK.printCurrentEnvironment()
     }
     
 }

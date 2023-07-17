@@ -1,0 +1,22 @@
+//
+//  Staging.xcconfig
+//  ExampleApp
+//
+//  Created by Domagoj Grizelj on 07.07.2023..
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// TODO: - Fill up when needed. User Defined Settings are also possible alternative to .xcconfig
+//
+//// API Key
+//API_KEY = my_super_secret_api_key
+//
+//// Overriding (do NOT change key name)
+//// app icon
+//ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon_Staging
+//// app version
+//MARKETING_VERSION = 0.1.0
+//// build number
+//CURRENT_PROJECT_VERSION = 1

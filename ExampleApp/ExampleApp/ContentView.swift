@@ -19,7 +19,7 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .onAppear {
-            viewModel.doSomething()
+
         }
         .padding()
     }
