@@ -1,6 +1,6 @@
 //
 //  ExampleServiceTest.swift
-//  
+//  MobileSDKTests
 //
 //  Created by Domagoj Grizelj on 13.07.2023..
 //

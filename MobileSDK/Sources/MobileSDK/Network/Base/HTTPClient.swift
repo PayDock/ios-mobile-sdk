@@ -15,6 +15,23 @@ protocol HTTPClient {
 
 extension HTTPClient {
 
+    // MARK: - Variables
+
+    var session: URLSession {
+        let configuration = URLSessionConfiguration.default
+        configuration.waitsForConnectivity = true
+        configuration.timeoutIntervalForRequest = 60
+        configuration.timeoutIntervalForResource = 300
+
+        return URLSession(configuration: configuration, delegate: sslPinningManager, delegateQueue: nil)
+    }
+
+    var sslPinningManager: SSLPinningManager {
+        return SSLPinningManager()
+    }
+
+    // MARK: - Default implementation
+
     func sendRequest<T: Decodable>(endpoint: Endpoint, responseModel: T.Type) async throws -> T {
         var urlComponents = URLComponents()
         urlComponents.scheme = endpoint.scheme
@@ -35,7 +52,7 @@ extension HTTPClient {
 
         do {
             NetworkLogger.log(request: request)
-            let (data, response) = try await URLSession.shared.data(for: request, delegate: nil)
+            let (data, response) = try await session.data(for: request, delegate: nil)
             NetworkLogger.log(data: data, response: response as? HTTPURLResponse, error: nil)
 
             guard let response = response as? HTTPURLResponse else {
