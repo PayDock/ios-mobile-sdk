@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  WidgetsView.swift
 //  ExampleApp
 //
 //  Created by Domagoj Grizelj on 05.07.2023..
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct WidgetsView: View {
     
-    @StateObject private var viewModel = ContentVM()
+    @StateObject private var viewModel = WidgetsVM()
 
     var body: some View {
         VStack {
@@ -27,6 +27,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        WidgetsView()
     }
 }
