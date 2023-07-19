@@ -13,34 +13,27 @@ struct MainView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            WidgetsView()
+            CheckoutView()
                 .tabItem {
                     Label("Checkout", image: selection == 0 ? "cart-active" : "cart")
-                }
-                .tag(0)
+                }.tag(0)
 
             WidgetsView()
                 .tabItem {
-                    selection == 1 ? Image("grid-layout-active") : Image("grid-layout")        .resizable()
-                        .scaleToFit()
-                        .frame(width: 24, height: 24)
-                    Text("Widgets")
-                    //                    Label("Widgets", image: selection == 1 ? "grid-layout-active" : "grid-layout")
-                }
-                .tag(1)
+                    Label("Widgets", image: selection == 1 ? "grid-layout-active" : "grid-layout")
+                }.tag(1)
 
-            WidgetsView()
+            StyleView()
                 .tabItem {
                     Label("Style", image: selection == 2 ? "paintbucket-active" : "paintbucket")
-                }
-                .tag(2)
+                }.tag(2)
 
-            WidgetsView()
+            SettingsView()
                 .tabItem {
                     Label("Settings", image: selection == 3 ? "cog-active" : "cog")
-                }
-                .tag(3)
+                }.tag(3)
         }
+        .accentColor(.black)
     }
 }
 
