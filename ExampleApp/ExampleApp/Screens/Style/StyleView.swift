@@ -21,7 +21,24 @@ struct StyleView: View {
                     divider
 
                     sectionTitle("Font")
+                    fontPickerView(title: "Font", text: $viewModel.fontName)
+                    divider
 
+                    HStack {
+                        designTextView(title: "Corner Radius", text: $viewModel.cornerRadius)
+                        designTextView(title: "Padding", text: $viewModel.padding)
+                    }
+                    .padding(.trailing, 16)
+                    divider
+
+                    Button("Button Name") {
+                        print("asdf")
+                    }
+                    .frame(height: 48)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.white)
+                    .background(Color.black)
+                    .padding(.horizontal, 16)
                 }
                 .navigationTitle("Style")
             }
@@ -72,7 +89,60 @@ struct StyleView: View {
                     .padding(16)
             }
         }
+    }
 
+    private func fontPickerView(title: String, text: Binding<String>) -> some View {
+        VStack {
+            Menu {
+                ForEach(viewModel.allFontNames, id: \.self) { client in
+                    Button(client) {
+                        self.viewModel.fontName = client
+                    }
+                }
+            } label: {
+                VStack {
+                    ZStack {
+                        Rectangle()
+                            .frame(height: 40)
+                            .foregroundColor(Color.white)
+                            .padding(.horizontal, 16)
+
+                        HStack {
+                            Text(viewModel.fontName.isEmpty ? "Select font" : viewModel.fontName)
+                                .foregroundColor(.black)
+                                .padding(.leading, 32)
+                            Spacer()
+                            Image("angle-down")
+                                .padding(.trailing, 32)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func designTextView(title: String, text: Binding<String>) -> some View {
+        VStack {
+            HStack {
+                Text(title)
+                    .padding(.leading, 16)
+                    .padding(.bottom, -4)
+                Spacer()
+            }
+            HStack {
+                ZStack {
+                    Rectangle()
+                        .frame(height: 40)
+                        .foregroundColor(Color.white)
+                        .padding(.leading, 16)
+
+                    TextField(title, text: text)
+                        .frame(height: 40)
+                        .background(Color.white)
+                        .padding(.leading, 32)
+                }
+            }
+        }
     }
 }
 
