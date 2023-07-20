@@ -11,6 +11,10 @@ struct MainView: View {
 
     @State private var selection: Int = 0
 
+    init() {
+        UITabBar.appearance().backgroundColor = .white
+    }
+
     var body: some View {
         TabView(selection: $selection) {
             CheckoutView()
@@ -27,12 +31,14 @@ struct MainView: View {
                 .tabItem {
                     Label("Style", image: selection == 2 ? "paintbucket-active" : "paintbucket")
                 }.tag(2)
+                .toolbarBackground(Color.white, for: .tabBar)
 
             SettingsView()
                 .tabItem {
                     Label("Settings", image: selection == 3 ? "cog-active" : "cog")
                 }.tag(3)
         }
+        .toolbarBackground(Color.red, for: .tabBar)
         .accentColor(.black)
     }
 }
