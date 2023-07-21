@@ -19,4 +19,8 @@ class StyleVM: ObservableObject {
     @Published var padding = "0"
 
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
+
+    func saveStyle() {
+        
+    }
 }

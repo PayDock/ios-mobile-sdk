@@ -32,7 +32,7 @@ struct StyleView: View {
                     divider
 
                     Button("Button Name") {
-                        print("asdf")
+                        viewModel.saveStyle()
                     }
                     .frame(height: 48)
                     .frame(maxWidth: .infinity)
