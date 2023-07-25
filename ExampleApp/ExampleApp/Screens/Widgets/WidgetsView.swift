@@ -14,15 +14,11 @@ struct WidgetsView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink {
-                    CardDetailsView()
-                } label: {
-                    cell(title: "Card Details", subtitle: "Tokenise card details", onTap: {
-                    })
-                    .listRowSeparatorTint(.black)
-                    .listRowSeparator(.hidden, edges: .top)
+                NavigationLink(destination: CardDetailsView()) {
+                    cell(title: "Card Details",
+                         subtitle: "Tokenise card details") {}
                 }
-                .background(Color(hex: "#EAE0D7"))
+                .listRowBackground(Color(hex: "#EAE0D7"))
 
             }
             .navigationTitle("Widgets")
