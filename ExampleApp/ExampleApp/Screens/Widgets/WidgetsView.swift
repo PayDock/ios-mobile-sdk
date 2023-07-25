@@ -18,14 +18,16 @@ struct WidgetsView: View {
                     cell(title: "Card Details",
                          subtitle: "Tokenise card details") {}
                 }
+                .listRowSeparatorTint(.black)
+                .listSectionSeparator(.hidden, edges: .top)
                 .listRowBackground(Color(hex: "#EAE0D7"))
-
             }
             .navigationTitle("Widgets")
             .background(Color(hex: "#EAE0D7"))
             .listStyle(.plain)
 
         }
+        .padding(.trailing, -28)
         .background(Color(hex: "#EAE0D7"))
     }
 

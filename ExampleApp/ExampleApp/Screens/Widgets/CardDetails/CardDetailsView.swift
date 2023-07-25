@@ -9,7 +9,16 @@ import SwiftUI
 
 struct CardDetailsView: View {
     var body: some View {
-        Text("Card details")
+        ScrollView {
+            HStack {
+                Spacer()
+                Text("Card details")
+                Spacer()
+            }
+            
+        }
+        .background(Color(hex: "#EAE0D7"))
+
     }
 }
 
