@@ -12,17 +12,50 @@ struct WidgetsView: View {
     @StateObject private var viewModel = WidgetsVM()
 
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Widgets")
-        }
-        .onAppear {
+        NavigationStack {
+            List {
+                NavigationLink(destination: CardDetailsView()) {
+                    cell(title: "Card Details",
+                         subtitle: "Tokenise card details") {}
+                }
+                .listRowSeparatorTint(.black)
+                .listSectionSeparator(.hidden, edges: .top)
+                .listRowBackground(Color(hex: "#EAE0D7"))
+            }
+            .navigationTitle("Widgets")
+            .background(Color(hex: "#EAE0D7"))
+            .listStyle(.plain)
 
         }
-        .padding()
+        .padding(.trailing, -28)
+        .background(Color(hex: "#EAE0D7"))
     }
+
+    func cell(title: String, subtitle: String, onTap: () -> Void) -> some View {
+        HStack {
+            VStack {
+                HStack {
+                    Text(title)
+                        .font(.title2)
+                        .padding(.vertical, 6)
+                    Spacer()
+                }
+
+                HStack {
+                    Text(subtitle)
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 6)
+                    Spacer()
+                }
+
+            }
+
+            Spacer()
+            Image("chevron-right")
+        }
+        .listRowBackground(Color(hex: "#EAE0D7"))
+    }
+
 }
 
 struct ContentView_Previews: PreviewProvider {

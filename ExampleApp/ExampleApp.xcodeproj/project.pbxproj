@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2808B3422A7056F100E86C7E /* CardDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808B3412A7056F100E86C7E /* CardDetailsView.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
 		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
 		282D31662A66B82900E3ECAD /* StyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31652A66B82900E3ECAD /* StyleView.swift */; };
@@ -47,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2808B3412A7056F100E86C7E /* CardDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailsView.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 		282D31652A66B82900E3ECAD /* StyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleView.swift; sourceTree = "<group>"; };
@@ -102,6 +104,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2808B3402A7056E300E86C7E /* CardDetails */ = {
+			isa = PBXGroup;
+			children = (
+				2808B3412A7056F100E86C7E /* CardDetailsView.swift */,
+			);
+			path = CardDetails;
+			sourceTree = "<group>";
+		};
 		282D315B2A66A61800E3ECAD /* Screens */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +129,7 @@
 			children = (
 				2889B7D62A558F1800D6C7BE /* WidgetsView.swift */,
 				28850E562A559A6D00C39A9D /* WidgetsVM.swift */,
+				2808B3402A7056E300E86C7E /* CardDetails */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -403,6 +414,7 @@
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
+				2808B3422A7056F100E86C7E /* CardDetailsView.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
