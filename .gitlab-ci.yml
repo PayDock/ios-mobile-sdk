@@ -23,7 +23,7 @@ test_exampleApp:
   artifacts:
     paths:
     - fastlane/test_output
-  tag:
+  tags:
     - saas-macos-medium-m1	
 
 export_exampleApp:
