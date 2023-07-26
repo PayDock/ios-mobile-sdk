@@ -29,7 +29,18 @@ struct ProjectEnvironment {
         print("[ENVIRONMENT] Working environment set to \(environment)")
     }
 
-    enum Environment: String {
+    enum Environment: String, CaseIterable {
         case production, sandbox, staging
+    }
+
+    func getEnvironmentEndpoint(for environmentString: String) -> String {
+        let environment = Environment(rawValue: environmentString)
+        
+        switch environment {
+        case .production: return "api.paydock.com"
+        case .sandbox: return "api-sandbox.paydock.com"
+        case .staging: return "apista.paydock.com"
+        case .none: return ""
+        }
     }
 }

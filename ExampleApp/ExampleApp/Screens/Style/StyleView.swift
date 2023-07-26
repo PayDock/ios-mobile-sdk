@@ -21,7 +21,7 @@ struct StyleView: View {
                     divider
 
                     sectionTitle("Font")
-                    fontPickerView(title: "Font", text: $viewModel.fontName)
+                    PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: {_ in })
                     divider
 
                     HStack {
@@ -31,7 +31,7 @@ struct StyleView: View {
                     .padding(.trailing, 16)
                     divider
 
-                    Button("Button Name") {
+                    Button("Update styles") {
                         viewModel.saveStyle()
                     }
                     .frame(height: 48)
@@ -87,36 +87,6 @@ struct StyleView: View {
                     .frame(width: 20, height: 20)
                     .foregroundColor(Color(hex: "#\(text.wrappedValue)"))
                     .padding(16)
-            }
-        }
-    }
-
-    private func fontPickerView(title: String, text: Binding<String>) -> some View {
-        VStack {
-            Menu {
-                ForEach(viewModel.allFontNames, id: \.self) { client in
-                    Button(client) {
-                        self.viewModel.fontName = client
-                    }
-                }
-            } label: {
-                VStack {
-                    ZStack {
-                        Rectangle()
-                            .frame(height: 40)
-                            .foregroundColor(Color.white)
-                            .padding(.horizontal, 16)
-
-                        HStack {
-                            Text(viewModel.fontName.isEmpty ? "Select font" : viewModel.fontName)
-                                .foregroundColor(.black)
-                                .padding(.leading, 32)
-                            Spacer()
-                            Image("angle-down")
-                                .padding(.trailing, 32)
-                        }
-                    }
-                }
             }
         }
     }
