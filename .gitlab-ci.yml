@@ -33,7 +33,7 @@ test_exampleApp:
     - fastlane/test_output
 
 export_exampleApp:
-extends: 
+  extends: 
     - .macos_saas_runners
   stage: build
   script:
