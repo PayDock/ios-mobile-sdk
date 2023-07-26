@@ -1,0 +1,46 @@
+lane :build_and_test do |options|
+    device_string = options[:device] || UI.user_error!("Missing required parameeter `device`")
+    begin
+        scan(
+            project: ENV["PROJECT_WORKSPACE"],
+            scheme: ENV["EXAMPLE_APP_TEST_SCHEME"],
+            clean: true,
+            derived_data_path: "fastlane/derived_data/",
+            device: device_string,
+            code_coverage: true,
+            result_bundle: true,
+            skip_build: true,
+            output_directory: options[:output],
+            number_of_retries: 2
+        )
+    end
+end
+
+lane :archive do |options|
+    gym(
+        project: ENV["PROJECT_WORKSPACE"],
+        derived_data_path: "fastlane/derived_data/",
+        scheme: ENV["EXAMPLE_APP_TEST_SCHEME"],
+        configuration: "Release",
+        export_method: "ad-hoc",
+        output_directory: options[:output]
+    )
+end
+
+lane :adhoc_certs do
+    match(
+        app_identifier: "com.paydock.ExampleApp",
+        type: "adhoc",
+        readonly: false,
+        force_for_new_devices: true
+    )
+end
+
+lane :dev_certs do
+    match(
+        app_identifier: "com.paydock.ExampleApp",
+        type: "development",
+        readonly: false,
+        force_for_new_devices: true
+    )
+end
