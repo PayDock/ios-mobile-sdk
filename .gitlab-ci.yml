@@ -15,7 +15,15 @@ variables:
   LANG: "en_US.UTF-8"
   GIT_STRATEGY: clone
 
+.macos_saas_runners:
+  tags:
+    - saas-macos-medium-m1
+  image: macos-12-xcode-14
+
+
 test_exampleApp:
+  extends: 
+    - .macos_saas_runners
   stage: test
   script: 
     - bundle install
@@ -23,10 +31,10 @@ test_exampleApp:
   artifacts:
     paths:
     - fastlane/test_output
-  tags:
-    - saas-macos-medium-m1	
 
 export_exampleApp:
+extends: 
+    - .macos_saas_runners
   stage: build
   script:
     - bundle install
