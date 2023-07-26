@@ -21,6 +21,10 @@
 		2889B7F12A558F1A00D6C7BE /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F02A558F1A00D6C7BE /* ExampleAppUITests.swift */; };
 		2889B7F32A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */; };
 		288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */; };
+		28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */; };
+		28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C32A696341004A8D34 /* View+Extensions.swift */; };
+		28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */; };
+		28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C72A697647004A8D34 /* Color+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +65,10 @@
 		288E33A52A5C873800DB2A41 /* Sandbox.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sandbox.xcconfig; sourceTree = "<group>"; };
 		288E33A62A5C874200DB2A41 /* Staging.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Staging.xcconfig; sourceTree = "<group>"; };
 		288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEnvironment.swift; sourceTree = "<group>"; };
+		28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleVM.swift; sourceTree = "<group>"; };
+		28A3A9C32A696341004A8D34 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
+		28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusablePadding.swift; sourceTree = "<group>"; };
+		28A3A9C72A697647004A8D34 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -131,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				282D31652A66B82900E3ECAD /* StyleView.swift */,
+				28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */,
 			);
 			path = Style;
 			sourceTree = "<group>";
@@ -168,6 +177,8 @@
 		2889B7D32A558F1800D6C7BE /* ExampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				28A3A9C22A69632D004A8D34 /* Extensions */,
+				28A3A9C12A6962C2004A8D34 /* CustomViews */,
 				282D315B2A66A61800E3ECAD /* Screens */,
 				2889B7D42A558F1800D6C7BE /* ExampleApp.swift */,
 				288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */,
@@ -212,6 +223,23 @@
 				288E33A62A5C874200DB2A41 /* Staging.xcconfig */,
 			);
 			path = Configs;
+			sourceTree = "<group>";
+		};
+		28A3A9C12A6962C2004A8D34 /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */,
+			);
+			path = CustomViews;
+			sourceTree = "<group>";
+		};
+		28A3A9C22A69632D004A8D34 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				28A3A9C32A696341004A8D34 /* View+Extensions.swift */,
+				28A3A9C72A697647004A8D34 /* Color+Extensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		28EA57082A5B40200003774F /* Frameworks */ = {
@@ -363,13 +391,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
+				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
+				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
+				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
+				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
