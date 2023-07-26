@@ -1,5 +1,5 @@
 //
-//  ContentViewVM.swift
+//  WidgetsVM.swift
 //  ExampleApp
 //
 //  Created by Domagoj Grizelj on 05.07.2023..
@@ -8,7 +8,7 @@
 import Foundation
 import MobileSDK
 
-class ContentVM: ObservableObject {
+class WidgetsVM: ObservableObject {
     
     private let mobileSDK: MobileSDK
     
