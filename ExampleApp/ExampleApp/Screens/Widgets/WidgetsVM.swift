@@ -28,6 +28,8 @@ class WidgetsVM: ObservableObject {
 
         mobileSDK.configureMobileSDK(config: config)
         mobileSDK.printCurrentEnvironment()
+
+        
     }
     
 }
