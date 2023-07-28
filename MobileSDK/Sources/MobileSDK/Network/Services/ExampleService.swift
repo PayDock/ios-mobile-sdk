@@ -16,7 +16,7 @@ protocol ExampleService {
 struct ExampleServiceImpl: HTTPClient, ExampleService {
 
     func getExample(id: Int) async throws -> Example {
-        return try await sendRequest(endpoint: ExampleEndpoint.example(id: id), responseModel: Example.self)
+        return try await sendRequest(endpoint: CardsEndpoints.example(id: id), responseModel: Example.self)
     }
 
 }
