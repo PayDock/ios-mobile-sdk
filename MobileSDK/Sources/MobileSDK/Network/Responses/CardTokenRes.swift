@@ -10,8 +10,8 @@ import Foundation
 struct CardTokenRes: Codable {
 
     let status: Int
-    let error: String?
-    let resource: Resource?
+    let error: ErrorRes?
+    let resource: Resource
 
     struct Resource: Codable {
         let type: String
