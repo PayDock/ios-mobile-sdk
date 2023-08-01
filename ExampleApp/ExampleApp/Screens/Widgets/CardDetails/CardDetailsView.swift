@@ -15,10 +15,9 @@ struct CardDetailsView: View {
                 Text("Card details")
                 Spacer()
             }
-            
+
         }
         .background(Color(hex: "#EAE0D7"))
-
     }
 }
 

@@ -9,15 +9,15 @@ import Foundation
 
 protocol CardService {
 
-    func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> CardTokenRes
+    func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> String
 
 }
 
 struct CardServiceImpl: HTTPClient, CardService {
 
-    func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> CardTokenRes {
-        
-        return try await sendRequest(endpoint: CardsEndpoints.cardToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq), responseModel: CardTokenRes.self)
+    func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> String {
+        let response = try await sendRequest(endpoint: CardsEndpoints.cardToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq), responseModel: CardTokenRes.self)
+        return response.resource.data
     }
 
 }

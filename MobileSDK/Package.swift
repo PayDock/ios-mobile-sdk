@@ -28,7 +28,8 @@ let package = Package(
             name: "MobileSDKTests",
             dependencies: ["MobileSDK"],
             resources: [
-                .copy("Resources/JSON/example_response.json")]
+                .copy("Resources/JSON/card_tokenisation_error_response.json"),
+                .copy("Resources/JSON/card_tokenisation_success_response.json")]
         ),
     ]
 )

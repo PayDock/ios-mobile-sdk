@@ -1,0 +1,22 @@
+{
+   "status":403,
+   "error":{
+      "message":"Access forbidden",
+      "code":"invalid_public_key"
+   },
+   "resource":{
+      "type":"authorization",
+      "data":{
+
+      }
+   },
+   "error_summary":{
+      "message":"Access forbidden",
+      "code":"invalid_public_key",
+      "details":{
+         "messages":[
+
+         ]
+      }
+   }
+}
