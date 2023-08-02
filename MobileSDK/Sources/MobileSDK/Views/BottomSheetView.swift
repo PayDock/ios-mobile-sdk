@@ -21,19 +21,36 @@ public struct BottomSheetView<Content: View>: View {
     public var body: some View {
         Text("")
             .sheet(isPresented: $isPresented) {
-                content
-                    .overlay {
-                        GeometryReader { geometry in
-                            Color.clear.preference(key: InnerHeightPreferenceKey.self, value: geometry.size.height)
+                VStack {
+                    headerView
+                    content
+                        .padding(.top, 20)
+                        .padding(.bottom, 60)
+                        .overlay {
+                            GeometryReader { geometry in
+                                Color.clear.preference(key: InnerHeightPreferenceKey.self, value: geometry.size.height)
+                            }
                         }
-                    }
-                    .onPreferenceChange(InnerHeightPreferenceKey.self) { newHeight in
-                        sheetHeight = newHeight
-                    }
-                    .presentationDetents([.height(sheetHeight)])
+                        .onPreferenceChange(InnerHeightPreferenceKey.self) { newHeight in
+                            sheetHeight = newHeight
+                        }
+                        .presentationDetents([.height(sheetHeight)])
+                }
             }
     }
 
+    private var headerView: some View {
+        HStack {
+            Spacer()
+            Button {
+                isPresented = false
+            } label: {
+                Image("round-btn", bundle:Bundle.module)
+            }
+            .padding(.top, 60)
+            .padding(.trailing, 16)
+        }
+    }
 }
 
 struct BottomSheetView_Previews: PreviewProvider {
