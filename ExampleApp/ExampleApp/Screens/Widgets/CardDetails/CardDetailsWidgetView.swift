@@ -1,5 +1,5 @@
 //
-//  CardDetailsView.swift
+//  CardDetailsWidgetView.swift
 //  ExampleApp
 //
 //  Created by Domagoj Grizelj on 25.07.2023..
@@ -8,7 +8,7 @@
 import SwiftUI
 import MobileSDK
 
-struct CardDetailsView: View {
+struct CardDetailsWidgetView: View {
     @State var isSheetPresented = false
 
     var body: some View {
@@ -32,6 +32,6 @@ struct CardDetailsView: View {
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsView()
+        CardDetailsWidgetView()
     }
 }
