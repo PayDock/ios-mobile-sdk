@@ -6,18 +6,27 @@
 //
 
 import SwiftUI
+import MobileSDK
 
 struct CardDetailsView: View {
-    var body: some View {
-        ScrollView {
-            HStack {
-                Spacer()
-                Text("Card details")
-                Spacer()
-            }
+    @State var isSheetPresented = false
 
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                HStack {
+                    Spacer()
+                    Button("Launch card sheet") {
+                        isSheetPresented = true
+                    }
+                    .padding()
+                    Spacer()
+                    CardDetailsSheetView(isPresented: $isSheetPresented)
+                }
+
+            }
+            .background(Color(hex: "#EAE0D7"))
         }
-        .background(Color(hex: "#EAE0D7"))
     }
 }
 
