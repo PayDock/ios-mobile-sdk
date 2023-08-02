@@ -9,25 +9,39 @@ import SwiftUI
 
 public struct BottomSheetView<Content: View>: View {
 
+    @ViewBuilder private let content: Content
     @Binding var isPresented: Bool
-    @State var selectedDetent: PresentationDetent = .medium
-    @ViewBuilder let content: Content
+    @State private var sheetHeight: CGFloat = .zero
 
-    private let availableDetents: [PresentationDetent] = [.medium, .large]
+    public init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
+        self._isPresented = isPresented
+        self.content = content()
+    }
 
     public var body: some View {
         Text("")
             .sheet(isPresented: $isPresented) {
                 content
-                    .presentationDetents([.medium])
+                    .overlay {
+                        GeometryReader { geometry in
+                            Color.clear.preference(key: InnerHeightPreferenceKey.self, value: geometry.size.height)
+                        }
+                    }
+                    .onPreferenceChange(InnerHeightPreferenceKey.self) { newHeight in
+                        sheetHeight = newHeight
+                    }
+                    .presentationDetents([.height(sheetHeight)])
             }
     }
+
 }
 
 struct BottomSheetView_Previews: PreviewProvider {
+
     static var previews: some View {
         BottomSheetView(isPresented: .constant(true)) {
             Text("Bottom sheet content")
         }
     }
+
 }
