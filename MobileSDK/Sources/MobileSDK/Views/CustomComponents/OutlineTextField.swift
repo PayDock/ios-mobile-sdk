@@ -20,8 +20,8 @@ struct OutlineTextField: View {
     // MARK: - Initialisation
 
     init(_ text: Binding<String>, editing: Binding<Bool>) {
-      self._text = text
-      self._editing = editing
+        self._text = text
+        self._editing = editing
     }
 
     var body: some View {
@@ -29,12 +29,14 @@ struct OutlineTextField: View {
             .padding(6.0)
             .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
                 .stroke(borderColor, lineWidth: borderWidth))
-            .focused($focusField, equals: .textField)
+        //                    .focused($focusField, equals: .textField)
             .onChange(of: editing) {
-                focusField = $0 ? .textField : nil
+                let currentEdit = $0
+                print($0)
+                //                focusField = $0 ? .textField : nil
                 withAnimation(.easeOut(duration: 0.1)) {
-                    borderColor = editing ? .blue : .gray
-                    borderWidth = editing ? 2.0 : 1.0
+                    borderColor = currentEdit ? .blue : .gray
+                    borderWidth = currentEdit ? 2.0 : 1.0
                 }
             }
     }

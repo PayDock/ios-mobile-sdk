@@ -10,24 +10,27 @@ import SwiftUI
 struct CardDetailsView: View {
 
     @State var isPresented = false
-    @ObservedObject var viewModel = CardDetailsVM()
+    @StateObject private var viewModel = CardDetailsVM()
+    @FocusState private var text1InFocus: Bool
 
     var body: some View {
         VStack {
             OutlineTextField($viewModel.text1, editing: $viewModel.editingTextField1)
-                .padding()
                 .onTapGesture { viewModel.editingTextField1 = true }
+                .focused($text1InFocus)
+                .onAppear {
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                    self.text1InFocus = true
+                  }
+                }
 
             OutlineTextField($viewModel.text2, editing: $viewModel.editingTextField2)
-                .padding()
                 .onTapGesture { viewModel.editingTextField2 = true }
             Spacer()
         }
         .onTapGesture {
             viewModel.cancelEditing()
         }
-        .frame(width: 300.0, height: 200.0)
-        .contentShape(Rectangle())
     }
 }
 
