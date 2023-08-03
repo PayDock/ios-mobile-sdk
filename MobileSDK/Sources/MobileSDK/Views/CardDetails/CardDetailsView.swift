@@ -9,17 +9,16 @@ import SwiftUI
 
 struct CardDetailsView: View {
 
-    @State var isPresented = false
+    // MARK: - Properties
+
     @StateObject private var viewModel = CardDetailsVM()
     @FocusState private var text1InFocus: Bool
+    @State var isPresented = false
 
-
-    @State
-    private var editingTextField1 = false {
+    @State private var editingTextField1 = false {
         didSet {
-            guard editingTextField1 != oldValue else {
-                return
-            }
+            guard editingTextField1 != oldValue else { return }
+
             if editingTextField1 {
                 editingTextField2 = false
             } else {
@@ -27,12 +26,11 @@ struct CardDetailsView: View {
             }
         }
     }
-    @State
-    private var editingTextField2 = false {
+
+    @State private var editingTextField2 = false {
         didSet {
-            guard editingTextField2 != oldValue else {
-                return
-            }
+            guard editingTextField2 != oldValue else { return }
+
             if editingTextField2 {
                 editingTextField1 = false
             } else {
@@ -40,6 +38,8 @@ struct CardDetailsView: View {
             }
         }
     }
+
+    // MARK: - View protocol properties
 
     var body: some View {
         VStack {
@@ -62,9 +62,9 @@ struct CardDetailsView: View {
             .onTapGesture { editingTextField2 = true }
             Spacer()
         }
-        .contentShape(Rectangle())
         .onTapGesture {
-//            viewModel.cancelEditing()
+            editingTextField1 = false
+            editingTextField2 = false
         }
     }
 }

@@ -8,8 +8,48 @@
 import SwiftUI
 
 struct OutlineTextField: View {
-    
-    // MARK: View protocol properties
+
+    // MARK: Properties
+
+    @State private var borderColor = Color.gray
+    @State private var borderWidth = 1.0
+    @State private var placeholderBackgroundOpacity = 0.0
+    @State private var placeholderBottomPadding = 0.0
+    @State private var placeholderColor = Color.gray
+    @State private var placeholderFontSize = 16.0
+    @State private var placeholderLeadingPadding = 2.0
+
+    @Binding private var text: String
+    @Binding private var valid: Bool
+    @Binding private var editing: Bool
+    @Binding private var hint: String
+
+    @FocusState private var focusField: Field?
+
+    private let placeholder: String
+
+    // MARK: - Initialization
+
+    /// Creates a Material Design inspired text field with an animated border and placeholder.
+    /// - Parameters:
+    ///   - text: The text field contents.
+    ///   - placeholder: The placeholder string.
+    ///   - hint: The field hint string.
+    ///   - editing: Whether the field is in the editing state.
+    ///   - valid: Whether the field is in the valid state.
+    public init(_ text: Binding<String>,
+                placeholder: String,
+                hint: Binding<String>,
+                editing: Binding<Bool>,
+                valid: Binding<Bool>) {
+        self._text = text
+        self.placeholder = placeholder
+        self._hint = hint
+        self._editing = editing
+        self._valid = valid
+    }
+
+    // MARK: - View protocol properties
 
     public var body: some View {
         ZStack {
@@ -17,7 +57,8 @@ struct OutlineTextField: View {
                 .padding(6.0)
                 .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
                     .stroke(borderColor, lineWidth: borderWidth))
-                .focused($focusField, equals: .textField)
+            // TODO: - Handle focusing from CardDetailsView
+            //                .focused($focusField, equals: .textField)
             HStack {
                 ZStack {
                     Color(.white)
@@ -30,8 +71,8 @@ struct OutlineTextField: View {
                         .padding(2.0)
                         .layoutPriority(1)
                 }
-                    .padding([.leading], placeholderLeadingPadding)
-                    .padding([.bottom], placeholderBottomPadding)
+                .padding([.leading], placeholderLeadingPadding)
+                .padding([.bottom], placeholderBottomPadding)
                 Spacer()
             }
             HStack {
@@ -45,77 +86,29 @@ struct OutlineTextField: View {
                 Spacer()
             }
         }
-            .onChange(of: editing) {
-                focusField = $0
-                    ? .textField
-                    : nil
-                withAnimation(.easeOut(duration: 0.1)) {
-                    updateBorder()
-                    updatePlaceholder()
-                }
+        .onChange(of: editing) { _ in
+            // TODO: - Handle focusing from CardDetailsView
+            //            focusField = $0 ? .textField : nil
+            withAnimation(.easeInOut(duration: 0.15)) {
+                updateBorder()
+                updatePlaceholder()
             }
-            .frame(width: .infinity, height: 64.0)
+        }
+        .frame(height: 64.0)
     }
 
-    // MARK: Private properties
+}
 
-    private let placeholder: String
-    @State
-    private var borderColor = Color.gray
-    @State
-    private var borderWidth = 1.0
-    @Binding
-    private var editing: Bool
-    @FocusState
-    private var focusField: Field?
-    @Binding
-    private var hint: String
-    @State
-    private var placeholderBackgroundOpacity = 0.0
-    @State
-    private var placeholderBottomPadding = 0.0
-    @State
-    private var placeholderColor = Color.gray
-    @State
-    private var placeholderFontSize = 16.0
-    @State
-    private var placeholderLeadingPadding = 2.0
-    @Binding
-    private var text: String
-    @Binding
-    private var valid: Bool
+// MARK: - Private methods
 
-    // MARK: - Initialization
+private extension OutlineTextField {
 
-    /// Creates a Material Design inspired text field with an animated border and placeholder.
-    /// - Parameters:
-    ///   - text: The text field contents.
-    ///   - placeholder: The placeholder string.
-    ///   - hint: The field hint string.
-    ///   - editing: Whether the field is in the editing state.
-    ///   - valid: Whether the field is in the valid state.
-    public init(_ text: Binding<String>,
-         placeholder: String,
-         hint: Binding<String>,
-         editing: Binding<Bool>,
-         valid: Binding<Bool>) {
-        self._text = text
-        self.placeholder = placeholder
-        self._hint = hint
-        self._editing = editing
-        self._valid = valid
-    }
-
-    // MARK: - Methods
-
-    // MARK: Private methods
-
-    private func updateBorder() {
+    func updateBorder() {
         updateBorderColor()
         updateBorderWidth()
     }
 
-    private func updateBorderColor() {
+    func updateBorderColor() {
         if !valid {
             borderColor = .red
         } else if editing {
@@ -125,75 +118,66 @@ struct OutlineTextField: View {
         }
     }
 
-    private func updateBorderWidth() {
-        borderWidth = editing
-            ? 2.0
-            : 1.0
+    func updateBorderWidth() {
+        borderWidth = editing ? 2.0 : 1.0
     }
 
-    private func updatePlaceholder() {
+    func updatePlaceholder() {
         updatePlaceholderBackground()
         updatePlaceholderColor()
         updatePlaceholderFontSize()
         updatePlaceholderPosition()
     }
 
-    private func updatePlaceholderBackground() {
-        if editing
-            || !text.isEmpty {
+    func updatePlaceholderBackground() {
+        if editing || !text.isEmpty {
             placeholderBackgroundOpacity = 1.0
         } else {
             placeholderBackgroundOpacity = 0.0
         }
     }
 
-    private func updatePlaceholderColor() {
+    func updatePlaceholderColor() {
         if valid {
-            placeholderColor = editing
-                ? .blue
-                : .gray
+            placeholderColor = editing ? .blue : .gray
         } else if text.isEmpty {
-            placeholderColor = editing
-                ? .red
-                : .gray
+            placeholderColor = editing ? .red : .gray
         } else {
             placeholderColor = .red
         }
-
     }
 
-    private func updatePlaceholderFontSize() {
-        if editing
-            || !text.isEmpty {
+    func updatePlaceholderFontSize() {
+        if editing || !text.isEmpty {
             placeholderFontSize = 10.0
         } else {
             placeholderFontSize = 16.0
         }
     }
 
-    private func updatePlaceholderPosition() {
-        if editing
-            || !text.isEmpty {
+    func updatePlaceholderPosition() {
+        if editing || !text.isEmpty {
             placeholderBottomPadding = 34.0
             placeholderLeadingPadding = 8.0
+
         } else {
             placeholderBottomPadding = 0.0
             placeholderLeadingPadding = 8.0
         }
     }
 
-    // MARK: -
-
-    private enum Field {
-
+    enum Field {
         case textField
-
     }
 
 }
 
+// MARK: - OutlineTextField_Previews
+
 struct OutlineTextField_Previews: PreviewProvider {
+
     static var previews: some View {
-        OutlineTextField(.constant("Asdf"), placeholder: "Placeholder", hint: .constant("Hint"), editing: .constant(true), valid: .constant(true))
+        OutlineTextField(.constant("Asdf"), placeholder: "Placeholder", hint: .constant("Hint"), editing: .constant(false), valid: .constant(false))
     }
+
 }
