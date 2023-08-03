@@ -12,7 +12,7 @@ struct CardDetailsView: View {
     // MARK: - Properties
 
     @StateObject private var viewModel = CardDetailsVM()
-    @FocusState private var text1InFocus: Bool
+    @FocusState private var textFieldInFocus: CardDetailsFocusable?
     @State var isPresented = false
 
     @State private var editingTextField1 = false {
@@ -49,8 +49,12 @@ struct CardDetailsView: View {
                 hint: $viewModel.hint1,
                 editing: $editingTextField1,
                 valid: $viewModel.text1Valid)
-            .padding()
-            .onTapGesture { editingTextField1 = true }
+            .focused($textFieldInFocus, equals: .text1)
+            .padding(.horizontal, 16)
+            .onTapGesture {
+                self.textFieldInFocus = .text1
+                self.editingTextField1 = true
+            }
 
             OutlineTextField(
                 $viewModel.text2,
@@ -58,14 +62,24 @@ struct CardDetailsView: View {
                 hint: $viewModel.hint2,
                 editing: $editingTextField2,
                 valid: $viewModel.text2Valid)
-            .padding()
-            .onTapGesture { editingTextField2 = true }
+            .focused($textFieldInFocus, equals: .text2)
+            .padding(.horizontal, 16)
+            .onTapGesture {
+                self.textFieldInFocus = .text2
+                self.editingTextField2 = true
+            }
+            
             Spacer()
         }
         .onTapGesture {
             editingTextField1 = false
             editingTextField2 = false
         }
+    }
+
+    enum CardDetailsFocusable: Hashable {
+      case text1
+      case text2
     }
 }
 
