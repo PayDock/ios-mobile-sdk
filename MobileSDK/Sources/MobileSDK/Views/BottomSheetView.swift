@@ -36,6 +36,8 @@ public struct BottomSheetView<Content: View>: View {
                         }
                         .presentationDetents([.height(sheetHeight)])
                         .interactiveDismissDisabled(true)
+                        .scrollDisabled(true)
+                    Spacer()
                 }
             }
     }
