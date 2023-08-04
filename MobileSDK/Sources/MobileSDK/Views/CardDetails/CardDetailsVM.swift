@@ -32,27 +32,19 @@ class CardDetailsVM: ObservableObject {
     var text1: String = ""
     var text2: String = ""
 
-    var editingTextField1 = false {
-        didSet {
-            guard editingTextField1 != oldValue else { return }
+    @Published var editingTextField1 = false
+    @Published var editingTextField2 = false
 
-            if editingTextField1 {
-                editingTextField2 = false
-            } else {
-                validateText1()
-            }
-        }
-    }
+    func setEditingTextField(focusedField: CardDetailsFocusable?) {
+        guard let focusedField = focusedField else { return }
+        switch focusedField {
+        case .text1:
+            editingTextField1 = true
+            editingTextField2 = false
 
-    var editingTextField2 = false {
-        didSet {
-            guard editingTextField2 != oldValue else { return }
-
-            if editingTextField2 {
-                editingTextField1 = false
-            } else {
-                validateText2()
-            }
+        case .text2:
+            editingTextField1 = false
+            editingTextField2 = true
         }
     }
 
@@ -64,6 +56,11 @@ class CardDetailsVM: ObservableObject {
 
     func validateText2() {
       text2Valid.toggle() // Test validation.
+    }
+
+    enum CardDetailsFocusable: Hashable {
+      case text1
+      case text2
     }
     
 }

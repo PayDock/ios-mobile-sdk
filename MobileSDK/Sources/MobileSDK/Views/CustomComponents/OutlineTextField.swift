@@ -57,8 +57,6 @@ struct OutlineTextField: View {
                 .padding(6.0)
                 .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
                     .stroke(borderColor, lineWidth: borderWidth))
-            // TODO: - Handle focusing from CardDetailsView
-            //                .focused($focusField, equals: .textField)
             HStack {
                 ZStack {
                     Color(.white)
@@ -87,8 +85,6 @@ struct OutlineTextField: View {
             }
         }
         .onChange(of: editing) { _ in
-            // TODO: - Handle focusing from CardDetailsView
-            //            focusField = $0 ? .textField : nil
             withAnimation(.easeInOut(duration: 0.15)) {
                 updateBorder()
                 updatePlaceholder()

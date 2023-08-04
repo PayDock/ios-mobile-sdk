@@ -12,7 +12,7 @@ struct CardDetailsView: View {
     // MARK: - Properties
 
     @StateObject private var viewModel = CardDetailsVM()
-    @FocusState private var textFieldInFocus: CardDetailsFocusable?
+    @FocusState private var textFieldInFocus: CardDetailsVM.CardDetailsFocusable?
     @State var isPresented = false
 
     // MARK: - View protocol properties
@@ -29,7 +29,7 @@ struct CardDetailsView: View {
             .padding(.horizontal, 16)
             .onTapGesture {
                 self.textFieldInFocus = .text1
-                self.viewModel.editingTextField1 = true
+                viewModel.setEditingTextField(focusedField: .text1)
             }
 
             OutlineTextField(
@@ -42,17 +42,14 @@ struct CardDetailsView: View {
             .padding(.horizontal, 16)
             .onTapGesture {
                 self.textFieldInFocus = .text2
-                self.viewModel.editingTextField2 = true
+                viewModel.setEditingTextField(focusedField: .text2)
             }
             
             Spacer()
         }
     }
 
-    enum CardDetailsFocusable: Hashable {
-      case text1
-      case text2
-    }
+
 }
 
 struct CardDetailsView_Previews: PreviewProvider {
