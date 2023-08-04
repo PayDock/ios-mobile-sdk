@@ -12,8 +12,8 @@ final class SSLPinningManager: NSObject {
 
     // MARK: - Properties
 
-    let publicKeyHash = "NGKfDItRieVy86A22OPQZDKvZrhSBgA9JpgrGv8veAk="
-    let rsa2048Asn1Header:[UInt8] = [0x30, 0x82, 0x01, 0x22, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00, 0x03, 0x82, 0x01, 0x0f, 0x00];
+    private let publicKeyHash = "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
+    private let rsa2048Asn1Header:[UInt8] = [0x30, 0x82, 0x01, 0x22, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00, 0x03, 0x82, 0x01, 0x0f, 0x00];
 
     // MARK: - Helpers
 
@@ -38,13 +38,13 @@ extension SSLPinningManager: URLSessionDelegate {
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         // TODO: - Replace this with SecTrustCopyCertificateChain when testing on real API
         guard let serverTrust = challenge.protectionSpace.serverTrust,
-              let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 1) else {
+              let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) else {
             completionHandler(.cancelAuthenticationChallenge, nil);
             return
         }
 
         let serverPublicKey = SecCertificateCopyKey(serverCertificate)
-        let serverPublicKeyData = SecKeyCopyExternalRepresentation(serverPublicKey!, nil )!
+        let serverPublicKeyData = SecKeyCopyExternalRepresentation(serverPublicKey!, nil)!
         let data: Data = serverPublicKeyData as Data
         let serverHashKey = sha256(data: data)
         let publicKeyLocal = publicKeyHash
