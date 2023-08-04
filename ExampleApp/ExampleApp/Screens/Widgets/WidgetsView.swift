@@ -14,7 +14,7 @@ struct WidgetsView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink(destination: CardDetailsView()) {
+                NavigationLink(destination: CardDetailsWidgetView()) {
                     cell(title: "Card Details",
                          subtitle: "Tokenise card details") {}
                 }
