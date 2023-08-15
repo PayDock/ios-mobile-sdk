@@ -24,7 +24,7 @@ struct OutlineTextField: View {
     @Binding private var valid: Bool
     @Binding private var leftImage: Image?
     @Binding private var editing: Bool
-    @Binding private var hint: String
+    @Binding private var errorMessage: String
 
     @FocusState private var focusField: Field?
 
@@ -37,18 +37,18 @@ struct OutlineTextField: View {
     /// - Parameters:
     ///   - text: The text field contents.
     ///   - placeholder: The placeholder string.
-    ///   - hint: The field hint string.
+    ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
     public init(_ text: Binding<String>,
                 placeholder: String,
-                hint: Binding<String>,
+                errorMessage: Binding<String>,
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
                 valid: Binding<Bool>) {
         self._text = text
         self.placeholder = placeholder
-        self._hint = hint
+        self._errorMessage = errorMessage
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
@@ -61,12 +61,13 @@ struct OutlineTextField: View {
             HStack {
                 leftImage
                 TextField("", text: $text)
-                    .frame(height: 36)
+                    .frame(height: 48)
                 validationIconView
             }
-            .padding(6.0)
+            .padding([.leading, .trailing], 6.0)
             .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
                 .stroke(borderColor, lineWidth: borderWidth))
+
             HStack {
                 ZStack {
                     Color(.white)
@@ -76,31 +77,33 @@ struct OutlineTextField: View {
                         .foregroundColor(.white)
                         .colorMultiply(placeholderColor)
                         .animatableFont(size: placeholderFontSize)
-                        .padding(2.0)
+                        .padding([.leading, .trailing], 2.0)
                         .layoutPriority(1)
                 }
                 .padding([.leading], placeholderLeadingPadding)
                 .padding([.bottom], placeholderBottomPadding)
                 Spacer()
             }
+
             HStack {
                 VStack {
                     Spacer()
-                    Text(hint)
+                    Text(errorMessage)
                         .font(.system(size: 10.0))
                         .foregroundColor(.gray)
-                        .padding([.leading], 10.0)
+                        .padding(.leading, 10.0)
                 }
                 Spacer()
             }
         }
+        .frame(height: 74, alignment: .top)
+
         .onChange(of: editing) { _ in
             withAnimation(.easeInOut(duration: 0.15)) {
                 updateBorder()
                 updatePlaceholder()
             }
         }
-        .frame(height: 64.0)
     }
 
     private var validationIconView: some View {
@@ -202,7 +205,7 @@ private extension OutlineTextField {
 struct OutlineTextField_Previews: PreviewProvider {
 
     static var previews: some View {
-        OutlineTextField(.constant("Asdf"), placeholder: "Placeholder", hint: .constant("Hint"), editing: .constant(false), valid: .constant(false))
+        OutlineTextField(.constant("Asdf"), placeholder: "Placeholder", errorMessage: .constant("Error message"), editing: .constant(false), valid: .constant(false))
     }
 
 }

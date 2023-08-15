@@ -11,58 +11,118 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Properties
 
-    @Published var hint1 = "Hint 1"
-    @Published var hint2 = "Hint 2"
+    @Published var cardholderNameError = "CardholderError"
+    @Published var cardNumberError = "CardNumber error"
+    @Published var expiryDateError = "Expiry error"
+    @Published var cvcError = "CVC error"
 
-    @Published var text1Valid = true {
+    @Published var editingCardholderName = false
+    @Published var editingCardNumber = false
+    @Published var editingExpiryDate = false
+    @Published var editingCVC = false
+
+    @Published var cardHolderNameValid = true {
       didSet {
-        hint1 = text1Valid ? "Hint 1" : "Error 1"
+        cardholderNameError = cardHolderNameValid ? "" : "Error 1"
       }
     }
 
-    @Published var text2Valid = true {
+    @Published var cardNumberValid = true {
       didSet {
-        hint2 = text2Valid ? "Hint 2" : "Error 2"
+        cardNumberError = cardNumberValid ? "" : "Error 2"
       }
     }
 
-    let placeholder1 = "Placeholder 1"
-    let placeholder2 = "Placeholder 2"
+    @Published var expiryDateValid = true {
+      didSet {
+        expiryDateError = expiryDateValid ? "" : "Error 2"
+      }
+    }
 
-    var text1: String = ""
-    var text2: String = ""
+    @Published var cvcValid = true {
+      didSet {
+        cvcError = cvcValid ? "" : "Error 2"
+      }
+    }
 
-    @Published var editingTextField1 = false
-    @Published var editingTextField2 = false
+    let cardholderNamePlaceholder = "Cardholder name"
+    let cardNumberPlaceholder = "Card number"
+    let expiryDatePlaceholder = "Expiry"
+    let cvcPlaceholder = "CVC"
+
+    var cardholderNameText: String = ""
+    var cardNumberText: String = ""
+    var expiryDateText = ""
+    var cvcText = ""
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
         guard let focusedField = focusedField else { return }
         switch focusedField {
-        case .text1:
-            editingTextField1 = true
-            editingTextField2 = false
-            validateText2()
+        case .cardholderName:
+            editingCardholderName = true
+            editingCardNumber = false
+            editingExpiryDate = false
+            editingCVC = false
 
-        case .text2:
-            editingTextField1 = false
-            editingTextField2 = true
-            validateText1()
+            validateCardNumber()
+            validateExpiryDate()
+            validateCVC()
+
+        case .cardNumber:
+            editingCardholderName = false
+            editingCardNumber = true
+            editingExpiryDate = false
+            editingCVC = false
+
+            validateCardholderName()
+            validateExpiryDate()
+            validateCVC()
+
+        case .expiryDate:
+            editingCardholderName = false
+            editingCardNumber = false
+            editingExpiryDate = true
+            editingCVC = false
+
+            validateCardholderName()
+            validateCardholderName()
+            validateCVC()
+
+        case .cvc:
+            editingCardholderName = false
+            editingCardNumber = false
+            editingExpiryDate = false
+            editingCVC = true
+
+            validateCardholderName()
+            validateCardholderName()
+            validateExpiryDate()
         }
     }
 
     // MARK: - Methods
 
-    func validateText1() {
-      text1Valid.toggle() // Test validation.
+    func validateCardholderName() {
+      cardHolderNameValid.toggle() // Test validation.
     }
 
-    func validateText2() {
-      text2Valid.toggle() // Test validation.
+    func validateCardNumber() {
+      cardNumberValid.toggle() // Test validation.
+    }
+
+    func validateExpiryDate() {
+        expiryDateValid.toggle()
+    }
+
+    func validateCVC() {
+        cvcValid.toggle()
     }
 
     enum CardDetailsFocusable: Hashable {
-      case text1
-      case text2
+        case cardholderName
+        case cardNumber
+        case expiryDate
+        case cvc
     }
     
 }

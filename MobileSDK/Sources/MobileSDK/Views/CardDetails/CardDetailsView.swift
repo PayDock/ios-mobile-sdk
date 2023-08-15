@@ -21,30 +21,60 @@ struct CardDetailsView: View {
         VStack {
             List {
                 OutlineTextField(
-                    $viewModel.text1,
-                    placeholder: viewModel.placeholder1,
-                    hint: $viewModel.hint1,
-                    editing: $viewModel.editingTextField1,
-                    valid: $viewModel.text1Valid)
-                .focused($textFieldInFocus, equals: .text1)
+                    $viewModel.cardholderNameText,
+                    placeholder: viewModel.cardholderNamePlaceholder,
+                    errorMessage: $viewModel.cardholderNameError,
+                    editing: $viewModel.editingCardholderName,
+                    valid: $viewModel.cardHolderNameValid)
+                .focused($textFieldInFocus, equals: .cardholderName)
                 .listRowSeparator(.hidden)
                 .onTapGesture {
-                    self.textFieldInFocus = .text1
-                    viewModel.setEditingTextField(focusedField: .text1)
+                    self.textFieldInFocus = .cardholderName
+                    viewModel.setEditingTextField(focusedField: .cardholderName)
                 }
+                .listRowInsets(EdgeInsets())
 
                 OutlineTextField(
-                    $viewModel.text2,
-                    placeholder: viewModel.placeholder2,
-                    hint: $viewModel.hint2,
-                    editing: $viewModel.editingTextField2,
-                    valid: $viewModel.text2Valid)
-                .focused($textFieldInFocus, equals: .text2)
+                    $viewModel.cardNumberText,
+                    placeholder: viewModel.cardNumberPlaceholder,
+                    errorMessage: $viewModel.cardNumberError,
+                    editing: $viewModel.editingCardNumber,
+                    valid: $viewModel.cardNumberValid)
+                .focused($textFieldInFocus, equals: .cardNumber)
                 .listRowSeparator(.hidden)
                 .onTapGesture {
-                    self.textFieldInFocus = .text2
-                    viewModel.setEditingTextField(focusedField: .text2)
+                    self.textFieldInFocus = .cardNumber
+                    viewModel.setEditingTextField(focusedField: .cardNumber)
                 }
+                .listRowInsets(EdgeInsets())
+
+                HStack(spacing: 12) {
+                    OutlineTextField(
+                        $viewModel.expiryDateText,
+                        placeholder: viewModel.expiryDatePlaceholder,
+                        errorMessage: $viewModel.expiryDateError,
+                        editing: $viewModel.editingExpiryDate,
+                        valid: $viewModel.expiryDateValid)
+                    .focused($textFieldInFocus, equals: .expiryDate)
+                    .onTapGesture {
+                        self.textFieldInFocus = .expiryDate
+                        viewModel.setEditingTextField(focusedField: .expiryDate)
+                    }
+
+                    OutlineTextField(
+                        $viewModel.cvcText,
+                        placeholder: viewModel.cvcPlaceholder,
+                        errorMessage: $viewModel.cvcError,
+                        editing: $viewModel.editingCVC,
+                        valid: $viewModel.cvcValid)
+                    .focused($textFieldInFocus, equals: .cvc)
+                    .onTapGesture {
+                        self.textFieldInFocus = .cvc
+                        viewModel.setEditingTextField(focusedField: .cvc)
+                    }
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .frame(height: 300)
