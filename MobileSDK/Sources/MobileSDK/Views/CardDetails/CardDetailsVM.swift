@@ -41,10 +41,12 @@ class CardDetailsVM: ObservableObject {
         case .text1:
             editingTextField1 = true
             editingTextField2 = false
+            validateText2()
 
         case .text2:
             editingTextField1 = false
             editingTextField2 = true
+            validateText1()
         }
     }
 

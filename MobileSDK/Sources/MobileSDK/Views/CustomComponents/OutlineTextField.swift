@@ -18,15 +18,18 @@ struct OutlineTextField: View {
     @State private var placeholderColor = Color.gray
     @State private var placeholderFontSize = 16.0
     @State private var placeholderLeadingPadding = 2.0
+    @State private var validationIconState: ValidationIconState = .none
 
     @Binding private var text: String
     @Binding private var valid: Bool
+    @Binding private var leftImage: Image?
     @Binding private var editing: Bool
     @Binding private var hint: String
 
     @FocusState private var focusField: Field?
 
     private let placeholder: String
+
 
     // MARK: - Initialization
 
@@ -40,11 +43,13 @@ struct OutlineTextField: View {
     public init(_ text: Binding<String>,
                 placeholder: String,
                 hint: Binding<String>,
+                leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
                 valid: Binding<Bool>) {
         self._text = text
         self.placeholder = placeholder
         self._hint = hint
+        self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
     }
@@ -53,10 +58,15 @@ struct OutlineTextField: View {
 
     public var body: some View {
         ZStack {
-            TextField("", text: $text)
-                .padding(6.0)
-                .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
-                    .stroke(borderColor, lineWidth: borderWidth))
+            HStack {
+                leftImage
+                TextField("", text: $text)
+                    .frame(height: 36)
+                validationIconView
+            }
+            .padding(6.0)
+            .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+                .stroke(borderColor, lineWidth: borderWidth))
             HStack {
                 ZStack {
                     Color(.white)
@@ -93,6 +103,16 @@ struct OutlineTextField: View {
         .frame(height: 64.0)
     }
 
+    private var validationIconView: some View {
+        HStack {
+            switch validationIconState {
+            case .valid: Image("tick-circle", bundle: Bundle.module)
+            case .invalid: Image("exclamation-circle", bundle: Bundle.module)
+            case .none: EmptyView()
+            }
+        }
+    }
+
 }
 
 // MARK: - Private methods
@@ -107,10 +127,13 @@ private extension OutlineTextField {
     func updateBorderColor() {
         if !valid {
             borderColor = .red
+            validationIconState = .invalid
         } else if editing {
             borderColor = .blue
+            validationIconState = .none
         } else {
             borderColor = .gray
+            validationIconState = .valid
         }
     }
 
@@ -153,7 +176,7 @@ private extension OutlineTextField {
 
     func updatePlaceholderPosition() {
         if editing || !text.isEmpty {
-            placeholderBottomPadding = 34.0
+            placeholderBottomPadding = 48.0
             placeholderLeadingPadding = 8.0
 
         } else {
@@ -164,6 +187,12 @@ private extension OutlineTextField {
 
     enum Field {
         case textField
+    }
+
+    enum ValidationIconState {
+        case valid
+        case invalid
+        case none
     }
 
 }
