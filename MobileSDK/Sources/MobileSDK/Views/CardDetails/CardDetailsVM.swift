@@ -6,15 +6,16 @@
 //
 
 import Foundation
+import SwiftUI
 
 class CardDetailsVM: ObservableObject {
 
     // MARK: - Properties
 
-    @Published var cardholderNameError = "CardholderError"
-    @Published var cardNumberError = "CardNumber error"
-    @Published var expiryDateError = "Expiry error"
-    @Published var cvcError = "CVC error"
+    @Published var cardholderNameError = ""
+    @Published var cardNumberError = ""
+    @Published var expiryDateError = ""
+    @Published var cvcError = ""
 
     @Published var editingCardholderName = false
     @Published var editingCardNumber = false
@@ -44,6 +45,8 @@ class CardDetailsVM: ObservableObject {
         cvcError = cvcValid ? "" : "Error 2"
       }
     }
+
+    @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
     let cardholderNamePlaceholder = "Cardholder name"
     let cardNumberPlaceholder = "Card number"
@@ -103,10 +106,11 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Methods
 
     func validateCardholderName() {
-      cardHolderNameValid.toggle() // Test validation.
+        cardHolderNameValid = !cardholderNameText.isEmpty
     }
 
     func validateCardNumber() {
+        print(cardNumberText)
       cardNumberValid.toggle() // Test validation.
     }
 

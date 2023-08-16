@@ -19,6 +19,12 @@ struct CardDetailsView: View {
 
     var body: some View {
         VStack {
+            HStack {
+                Text("Card information")
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+
             List {
                 OutlineTextField(
                     $viewModel.cardholderNameText,
@@ -32,12 +38,13 @@ struct CardDetailsView: View {
                     self.textFieldInFocus = .cardholderName
                     viewModel.setEditingTextField(focusedField: .cardholderName)
                 }
-                .listRowInsets(EdgeInsets())
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 OutlineTextField(
                     $viewModel.cardNumberText,
                     placeholder: viewModel.cardNumberPlaceholder,
                     errorMessage: $viewModel.cardNumberError,
+                    leftImage: $viewModel.cardImage,
                     editing: $viewModel.editingCardNumber,
                     valid: $viewModel.cardNumberValid)
                 .focused($textFieldInFocus, equals: .cardNumber)
@@ -46,7 +53,7 @@ struct CardDetailsView: View {
                     self.textFieldInFocus = .cardNumber
                     viewModel.setEditingTextField(focusedField: .cardNumber)
                 }
-                .listRowInsets(EdgeInsets())
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack(spacing: 12) {
                     OutlineTextField(
@@ -73,12 +80,16 @@ struct CardDetailsView: View {
                         viewModel.setEditingTextField(focusedField: .cvc)
                     }
                 }
-                .listRowInsets(EdgeInsets())
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .frame(height: 300)
             Spacer()
+        }
+        .onChange(of: viewModel.cardNumberText) { newValue in
+            print("new value")
+            viewModel.validateCardNumber()
         }
     }
 

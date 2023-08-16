@@ -17,7 +17,7 @@ struct OutlineTextField: View {
     @State private var placeholderBottomPadding = 0.0
     @State private var placeholderColor = Color.gray
     @State private var placeholderFontSize = 16.0
-    @State private var placeholderLeadingPadding = 2.0
+    @State private var placeholderLeadingPadding: Double
     @State private var validationIconState: ValidationIconState = .none
 
     @Binding private var text: String
@@ -52,6 +52,8 @@ struct OutlineTextField: View {
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
+
+        placeholderLeadingPadding = (leftImage != nil) ? 30 : 8.0
     }
 
     // MARK: - View protocol properties
@@ -60,7 +62,7 @@ struct OutlineTextField: View {
         ZStack {
             HStack {
                 leftImage
-                TextField("", text: $text)
+                TextField("Text", text: $text)
                     .frame(height: 48)
                 validationIconView
             }
@@ -96,8 +98,7 @@ struct OutlineTextField: View {
                 Spacer()
             }
         }
-        .frame(height: 74, alignment: .top)
-
+        .frame(height: 78, alignment: .top)
         .onChange(of: editing) { _ in
             withAnimation(.easeInOut(duration: 0.15)) {
                 updateBorder()
@@ -184,7 +185,7 @@ private extension OutlineTextField {
 
         } else {
             placeholderBottomPadding = 0.0
-            placeholderLeadingPadding = 8.0
+            placeholderLeadingPadding = (leftImage != nil) ? 30 : 8.0
         }
     }
 
