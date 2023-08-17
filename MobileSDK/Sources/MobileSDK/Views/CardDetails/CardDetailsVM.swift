@@ -71,7 +71,7 @@ class CardDetailsVM: ObservableObject {
             get: {
                 self.cardNumberText
             }, set: {
-                self.cardNumberText = $0
+                self.cardNumberText = self.cardDetailsFormatter.formatCardNumber(updatedText: $0)
                 self.updateCardIssuerIcon()
             }
         )
@@ -82,7 +82,6 @@ class CardDetailsVM: ObservableObject {
             get: {
                 self.expiryDateText
             }, set: { newValue in
-                let appendedValue =
                 self.expiryDateText = self.cardDetailsFormatter.formatToExpiryDate(oldText: self.expiryDateText, updatedText: newValue)
             }
         )
@@ -182,7 +181,20 @@ class CardDetailsVM: ObservableObject {
     }
 
     func validateExpiryDate() {
-        expiryDateValid.toggle()
+        let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText)
+        switch expiryValidation {
+        case .valid:
+            expiryDateValid = true
+            expiryDateError = ""
+
+        case .expired:
+            expiryDateValid = false
+            expiryDateError = "Card expired"
+
+        case .invalidInput:
+            expiryDateValid = false
+            expiryDateError = "Invalid expiry date"
+        }
     }
 
     func validateCVC() {

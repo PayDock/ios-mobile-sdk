@@ -13,11 +13,8 @@ class CardExpiryDateValidatior {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/yy"
 
-        guard let enteredDate = dateFormatter.date(from: stringDate) else {
-            return .invalidInput
-        }
-
-        guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: enteredDate) else {
+        guard let enteredDate = dateFormatter.date(from: stringDate),
+              let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: enteredDate) else {
             return .invalidInput
         }
 
