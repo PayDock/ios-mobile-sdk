@@ -61,8 +61,9 @@ struct OutlineTextField: View {
     public var body: some View {
         ZStack {
             HStack {
-                leftImage
-                TextField("Text", text: $text)
+                leftImage?
+                    .frame(width: 28, height: 24)
+                TextField("", text: $text)
                     .frame(height: 48)
                 validationIconView
             }

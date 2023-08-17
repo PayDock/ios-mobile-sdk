@@ -41,7 +41,7 @@ struct CardDetailsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 OutlineTextField(
-                    $viewModel.cardNumberText,
+                    viewModel.cardNumberBinding,
                     placeholder: viewModel.cardNumberPlaceholder,
                     errorMessage: $viewModel.cardNumberError,
                     leftImage: $viewModel.cardImage,
@@ -57,7 +57,7 @@ struct CardDetailsView: View {
 
                 HStack(spacing: 12) {
                     OutlineTextField(
-                        $viewModel.expiryDateText,
+                        viewModel.expiryDateBinding,
                         placeholder: viewModel.expiryDatePlaceholder,
                         errorMessage: $viewModel.expiryDateError,
                         editing: $viewModel.editingExpiryDate,
@@ -86,10 +86,6 @@ struct CardDetailsView: View {
             .listStyle(.plain)
             .frame(height: 300)
             Spacer()
-        }
-        .onChange(of: viewModel.cardNumberText) { newValue in
-            print("new value")
-            viewModel.validateCardNumber()
         }
     }
 

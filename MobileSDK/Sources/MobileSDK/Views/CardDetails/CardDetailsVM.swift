@@ -10,6 +10,12 @@ import SwiftUI
 
 class CardDetailsVM: ObservableObject {
 
+    // MARK: - Dependencies
+
+    private let cardIssuerValidator: CardIssuerValidator
+    private let cardExpiryDateValidator: CardExpiryDateValidatior
+    private let cardDetailsFormatter: CardDetailsFormatter
+
     // MARK: - Properties
 
     @Published var cardholderNameError = ""
@@ -54,9 +60,45 @@ class CardDetailsVM: ObservableObject {
     let cvcPlaceholder = "CVC"
 
     var cardholderNameText: String = ""
-    var cardNumberText: String = ""
-    var expiryDateText = ""
+    private var cardNumberText: String = ""
+    private var expiryDateText = ""
     var cvcText = ""
+
+    // MARK: - Custom bindings
+
+    var cardNumberBinding: Binding<String> {
+        Binding(
+            get: {
+                self.cardNumberText
+            }, set: {
+                self.cardNumberText = $0
+                self.updateCardIssuerIcon()
+            }
+        )
+    }
+
+    var expiryDateBinding: Binding<String> {
+        Binding(
+            get: {
+                self.expiryDateText
+            }, set: { newValue in
+                let appendedValue =
+                self.expiryDateText = self.cardDetailsFormatter.formatToExpiryDate(oldText: self.expiryDateText, updatedText: newValue)
+            }
+        )
+    }
+
+    // MARK: - Initialisation
+
+    init(cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
+         cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
+         cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
+        self.cardIssuerValidator = cardIssuerValidator
+        self.cardExpiryDateValidator = cardExpiryDateValidator
+        self.cardDetailsFormatter = cardExpiryDateFormatter
+    }
+
+    // MARK: - Methods
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
         guard let focusedField = focusedField else { return }
@@ -103,15 +145,40 @@ class CardDetailsVM: ObservableObject {
         }
     }
 
-    // MARK: - Methods
+    private func updateCardIssuerIcon() {
+        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
+        cardImage = getCardIssuerIcon(for: cardIssuer)
+    }
+
+    private func getCardIssuerIcon(for cardIssuerType: CardIssuerType) -> Image {
+        switch cardIssuerType {
+        case .amex: return Image("amex", bundle: Bundle.module)
+        case .diners: return Image("diners", bundle: Bundle.module)
+        case .discover: return Image("discover", bundle: Bundle.module)
+        case .instaPayment: return Image("insta-payment", bundle: Bundle.module)
+        case .interPay: return Image("inter-pay", bundle: Bundle.module)
+        case .jcb: return Image("jcb", bundle: Bundle.module)
+        case .maestro: return Image("maestro", bundle: Bundle.module)
+        case .mastercard: return Image("mastercard", bundle: Bundle.module)
+        case .uatp: return Image("uatp", bundle: Bundle.module)
+        case .unionPay: return Image("union-pay", bundle: Bundle.module)
+        case .visa: return Image("visa", bundle: Bundle.module)
+        case .other: return Image("credit-card", bundle: Bundle.module)
+        }
+    }
+
+    // MARK: - Validations
 
     func validateCardholderName() {
         cardHolderNameValid = !cardholderNameText.isEmpty
     }
 
     func validateCardNumber() {
-        print(cardNumberText)
-      cardNumberValid.toggle() // Test validation.
+        if case .other = cardIssuerValidator.detectCardIssuer(number: cardNumberText) {
+            cardNumberValid = false
+        } else {
+            cardNumberValid = true
+        }
     }
 
     func validateExpiryDate() {
@@ -121,6 +188,10 @@ class CardDetailsVM: ObservableObject {
     func validateCVC() {
         cvcValid.toggle()
     }
+    
+}
+
+extension CardDetailsVM {
 
     enum CardDetailsFocusable: Hashable {
         case cardholderName
@@ -128,5 +199,5 @@ class CardDetailsVM: ObservableObject {
         case expiryDate
         case cvc
     }
-    
+
 }
