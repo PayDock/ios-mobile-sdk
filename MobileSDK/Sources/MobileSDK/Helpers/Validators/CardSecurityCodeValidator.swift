@@ -10,7 +10,7 @@ import Foundation
 /**
  A utility object for detecting the type of security code (CVV, CSC, CVC) based on the card issuer type.
  */
-internal enum CardSecurityCodeValidator {
+ class CardSecurityCodeValidator {
 
     func isSecurityCodeValid(code: String, securityCodeType: CardSecurityCodeType) -> Bool {
         return checkSecurityCode(code: code, securityCodeType: securityCodeType) && code.count == securityCodeType.requiredDigits
@@ -21,11 +21,11 @@ internal enum CardSecurityCodeValidator {
 
      - Parameters:
         - code: The security code input string to validate.
-        - securityCodeType: The type of security code to validate against.
+        - cardSecurityCodeType: The type of security code to validate against.
 
      - Returns: True if the security code input is valid, false otherwise.
      */
-    func checkSecurityCode(code: String, securityCodeType: CardSecurityCodeType) -> Bool {
+    private func checkSecurityCode(code: String, securityCodeType: CardSecurityCodeType) -> Bool {
         return !code.isEmpty && code.range(of: "^[0-9]+$", options: .regularExpression) != nil && code.count <= securityCodeType.requiredDigits
     }
 

@@ -14,6 +14,7 @@ class CardDetailsVM: ObservableObject {
 
     private let cardIssuerValidator: CardIssuerValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
+    private let cardSecurityCodeValidator: CardSecurityCodeValidator
     private let cardDetailsFormatter: CardDetailsFormatter
 
     // MARK: - Properties
@@ -81,8 +82,9 @@ class CardDetailsVM: ObservableObject {
         Binding(
             get: {
                 self.expiryDateText
-            }, set: { newValue in
-                self.expiryDateText = self.cardDetailsFormatter.formatToExpiryDate(oldText: self.expiryDateText, updatedText: newValue)
+            }, set: {
+                let newText = self.cardDetailsFormatter.formatExpiryDate(updatedText: $0)
+                self.expiryDateText = newText
             }
         )
     }
@@ -91,9 +93,11 @@ class CardDetailsVM: ObservableObject {
 
     init(cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
+         cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
          cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
         self.cardIssuerValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
+        self.cardSecurityCodeValidator = cardSecurityCodeValidator
         self.cardDetailsFormatter = cardExpiryDateFormatter
     }
 
@@ -198,7 +202,9 @@ class CardDetailsVM: ObservableObject {
     }
 
     func validateCVC() {
-        cvcValid.toggle()
+        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
+        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
+        cvcValid = cardSecurityCodeValidator.isSecurityCodeValid(code: cvcText, securityCodeType: cardSecurityCodeType)
     }
     
 }

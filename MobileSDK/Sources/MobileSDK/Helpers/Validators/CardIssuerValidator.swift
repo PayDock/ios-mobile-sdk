@@ -52,8 +52,9 @@ internal class CardIssuerValidator {
      - returns: The `CardIssuerType` enum representing the detected card issuer, or `CardIssuerType.other` if no issuer is matched.
      */
     func detectCardIssuer(number: String) -> CardIssuerType {
+        let cleanNumber = number.filter { !$0.isWhitespace }
         for (regex, issuer) in cardIssuerRegexMap {
-            if let _ = regex.firstMatch(in: number, options: [], range: NSRange(location: 0, length: number.utf16.count)) {
+            if let _ = regex.firstMatch(in: cleanNumber, options: [], range: NSRange(location: 0, length: cleanNumber.utf16.count)) {
                 return issuer
             }
         }
