@@ -27,29 +27,34 @@ class CardDetailsVM: ObservableObject {
     @Published var cardholderNameError = ""
     @Published var cardNumberError = ""
     @Published var expiryDateError = ""
-    @Published var cvcError = ""
+    @Published var securityCodeError = ""
 
     @Published var editingCardholderName = false
     @Published var editingCardNumber = false
     @Published var editingExpiryDate = false
-    @Published var editingCVC = false
+    @Published var editingSecurityCode = false
 
     @Published var cardHolderNameValid = true
     @Published var cardNumberValid = true
     @Published var expiryDateValid = true
-    @Published var cvcValid = true
+    @Published var securityCodeValid = true
 
     @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
-    let cardholderNamePlaceholder = "Cardholder name"
-    let cardNumberPlaceholder = "Card number"
-    let expiryDatePlaceholder = "Expiry"
-    @Published var cvcPlaceholder = "CVC"
+    let cardholderNameTitle = "Cardholder name"
+    let cardNumberTitle = "Card number"
+    let expiryDateTitle = "Expiry"
+    @Published var securityCodeTitle = "CVC"
+
+    var cardholderNamePlaceholder = ""
+    var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"
+    var expiryDatePlaceholder = "MM/YY"
+    @Published var securityCodePlaceholder = "XXX"
 
     var cardholderNameText: String = ""
     private var cardNumberText: String = ""
     private var expiryDateText = ""
-    var cvcText = ""
+    var securityCodeText = ""
 
     private var currentTextField: CardDetailsFocusable?
 
@@ -62,7 +67,7 @@ class CardDetailsVM: ObservableObject {
             }, set: {
                 self.cardNumberText = self.cardDetailsFormatter.formatCardNumber(updatedText: $0)
                 self.updateCardIssuerIcon()
-                self.updateSecurityCodePlaceholder()
+                self.updateSecurityCodeTitleAndPlaceholder()
             }
         )
     }
@@ -104,25 +109,25 @@ class CardDetailsVM: ObservableObject {
             editingCardholderName = true
             editingCardNumber = false
             editingExpiryDate = false
-            editingCVC = false
+            editingSecurityCode = false
 
         case .cardNumber:
             editingCardholderName = false
             editingCardNumber = true
             editingExpiryDate = false
-            editingCVC = false
+            editingSecurityCode = false
 
         case .expiryDate:
             editingCardholderName = false
             editingCardNumber = false
             editingExpiryDate = true
-            editingCVC = false
+            editingSecurityCode = false
 
-        case .cvc:
+        case .securityCode:
             editingCardholderName = false
             editingCardNumber = false
             editingExpiryDate = false
-            editingCVC = true
+            editingSecurityCode = true
         }
     }
 
@@ -131,14 +136,23 @@ class CardDetailsVM: ObservableObject {
         cardImage = getCardIssuerIcon(for: cardIssuer)
     }
 
-    private func updateSecurityCodePlaceholder() {
+    private func updateSecurityCodeTitleAndPlaceholder() {
         let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
         let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
 
         switch cardSecurityCodeType {
-        case .cvv: cvcPlaceholder = "CVV"
-        case .csc: cvcPlaceholder = "CSC"
-        case .cvc: cvcPlaceholder = "CVC"
+        case .cvv:
+            securityCodeTitle = "CVV"
+            securityCodePlaceholder = "XXX"
+
+        case .csc:
+            securityCodeTitle = "CSC"
+            securityCodePlaceholder = "XXXX"
+
+        case .cvc:
+            securityCodeTitle = "CVC"
+            securityCodePlaceholder = "XXX"
+
         }
     }
 
@@ -168,7 +182,7 @@ class CardDetailsVM: ObservableObject {
         case .cardholderName: validateCardholderName()
         case .cardNumber: validateCardNumber()
         case .expiryDate: validateExpiryDate()
-        case .cvc: validateCVC()
+        case .securityCode: validateSecurityCode()
         }
     }
 
@@ -210,16 +224,16 @@ class CardDetailsVM: ObservableObject {
         }
     }
 
-    private func validateCVC() {
+    private func validateSecurityCode() {
         let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
         let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
 
-        if cardSecurityCodeValidator.isSecurityCodeValid(code: cvcText, securityCodeType: cardSecurityCodeType) {
-            cvcValid = true
-            cvcError = ""
+        if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType) {
+            securityCodeValid = true
+            securityCodeError = ""
         } else {
-            cvcValid = false
-            cvcError = "Invalid security code"
+            securityCodeValid = false
+            securityCodeError = "Invalid security code"
         }
     }
 
@@ -238,7 +252,7 @@ class CardDetailsVM: ObservableObject {
                 cardNumber: cardNumberText,
                 expireMonth: String(expireMonth),
                 expireYear: String(expireYear),
-                cardCcv: cvcText)
+                cardCcv: securityCodeText)
 
             do {
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
@@ -259,7 +273,7 @@ extension CardDetailsVM {
         case cardholderName
         case cardNumber
         case expiryDate
-        case cvc
+        case securityCode
     }
 
 }

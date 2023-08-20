@@ -41,6 +41,7 @@ struct CardDetailsView: View {
                 List {
                     OutlineTextField(
                         $viewModel.cardholderNameText,
+                        title: viewModel.cardholderNameTitle,
                         placeholder: viewModel.cardholderNamePlaceholder,
                         errorMessage: $viewModel.cardholderNameError,
                         editing: $viewModel.editingCardholderName,
@@ -55,6 +56,7 @@ struct CardDetailsView: View {
 
                     OutlineTextField(
                         viewModel.cardNumberBinding,
+                        title: viewModel.cardNumberTitle,
                         placeholder: viewModel.cardNumberPlaceholder,
                         errorMessage: $viewModel.cardNumberError,
                         leftImage: $viewModel.cardImage,
@@ -71,6 +73,7 @@ struct CardDetailsView: View {
                     HStack(spacing: 12) {
                         OutlineTextField(
                             viewModel.expiryDateBinding,
+                            title: viewModel.expiryDateTitle,
                             placeholder: viewModel.expiryDatePlaceholder,
                             errorMessage: $viewModel.expiryDateError,
                             editing: $viewModel.editingExpiryDate,
@@ -82,15 +85,16 @@ struct CardDetailsView: View {
                         }
 
                         OutlineTextField(
-                            $viewModel.cvcText,
-                            placeholder: viewModel.cvcPlaceholder,
-                            errorMessage: $viewModel.cvcError,
-                            editing: $viewModel.editingCVC,
-                            valid: $viewModel.cvcValid)
-                        .focused($textFieldInFocus, equals: .cvc)
+                            $viewModel.securityCodeText,
+                            title: viewModel.securityCodeTitle,
+                            placeholder: viewModel.securityCodePlaceholder,
+                            errorMessage: $viewModel.securityCodeError,
+                            editing: $viewModel.editingSecurityCode,
+                            valid: $viewModel.securityCodeValid)
+                        .focused($textFieldInFocus, equals: .securityCode)
                         .onTapGesture {
-                            self.textFieldInFocus = .cvc
-                            viewModel.setEditingTextField(focusedField: .cvc)
+                            self.textFieldInFocus = .securityCode
+                            viewModel.setEditingTextField(focusedField: .securityCode)
                         }
                     }
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
