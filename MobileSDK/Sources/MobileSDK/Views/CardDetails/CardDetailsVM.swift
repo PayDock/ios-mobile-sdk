@@ -227,19 +227,26 @@ class CardDetailsVM: ObservableObject {
 
     func tokeniseCardDetails() {
         Task {
+            guard let expireMonth = expiryDateText.split(separator: "/").first,
+                  let expireYear = expiryDateText.split(separator: "/").last else {
+                return
+            }
+
+            let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
+                gatewayId: gatewayId,
+                cardName: cardholderNameText,
+                cardNumber: cardNumberText,
+                expireMonth: String(expireMonth),
+                expireYear: String(expireYear),
+                cardCcv: cvcText)
+
             do {
-                let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
-                    gatewayId: gatewayId,
-                    cardName: cardholderNameText,
-                    cardNumber: cardNumberText,
-                    expireMonth: "09",
-                    expireYear: "24",
-                    cardCcv: cvcText)
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
                 onCompletion?.wrappedValue = cardToken
+
             } catch {
-                onCompletion?.wrappedValue = "Pimpek"
-                print("KAOS")
+                // TODO: - Error popups and handling once designs are finalised.
+                print("Error tokenising card")
             }
         }
     }

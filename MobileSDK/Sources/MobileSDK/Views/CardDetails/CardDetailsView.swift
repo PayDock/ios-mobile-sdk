@@ -13,14 +13,16 @@ struct CardDetailsView: View {
 
     @StateObject private var viewModel = CardDetailsVM()
     @FocusState private var textFieldInFocus: CardDetailsVM.CardDetailsFocusable?
-//    @State var isPresented = false
+    @Binding private var onCompletion: String
+    @State private var gatewayId: String
+
 
     // MARK: - Initialisation
 
     public init(gatewayId: String,
                 onCompletion: Binding<String>) {
-        viewModel.gatewayId = gatewayId
-        viewModel.onCompletion = onCompletion
+        self._onCompletion = onCompletion
+        self.gatewayId = gatewayId
     }
 
     // MARK: - View protocol properties
@@ -103,6 +105,10 @@ struct CardDetailsView: View {
             .listStyle(.plain)
             .frame(height: 300)
             Spacer()
+        }
+        .onAppear {
+            viewModel.gatewayId = gatewayId
+            viewModel.onCompletion = $onCompletion
         }
     }
 
