@@ -29,36 +29,17 @@ class CardDetailsVM: ObservableObject {
     @Published var editingExpiryDate = false
     @Published var editingCVC = false
 
-    @Published var cardHolderNameValid = true {
-      didSet {
-        cardholderNameError = cardHolderNameValid ? "" : "Error 1"
-      }
-    }
-
-    @Published var cardNumberValid = true {
-      didSet {
-        cardNumberError = cardNumberValid ? "" : "Error 2"
-      }
-    }
-
-    @Published var expiryDateValid = true {
-      didSet {
-        expiryDateError = expiryDateValid ? "" : "Error 2"
-      }
-    }
-
-    @Published var cvcValid = true {
-      didSet {
-        cvcError = cvcValid ? "" : "Error 2"
-      }
-    }
+    @Published var cardHolderNameValid = true
+    @Published var cardNumberValid = true
+    @Published var expiryDateValid = true
+    @Published var cvcValid = true
 
     @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
     let cardholderNamePlaceholder = "Cardholder name"
     let cardNumberPlaceholder = "Card number"
     let expiryDatePlaceholder = "Expiry"
-    let cvcPlaceholder = "CVC"
+    @Published var cvcPlaceholder = "CVC"
 
     var cardholderNameText: String = ""
     private var cardNumberText: String = ""
@@ -74,6 +55,7 @@ class CardDetailsVM: ObservableObject {
             }, set: {
                 self.cardNumberText = self.cardDetailsFormatter.formatCardNumber(updatedText: $0)
                 self.updateCardIssuerIcon()
+                self.updateSecurityCodePlaceholder()
             }
         )
     }
@@ -153,13 +135,24 @@ class CardDetailsVM: ObservableObject {
         cardImage = getCardIssuerIcon(for: cardIssuer)
     }
 
+    private func updateSecurityCodePlaceholder() {
+        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
+        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
+
+        switch cardSecurityCodeType {
+        case .cvv: cvcPlaceholder = "CVV"
+        case .csc: cvcPlaceholder = "CSC"
+        case .cvc: cvcPlaceholder = "CVC"
+        }
+    }
+
     private func getCardIssuerIcon(for cardIssuerType: CardIssuerType) -> Image {
         switch cardIssuerType {
         case .amex: return Image("amex", bundle: Bundle.module)
         case .diners: return Image("diners", bundle: Bundle.module)
         case .discover: return Image("discover", bundle: Bundle.module)
         case .instaPayment: return Image("insta-payment", bundle: Bundle.module)
-        case .interPay: return Image("inter-pay", bundle: Bundle.module)
+        case .interPay: return Image("inter-payment", bundle: Bundle.module)
         case .jcb: return Image("jcb", bundle: Bundle.module)
         case .maestro: return Image("maestro", bundle: Bundle.module)
         case .mastercard: return Image("mastercard", bundle: Bundle.module)
@@ -173,14 +166,22 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Validations
 
     func validateCardholderName() {
-        cardHolderNameValid = !cardholderNameText.isEmpty
+        if !cardholderNameText.isEmpty {
+            cardHolderNameValid = true
+            cardholderNameError = ""
+        } else {
+            cardHolderNameValid = false
+            cardholderNameError = "Invalid name"
+        }
     }
 
     func validateCardNumber() {
         if case .other = cardIssuerValidator.detectCardIssuer(number: cardNumberText) {
             cardNumberValid = false
+            cardNumberError = "Invalid card number"
         } else {
             cardNumberValid = true
+            cardNumberError = ""
         }
     }
 
@@ -204,7 +205,14 @@ class CardDetailsVM: ObservableObject {
     func validateCVC() {
         let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
         let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
-        cvcValid = cardSecurityCodeValidator.isSecurityCodeValid(code: cvcText, securityCodeType: cardSecurityCodeType)
+
+        if cardSecurityCodeValidator.isSecurityCodeValid(code: cvcText, securityCodeType: cardSecurityCodeType) {
+            cvcValid = true
+            cvcError = ""
+        } else {
+            cvcValid = false
+            cvcError = "Invalid security code"
+        }
     }
     
 }
