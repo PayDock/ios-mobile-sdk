@@ -19,8 +19,8 @@ struct LargeButton: View {
 
     init(title: String,
          disabled: Bool = false,
-         backgroundColor: Color = Color.purple,
-         foregroundColor: Color = Color.white,
+         backgroundColor: Color = .primaryColor,
+         foregroundColor: Color = .white,
          action: @escaping () -> Void) {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor

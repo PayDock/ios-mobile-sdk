@@ -17,7 +17,12 @@ class CardDetailsVM: ObservableObject {
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
     private let cardDetailsFormatter: CardDetailsFormatter
 
+    private let cardService: CardService
+
     // MARK: - Properties
+
+    var gatewayId: String = ""
+    var onCompletion: Binding<String>?
 
     @Published var cardholderNameError = ""
     @Published var cardNumberError = ""
@@ -78,11 +83,13 @@ class CardDetailsVM: ObservableObject {
     init(cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
-         cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
+         cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter(),
+         cardService: CardService = CardServiceImpl()) {
         self.cardIssuerValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
         self.cardDetailsFormatter = cardExpiryDateFormatter
+        self.cardService = cardService
     }
 
     // MARK: - Methods
@@ -213,6 +220,27 @@ class CardDetailsVM: ObservableObject {
         } else {
             cvcValid = false
             cvcError = "Invalid security code"
+        }
+    }
+
+    // MARK: - Api Calls
+
+    func tokeniseCardDetails() {
+        Task {
+            do {
+                let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
+                    gatewayId: gatewayId,
+                    cardName: cardholderNameText,
+                    cardNumber: cardNumberText,
+                    expireMonth: "09",
+                    expireYear: "24",
+                    cardCcv: cvcText)
+                let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
+                onCompletion?.wrappedValue = cardToken
+            } catch {
+                onCompletion?.wrappedValue = "Pimpek"
+                print("KAOS")
+            }
         }
     }
     

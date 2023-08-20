@@ -11,11 +11,11 @@ struct OutlineTextField: View {
 
     // MARK: Properties
 
-    @State private var borderColor = Color.gray
+    @State private var borderColor = Color.placeholder
     @State private var borderWidth = 1.0
     @State private var placeholderBackgroundOpacity = 0.0
     @State private var placeholderBottomPadding = 0.0
-    @State private var placeholderColor = Color.gray
+    @State private var placeholderColor = Color.placeholder
     @State private var placeholderFontSize = 16.0
     @State private var placeholderLeadingPadding: Double
     @State private var validationIconState: ValidationIconState = .none
@@ -53,7 +53,7 @@ struct OutlineTextField: View {
         self._editing = editing
         self._valid = valid
 
-        placeholderLeadingPadding = (leftImage != nil) ? 30 : 8.0
+        placeholderLeadingPadding = (leftImage != nil) ? 48 : 8.0
     }
 
     // MARK: - View protocol properties
@@ -62,13 +62,14 @@ struct OutlineTextField: View {
         ZStack {
             HStack {
                 leftImage?
+                    .foregroundColor(.placeholder)
                     .frame(width: 28, height: 24)
                 TextField("", text: $text)
                     .customFont(.body, weight: .normal)
                     .frame(height: 48)
                 validationIconView
             }
-            .padding([.leading, .trailing], 6.0)
+            .padding([.leading, .trailing], 16.0)
             .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
                 .stroke(borderColor, lineWidth: borderWidth))
 
@@ -95,7 +96,7 @@ struct OutlineTextField: View {
                     Text(errorMessage)
                         .customFont(.caption)
                         .font(.system(size: 10.0))
-                        .foregroundColor(.red)
+                        .foregroundColor(.errorRed)
                         .padding(.leading, 10.0)
                 }
                 Spacer()
@@ -133,13 +134,13 @@ private extension OutlineTextField {
 
     func updateBorderColor() {
         if !valid {
-            borderColor = .red
+            borderColor = .errorRed
             validationIconState = .invalid
         } else if editing {
-            borderColor = .blue
+            borderColor = .primaryColor
             validationIconState = .none
         } else {
-            borderColor = .gray
+            borderColor = .placeholder
             validationIconState = .valid
         }
     }
@@ -165,11 +166,11 @@ private extension OutlineTextField {
 
     func updatePlaceholderColor() {
         if valid {
-            placeholderColor = editing ? .blue : .gray
+            placeholderColor = editing ? .primaryColor : .placeholder
         } else if text.isEmpty {
-            placeholderColor = editing ? .red : .gray
+            placeholderColor = editing ? .errorRed : .placeholder
         } else {
-            placeholderColor = .red
+            placeholderColor = .errorRed
         }
     }
 
@@ -184,11 +185,11 @@ private extension OutlineTextField {
     func updatePlaceholderPosition() {
         if editing || !text.isEmpty {
             placeholderBottomPadding = 48.0
-            placeholderLeadingPadding = 8.0
+            placeholderLeadingPadding = 14.0
 
         } else {
             placeholderBottomPadding = 0.0
-            placeholderLeadingPadding = (leftImage != nil) ? 30 : 8.0
+            placeholderLeadingPadding = (leftImage != nil) ? 48 : 8.0
         }
     }
 

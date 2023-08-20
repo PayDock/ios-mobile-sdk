@@ -13,7 +13,15 @@ struct CardDetailsView: View {
 
     @StateObject private var viewModel = CardDetailsVM()
     @FocusState private var textFieldInFocus: CardDetailsVM.CardDetailsFocusable?
-    @State var isPresented = false
+//    @State var isPresented = false
+
+    // MARK: - Initialisation
+
+    public init(gatewayId: String,
+                onCompletion: Binding<String>) {
+        viewModel.gatewayId = gatewayId
+        viewModel.onCompletion = onCompletion
+    }
 
     // MARK: - View protocol properties
 
@@ -87,7 +95,7 @@ struct CardDetailsView: View {
                     .listRowSeparator(.hidden)
                 }
                 LargeButton(title: "Save card") {
-
+                    viewModel.tokeniseCardDetails()
                 }
                 .customFont(.body)
                 .padding(.horizontal, 16)
@@ -103,7 +111,7 @@ struct CardDetailsView: View {
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsView()
+        CardDetailsView(gatewayId: "asdf", onCompletion: .constant("asdf"))
             .previewLayout(.sizeThatFits)
     }
 }
