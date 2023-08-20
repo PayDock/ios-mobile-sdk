@@ -53,7 +53,7 @@ struct OutlineTextField: View {
         self._editing = editing
         self._valid = valid
 
-        placeholderLeadingPadding = (leftImage != nil) ? 48 : 8.0
+        placeholderLeadingPadding = (leftImage != nil) ? 52 : 12
     }
 
     // MARK: - View protocol properties
@@ -189,7 +189,7 @@ private extension OutlineTextField {
 
         } else {
             placeholderBottomPadding = 0.0
-            placeholderLeadingPadding = (leftImage != nil) ? 48 : 8.0
+            placeholderLeadingPadding = (leftImage != nil) ? 52 : 12.0
         }
     }
 
