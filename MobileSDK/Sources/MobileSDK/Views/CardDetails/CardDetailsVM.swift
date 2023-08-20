@@ -46,6 +46,8 @@ class CardDetailsVM: ObservableObject {
     private var expiryDateText = ""
     var cvcText = ""
 
+    private var currentTextField: CardDetailsFocusable?
+
     // MARK: - Custom bindings
 
     var cardNumberBinding: Binding<String> {
@@ -86,6 +88,9 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
+        validateOldTextField(currentTextField)
+        currentTextField = focusedField
+
         guard let focusedField = focusedField else { return }
         switch focusedField {
         case .cardholderName:
@@ -94,19 +99,11 @@ class CardDetailsVM: ObservableObject {
             editingExpiryDate = false
             editingCVC = false
 
-            validateCardNumber()
-            validateExpiryDate()
-            validateCVC()
-
         case .cardNumber:
             editingCardholderName = false
             editingCardNumber = true
             editingExpiryDate = false
             editingCVC = false
-
-            validateCardholderName()
-            validateExpiryDate()
-            validateCVC()
 
         case .expiryDate:
             editingCardholderName = false
@@ -114,19 +111,11 @@ class CardDetailsVM: ObservableObject {
             editingExpiryDate = true
             editingCVC = false
 
-            validateCardholderName()
-            validateCardholderName()
-            validateCVC()
-
         case .cvc:
             editingCardholderName = false
             editingCardNumber = false
             editingExpiryDate = false
             editingCVC = true
-
-            validateCardholderName()
-            validateCardholderName()
-            validateExpiryDate()
         }
     }
 
@@ -165,17 +154,29 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Validations
 
-    func validateCardholderName() {
+    private func validateOldTextField(_ textField: CardDetailsFocusable?) {
+        guard let textField = textField else { return }
+
+        switch textField {
+        case .cardholderName: validateCardholderName()
+        case .cardNumber: validateCardNumber()
+        case .expiryDate: validateExpiryDate()
+        case .cvc: validateCVC()
+        }
+    }
+
+    private func validateCardholderName() {
         if !cardholderNameText.isEmpty {
             cardHolderNameValid = true
             cardholderNameError = ""
+
         } else {
             cardHolderNameValid = false
             cardholderNameError = "Invalid name"
         }
     }
 
-    func validateCardNumber() {
+    private func validateCardNumber() {
         if case .other = cardIssuerValidator.detectCardIssuer(number: cardNumberText) {
             cardNumberValid = false
             cardNumberError = "Invalid card number"
@@ -185,7 +186,7 @@ class CardDetailsVM: ObservableObject {
         }
     }
 
-    func validateExpiryDate() {
+    private func validateExpiryDate() {
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText)
         switch expiryValidation {
         case .valid:
@@ -202,7 +203,7 @@ class CardDetailsVM: ObservableObject {
         }
     }
 
-    func validateCVC() {
+    private func validateCVC() {
         let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
         let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
 

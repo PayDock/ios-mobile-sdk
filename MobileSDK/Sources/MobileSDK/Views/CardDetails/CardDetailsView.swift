@@ -21,67 +21,76 @@ struct CardDetailsView: View {
         VStack {
             HStack {
                 Text("Card information")
+                    .customFont(.body, weight: .normal)
+                    .foregroundColor(.gray)
                 Spacer()
             }
             .padding(.horizontal, 16)
 
-            List {
-                OutlineTextField(
-                    $viewModel.cardholderNameText,
-                    placeholder: viewModel.cardholderNamePlaceholder,
-                    errorMessage: $viewModel.cardholderNameError,
-                    editing: $viewModel.editingCardholderName,
-                    valid: $viewModel.cardHolderNameValid)
-                .focused($textFieldInFocus, equals: .cardholderName)
-                .listRowSeparator(.hidden)
-                .onTapGesture {
-                    self.textFieldInFocus = .cardholderName
-                    viewModel.setEditingTextField(focusedField: .cardholderName)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                OutlineTextField(
-                    viewModel.cardNumberBinding,
-                    placeholder: viewModel.cardNumberPlaceholder,
-                    errorMessage: $viewModel.cardNumberError,
-                    leftImage: $viewModel.cardImage,
-                    editing: $viewModel.editingCardNumber,
-                    valid: $viewModel.cardNumberValid)
-                .focused($textFieldInFocus, equals: .cardNumber)
-                .listRowSeparator(.hidden)
-                .onTapGesture {
-                    self.textFieldInFocus = .cardNumber
-                    viewModel.setEditingTextField(focusedField: .cardNumber)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack(spacing: 12) {
+            VStack {
+                List {
                     OutlineTextField(
-                        viewModel.expiryDateBinding,
-                        placeholder: viewModel.expiryDatePlaceholder,
-                        errorMessage: $viewModel.expiryDateError,
-                        editing: $viewModel.editingExpiryDate,
-                        valid: $viewModel.expiryDateValid)
-                    .focused($textFieldInFocus, equals: .expiryDate)
+                        $viewModel.cardholderNameText,
+                        placeholder: viewModel.cardholderNamePlaceholder,
+                        errorMessage: $viewModel.cardholderNameError,
+                        editing: $viewModel.editingCardholderName,
+                        valid: $viewModel.cardHolderNameValid)
+                    .focused($textFieldInFocus, equals: .cardholderName)
+                    .listRowSeparator(.hidden)
                     .onTapGesture {
-                        self.textFieldInFocus = .expiryDate
-                        viewModel.setEditingTextField(focusedField: .expiryDate)
+                        self.textFieldInFocus = .cardholderName
+                        viewModel.setEditingTextField(focusedField: .cardholderName)
                     }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     OutlineTextField(
-                        $viewModel.cvcText,
-                        placeholder: viewModel.cvcPlaceholder,
-                        errorMessage: $viewModel.cvcError,
-                        editing: $viewModel.editingCVC,
-                        valid: $viewModel.cvcValid)
-                    .focused($textFieldInFocus, equals: .cvc)
+                        viewModel.cardNumberBinding,
+                        placeholder: viewModel.cardNumberPlaceholder,
+                        errorMessage: $viewModel.cardNumberError,
+                        leftImage: $viewModel.cardImage,
+                        editing: $viewModel.editingCardNumber,
+                        valid: $viewModel.cardNumberValid)
+                    .focused($textFieldInFocus, equals: .cardNumber)
+                    .listRowSeparator(.hidden)
                     .onTapGesture {
-                        self.textFieldInFocus = .cvc
-                        viewModel.setEditingTextField(focusedField: .cvc)
+                        self.textFieldInFocus = .cardNumber
+                        viewModel.setEditingTextField(focusedField: .cardNumber)
                     }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                    HStack(spacing: 12) {
+                        OutlineTextField(
+                            viewModel.expiryDateBinding,
+                            placeholder: viewModel.expiryDatePlaceholder,
+                            errorMessage: $viewModel.expiryDateError,
+                            editing: $viewModel.editingExpiryDate,
+                            valid: $viewModel.expiryDateValid)
+                        .focused($textFieldInFocus, equals: .expiryDate)
+                        .onTapGesture {
+                            self.textFieldInFocus = .expiryDate
+                            viewModel.setEditingTextField(focusedField: .expiryDate)
+                        }
+
+                        OutlineTextField(
+                            $viewModel.cvcText,
+                            placeholder: viewModel.cvcPlaceholder,
+                            errorMessage: $viewModel.cvcError,
+                            editing: $viewModel.editingCVC,
+                            valid: $viewModel.cvcValid)
+                        .focused($textFieldInFocus, equals: .cvc)
+                        .onTapGesture {
+                            self.textFieldInFocus = .cvc
+                            viewModel.setEditingTextField(focusedField: .cvc)
+                        }
+                    }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    .listRowSeparator(.hidden)
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .listRowSeparator(.hidden)
+                LargeButton(title: "Save card") {
+
+                }
+                .customFont(.body)
+                .padding(.horizontal, 16)
             }
             .listStyle(.plain)
             .frame(height: 300)

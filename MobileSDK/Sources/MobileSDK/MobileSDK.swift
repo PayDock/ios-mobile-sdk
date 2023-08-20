@@ -12,15 +12,19 @@ public class MobileSDK {
     public static let shared = MobileSDK()
     var config: MobileSDKConfig?
     private let cardService: CardService
+    private let fontRegistration: FontRegistration
 
     // MARK: - Initialisation
 
-    private init(cardService: CardService = CardServiceImpl()) {
+    private init(cardService: CardService = CardServiceImpl(),
+                 fontRegistration: FontRegistration = FontRegistration()) {
         self.cardService = cardService
+        self.fontRegistration = fontRegistration
     }
 
     public func configureMobileSDK(config: MobileSDKConfig) {
         self.config = config
+        self.registerFonts()
     }
 
     public func printCurrentEnvironment() {
@@ -39,6 +43,10 @@ public class MobileSDK {
             }
 
         }
+    }
+
+    private func registerFonts() {
+        fontRegistration.registerAllFonts()
     }
 
 }

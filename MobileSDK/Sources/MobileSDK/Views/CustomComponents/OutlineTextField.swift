@@ -64,6 +64,7 @@ struct OutlineTextField: View {
                 leftImage?
                     .frame(width: 28, height: 24)
                 TextField("", text: $text)
+                    .customFont(.body, weight: .normal)
                     .frame(height: 48)
                 validationIconView
             }
@@ -92,6 +93,7 @@ struct OutlineTextField: View {
                 VStack {
                     Spacer()
                     Text(errorMessage)
+                        .customFont(.caption)
                         .font(.system(size: 10.0))
                         .foregroundColor(.red)
                         .padding(.leading, 10.0)
@@ -173,7 +175,7 @@ private extension OutlineTextField {
 
     func updatePlaceholderFontSize() {
         if editing || !text.isEmpty {
-            placeholderFontSize = 10.0
+            placeholderFontSize = 12.0
         } else {
             placeholderFontSize = 16.0
         }
