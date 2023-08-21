@@ -260,7 +260,7 @@ class CardDetailsVM: ObservableObject {
 
             } catch {
                 // TODO: - Error popups and handling once designs are finalised.
-                print("Error tokenising card")
+                onCompletion?.wrappedValue = "Error tokenising card!"
             }
         }
     }

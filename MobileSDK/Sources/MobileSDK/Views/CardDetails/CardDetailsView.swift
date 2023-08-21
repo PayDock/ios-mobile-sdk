@@ -16,7 +16,6 @@ struct CardDetailsView: View {
     @Binding private var onCompletion: String
     @State private var gatewayId: String
 
-
     // MARK: - Initialisation
 
     public init(gatewayId: String,
@@ -115,7 +114,6 @@ struct CardDetailsView: View {
             viewModel.onCompletion = $onCompletion
         }
     }
-
 
 }
 
