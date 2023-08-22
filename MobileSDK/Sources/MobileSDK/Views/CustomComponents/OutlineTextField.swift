@@ -17,7 +17,7 @@ struct OutlineTextField: View {
     @State private var titleBottomPadding = 0.0
     @State private var titleColor = Color.paydockGray
     @State private var titleFontSize = 16.0
-    @State private var titleLeadingPadding: Double = 12
+    @State private var titleLeadingPadding: Double
     @State private var validationIconState: ValidationIconState = .none
 
     @Binding private var text: String
