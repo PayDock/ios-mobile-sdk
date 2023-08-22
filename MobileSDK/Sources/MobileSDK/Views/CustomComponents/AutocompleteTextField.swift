@@ -63,21 +63,31 @@ struct AutocompleteTextField: View {
                 errorMessage: $errorMessage,
                 editing: $editing,
                 valid: $valid)
-                .overlay(
-                    ZStack{
-                        if hasOptions {
-                            Spacer()
-                                .frame(height: 50)
-                            VStack(alignment: .center) {
-                                ForEach(options, id: \.self) {
-                                    Text($0).frame(maxWidth: .infinity).padding(4)
-                                }
-                            }.frame(maxWidth: .infinity).background(RoundedRectangle(cornerRadius: 6).foregroundColor(.white).shadow(radius: 4))
+            .overlay(
+                ZStack {
+                    if hasOptions {
+                        Spacer()
+                            .frame(height: 50)
+                        VStack(alignment: .center) {
+                            ForEach(options, id: \.self) {
+                                Text($0)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(4)
+                            }
                         }
-                    }.offset(y: 70)
-                    , alignment: .topLeading)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .foregroundColor(.white)
+                                .shadow(radius: 4)
+                        )
+                    }
+                }
+                    .offset(y: 64), alignment: .topLeading)
 
-        }.padding([.top, .leading, .trailing], 8).frame(height: 45)
+        }
+        .padding([.top, .leading, .trailing], 8)
+        .frame(height: 48)
     }
 }
 
