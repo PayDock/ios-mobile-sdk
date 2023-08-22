@@ -9,6 +9,16 @@ import Foundation
 
 class AddressVM: ObservableObject {
 
+    // MARK: - Dependencies
+
+    var addressFormManager: AddressFormManager
+
+    // MARK: - Initialisation
+
+    init(addressFormManager: AddressFormManager = AddressFormManager()) {
+        self.addressFormManager = addressFormManager
+    }
+
     var text = ""
     var isValid = true
 

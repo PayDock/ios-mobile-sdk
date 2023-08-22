@@ -21,8 +21,11 @@ struct AutocompleteTextField: View {
 
     // MARK: - AutocompleteTextField Properties
 
-    @State var hasOptions : Bool
-    @State var options: [String]
+    @Binding private var showPopup: Bool
+    @State private var options: [String]
+    @State private var popupOpacity: CGFloat = 0
+
+    @FocusState private var focusField: Field?
 
     // MARK: - Initialization
 
@@ -41,7 +44,7 @@ struct AutocompleteTextField: View {
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
-                hasOptions: Bool,
+                showPopup: Binding<Bool>,
                 options: Array<String>) {
         self._text = text
         self.title = title
@@ -50,7 +53,7 @@ struct AutocompleteTextField: View {
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
-        self.hasOptions = hasOptions
+        self._showPopup = showPopup
         self.options = options
     }
 
@@ -64,30 +67,47 @@ struct AutocompleteTextField: View {
                 editing: $editing,
                 valid: $valid)
             .overlay(
-                ZStack {
-                    if hasOptions {
-                        Spacer()
-                            .frame(height: 50)
-                        VStack(alignment: .center) {
-                            ForEach(options, id: \.self) {
-                                Text($0)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(4)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .foregroundColor(.white)
-                                .shadow(radius: 4)
-                        )
-                    }
-                }
-                    .offset(y: 64), alignment: .topLeading)
-
+                autocompletePopup
+                    .offset(y: 64), alignment: .topLeading
+            )
         }
         .padding([.top, .leading, .trailing], 8)
         .frame(height: 48)
+    }
+
+    private var autocompletePopup: some View {
+        ZStack {
+            if showPopup {
+                Spacer()
+                    .frame(height: 50)
+                VStack(alignment: .center) {
+                    ForEach(options, id: \.self) {
+                        Text($0)
+                            .frame(maxWidth: .infinity)
+                            .padding(4)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .foregroundColor(.white)
+                        .shadow(radius: 4)
+                )
+                .opacity(popupOpacity)
+                .onAppear {
+                    withAnimation {
+                        popupOpacity = 1
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    enum Field {
+        case textField
     }
 }
 
@@ -104,7 +124,7 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             errorMessage: .constant(""),
             editing: .constant(true),
             valid: .constant(true),
-            hasOptions: true,
+            showPopup: .constant(true),
             options: options)
     }
 
