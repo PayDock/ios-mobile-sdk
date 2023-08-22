@@ -18,7 +18,7 @@ struct AnimatableCustomFontModifier: AnimatableModifier {
 
     func body(content: Content) -> some View {
         content
-            .font(.system(size: size))
+            .font(Font.custom("FFF-AcidGrotesk-Normal", fixedSize: size))
     }
 
 }

@@ -9,6 +9,7 @@ import SwiftUI
 import MobileSDK
 
 struct CardDetailsWidgetView: View {
+    @State var cardToken: String = ""
     @State var isSheetPresented = false
 
     var body: some View {
@@ -21,9 +22,12 @@ struct CardDetailsWidgetView: View {
                     }
                     .padding()
                     Spacer()
-                    CardDetailsSheetView(isPresented: $isSheetPresented)
+                    CardDetailsSheetView(
+                        isPresented: $isSheetPresented,
+                        gatewayId: "5cbede1f151b842653e987be",
+                        onCompletion: $cardToken)
                 }
-
+                Text(cardToken)
             }
             .background(Color(hex: "#EAE0D7"))
         }

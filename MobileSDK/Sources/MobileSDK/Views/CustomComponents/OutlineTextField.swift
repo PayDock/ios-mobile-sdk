@@ -11,86 +11,118 @@ struct OutlineTextField: View {
 
     // MARK: Properties
 
-    @State private var borderColor = Color.gray
+    @State private var borderColor = Color.paydockGray
     @State private var borderWidth = 1.0
-    @State private var placeholderBackgroundOpacity = 0.0
-    @State private var placeholderBottomPadding = 0.0
-    @State private var placeholderColor = Color.gray
-    @State private var placeholderFontSize = 16.0
-    @State private var placeholderLeadingPadding = 2.0
+    @State private var titleBackgroundOpacity = 0.0
+    @State private var titleBottomPadding = 0.0
+    @State private var titleColor = Color.paydockGray
+    @State private var titleFontSize = 16.0
+    @State private var titleLeadingPadding: Double
+    @State private var validationIconState: ValidationIconState = .none
 
     @Binding private var text: String
     @Binding private var valid: Bool
+    @Binding private var leftImage: Image?
     @Binding private var editing: Bool
-    @Binding private var hint: String
+    @Binding private var errorMessage: String
 
     @FocusState private var focusField: Field?
 
+    private let title: String
     private let placeholder: String
+
 
     // MARK: - Initialization
 
-    /// Creates a Material Design inspired text field with an animated border and placeholder.
+    /// Creates a Material Design inspired text field with an animated border and title.
     /// - Parameters:
     ///   - text: The text field contents.
-    ///   - placeholder: The placeholder string.
-    ///   - hint: The field hint string.
+    ///   - title: The title string.
+    ///   - placeholder: Placeholder that appears when field is active.
+    ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
     public init(_ text: Binding<String>,
+                title: String,
                 placeholder: String,
-                hint: Binding<String>,
+                errorMessage: Binding<String>,
+                leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
                 valid: Binding<Bool>) {
         self._text = text
+        self.title = title
         self.placeholder = placeholder
-        self._hint = hint
+        self._errorMessage = errorMessage
+        self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
+
+        titleLeadingPadding = (leftImage != nil) ? 52 : 12
     }
 
     // MARK: - View protocol properties
 
     public var body: some View {
         ZStack {
-            TextField("", text: $text)
-                .padding(6.0)
-                .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
-                    .stroke(borderColor, lineWidth: borderWidth))
+            HStack {
+                leftImage?
+                    .foregroundColor(.paydockGray)
+                    .frame(width: 28, height: 24)
+                TextField(editing ? placeholder : "", text: $text)
+                    .customFont(.body, weight: .normal)
+                    .frame(height: 48)
+                validationIconView
+            }
+            .padding([.leading, .trailing], 16.0)
+            .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+                .stroke(borderColor, lineWidth: borderWidth))
+
             HStack {
                 ZStack {
                     Color(.white)
                         .cornerRadius(4.0)
-                        .opacity(placeholderBackgroundOpacity)
-                    Text(placeholder)
+                        .opacity(titleBackgroundOpacity)
+                    Text(title)
                         .foregroundColor(.white)
-                        .colorMultiply(placeholderColor)
-                        .animatableFont(size: placeholderFontSize)
-                        .padding(2.0)
+                        .colorMultiply(titleColor)
+                        .animatableFont(size: titleFontSize)
+                        .padding([.leading, .trailing], 2.0)
                         .layoutPriority(1)
                 }
-                .padding([.leading], placeholderLeadingPadding)
-                .padding([.bottom], placeholderBottomPadding)
+                .padding([.leading], titleLeadingPadding)
+                .padding([.bottom], titleBottomPadding)
                 Spacer()
             }
+
             HStack {
                 VStack {
                     Spacer()
-                    Text(hint)
+                    Text(errorMessage)
+                        .customFont(.caption)
                         .font(.system(size: 10.0))
-                        .foregroundColor(.gray)
-                        .padding([.leading], 10.0)
+                        .foregroundColor(.errorRed)
+                        .padding(.leading, 10.0)
                 }
                 Spacer()
             }
         }
+        .frame(height: 78, alignment: .top)
         .onChange(of: editing) { _ in
             withAnimation(.easeInOut(duration: 0.15)) {
                 updateBorder()
-                updatePlaceholder()
+                updateTitle()
             }
         }
-        .frame(height: 64.0)
+    }
+
+    private var validationIconView: some View {
+        HStack {
+            switch validationIconState {
+            case .valid: Image("tick-circle", bundle: Bundle.module)
+            case .invalid: Image("exclamation-circle", bundle: Bundle.module)
+            case .none: EmptyView()
+            }
+        }
     }
 
 }
@@ -106,11 +138,14 @@ private extension OutlineTextField {
 
     func updateBorderColor() {
         if !valid {
-            borderColor = .red
+            borderColor = .errorRed
+            validationIconState = .invalid
         } else if editing {
-            borderColor = .blue
+            borderColor = .primaryColor
+            validationIconState = .none
         } else {
-            borderColor = .gray
+            borderColor = .paydockGray
+            validationIconState = .valid
         }
     }
 
@@ -118,52 +153,58 @@ private extension OutlineTextField {
         borderWidth = editing ? 2.0 : 1.0
     }
 
-    func updatePlaceholder() {
-        updatePlaceholderBackground()
-        updatePlaceholderColor()
-        updatePlaceholderFontSize()
-        updatePlaceholderPosition()
+    func updateTitle() {
+        updateTitleBackground()
+        updateTitleColor()
+        updateTitleFontSize()
+        updateTitlePosition()
     }
 
-    func updatePlaceholderBackground() {
+    func updateTitleBackground() {
         if editing || !text.isEmpty {
-            placeholderBackgroundOpacity = 1.0
+            titleBackgroundOpacity = 1.0
         } else {
-            placeholderBackgroundOpacity = 0.0
+            titleBackgroundOpacity = 0.0
         }
     }
 
-    func updatePlaceholderColor() {
+    func updateTitleColor() {
         if valid {
-            placeholderColor = editing ? .blue : .gray
+            titleColor = editing ? .primaryColor : .paydockGray
         } else if text.isEmpty {
-            placeholderColor = editing ? .red : .gray
+            titleColor = editing ? .errorRed : .paydockGray
         } else {
-            placeholderColor = .red
+            titleColor = .errorRed
         }
     }
 
-    func updatePlaceholderFontSize() {
+    func updateTitleFontSize() {
         if editing || !text.isEmpty {
-            placeholderFontSize = 10.0
+            titleFontSize = 12.0
         } else {
-            placeholderFontSize = 16.0
+            titleFontSize = 16.0
         }
     }
 
-    func updatePlaceholderPosition() {
+    func updateTitlePosition() {
         if editing || !text.isEmpty {
-            placeholderBottomPadding = 34.0
-            placeholderLeadingPadding = 8.0
+            titleBottomPadding = 48.0
+            titleLeadingPadding = 14.0
 
         } else {
-            placeholderBottomPadding = 0.0
-            placeholderLeadingPadding = 8.0
+            titleBottomPadding = 0.0
+            titleLeadingPadding = (leftImage != nil) ? 52 : 14.0
         }
     }
 
     enum Field {
         case textField
+    }
+
+    enum ValidationIconState {
+        case valid
+        case invalid
+        case none
     }
 
 }
@@ -173,7 +214,13 @@ private extension OutlineTextField {
 struct OutlineTextField_Previews: PreviewProvider {
 
     static var previews: some View {
-        OutlineTextField(.constant("Asdf"), placeholder: "Placeholder", hint: .constant("Hint"), editing: .constant(false), valid: .constant(false))
+        OutlineTextField(
+            .constant("Asdf"),
+            title: "Title",
+            placeholder: "Placeholder",
+            errorMessage: .constant("Error message"),
+            editing: .constant(false),
+            valid: .constant(false))
     }
 
 }

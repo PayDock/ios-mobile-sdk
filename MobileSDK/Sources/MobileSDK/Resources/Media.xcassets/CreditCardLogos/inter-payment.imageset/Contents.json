@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "inter-payment.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

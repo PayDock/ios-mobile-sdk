@@ -8,11 +8,17 @@
 import SwiftUI
 
 public struct CardDetailsSheetView: View {
-    
-    @Binding var isPresented: Bool
 
-    public init(isPresented: Binding<Bool>) {
+    @State private var gatewayId: String
+    @Binding var isPresented: Bool
+    @Binding var onCompletion: String
+
+    public init(isPresented: Binding<Bool>,
+                gatewayId: String,
+                onCompletion: Binding<String>) {
         self._isPresented = isPresented
+        self.gatewayId = gatewayId
+        self._onCompletion = onCompletion
     }
 
     public var body: some View {
@@ -20,13 +26,13 @@ public struct CardDetailsSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            CardDetailsView()
+            CardDetailsView(gatewayId: gatewayId, onCompletion: $onCompletion)
         }
     }
 }
 
 struct CardDetailsSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsSheetView(isPresented: .constant(true))
+        CardDetailsSheetView(isPresented: .constant(true), gatewayId: "a1234", onCompletion: .constant("Asd"))
     }
 }

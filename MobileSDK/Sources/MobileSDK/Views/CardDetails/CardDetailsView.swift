@@ -13,48 +13,113 @@ struct CardDetailsView: View {
 
     @StateObject private var viewModel = CardDetailsVM()
     @FocusState private var textFieldInFocus: CardDetailsVM.CardDetailsFocusable?
-    @State var isPresented = false
+    @Binding private var onCompletion: String
+    @State private var gatewayId: String
+
+    // MARK: - Initialisation
+
+    public init(gatewayId: String,
+                onCompletion: Binding<String>) {
+        self._onCompletion = onCompletion
+        self.gatewayId = gatewayId
+    }
 
     // MARK: - View protocol properties
 
     var body: some View {
         VStack {
-            OutlineTextField(
-                $viewModel.text1,
-                placeholder: viewModel.placeholder1,
-                hint: $viewModel.hint1,
-                editing: $viewModel.editingTextField1,
-                valid: $viewModel.text1Valid)
-            .focused($textFieldInFocus, equals: .text1)
-            .padding(.horizontal, 16)
-            .onTapGesture {
-                self.textFieldInFocus = .text1
-                viewModel.setEditingTextField(focusedField: .text1)
+            HStack {
+                Text("Card information")
+                    .customFont(.body, weight: .normal)
+                    .foregroundColor(.gray)
+                Spacer()
             }
+            .padding(.horizontal, 16)
 
-            OutlineTextField(
-                $viewModel.text2,
-                placeholder: viewModel.placeholder2,
-                hint: $viewModel.hint2,
-                editing: $viewModel.editingTextField2,
-                valid: $viewModel.text2Valid)
-            .focused($textFieldInFocus, equals: .text2)
-            .padding(.horizontal, 16)
-            .onTapGesture {
-                self.textFieldInFocus = .text2
-                viewModel.setEditingTextField(focusedField: .text2)
+            VStack {
+                List {
+                    OutlineTextField(
+                        $viewModel.cardholderNameText,
+                        title: viewModel.cardholderNameTitle,
+                        placeholder: viewModel.cardholderNamePlaceholder,
+                        errorMessage: $viewModel.cardholderNameError,
+                        editing: $viewModel.editingCardholderName,
+                        valid: $viewModel.cardHolderNameValid)
+                    .focused($textFieldInFocus, equals: .cardholderName)
+                    .listRowSeparator(.hidden)
+                    .onTapGesture {
+                        self.textFieldInFocus = .cardholderName
+                        viewModel.setEditingTextField(focusedField: .cardholderName)
+                    }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                    OutlineTextField(
+                        viewModel.cardNumberBinding,
+                        title: viewModel.cardNumberTitle,
+                        placeholder: viewModel.cardNumberPlaceholder,
+                        errorMessage: $viewModel.cardNumberError,
+                        leftImage: $viewModel.cardImage,
+                        editing: $viewModel.editingCardNumber,
+                        valid: $viewModel.cardNumberValid)
+                    .focused($textFieldInFocus, equals: .cardNumber)
+                    .listRowSeparator(.hidden)
+                    .onTapGesture {
+                        self.textFieldInFocus = .cardNumber
+                        viewModel.setEditingTextField(focusedField: .cardNumber)
+                    }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                    HStack(spacing: 12) {
+                        OutlineTextField(
+                            viewModel.expiryDateBinding,
+                            title: viewModel.expiryDateTitle,
+                            placeholder: viewModel.expiryDatePlaceholder,
+                            errorMessage: $viewModel.expiryDateError,
+                            editing: $viewModel.editingExpiryDate,
+                            valid: $viewModel.expiryDateValid)
+                        .focused($textFieldInFocus, equals: .expiryDate)
+                        .onTapGesture {
+                            self.textFieldInFocus = .expiryDate
+                            viewModel.setEditingTextField(focusedField: .expiryDate)
+                        }
+
+                        OutlineTextField(
+                            $viewModel.securityCodeText,
+                            title: viewModel.securityCodeTitle,
+                            placeholder: viewModel.securityCodePlaceholder,
+                            errorMessage: $viewModel.securityCodeError,
+                            editing: $viewModel.editingSecurityCode,
+                            valid: $viewModel.securityCodeValid)
+                        .focused($textFieldInFocus, equals: .securityCode)
+                        .onTapGesture {
+                            self.textFieldInFocus = .securityCode
+                            viewModel.setEditingTextField(focusedField: .securityCode)
+                        }
+                    }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    .listRowSeparator(.hidden)
+                }
+                LargeButton(title: "Save card") {
+                    viewModel.tokeniseCardDetails()
+                }
+                .customFont(.body)
+                .padding(.horizontal, 16)
             }
-            
+            .listStyle(.plain)
+            .frame(height: 300)
             Spacer()
         }
+        .onAppear {
+            viewModel.gatewayId = gatewayId
+            viewModel.onCompletion = $onCompletion
+        }
     }
-
 
 }
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsView()
+        CardDetailsView(gatewayId: "asdf", onCompletion: .constant("asdf"))
             .previewLayout(.sizeThatFits)
     }
 }
