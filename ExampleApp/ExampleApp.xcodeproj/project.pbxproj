@@ -26,6 +26,7 @@
 		28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C32A696341004A8D34 /* View+Extensions.swift */; };
 		28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */; };
 		28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C72A697647004A8D34 /* Color+Extensions.swift */; };
+		28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
 /* End PBXBuildFile section */
@@ -73,6 +74,7 @@
 		28A3A9C32A696341004A8D34 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusablePadding.swift; sourceTree = "<group>"; };
 		28A3A9C72A697647004A8D34 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetView.swift; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28D541F92A6FFC290041BAE0 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 		282D315C2A66A64900E3ECAD /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				28A65CA12A94CE4E002A04CA /* Address */,
 				2889B7D62A558F1800D6C7BE /* WidgetsView.swift */,
 				28850E562A559A6D00C39A9D /* WidgetsVM.swift */,
 				2808B3402A7056E300E86C7E /* CardDetails */,
@@ -257,6 +260,14 @@
 				28A3A9C72A697647004A8D34 /* Color+Extensions.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		28A65CA12A94CE4E002A04CA /* Address */ = {
+			isa = PBXGroup;
+			children = (
+				28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */,
+			);
+			path = Address;
 			sourceTree = "<group>";
 		};
 		28EA57082A5B40200003774F /* Frameworks */ = {
@@ -414,6 +425,7 @@
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
+				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
