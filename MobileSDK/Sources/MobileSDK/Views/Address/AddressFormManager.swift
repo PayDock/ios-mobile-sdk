@@ -15,6 +15,7 @@ class AddressFormManager {
 
     @Published var editingAddressSearch = false
     @Published var showAddressSearchPopup = false
+    @Published var addressSearchSuggestions: Array<String> = ["asdf", "asdf", "asdf"]
 
     @Published var addressSearchErrorValid = true
 
@@ -23,6 +24,9 @@ class AddressFormManager {
     var addressSearchErrorPlaceholder = ""
 
     var addressSearchErrorText: String = ""
+
+    var addressSearchText: String = ""
+
 
     private var currentTextField: AddressFocusable?
 

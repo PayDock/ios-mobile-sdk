@@ -22,7 +22,7 @@ struct AutocompleteTextField: View {
     // MARK: - AutocompleteTextField Properties
 
     @Binding private var showPopup: Bool
-    @State private var options: [String]
+    @Binding private var options: [String]
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
 
@@ -38,6 +38,8 @@ struct AutocompleteTextField: View {
     ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
+    ///   - showPopup: Whether the autocomplete field is displayed..
+    ///   - option: Autocomplete popup list of options.
     public init(text: Binding<String>,
                 title: String,
                 placeholder: String,
@@ -46,7 +48,7 @@ struct AutocompleteTextField: View {
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
                 showPopup: Binding<Bool>,
-                options: Array<String>) {
+                options: Binding<Array<String>>) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -55,7 +57,7 @@ struct AutocompleteTextField: View {
         self._editing = editing
         self._valid = valid
         self._showPopup = showPopup
-        self.options = options
+        self._options = options
     }
 
     var body: some View {
@@ -103,9 +105,12 @@ struct AutocompleteTextField: View {
                     }
                 }
             }
-
         }
-
+        .onChange(of: options) { newValue in
+            if options.count > 0 {
+                showPopup = true
+            }
+        }
     }
 
     enum Field {
@@ -127,7 +132,7 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             editing: .constant(true),
             valid: .constant(true),
             showPopup: .constant(true),
-            options: options)
+            options: .constant(options))
     }
 
 }

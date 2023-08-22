@@ -16,14 +16,14 @@ struct AddressView: View {
     var body: some View {
         VStack {
             AutocompleteTextField(
-                text: $viewModel.addressFormManager.addressSearchErrorText,
+                text: viewModel.addressSearchBinding,
                 title: viewModel.addressFormManager.addressSearchErrorTitle,
                 placeholder: viewModel.addressFormManager.addressSearchErrorPlaceholder,
                 errorMessage: $viewModel.addressFormManager.addressSearchError,
                 editing: $viewModel.addressFormManager.editingAddressSearch,
                 valid: $viewModel.addressFormManager.addressSearchErrorValid,
                 showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
-                options: ["option 1", "option 2"])
+                options: $viewModel.addressFormManager.addressSearchSuggestions)
             .focused($textFieldInFocus, equals: .searchAddress)
             .onTapGesture {
                 self.textFieldInFocus = .searchAddress
