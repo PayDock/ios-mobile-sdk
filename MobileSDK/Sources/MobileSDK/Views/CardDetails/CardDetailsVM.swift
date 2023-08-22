@@ -20,31 +20,6 @@ class CardDetailsVM: ObservableObject {
     var gatewayId: String = ""
     var onCompletion: Binding<String>?
 
-    // MARK: - Custom bindings
-
-    var cardNumberBinding: Binding<String> {
-        Binding(
-            get: {
-                self.cardDetailsFormManager.cardNumberText
-            }, set: {
-                self.cardDetailsFormManager.cardNumberText = self.cardDetailsFormManager.formatCardNumber(updatedText: $0)
-                self.cardDetailsFormManager.updateCardIssuerIcon()
-                self.cardDetailsFormManager.updateSecurityCodeTitleAndPlaceholder()
-            }
-        )
-    }
-
-    var expiryDateBinding: Binding<String> {
-        Binding(
-            get: {
-                self.cardDetailsFormManager.expiryDateText
-            }, set: {
-                let newText = self.cardDetailsFormManager.formatExpiryDate(updatedText: $0)
-                self.cardDetailsFormManager.expiryDateText = newText
-            }
-        )
-    }
-
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
@@ -57,8 +32,8 @@ class CardDetailsVM: ObservableObject {
 
     func tokeniseCardDetails() {
         Task {
-            guard let expireMonth = cardDetailsFormManager.expiryDateText.split(separator: "/").first,
-                  let expireYear = cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
+            guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
+                  let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
                 return
             }
 

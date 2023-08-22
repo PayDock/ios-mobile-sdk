@@ -54,7 +54,7 @@ struct CardDetailsView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     OutlineTextField(
-                        text: viewModel.cardNumberBinding,
+                        text: viewModel.cardDetailsFormManager.cardNumberBinding,
                         title: viewModel.cardDetailsFormManager.cardNumberTitle,
                         placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
@@ -71,7 +71,7 @@ struct CardDetailsView: View {
 
                     HStack(spacing: 12) {
                         OutlineTextField(
-                            text: viewModel.expiryDateBinding,
+                            text: viewModel.cardDetailsFormManager.expiryDateBinding,
                             title: viewModel.cardDetailsFormManager.expiryDateTitle,
                             placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
                             errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,

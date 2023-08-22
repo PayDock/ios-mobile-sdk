@@ -47,11 +47,37 @@ class CardDetailsFormManager {
     @Published var securityCodePlaceholder = "XXX"
 
     var cardholderNameText: String = ""
-    var cardNumberText: String = ""
-     var expiryDateText = ""
+    private(set) var cardNumberText: String = ""
+    private(set) var expiryDateText = ""
     var securityCodeText = ""
 
     private var currentTextField: CardDetailsFocusable?
+
+    // MARK: - Custom bindings
+
+    var cardNumberBinding: Binding<String> {
+        Binding(
+            get: {
+                self.cardNumberText
+            }, set: {
+                self.cardNumberText = self.formatCardNumber(updatedText: $0)
+                self.updateCardIssuerIcon()
+                self.updateSecurityCodeTitleAndPlaceholder()
+            }
+        )
+    }
+
+    var expiryDateBinding: Binding<String> {
+        Binding(
+            get: {
+                self.expiryDateText
+            }, set: {
+                let newText = self.formatExpiryDate(updatedText: $0)
+                self.expiryDateText = newText
+            }
+        )
+    }
+
 
     // MARK: - Initialisation
 
