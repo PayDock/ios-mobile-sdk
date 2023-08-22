@@ -70,7 +70,7 @@ struct OutlineTextField: View {
         }
         .frame(height: 78, alignment: .top)
         .onChange(of: editing) { _ in
-            withAnimation(.easeInOut(duration: 0.15)) {
+            withAnimation(.easeOut(duration: 0.15)) {
                 updateBorder()
                 updateTitle()
             }

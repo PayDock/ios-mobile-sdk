@@ -24,6 +24,7 @@ struct AutocompleteTextField: View {
     @Binding private var showPopup: Bool
     @State private var options: [String]
     @State private var popupOpacity: CGFloat = 0
+    @State private var popupScale = 0.7
 
     @FocusState private var focusField: Field?
 
@@ -94,10 +95,11 @@ struct AutocompleteTextField: View {
                         .shadow(radius: 4)
                 )
                 .opacity(popupOpacity)
+                .scaleEffect(popupScale)
                 .onAppear {
-                    withAnimation {
+                    withAnimation(.easeOut(duration: 0.15)) {
                         popupOpacity = 1
-
+                        popupScale = 1
                     }
                 }
             }
