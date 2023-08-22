@@ -17,7 +17,7 @@ struct OutlineTextField: View {
     @State private var titleBottomPadding = 0.0
     @State private var titleColor = Color.paydockGray
     @State private var titleFontSize = 16.0
-    @State private var titleLeadingPadding: Double
+    @State private var titleLeadingPadding: Double = 12
     @State private var validationIconState: ValidationIconState = .none
 
     @Binding private var text: String
@@ -42,7 +42,7 @@ struct OutlineTextField: View {
     ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
-    public init(_ text: Binding<String>,
+    public init(text: Binding<String>,
                 title: String,
                 placeholder: String,
                 errorMessage: Binding<String>,
@@ -64,47 +64,9 @@ struct OutlineTextField: View {
 
     public var body: some View {
         ZStack {
-            HStack {
-                leftImage?
-                    .foregroundColor(.paydockGray)
-                    .frame(width: 28, height: 24)
-                TextField(editing ? placeholder : "", text: $text)
-                    .customFont(.body, weight: .normal)
-                    .frame(height: 48)
-                validationIconView
-            }
-            .padding([.leading, .trailing], 16.0)
-            .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
-                .stroke(borderColor, lineWidth: borderWidth))
-
-            HStack {
-                ZStack {
-                    Color(.white)
-                        .cornerRadius(4.0)
-                        .opacity(titleBackgroundOpacity)
-                    Text(title)
-                        .foregroundColor(.white)
-                        .colorMultiply(titleColor)
-                        .animatableFont(size: titleFontSize)
-                        .padding([.leading, .trailing], 2.0)
-                        .layoutPriority(1)
-                }
-                .padding([.leading], titleLeadingPadding)
-                .padding([.bottom], titleBottomPadding)
-                Spacer()
-            }
-
-            HStack {
-                VStack {
-                    Spacer()
-                    Text(errorMessage)
-                        .customFont(.caption)
-                        .font(.system(size: 10.0))
-                        .foregroundColor(.errorRed)
-                        .padding(.leading, 10.0)
-                }
-                Spacer()
-            }
+            textFieldView()
+            placeholderView()
+            errorView()
         }
         .frame(height: 78, alignment: .top)
         .onChange(of: editing) { _ in
@@ -112,6 +74,54 @@ struct OutlineTextField: View {
                 updateBorder()
                 updateTitle()
             }
+        }
+    }
+
+    private func textFieldView() -> some View {
+        HStack {
+            leftImage?
+                .foregroundColor(.paydockGray)
+                .frame(width: 28, height: 24)
+            TextField(editing ? placeholder : "", text: $text)
+                .customFont(.body, weight: .normal)
+                .frame(height: 48)
+            validationIconView
+        }
+        .padding([.leading, .trailing], 16.0)
+        .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+            .stroke(borderColor, lineWidth: borderWidth))
+    }
+
+    private func placeholderView() -> some View {
+        HStack {
+            ZStack {
+                Color(.white)
+                    .cornerRadius(4.0)
+                    .opacity(titleBackgroundOpacity)
+                Text(title)
+                    .foregroundColor(.white)
+                    .colorMultiply(titleColor)
+                    .animatableFont(size: titleFontSize)
+                    .padding([.leading, .trailing], 2.0)
+                    .layoutPriority(1)
+            }
+            .padding([.leading], titleLeadingPadding)
+            .padding([.bottom], titleBottomPadding)
+            Spacer()
+        }
+    }
+
+    private func errorView() -> some View {
+        HStack {
+            VStack {
+                Spacer()
+                Text(errorMessage)
+                    .customFont(.caption)
+                    .font(.system(size: 10.0))
+                    .foregroundColor(.errorRed)
+                    .padding(.leading, 10.0)
+            }
+            Spacer()
         }
     }
 
@@ -124,6 +134,7 @@ struct OutlineTextField: View {
             }
         }
     }
+    
 
 }
 
@@ -215,7 +226,7 @@ struct OutlineTextField_Previews: PreviewProvider {
 
     static var previews: some View {
         OutlineTextField(
-            .constant("Asdf"),
+            text: .constant("Asdf"),
             title: "Title",
             placeholder: "Placeholder",
             errorMessage: .constant("Error message"),

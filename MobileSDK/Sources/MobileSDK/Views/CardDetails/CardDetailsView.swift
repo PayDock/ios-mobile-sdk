@@ -39,7 +39,7 @@ struct CardDetailsView: View {
             VStack {
                 List {
                     OutlineTextField(
-                        $viewModel.cardholderNameText,
+                        text: $viewModel.cardholderNameText,
                         title: viewModel.cardholderNameTitle,
                         placeholder: viewModel.cardholderNamePlaceholder,
                         errorMessage: $viewModel.cardholderNameError,
@@ -54,7 +54,7 @@ struct CardDetailsView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     OutlineTextField(
-                        viewModel.cardNumberBinding,
+                        text: viewModel.cardNumberBinding,
                         title: viewModel.cardNumberTitle,
                         placeholder: viewModel.cardNumberPlaceholder,
                         errorMessage: $viewModel.cardNumberError,
@@ -71,7 +71,7 @@ struct CardDetailsView: View {
 
                     HStack(spacing: 12) {
                         OutlineTextField(
-                            viewModel.expiryDateBinding,
+                            text: viewModel.expiryDateBinding,
                             title: viewModel.expiryDateTitle,
                             placeholder: viewModel.expiryDatePlaceholder,
                             errorMessage: $viewModel.expiryDateError,
@@ -84,7 +84,7 @@ struct CardDetailsView: View {
                         }
 
                         OutlineTextField(
-                            $viewModel.securityCodeText,
+                            text: $viewModel.securityCodeText,
                             title: viewModel.securityCodeTitle,
                             placeholder: viewModel.securityCodePlaceholder,
                             errorMessage: $viewModel.securityCodeError,

@@ -8,8 +8,23 @@
 import SwiftUI
 
 struct AddressView: View {
+
+    @State var viewModel = AddressVM()
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            AutocompleteTextField(
+                text: $viewModel.text,
+                title: "Select countries",
+                placeholder: "",
+                errorMessage: .constant(""),
+                editing: .constant(true),
+                valid: .constant(true),
+                hasOptions: true,
+                options: ["option 1", "option 2"])
+
+        }
+        .frame(height: 200)
     }
 }
 
