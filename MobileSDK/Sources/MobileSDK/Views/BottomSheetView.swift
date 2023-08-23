@@ -35,8 +35,8 @@ public struct BottomSheetView<Content: View>: View {
                             sheetHeight = newHeight
                         }
                         .presentationDetents([.height(sheetHeight)])
-                        .interactiveDismissDisabled(true)
-                        .scrollDisabled(true)
+                        .interactiveDismissDisabled(false)
+                        .scrollDisabled(false)
                 }
             }
     }

@@ -12,7 +12,7 @@ struct CardDetailsView: View {
     // MARK: - Properties
 
     @StateObject private var viewModel = CardDetailsVM()
-    @FocusState private var textFieldInFocus: CardDetailsVM.CardDetailsFocusable?
+    @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
     @Binding private var onCompletion: String
     @State private var gatewayId: String
 
@@ -39,61 +39,61 @@ struct CardDetailsView: View {
             VStack {
                 List {
                     OutlineTextField(
-                        $viewModel.cardholderNameText,
-                        title: viewModel.cardholderNameTitle,
-                        placeholder: viewModel.cardholderNamePlaceholder,
-                        errorMessage: $viewModel.cardholderNameError,
-                        editing: $viewModel.editingCardholderName,
-                        valid: $viewModel.cardHolderNameValid)
+                        text: $viewModel.cardDetailsFormManager.cardholderNameText,
+                        title: viewModel.cardDetailsFormManager.cardholderNameTitle,
+                        placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
+                        errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
+                        editing: $viewModel.cardDetailsFormManager.editingCardholderName,
+                        valid: $viewModel.cardDetailsFormManager.cardHolderNameValid)
                     .focused($textFieldInFocus, equals: .cardholderName)
                     .listRowSeparator(.hidden)
                     .onTapGesture {
                         self.textFieldInFocus = .cardholderName
-                        viewModel.setEditingTextField(focusedField: .cardholderName)
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
                     }
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     OutlineTextField(
-                        viewModel.cardNumberBinding,
-                        title: viewModel.cardNumberTitle,
-                        placeholder: viewModel.cardNumberPlaceholder,
-                        errorMessage: $viewModel.cardNumberError,
-                        leftImage: $viewModel.cardImage,
-                        editing: $viewModel.editingCardNumber,
-                        valid: $viewModel.cardNumberValid)
+                        text: viewModel.cardDetailsFormManager.cardNumberBinding,
+                        title: viewModel.cardDetailsFormManager.cardNumberTitle,
+                        placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
+                        errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
+                        leftImage: $viewModel.cardDetailsFormManager.cardImage,
+                        editing: $viewModel.cardDetailsFormManager.editingCardNumber,
+                        valid: $viewModel.cardDetailsFormManager.cardNumberValid)
                     .focused($textFieldInFocus, equals: .cardNumber)
                     .listRowSeparator(.hidden)
                     .onTapGesture {
                         self.textFieldInFocus = .cardNumber
-                        viewModel.setEditingTextField(focusedField: .cardNumber)
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                     }
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     HStack(spacing: 12) {
                         OutlineTextField(
-                            viewModel.expiryDateBinding,
-                            title: viewModel.expiryDateTitle,
-                            placeholder: viewModel.expiryDatePlaceholder,
-                            errorMessage: $viewModel.expiryDateError,
-                            editing: $viewModel.editingExpiryDate,
-                            valid: $viewModel.expiryDateValid)
+                            text: viewModel.cardDetailsFormManager.expiryDateBinding,
+                            title: viewModel.cardDetailsFormManager.expiryDateTitle,
+                            placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
+                            errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
+                            editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
+                            valid: $viewModel.cardDetailsFormManager.expiryDateValid)
                         .focused($textFieldInFocus, equals: .expiryDate)
                         .onTapGesture {
                             self.textFieldInFocus = .expiryDate
-                            viewModel.setEditingTextField(focusedField: .expiryDate)
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
                         }
 
                         OutlineTextField(
-                            $viewModel.securityCodeText,
-                            title: viewModel.securityCodeTitle,
-                            placeholder: viewModel.securityCodePlaceholder,
-                            errorMessage: $viewModel.securityCodeError,
-                            editing: $viewModel.editingSecurityCode,
-                            valid: $viewModel.securityCodeValid)
+                            text: $viewModel.cardDetailsFormManager.securityCodeText,
+                            title: viewModel.cardDetailsFormManager.securityCodeTitle,
+                            placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
+                            errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
+                            editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
+                            valid: $viewModel.cardDetailsFormManager.securityCodeValid)
                         .focused($textFieldInFocus, equals: .securityCode)
                         .onTapGesture {
                             self.textFieldInFocus = .securityCode
-                            viewModel.setEditingTextField(focusedField: .securityCode)
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                         }
                     }
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))

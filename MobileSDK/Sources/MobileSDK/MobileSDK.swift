@@ -33,16 +33,6 @@ public class MobileSDK {
             return
         }
         print(config.environment)
-
-        Task {
-            let req = TokeniseCardDetailsReq(gatewayId: "5cbede1f151b842653e987be", cardName: "Wanda Mertz", cardNumber: "4242424242424242", expireMonth: "09", expireYear: "21", cardCcv: "123")
-            do {
-                let token = try await cardService.createToken(tokeniseCardDetailsReq: req)
-            } catch {
-                print(error)
-            }
-
-        }
     }
 
     private func registerFonts() {

@@ -15,8 +15,19 @@ struct WidgetsView: View {
         NavigationStack {
             List {
                 NavigationLink(destination: CardDetailsWidgetView()) {
-                    cell(title: "Card Details",
-                         subtitle: "Tokenise card details") {}
+                    cell(
+                        title: "Card Details",
+                        subtitle: "Tokenise card details") {}
+                }
+                .listRowSeparatorTint(.black)
+                .listSectionSeparator(.hidden, edges: .top)
+                .listRowBackground(Color(hex: "#EAE0D7"))
+                
+                NavigationLink(destination: AddressWidgetView()) {
+                    cell(
+                        title: "Address",
+                        subtitle: "Capture customer address form",
+                        onTap: {})
                 }
                 .listRowSeparatorTint(.black)
                 .listSectionSeparator(.hidden, edges: .top)
