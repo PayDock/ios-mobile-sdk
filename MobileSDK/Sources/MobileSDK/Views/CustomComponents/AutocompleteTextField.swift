@@ -75,47 +75,49 @@ struct AutocompleteTextField: View {
                 valid: $valid)
             .overlay(
                 autocompletePopup
-                    .offset(y: 64), alignment: .topLeading
+                    .offset(x: -1, y: 64), alignment: .topLeading
             )
         }
-        .padding([.top, .leading, .trailing], 8)
         .frame(height: 48)
     }
 
     private var autocompletePopup: some View {
-        ZStack {
-            if showPopup {
-                Spacer()
-                    .frame(height: 50)
-                VStack(alignment: .center) {
-                    ForEach(options, id: \.self) { option in
-                        Text(option)
-                            .frame(maxWidth: .infinity)
-                            .padding(4)
-                            .onTapGesture {
-                                onSelection(getOptionIndex(option: option))
-                            }
+        GeometryReader { proxy in
+            ZStack(alignment: .center) {
+                if showPopup {
+                    Spacer()
+                        .frame(height: 50)
+                    VStack(alignment: .center) {
+                        ForEach(options, id: \.self) { option in
+                            Text(option)
+                                .frame(maxWidth: .infinity)
+                                .padding(4)
+                                .onTapGesture {
+                                    onSelection(getOptionIndex(option: option))
+                                }
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .foregroundColor(.white)
-                        .shadow(radius: 4)
-                )
-                .opacity(popupOpacity)
-                .scaleEffect(popupScale)
-                .onAppear {
-                    withAnimation(.easeOut(duration: 0.15)) {
-                        popupOpacity = 1
-                        popupScale = 1
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .foregroundColor(.white)
+                            .shadow(radius: 4)
+                    )
+                    .opacity(popupOpacity)
+                    .scaleEffect(popupScale)
+                    .frame(width: proxy.size.width + 2)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            popupOpacity = 1
+                            popupScale = 1
+                        }
                     }
                 }
             }
-        }
-        .onChange(of: options) { newValue in
-            if options.count > 0 {
-                showPopup = true
+            .onChange(of: options) { newValue in
+                if options.count > 0 {
+                    showPopup = true
+                }
             }
         }
     }
