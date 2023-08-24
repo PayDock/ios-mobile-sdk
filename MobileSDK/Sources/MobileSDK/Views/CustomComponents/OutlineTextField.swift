@@ -13,12 +13,19 @@ struct OutlineTextField: View {
 
     @State private var borderColor = Color.paydockGray
     @State private var borderWidth = 1.0
+
     @State private var titleBackgroundOpacity = 0.0
     @State private var titleBottomPadding = 0.0
     @State private var titleColor = Color.paydockGray
     @State private var titleFontSize = 16.0
+    @State private var titleVerticalPadding: CGFloat = 0
     @State private var titleLeadingPadding: Double
+
     @State private var validationIconState: ValidationIconState = .none
+
+    @State private var errorViewOpacity: Double = 0
+    @State private var errorViewScale = 0
+    @State private var showErrorView = false
 
     @Binding private var text: String
     @Binding private var valid: Bool
@@ -63,16 +70,27 @@ struct OutlineTextField: View {
     // MARK: - View protocol properties
 
     public var body: some View {
-        ZStack {
-            textFieldView()
-            placeholderView()
-            errorView()
+        VStack {
+            ZStack {
+                textFieldView()
+                placeholderView()
+            }
+            if showErrorView {
+                errorView()
+            }
+            Spacer()
         }
-        .frame(height: 78, alignment: .top)
+        .padding(.top, 10)
+        .padding(.bottom, 2)
         .onChange(of: editing) { _ in
             withAnimation(.easeOut(duration: 0.15)) {
                 updateBorder()
                 updateTitle()
+            }
+        }
+        .onChange(of: errorMessage) { _ in
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showErrorView = !errorMessage.isEmpty
             }
         }
     }
@@ -109,6 +127,7 @@ struct OutlineTextField: View {
             .padding([.bottom], titleBottomPadding)
             Spacer()
         }
+        .padding(.vertical, titleVerticalPadding)
     }
 
     private func errorView() -> some View {
@@ -119,9 +138,20 @@ struct OutlineTextField: View {
                     .customFont(.caption)
                     .font(.system(size: 10.0))
                     .foregroundColor(.errorRed)
-                    .padding(.leading, 10.0)
+                    .padding(.leading, 16.0)
             }
             Spacer()
+        }
+        .opacity(errorViewOpacity)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.15)) {
+                errorViewOpacity = 1
+            }
+        }
+        .onDisappear {
+            withAnimation(.easeOut(duration: 0.15)) {
+                errorViewOpacity = 0
+            }
         }
     }
 
@@ -134,7 +164,6 @@ struct OutlineTextField: View {
             }
         }
     }
-    
 
 }
 
@@ -201,10 +230,12 @@ private extension OutlineTextField {
         if editing || !text.isEmpty {
             titleBottomPadding = 48.0
             titleLeadingPadding = 14.0
+            titleVerticalPadding = -10
 
         } else {
             titleBottomPadding = 0.0
             titleLeadingPadding = (leftImage != nil) ? 52 : 14.0
+            titleVerticalPadding = 0
         }
     }
 
