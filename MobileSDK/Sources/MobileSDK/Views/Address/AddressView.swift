@@ -14,15 +14,23 @@ struct AddressView: View {
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
 
     var body: some View {
-        VStack {
-            nameHeader
-            nameAndLastNameView
-            autocompleteTextFieldView
-            addressLine1View
-            addressLine2View
+        ScrollView {
+            VStack {
+                nameHeader
+                nameAndLastNameView
+                findAnAddressHeader
+                autocompleteTextFieldView
+                addressLine1View
+                addressLine2View
+                cityView
+                stateView
+                postcodeView
+                countryView
+            }
+            .padding(.horizontal, 16)
         }
-        .padding(.horizontal, 16)
-        .frame(height: 400)
+        .frame(height: 600)
+
     }
 
     private var nameHeader: some View {
@@ -64,6 +72,16 @@ struct AddressView: View {
         }
     }
 
+    private var findAnAddressHeader: some View {
+        HStack {
+            Text("Find an address")
+                .customFont(.body, weight: .normal)
+                .foregroundColor(.gray)
+            Spacer()
+        }
+    }
+    
+
     private var autocompleteTextFieldView: some View {
         AutocompleteTextField(
             text: viewModel.addressSearchBinding,
@@ -93,7 +111,6 @@ struct AddressView: View {
             editing: $viewModel.addressFormManager.editingAddressLine1,
             valid: $viewModel.addressFormManager.addressLine1Valid)
         .focused($textFieldInFocus, equals: .addressLine1)
-        .listRowSeparator(.hidden)
         .onTapGesture {
             self.textFieldInFocus = .addressLine1
             viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
@@ -109,10 +126,70 @@ struct AddressView: View {
             editing: $viewModel.addressFormManager.editingAddressLine2,
             valid: $viewModel.addressFormManager.addressLine2Valid)
         .focused($textFieldInFocus, equals: .addressLine2)
-        .listRowSeparator(.hidden)
         .onTapGesture {
             self.textFieldInFocus = .addressLine2
             viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
+        }
+    }
+
+    private var cityView: some View {
+        OutlineTextField(
+            text: $viewModel.addressFormManager.cityText,
+            title: viewModel.addressFormManager.cityTitle,
+            placeholder: viewModel.addressFormManager.cityPlaceholder,
+            errorMessage: $viewModel.addressFormManager.cityError,
+            editing: $viewModel.addressFormManager.editingCity,
+            valid: $viewModel.addressFormManager.cityValid)
+        .focused($textFieldInFocus, equals: .city)
+        .onTapGesture {
+            self.textFieldInFocus = .city
+            viewModel.addressFormManager.setEditingTextField(focusedField: .city)
+        }
+    }
+
+    private var stateView: some View {
+        OutlineTextField(
+            text: $viewModel.addressFormManager.stateText,
+            title: viewModel.addressFormManager.stateTitle,
+            placeholder: viewModel.addressFormManager.statePlaceholder,
+            errorMessage: $viewModel.addressFormManager.stateError,
+            editing: $viewModel.addressFormManager.editingState,
+            valid: $viewModel.addressFormManager.stateValid)
+        .focused($textFieldInFocus, equals: .state)
+        .onTapGesture {
+            self.textFieldInFocus = .state
+            viewModel.addressFormManager.setEditingTextField(focusedField: .state)
+        }
+    }
+
+    private var postcodeView: some View {
+        OutlineTextField(
+            text: $viewModel.addressFormManager.postcodeText,
+            title: viewModel.addressFormManager.postcodeTitle,
+            placeholder: viewModel.addressFormManager.postcodePlaceholder,
+            errorMessage: $viewModel.addressFormManager.postcodeError,
+            editing: $viewModel.addressFormManager.editingPostcode,
+            valid: $viewModel.addressFormManager.postcodeValid)
+        .focused($textFieldInFocus, equals: .postcode)
+        .onTapGesture {
+            self.textFieldInFocus = .postcode
+            viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
+        }
+    }
+
+    private var countryView: some View {
+        OutlineTextField(
+            text: $viewModel.addressFormManager.countryText,
+            title: viewModel.addressFormManager.countryTitle,
+            placeholder: viewModel.addressFormManager.countryPlaceholder,
+            errorMessage: $viewModel.addressFormManager.countryError,
+            editing: $viewModel.addressFormManager.editingCountry,
+            valid: $viewModel.addressFormManager.countryValid)
+        .focused($textFieldInFocus, equals: .country)
+        .onTapGesture {
+            self.textFieldInFocus = .country
+            viewModel.addressFormManager.setEditingTextField(focusedField: .country
+            )
         }
     }
 
