@@ -15,23 +15,28 @@ struct AddressView: View {
 
     var body: some View {
         VStack {
-            AutocompleteTextField(
-                text: viewModel.addressSearchBinding,
-                title: viewModel.addressFormManager.addressSearchErrorTitle,
-                placeholder: viewModel.addressFormManager.addressSearchErrorPlaceholder,
-                errorMessage: $viewModel.addressFormManager.addressSearchError,
-                editing: $viewModel.addressFormManager.editingAddressSearch,
-                valid: $viewModel.addressFormManager.addressSearchErrorValid,
-                showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
-                options: $viewModel.addressFormManager.addressSearchSuggestions)
-            .focused($textFieldInFocus, equals: .searchAddress)
-            .onTapGesture {
-                self.textFieldInFocus = .searchAddress
-                viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
-            }
-
+            autocompleteTextFieldView
         }
         .frame(height: 200)
+    }
+
+    private var autocompleteTextFieldView: some View {
+        AutocompleteTextField(
+            text: viewModel.addressSearchBinding,
+            title: viewModel.addressFormManager.addressSearchErrorTitle,
+            placeholder: viewModel.addressFormManager.addressSearchErrorPlaceholder,
+            errorMessage: $viewModel.addressFormManager.addressSearchError,
+            editing: $viewModel.addressFormManager.editingAddressSearch,
+            valid: $viewModel.addressFormManager.addressSearchErrorValid,
+            showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
+            options: $viewModel.addressSearchSuggestions, onSelection: {
+                viewModel.reverseGeoForOptionAt(index: $0)
+            })
+        .focused($textFieldInFocus, equals: .searchAddress)
+        .onTapGesture {
+            self.textFieldInFocus = .searchAddress
+            viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
+        }
     }
 }
 

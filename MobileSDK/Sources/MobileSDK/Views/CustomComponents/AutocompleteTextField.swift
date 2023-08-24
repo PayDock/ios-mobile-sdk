@@ -25,6 +25,7 @@ struct AutocompleteTextField: View {
     @Binding private var options: [String]
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
+    private var onSelection: (Int?) -> ()
 
     @FocusState private var focusField: Field?
 
@@ -40,6 +41,7 @@ struct AutocompleteTextField: View {
     ///   - valid: Whether the field is in the valid state.
     ///   - showPopup: Whether the autocomplete field is displayed..
     ///   - option: Autocomplete popup list of options.
+    ///   - onSelection: Returns selected value
     public init(text: Binding<String>,
                 title: String,
                 placeholder: String,
@@ -48,7 +50,8 @@ struct AutocompleteTextField: View {
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
                 showPopup: Binding<Bool>,
-                options: Binding<Array<String>>) {
+                options: Binding<Array<String>>,
+                onSelection: @escaping (Int?) -> ()) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -58,6 +61,7 @@ struct AutocompleteTextField: View {
         self._valid = valid
         self._showPopup = showPopup
         self._options = options
+        self.onSelection = onSelection
     }
 
     var body: some View {
@@ -84,10 +88,13 @@ struct AutocompleteTextField: View {
                 Spacer()
                     .frame(height: 50)
                 VStack(alignment: .center) {
-                    ForEach(options, id: \.self) {
-                        Text($0)
+                    ForEach(options, id: \.self) { option in
+                        Text(option)
                             .frame(maxWidth: .infinity)
                             .padding(4)
+                            .onTapGesture {
+                                onSelection(getOptionIndex(option: option))
+                            }
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -113,6 +120,10 @@ struct AutocompleteTextField: View {
         }
     }
 
+    private func getOptionIndex(option: String) -> Int? {
+        return options.firstIndex { $0 == option }
+    }
+
     enum Field {
         case textField
     }
@@ -132,7 +143,7 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             editing: .constant(true),
             valid: .constant(true),
             showPopup: .constant(true),
-            options: .constant(options))
+            options: .constant(options), onSelection: {_ in })
     }
 
 }
