@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class CardDetailsFormManager {
+class CardDetailsFormManager: ObservableObject {
 
     // MARK: - Dependencies
 

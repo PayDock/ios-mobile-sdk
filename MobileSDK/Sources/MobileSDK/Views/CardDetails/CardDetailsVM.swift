@@ -7,12 +7,13 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 class CardDetailsVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    var cardDetailsFormManager: CardDetailsFormManager
+    @Published var cardDetailsFormManager: CardDetailsFormManager
     private let cardService: CardService
 
     // MARK: - Properties
@@ -20,12 +21,18 @@ class CardDetailsVM: ObservableObject {
     var gatewayId: String = ""
     var onCompletion: Binding<String>?
 
+    var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
+
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
          cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager()) {
         self.cardService = cardService
         self.cardDetailsFormManager = cardDetailsFormManager
+
+        anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     // MARK: - Api Calls
