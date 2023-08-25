@@ -88,6 +88,12 @@ struct OutlineTextField: View {
                 updateTitle()
             }
         }
+        .onChange(of: valid) { _ in
+            withAnimation(.easeOut(duration: 0.15)) {
+                updateBorder()
+                updateTitle()
+            }
+        }
         .onChange(of: errorMessage) { _ in
             withAnimation(.easeInOut(duration: 0.15)) {
                 showErrorView = !errorMessage.isEmpty

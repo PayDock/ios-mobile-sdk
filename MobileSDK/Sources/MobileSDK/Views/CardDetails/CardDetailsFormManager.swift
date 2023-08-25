@@ -46,14 +46,28 @@ class CardDetailsFormManager: ObservableObject {
     var expiryDatePlaceholder = "MM/YY"
     @Published var securityCodePlaceholder = "XXX"
 
-    var cardholderNameText: String = ""
+    private(set) var cardholderNameText: String = ""
     private(set) var cardNumberText: String = ""
     private(set) var expiryDateText = ""
-    var securityCodeText = ""
+    private(set) var securityCodeText = ""
 
     private var currentTextField: CardDetailsFocusable?
 
     // MARK: - Custom bindings
+
+    var cardHolderNameBinding: Binding<String> {
+        Binding(
+            get: {
+                self.cardholderNameText
+            }, set: {
+                self.cardholderNameText = $0
+                if !self.cardHolderNameValid {
+                    self.validateTextField(.cardholderName)
+                }
+            }
+        )
+    }
+
 
     var cardNumberBinding: Binding<String> {
         Binding(
@@ -63,6 +77,9 @@ class CardDetailsFormManager: ObservableObject {
                 self.cardNumberText = self.formatCardNumber(updatedText: $0)
                 self.updateCardIssuerIcon()
                 self.updateSecurityCodeTitleAndPlaceholder()
+                if !self.cardNumberValid {
+                    self.validateTextField(.cardNumber)
+                }
             }
         )
     }
@@ -74,10 +91,25 @@ class CardDetailsFormManager: ObservableObject {
             }, set: {
                 let newText = self.formatExpiryDate(updatedText: $0)
                 self.expiryDateText = newText
+                if !self.expiryDateValid {
+                    self.validateTextField(.expiryDate)
+                }
             }
         )
     }
 
+    var securityCodeBinding: Binding<String> {
+        Binding(
+            get: {
+                self.securityCodeText
+            }, set: {
+                self.securityCodeText = $0
+                if !self.securityCodeValid {
+                    self.validateTextField(.securityCode)
+                }
+            }
+        )
+    }
 
     // MARK: - Initialisation
 
@@ -94,7 +126,7 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
-        validateOldTextField(currentTextField)
+        validateTextField(currentTextField)
         currentTextField = focusedField
 
         guard let focusedField = focusedField else { return }
@@ -169,7 +201,7 @@ class CardDetailsFormManager: ObservableObject {
 
     // MARK: - Validations
 
-    private func validateOldTextField(_ textField: CardDetailsFocusable?) {
+    private func validateTextField(_ textField: CardDetailsFocusable?) {
         guard let textField = textField else { return }
 
         switch textField {

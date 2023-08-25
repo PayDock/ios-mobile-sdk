@@ -39,7 +39,7 @@ struct CardDetailsView: View {
 
                 VStack(spacing: 0) {
                     OutlineTextField(
-                        text: $viewModel.cardDetailsFormManager.cardholderNameText,
+                        text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
                         placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
@@ -80,7 +80,7 @@ struct CardDetailsView: View {
                         }
 
                         OutlineTextField(
-                            text: $viewModel.cardDetailsFormManager.securityCodeText,
+                            text: viewModel.cardDetailsFormManager.securityCodeBinding,
                             title: viewModel.cardDetailsFormManager.securityCodeTitle,
                             placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
                             errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
