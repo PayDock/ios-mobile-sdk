@@ -99,6 +99,9 @@ struct OutlineTextField: View {
                 showErrorView = !errorMessage.isEmpty
             }
         }
+        .onChange(of: text) { _ in
+            updateTitle()
+        }
     }
 
     private func textFieldView() -> some View {

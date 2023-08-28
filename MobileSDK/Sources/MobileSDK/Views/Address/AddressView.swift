@@ -18,13 +18,17 @@ struct AddressView: View {
             VStack(spacing: 0) {
                 nameAndLastNameView
                 autocompleteTextFieldView
-                manualEntryButton
-                addressLine1View
-                addressLine2View
-                cityView
-                stateView
-                postcodeView
-                countryView
+
+                if viewModel.addressFormManager.isAddressFormExpanded {
+                    addressLine1View
+                    addressLine2View
+                    cityView
+                    stateView
+                    postcodeView
+                    countryView
+                } else {
+                    manualEntryButton
+                }
             }
             .padding(.horizontal, 16)
         }
@@ -101,7 +105,7 @@ struct AddressView: View {
                 valid: $viewModel.addressFormManager.addressSearchValid,
                 showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
                 options: $viewModel.addressSearchSuggestions, onSelection: {
-                    viewModel.reverseGeoForOptionAt(index: $0)
+                    viewModel.handleTapOnOptionAt(index: $0)
                 })
             .focused($textFieldInFocus, equals: .searchAddress)
             .onTapGesture {

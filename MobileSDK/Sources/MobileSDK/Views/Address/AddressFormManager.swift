@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AddressFormManager {
+class AddressFormManager: ObservableObject {
 
     // MARK: - Properties
 
@@ -73,6 +73,7 @@ class AddressFormManager {
 
     private var currentTextField: AddressFocusable?
     @Published var showAddressSearchPopup = false
+    @Published var isAddressFormExpanded = false
 
     // MARK: - Methods
 
@@ -97,6 +98,14 @@ class AddressFormManager {
 
     private func validateOldTextField(_ textField: AddressFocusable?) {
 
+    }
+
+    func updateFormWith(reversedGeoLocation: ReversedGeoLocation) {
+        addressLine1Text = reversedGeoLocation.formattedAddressLine
+        cityText = reversedGeoLocation.city
+        stateText = reversedGeoLocation.state
+        postcodeText = reversedGeoLocation.zipCode
+        countryText = reversedGeoLocation.country
     }
 
 }

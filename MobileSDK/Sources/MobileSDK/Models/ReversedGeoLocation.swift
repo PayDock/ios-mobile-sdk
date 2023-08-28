@@ -17,7 +17,11 @@ struct ReversedGeoLocation {
     let country: String         // eg. United States
     let isoCountryCode: String  // eg. US
 
-    var formattedAddress: String {
+    var formattedAddressLine: String {
+        return "\(streetNumber) \(streetName)"
+    }
+
+    var formattedFullAddress: String {
         return """
         \(streetNumber) \(streetName),
         \(city), \(state) \(zipCode)

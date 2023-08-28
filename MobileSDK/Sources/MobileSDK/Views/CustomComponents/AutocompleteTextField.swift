@@ -84,7 +84,7 @@ struct AutocompleteTextField: View {
     private var autocompletePopup: some View {
         GeometryReader { proxy in
             ZStack(alignment: .center) {
-                if showPopup {
+                if showPopup && editing {
                     Spacer()
                         .frame(height: 50)
                     VStack(alignment: .center) {
@@ -117,13 +117,17 @@ struct AutocompleteTextField: View {
                             popupScale = 1
                         }
                     }
+                    .onDisappear {
+                        popupOpacity = 0
+                        popupScale = 0.7
+                    }
                 }
             }
-            .onChange(of: options) { newValue in
-                if options.count > 0 {
-                    showPopup = true
-                }
-            }
+//            .onChange(of: options) { newValue in
+//                if showPopup {
+//
+//                }
+//            }
         }
     }
 
@@ -152,5 +156,4 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             showPopup: .constant(true),
             options: .constant(options), onSelection: {_ in })
     }
-
 }

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import MapKit
+import Combine
 
 class AddressVM: NSObject, ObservableObject {
 
@@ -20,6 +21,7 @@ class AddressVM: NSObject, ObservableObject {
 
     @Published var addressSearchSuggestions: Array<String> = [""]
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
+    var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Custom bindings
 
@@ -47,6 +49,10 @@ class AddressVM: NSObject, ObservableObject {
 
     private func setup() {
         localSearchCompleter.delegate = self
+
+        anyCancellable = addressFormManager.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     // MARK: - Address Search
@@ -56,15 +62,25 @@ class AddressVM: NSObject, ObservableObject {
         localSearchCompleter.queryFragment = searchableText
     }
 
-    func reverseGeoForOptionAt(index: Int?) {
+    func handleTapOnOptionAt(index: Int?) {
         guard let index = index else { return }
 
+        addressFormManager.isAddressFormExpanded = true
+        addressFormManager.addressSearchText = ""
+        addressFormManager.showAddressSearchPopup = false
+        addressFormManager.setEditingTextField(focusedField: nil)
+
+        addressSearchSuggestions = [""]
+        reverseGeoForOptionAt(index: index)
+    }
+
+    private func reverseGeoForOptionAt(index: Int) {
         let location = mkLocalSearchCompletions[index]
 
         let searchRequest = MKLocalSearch.Request(completion: location)
         let search = MKLocalSearch(request: searchRequest)
         var coordinateK : CLLocationCoordinate2D?
-        search.start { (response, error) in
+        search.start { [weak self] (response, error) in
             if error == nil, let coordinate = response?.mapItems.first?.placemark.coordinate {
                 coordinateK = coordinate
             }
@@ -80,13 +96,7 @@ class AddressVM: NSObject, ObservableObject {
                     }
 
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                    print(reversedGeoLocation)
-                    //             address = "\(reversedGeoLocation.streetNumber) \(reversedGeoLocation.streetName)"
-                    //             city = "\(reversedGeoLocation.city)"
-                    //             state = "\(reversedGeoLocation.state)"
-                    //             zip = "\(reversedGeoLocation.zipCode)"
-                    //             mapSearch.searchTerm = address
-                    //             isFocused = false
+                    self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
                 }
             }
         }
@@ -102,6 +112,7 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
         Task { @MainActor in
             mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
             addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
+            addressFormManager.showAddressSearchPopup = true
         }
     }
 
