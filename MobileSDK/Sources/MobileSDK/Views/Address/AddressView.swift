@@ -120,7 +120,7 @@ struct AddressView: View {
     private var manualEntryButton: some View {
         HStack {
             Button {
-
+                self.viewModel.addressFormManager.isAddressFormExpanded = true
             } label: {
                 Text("Or enter address manually")
                     .customFont(.body3)

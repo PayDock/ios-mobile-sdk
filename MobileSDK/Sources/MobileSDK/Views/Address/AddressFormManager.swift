@@ -61,15 +61,15 @@ class AddressFormManager: ObservableObject {
     let postcodePlaceholder = ""
     let countryPlaceholder = ""
 
-    var firstNameText = ""
-    var lastNameText = ""
-    var addressSearchText = ""
-    var addressLine1Text = ""
-    var addressLine2Text = ""
-    var cityText = ""
-    var stateText = ""
-    var postcodeText = ""
-    var countryText = ""
+    @Published var firstNameText = ""
+    @Published var lastNameText = ""
+    @Published var addressSearchText = ""
+    @Published var addressLine1Text = ""
+    @Published var addressLine2Text = ""
+    @Published var cityText = ""
+    @Published var stateText = ""
+    @Published var postcodeText = ""
+    @Published var countryText = ""
 
     private var currentTextField: AddressFocusable?
     @Published var showAddressSearchPopup = false

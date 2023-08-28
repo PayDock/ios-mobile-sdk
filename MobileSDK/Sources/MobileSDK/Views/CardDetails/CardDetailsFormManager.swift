@@ -130,31 +130,11 @@ class CardDetailsFormManager: ObservableObject {
         currentTextField = focusedField
 
         guard let focusedField = focusedField else { return }
-        switch focusedField {
-        case .cardholderName:
-            editingCardholderName = true
-            editingCardNumber = false
-            editingExpiryDate = false
-            editingSecurityCode = false
 
-        case .cardNumber:
-            editingCardholderName = false
-            editingCardNumber = true
-            editingExpiryDate = false
-            editingSecurityCode = false
-
-        case .expiryDate:
-            editingCardholderName = false
-            editingCardNumber = false
-            editingExpiryDate = true
-            editingSecurityCode = false
-
-        case .securityCode:
-            editingCardholderName = false
-            editingCardNumber = false
-            editingExpiryDate = false
-            editingSecurityCode = true
-        }
+        editingCardholderName = focusedField == .cardholderName
+        editingCardNumber = focusedField == .cardNumber
+        editingExpiryDate = focusedField == .expiryDate
+        editingSecurityCode = focusedField == .securityCode
     }
 
     func updateCardIssuerIcon() {
@@ -178,7 +158,6 @@ class CardDetailsFormManager: ObservableObject {
         case .cvc:
             securityCodeTitle = "CVC"
             securityCodePlaceholder = "XXX"
-
         }
     }
 
@@ -227,6 +206,7 @@ class CardDetailsFormManager: ObservableObject {
         if case .other = cardIssuerValidator.detectCardIssuer(number: cardNumberText) {
             cardNumberValid = false
             cardNumberError = "Invalid card number"
+
         } else {
             cardNumberValid = true
             cardNumberError = ""
