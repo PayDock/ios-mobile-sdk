@@ -75,7 +75,7 @@ struct AutocompleteTextField: View {
                 valid: $valid)
             .overlay(
                 autocompletePopup
-                    .offset(x: -1, y: 64), alignment: .topLeading
+                    .offset(x: -1, y: 52), alignment: .topLeading
             )
         }
         .frame(height: 48)
@@ -89,18 +89,23 @@ struct AutocompleteTextField: View {
                         .frame(height: 50)
                     VStack(alignment: .center) {
                         ForEach(options, id: \.self) { option in
-                            Text(option)
-                                .frame(maxWidth: .infinity)
-                                .padding(4)
-                                .onTapGesture {
-                                    onSelection(getOptionIndex(option: option))
-                                }
+                            HStack {
+                                Text(option)
+                                    .customFont(.body)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .onTapGesture {
+                                        onSelection(getOptionIndex(option: option))
+                                    }
+                                Spacer()
+                            }
                         }
                     }
+                    .padding(.vertical, 4)
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .foregroundColor(.white)
+                            .foregroundColor(.primaryLight)
                             .shadow(radius: 4)
                     )
                     .opacity(popupOpacity)

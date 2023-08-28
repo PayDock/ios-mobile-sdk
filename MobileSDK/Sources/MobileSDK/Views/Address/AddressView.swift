@@ -15,11 +15,10 @@ struct AddressView: View {
 
     var body: some View {
         ScrollView {
-            VStack {
-                nameHeader
+            VStack(spacing: 0) {
                 nameAndLastNameView
-                findAnAddressHeader
                 autocompleteTextFieldView
+                manualEntryButton
                 addressLine1View
                 addressLine2View
                 cityView
@@ -40,35 +39,41 @@ struct AddressView: View {
                 .foregroundColor(.gray)
             Spacer()
         }
+        .padding(.bottom, 20)
     }
 
     private var nameAndLastNameView: some View {
-        HStack(spacing: 12) {
-            OutlineTextField(
-                text: $viewModel.addressFormManager.firstNameText,
-                title: viewModel.addressFormManager.firstNameTitle,
-                placeholder: viewModel.addressFormManager.firstNamePlaceholder,
-                errorMessage: $viewModel.addressFormManager.firstNameError,
-                editing: $viewModel.addressFormManager.editingFirstName,
-                valid: $viewModel.addressFormManager.firstNameValid)
-            .focused($textFieldInFocus, equals: .firstName)
-            .onTapGesture {
-                self.textFieldInFocus = .firstName
-                viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
-            }
+        VStack(spacing: 0) {
+            nameHeader
 
-            OutlineTextField(
-                text: $viewModel.addressFormManager.lastNameText,
-                title: viewModel.addressFormManager.lastNameTitle,
-                placeholder: viewModel.addressFormManager.lastNamePlaceholder,
-                errorMessage: $viewModel.addressFormManager.lastNameError,
-                editing: $viewModel.addressFormManager.editingLastName,
-                valid: $viewModel.addressFormManager.lastNameValid)
-            .focused($textFieldInFocus, equals: .lastName)
-            .onTapGesture {
-                self.textFieldInFocus = .lastName
-                viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
+            HStack(spacing: 12) {
+                OutlineTextField(
+                    text: $viewModel.addressFormManager.firstNameText,
+                    title: viewModel.addressFormManager.firstNameTitle,
+                    placeholder: viewModel.addressFormManager.firstNamePlaceholder,
+                    errorMessage: $viewModel.addressFormManager.firstNameError,
+                    editing: $viewModel.addressFormManager.editingFirstName,
+                    valid: $viewModel.addressFormManager.firstNameValid)
+                .focused($textFieldInFocus, equals: .firstName)
+                .onTapGesture {
+                    self.textFieldInFocus = .firstName
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
+                }
+
+                OutlineTextField(
+                    text: $viewModel.addressFormManager.lastNameText,
+                    title: viewModel.addressFormManager.lastNameTitle,
+                    placeholder: viewModel.addressFormManager.lastNamePlaceholder,
+                    errorMessage: $viewModel.addressFormManager.lastNameError,
+                    editing: $viewModel.addressFormManager.editingLastName,
+                    valid: $viewModel.addressFormManager.lastNameValid)
+                .focused($textFieldInFocus, equals: .lastName)
+                .onTapGesture {
+                    self.textFieldInFocus = .lastName
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
+                }
             }
+            .padding(.bottom, 20)
         }
     }
 
@@ -79,27 +84,49 @@ struct AddressView: View {
                 .foregroundColor(.gray)
             Spacer()
         }
+        .padding(.bottom, 20)
     }
     
 
     private var autocompleteTextFieldView: some View {
-        AutocompleteTextField(
-            text: viewModel.addressSearchBinding,
-            title: viewModel.addressFormManager.addressSearchTitle,
-            placeholder: viewModel.addressFormManager.addressSearchPlaceholder,
-            errorMessage: $viewModel.addressFormManager.addressSearchError,
-            editing: $viewModel.addressFormManager.editingAddressSearch,
-            valid: $viewModel.addressFormManager.addressSearchValid,
-            showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
-            options: $viewModel.addressSearchSuggestions, onSelection: {
-                viewModel.reverseGeoForOptionAt(index: $0)
-            })
-        .focused($textFieldInFocus, equals: .searchAddress)
-        .onTapGesture {
-            self.textFieldInFocus = .searchAddress
-            viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
+        VStack(spacing: 0) {
+            findAnAddressHeader
+
+            AutocompleteTextField(
+                text: viewModel.addressSearchBinding,
+                title: viewModel.addressFormManager.addressSearchTitle,
+                placeholder: viewModel.addressFormManager.addressSearchPlaceholder,
+                errorMessage: $viewModel.addressFormManager.addressSearchError,
+                editing: $viewModel.addressFormManager.editingAddressSearch,
+                valid: $viewModel.addressFormManager.addressSearchValid,
+                showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
+                options: $viewModel.addressSearchSuggestions, onSelection: {
+                    viewModel.reverseGeoForOptionAt(index: $0)
+                })
+            .focused($textFieldInFocus, equals: .searchAddress)
+            .onTapGesture {
+                self.textFieldInFocus = .searchAddress
+                viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
+            }
+            .padding(.bottom, 6)
         }
         .zIndex(1)
+    }
+
+    private var manualEntryButton: some View {
+        HStack {
+            Button {
+
+            } label: {
+                Text("Or enter address manually")
+                    .customFont(.body3)
+                    .foregroundColor(.primaryColor)
+                    .underline()
+            }
+            Spacer()
+        }
+        .padding(.top, 4)
+        .padding(.bottom, 16)
     }
 
     private var addressLine1View: some View {

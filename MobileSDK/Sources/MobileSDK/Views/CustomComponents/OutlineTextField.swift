@@ -80,7 +80,7 @@ struct OutlineTextField: View {
             }
             Spacer()
         }
-        .padding(.top, 6)
+        .padding(.top, 2)
         .padding(.bottom, 2)
         .onChange(of: editing) { _ in
             withAnimation(.easeOut(duration: 0.15)) {

@@ -100,7 +100,7 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
 
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         Task { @MainActor in
-            mkLocalSearchCompletions = completer.results.prefix(5).map { $0 }
+            mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
             addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
         }
     }
