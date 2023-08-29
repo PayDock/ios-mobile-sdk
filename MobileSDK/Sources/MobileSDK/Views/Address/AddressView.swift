@@ -29,6 +29,8 @@ struct AddressView: View {
                 } else {
                     manualEntryButton
                 }
+
+                saveButton
             }
             .padding(.horizontal, 16)
         }
@@ -222,6 +224,14 @@ struct AddressView: View {
             viewModel.addressFormManager.setEditingTextField(focusedField: .country
             )
         }
+    }
+
+    private var saveButton: some View {
+        LargeButton(title: "Save") {
+            viewModel.saveAddress()
+        }
+        .padding(.vertical, 16)
+        .customFont(.body)
     }
 
 }

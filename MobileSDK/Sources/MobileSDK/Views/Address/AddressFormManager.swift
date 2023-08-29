@@ -78,7 +78,7 @@ class AddressFormManager: ObservableObject {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: AddressFocusable?) {
-        validateOldTextField(currentTextField)
+        validateTextField(currentTextField)
         currentTextField = focusedField
 
         guard let focusedField = focusedField else { return }
@@ -96,8 +96,47 @@ class AddressFormManager: ObservableObject {
 
     // MARK: - Validations
 
-    private func validateOldTextField(_ textField: AddressFocusable?) {
+    private func validateAllTextFields() {
+        AddressFocusable.allCases.forEach {
+            validateTextField($0)
+        }
+    }
 
+    private func validateTextField(_ textField: AddressFocusable?) {
+        guard let textField = textField else { return }
+
+        switch textField {
+        case .firstName:
+            firstNameValid = !firstNameText.isEmpty
+            firstNameError = firstNameError.isEmpty ? "Mandatory field" : ""
+        case .lastName:
+            lastNameValid = !lastNameText.isEmpty
+            lastNameError = lastNameText.isEmpty ? "Mandatory field" : ""
+
+        case .searchAddress: break // Search field - no need to validate
+
+        case .addressLine1:
+            addressLine1Valid = !addressLine1Text.isEmpty
+            addressLine1Error = addressLine1Text.isEmpty ? "Mandatory field" : ""
+
+        case .addressLine2: break
+
+        case .city:
+            cityValid = !cityText.isEmpty
+            cityError = cityText.isEmpty ? "Mandatory field" : ""
+
+        case .state:
+            stateValid = !stateText.isEmpty
+            stateError = stateText.isEmpty ? "Mandatory field" : ""
+
+        case .postcode:
+            postcodeValid = !postcodeText.isEmpty
+            postcodeError = postcodeText.isEmpty ? "Mandatory field" : ""
+
+        case .country:
+            countryValid = !countryText.isEmpty
+            countryError = countryText.isEmpty ? "Mandatory field" : ""
+        }
     }
 
     func updateFormWith(reversedGeoLocation: ReversedGeoLocation) {
@@ -106,13 +145,15 @@ class AddressFormManager: ObservableObject {
         stateText = reversedGeoLocation.state
         postcodeText = reversedGeoLocation.zipCode
         countryText = reversedGeoLocation.country
+
+        validateAllTextFields()
     }
 
 }
 
 extension AddressFormManager {
 
-    enum AddressFocusable: Hashable {
+    enum AddressFocusable: Hashable, CaseIterable {
         case firstName
         case lastName
         case searchAddress

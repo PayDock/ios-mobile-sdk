@@ -21,15 +21,6 @@ struct ReversedGeoLocation {
         return "\(streetNumber) \(streetName)"
     }
 
-    var formattedFullAddress: String {
-        return """
-        \(streetNumber) \(streetName),
-        \(city), \(state) \(zipCode)
-        \(country)
-        """
-    }
-
-    // Handle optionals as needed
     init(with placemark: CLPlacemark) {
         self.streetName = placemark.thoroughfare ?? ""
         self.streetNumber = placemark.subThoroughfare ?? ""

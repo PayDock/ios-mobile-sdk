@@ -79,7 +79,7 @@ class AddressVM: NSObject, ObservableObject {
 
         let searchRequest = MKLocalSearch.Request(completion: location)
         let search = MKLocalSearch(request: searchRequest)
-        var coordinateK : CLLocationCoordinate2D?
+        var coordinateK: CLLocationCoordinate2D?
         search.start { [weak self] (response, error) in
             if error == nil, let coordinate = response?.mapItems.first?.placemark.coordinate {
                 coordinateK = coordinate
@@ -100,6 +100,22 @@ class AddressVM: NSObject, ObservableObject {
                 }
             }
         }
+    }
+
+    // MARK: - Logic
+
+    func saveAddress() {
+        let address = Address(
+            firstName: addressFormManager.firstNameText,
+            lastName: addressFormManager.lastNameText,
+            addressLine1: addressFormManager.addressLine1Text,
+            addressLine2: addressFormManager.addressLine2Text,
+            city: addressFormManager.cityText,
+            state: addressFormManager.stateText,
+            postcode: addressFormManager.postcodeText,
+            country: addressFormManager.countryText)
+
+        
     }
 
 }
