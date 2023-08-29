@@ -81,8 +81,6 @@ class AddressFormManager: ObservableObject {
         validateTextField(currentTextField)
         currentTextField = focusedField
 
-        guard let focusedField = focusedField else { return }
-
         editingFirstName = focusedField == .firstName
         editingLastName = focusedField == .lastName
         editingAddressSearch = focusedField == .searchAddress
@@ -102,13 +100,22 @@ class AddressFormManager: ObservableObject {
         }
     }
 
+    private func validateAllAddressFields() {
+        AddressFocusable.allCases.forEach {
+            if $0 != .firstName && $0 != .lastName {
+                validateTextField($0)
+            }
+        }
+    }
+
     private func validateTextField(_ textField: AddressFocusable?) {
         guard let textField = textField else { return }
 
         switch textField {
         case .firstName:
             firstNameValid = !firstNameText.isEmpty
-            firstNameError = firstNameError.isEmpty ? "Mandatory field" : ""
+            firstNameError = firstNameText.isEmpty ? "Mandatory field" : ""
+
         case .lastName:
             lastNameValid = !lastNameText.isEmpty
             lastNameError = lastNameText.isEmpty ? "Mandatory field" : ""
@@ -145,6 +152,20 @@ class AddressFormManager: ObservableObject {
         stateText = reversedGeoLocation.state
         postcodeText = reversedGeoLocation.zipCode
         countryText = reversedGeoLocation.country
+
+        validateAllAddressFields()
+    }
+
+    func updateFormWith(address: Address?) {
+        guard let address = address else { return }
+        firstNameText = address.firstName
+        lastNameText = address.lastName
+        addressLine1Text = address.addressLine1
+        addressLine2Text = address.addressLine2
+        cityText = address.city
+        stateText = address.state
+        postcodeText = address.postcode
+        countryText = address.country
 
         validateAllTextFields()
     }

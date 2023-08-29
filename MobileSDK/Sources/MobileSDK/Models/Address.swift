@@ -9,13 +9,31 @@ import Foundation
 
 public struct Address {
 
-    let firstName: String
-    let lastName: String
-    let addressLine1: String
-    let addressLine2: String
-    let city: String
-    let state: String
-    let postcode: String
-    let country: String
+    public let firstName: String
+    public let lastName: String
+    public let addressLine1: String
+    public let addressLine2: String
+    public let city: String
+    public let state: String
+    public let postcode: String
+    public let country: String
+
+    public init(firstName: String = "",
+         lastName: String = "",
+         addressLine1: String = "",
+         addressLine2: String = "",
+         city: String = "",
+         state: String = "",
+         postcode: String = "",
+         country: String = "") {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.addressLine1 = addressLine1
+        self.addressLine2 = addressLine2
+        self.city = city
+        self.state = state
+        self.postcode = postcode
+        self.country = country
+    }
 
 }

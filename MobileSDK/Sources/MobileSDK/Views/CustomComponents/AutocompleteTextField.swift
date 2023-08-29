@@ -88,16 +88,23 @@ struct AutocompleteTextField: View {
                     Spacer()
                         .frame(height: 50)
                     VStack(alignment: .center) {
-                        ForEach(options, id: \.self) { option in
-                            HStack {
-                                Text(option)
-                                    .customFont(.body)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .onTapGesture {
-                                        onSelection(getOptionIndex(option: option))
-                                    }
-                                Spacer()
+                        if options.isEmpty {
+                            Text("No results")
+                                .customFont(.body)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                        } else {
+                            ForEach(options, id: \.self) { option in
+                                HStack {
+                                    Text(option)
+                                        .customFont(.body)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .onTapGesture {
+                                            onSelection(getOptionIndex(option: option))
+                                        }
+                                    Spacer()
+                                }
                             }
                         }
                     }
@@ -123,11 +130,6 @@ struct AutocompleteTextField: View {
                     }
                 }
             }
-//            .onChange(of: options) { newValue in
-//                if showPopup {
-//
-//                }
-//            }
         }
     }
 

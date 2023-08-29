@@ -22,6 +22,7 @@ class AddressVM: NSObject, ObservableObject {
     @Published var addressSearchSuggestions: Array<String> = [""]
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
+    var onCompletion: Binding<Address>?
 
     // MARK: - Custom bindings
 
@@ -115,7 +116,7 @@ class AddressVM: NSObject, ObservableObject {
             postcode: addressFormManager.postcodeText,
             country: addressFormManager.countryText)
 
-        
+        onCompletion?.wrappedValue = address
     }
 
 }
