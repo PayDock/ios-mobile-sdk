@@ -25,7 +25,6 @@ public struct BottomSheetView<Content: View>: View {
                     headerView
                     content
                         .padding(.top, 20)
-                        .padding(.bottom, 60)
                         .overlay {
                             GeometryReader { geometry in
                                 Color.clear.preference(key: InnerHeightPreferenceKey.self, value: geometry.size.height)

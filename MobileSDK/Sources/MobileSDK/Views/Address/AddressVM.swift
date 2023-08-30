@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import MapKit
+import Combine
 
 class AddressVM: NSObject, ObservableObject {
 
@@ -18,7 +19,10 @@ class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
-    @Published private(set) var results: Array<String> = []
+    @Published var addressSearchSuggestions: Array<String> = [""]
+    var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
+    var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
+    var onCompletion: Binding<Address>?
 
     // MARK: - Custom bindings
 
@@ -46,13 +50,73 @@ class AddressVM: NSObject, ObservableObject {
 
     private func setup() {
         localSearchCompleter.delegate = self
+
+        anyCancellable = addressFormManager.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
-    // MARK: - Search
+    // MARK: - Address Search
 
     func searchAddress(_ searchableText: String) {
         guard searchableText.isEmpty == false else { return }
         localSearchCompleter.queryFragment = searchableText
+    }
+
+    func handleTapOnOptionAt(index: Int?) {
+        guard let index = index else { return }
+
+        addressFormManager.isAddressFormExpanded = true
+        addressFormManager.addressSearchText = ""
+        addressFormManager.showAddressSearchPopup = false
+        addressFormManager.setEditingTextField(focusedField: nil)
+
+        addressSearchSuggestions = [""]
+        reverseGeoForOptionAt(index: index)
+    }
+
+    private func reverseGeoForOptionAt(index: Int) {
+        let location = mkLocalSearchCompletions[index]
+
+        let searchRequest = MKLocalSearch.Request(completion: location)
+        let search = MKLocalSearch(request: searchRequest)
+        var coordinateK: CLLocationCoordinate2D?
+        search.start { [weak self] (response, error) in
+            if error == nil, let coordinate = response?.mapItems.first?.placemark.coordinate {
+                coordinateK = coordinate
+            }
+
+            if let c = coordinateK {
+                let location = CLLocation(latitude: c.latitude, longitude: c.longitude)
+                CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+
+                    guard let placemark = placemarks?.first else {
+                        let errorString = error?.localizedDescription ?? "Unexpected Error"
+                        print("Unable to reverse geocode the given location. Error: \(errorString)")
+                        return
+                    }
+
+                    let reversedGeoLocation = ReversedGeoLocation(with: placemark)
+                    self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
+                }
+            }
+        }
+    }
+
+    // MARK: - Logic
+
+    func saveAddress() {
+        let address = Address(
+            firstName: addressFormManager.firstNameText,
+            lastName: addressFormManager.lastNameText,
+            addressLine1: addressFormManager.addressLine1Text,
+            addressLine2: addressFormManager.addressLine2Text,
+            city: addressFormManager.cityText,
+            state: addressFormManager.stateText,
+            postcode: addressFormManager.postcodeText,
+            country: addressFormManager.countryText)
+
+        onCompletion?.wrappedValue = address
     }
 
 }
@@ -63,9 +127,9 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
 
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         Task { @MainActor in
-            let addressesResult = completer.results.prefix(5)
-            let addresses = addressesResult.map { "\($0.title), \($0.subtitle)"}
-            addressFormManager.addressSearchSuggestions = addresses
+            mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
+            addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
+            addressFormManager.showAddressSearchPopup = true
         }
     }
 

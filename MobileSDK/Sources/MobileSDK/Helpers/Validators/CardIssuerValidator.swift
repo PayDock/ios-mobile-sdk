@@ -10,7 +10,7 @@ import Foundation
 /**
  A utility object for detecting card issuer based on card numbers
  */
-internal class CardIssuerValidator {
+class CardIssuerValidator {
 
     /**
      Constants for the regex patterns and their corresponding card issuers

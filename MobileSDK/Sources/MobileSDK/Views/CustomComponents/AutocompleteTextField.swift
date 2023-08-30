@@ -25,6 +25,7 @@ struct AutocompleteTextField: View {
     @Binding private var options: [String]
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
+    private var onSelection: (Int?) -> ()
 
     @FocusState private var focusField: Field?
 
@@ -40,6 +41,7 @@ struct AutocompleteTextField: View {
     ///   - valid: Whether the field is in the valid state.
     ///   - showPopup: Whether the autocomplete field is displayed..
     ///   - option: Autocomplete popup list of options.
+    ///   - onSelection: Returns selected value
     public init(text: Binding<String>,
                 title: String,
                 placeholder: String,
@@ -48,7 +50,8 @@ struct AutocompleteTextField: View {
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
                 showPopup: Binding<Bool>,
-                options: Binding<Array<String>>) {
+                options: Binding<Array<String>>,
+                onSelection: @escaping (Int?) -> ()) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -58,6 +61,7 @@ struct AutocompleteTextField: View {
         self._valid = valid
         self._showPopup = showPopup
         self._options = options
+        self.onSelection = onSelection
     }
 
     var body: some View {
@@ -71,46 +75,66 @@ struct AutocompleteTextField: View {
                 valid: $valid)
             .overlay(
                 autocompletePopup
-                    .offset(y: 64), alignment: .topLeading
+                    .offset(x: -1, y: 52), alignment: .topLeading
             )
         }
-        .padding([.top, .leading, .trailing], 8)
         .frame(height: 48)
     }
 
     private var autocompletePopup: some View {
-        ZStack {
-            if showPopup {
-                Spacer()
-                    .frame(height: 50)
-                VStack(alignment: .center) {
-                    ForEach(options, id: \.self) {
-                        Text($0)
-                            .frame(maxWidth: .infinity)
-                            .padding(4)
+        GeometryReader { proxy in
+            ZStack(alignment: .center) {
+                if showPopup && editing {
+                    Spacer()
+                        .frame(height: 50)
+                    VStack(alignment: .center) {
+                        if options.isEmpty {
+                            Text("No results")
+                                .customFont(.body)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                        } else {
+                            ForEach(options, id: \.self) { option in
+                                HStack {
+                                    Text(option)
+                                        .customFont(.body)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .onTapGesture {
+                                            onSelection(getOptionIndex(option: option))
+                                        }
+                                    Spacer()
+                                }
+                            }
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .foregroundColor(.white)
-                        .shadow(radius: 4)
-                )
-                .opacity(popupOpacity)
-                .scaleEffect(popupScale)
-                .onAppear {
-                    withAnimation(.easeOut(duration: 0.15)) {
-                        popupOpacity = 1
-                        popupScale = 1
+                    .padding(.vertical, 4)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .foregroundColor(.primaryLight)
+                            .shadow(radius: 4)
+                    )
+                    .opacity(popupOpacity)
+                    .scaleEffect(popupScale)
+                    .frame(width: proxy.size.width + 2)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            popupOpacity = 1
+                            popupScale = 1
+                        }
+                    }
+                    .onDisappear {
+                        popupOpacity = 0
+                        popupScale = 0.7
                     }
                 }
             }
         }
-        .onChange(of: options) { newValue in
-            if options.count > 0 {
-                showPopup = true
-            }
-        }
+    }
+
+    private func getOptionIndex(option: String) -> Int? {
+        return options.firstIndex { $0 == option }
     }
 
     enum Field {
@@ -132,7 +156,6 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             editing: .constant(true),
             valid: .constant(true),
             showPopup: .constant(true),
-            options: .constant(options))
+            options: .constant(options), onSelection: {_ in })
     }
-
 }

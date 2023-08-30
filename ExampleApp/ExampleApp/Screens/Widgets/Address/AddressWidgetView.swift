@@ -9,6 +9,7 @@ import SwiftUI
 import MobileSDK
 
 struct AddressWidgetView: View {
+    @State var address: Address = Address()
     @State var isSheetPresented = false
 
     var body: some View {
@@ -22,9 +23,10 @@ struct AddressWidgetView: View {
                     .padding()
                     Spacer()
                     AddressSheetView(
-                        isPresented: $isSheetPresented)
+                        isPresented: $isSheetPresented,
+                        onCompletion: $address)
                 }
-                Text("")
+                Text(address.addressLine1)
             }
             .background(Color(hex: "#EAE0D7"))
         }

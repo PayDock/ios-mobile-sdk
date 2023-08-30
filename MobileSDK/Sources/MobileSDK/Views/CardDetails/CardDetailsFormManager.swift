@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class CardDetailsFormManager {
+class CardDetailsFormManager: ObservableObject {
 
     // MARK: - Dependencies
 
@@ -46,14 +46,28 @@ class CardDetailsFormManager {
     var expiryDatePlaceholder = "MM/YY"
     @Published var securityCodePlaceholder = "XXX"
 
-    var cardholderNameText: String = ""
+    private(set) var cardholderNameText: String = ""
     private(set) var cardNumberText: String = ""
     private(set) var expiryDateText = ""
-    var securityCodeText = ""
+    private(set) var securityCodeText = ""
 
     private var currentTextField: CardDetailsFocusable?
 
     // MARK: - Custom bindings
+
+    var cardHolderNameBinding: Binding<String> {
+        Binding(
+            get: {
+                self.cardholderNameText
+            }, set: {
+                self.cardholderNameText = $0
+                if !self.cardHolderNameValid {
+                    self.validateTextField(.cardholderName)
+                }
+            }
+        )
+    }
+
 
     var cardNumberBinding: Binding<String> {
         Binding(
@@ -63,6 +77,9 @@ class CardDetailsFormManager {
                 self.cardNumberText = self.formatCardNumber(updatedText: $0)
                 self.updateCardIssuerIcon()
                 self.updateSecurityCodeTitleAndPlaceholder()
+                if !self.cardNumberValid {
+                    self.validateTextField(.cardNumber)
+                }
             }
         )
     }
@@ -74,10 +91,25 @@ class CardDetailsFormManager {
             }, set: {
                 let newText = self.formatExpiryDate(updatedText: $0)
                 self.expiryDateText = newText
+                if !self.expiryDateValid {
+                    self.validateTextField(.expiryDate)
+                }
             }
         )
     }
 
+    var securityCodeBinding: Binding<String> {
+        Binding(
+            get: {
+                self.securityCodeText
+            }, set: {
+                self.securityCodeText = $0
+                if !self.securityCodeValid {
+                    self.validateTextField(.securityCode)
+                }
+            }
+        )
+    }
 
     // MARK: - Initialisation
 
@@ -94,35 +126,15 @@ class CardDetailsFormManager {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
-        validateOldTextField(currentTextField)
+        validateTextField(currentTextField)
         currentTextField = focusedField
 
         guard let focusedField = focusedField else { return }
-        switch focusedField {
-        case .cardholderName:
-            editingCardholderName = true
-            editingCardNumber = false
-            editingExpiryDate = false
-            editingSecurityCode = false
 
-        case .cardNumber:
-            editingCardholderName = false
-            editingCardNumber = true
-            editingExpiryDate = false
-            editingSecurityCode = false
-
-        case .expiryDate:
-            editingCardholderName = false
-            editingCardNumber = false
-            editingExpiryDate = true
-            editingSecurityCode = false
-
-        case .securityCode:
-            editingCardholderName = false
-            editingCardNumber = false
-            editingExpiryDate = false
-            editingSecurityCode = true
-        }
+        editingCardholderName = focusedField == .cardholderName
+        editingCardNumber = focusedField == .cardNumber
+        editingExpiryDate = focusedField == .expiryDate
+        editingSecurityCode = focusedField == .securityCode
     }
 
     func updateCardIssuerIcon() {
@@ -146,7 +158,6 @@ class CardDetailsFormManager {
         case .cvc:
             securityCodeTitle = "CVC"
             securityCodePlaceholder = "XXX"
-
         }
     }
 
@@ -169,7 +180,7 @@ class CardDetailsFormManager {
 
     // MARK: - Validations
 
-    private func validateOldTextField(_ textField: CardDetailsFocusable?) {
+    private func validateTextField(_ textField: CardDetailsFocusable?) {
         guard let textField = textField else { return }
 
         switch textField {
@@ -195,6 +206,7 @@ class CardDetailsFormManager {
         if case .other = cardIssuerValidator.detectCardIssuer(number: cardNumberText) {
             cardNumberValid = false
             cardNumberError = "Invalid card number"
+
         } else {
             cardNumberValid = true
             cardNumberError = ""

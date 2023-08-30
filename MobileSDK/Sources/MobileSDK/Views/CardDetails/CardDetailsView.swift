@@ -27,31 +27,29 @@ struct CardDetailsView: View {
     // MARK: - View protocol properties
 
     var body: some View {
-        VStack {
-            HStack {
-                Text("Card information")
-                    .customFont(.body, weight: .normal)
-                    .foregroundColor(.gray)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
+        ScrollView {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Card information")
+                        .customFont(.body, weight: .normal)
+                        .foregroundColor(.gray)
+                    Spacer()
+                }
+                .padding(.bottom, 12)
 
-            VStack {
-                List {
+                VStack(spacing: 0) {
                     OutlineTextField(
-                        text: $viewModel.cardDetailsFormManager.cardholderNameText,
+                        text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
                         placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
                         editing: $viewModel.cardDetailsFormManager.editingCardholderName,
                         valid: $viewModel.cardDetailsFormManager.cardHolderNameValid)
                     .focused($textFieldInFocus, equals: .cardholderName)
-                    .listRowSeparator(.hidden)
                     .onTapGesture {
                         self.textFieldInFocus = .cardholderName
                         viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
                     }
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     OutlineTextField(
                         text: viewModel.cardDetailsFormManager.cardNumberBinding,
@@ -62,12 +60,10 @@ struct CardDetailsView: View {
                         editing: $viewModel.cardDetailsFormManager.editingCardNumber,
                         valid: $viewModel.cardDetailsFormManager.cardNumberValid)
                     .focused($textFieldInFocus, equals: .cardNumber)
-                    .listRowSeparator(.hidden)
                     .onTapGesture {
                         self.textFieldInFocus = .cardNumber
                         viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                     }
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                     HStack(spacing: 12) {
                         OutlineTextField(
@@ -84,7 +80,7 @@ struct CardDetailsView: View {
                         }
 
                         OutlineTextField(
-                            text: $viewModel.cardDetailsFormManager.securityCodeText,
+                            text: viewModel.cardDetailsFormManager.securityCodeBinding,
                             title: viewModel.cardDetailsFormManager.securityCodeTitle,
                             placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
                             errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
@@ -96,25 +92,21 @@ struct CardDetailsView: View {
                             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                         }
                     }
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                    .listRowSeparator(.hidden)
                 }
                 LargeButton(title: "Save card") {
                     viewModel.tokeniseCardDetails()
                 }
+                .padding(.vertical, 16)
                 .customFont(.body)
-                .padding(.horizontal, 16)
             }
-            .listStyle(.plain)
-            .frame(height: 300)
-            Spacer()
+            .padding(.horizontal, 16)
         }
+        .frame(height: 380, alignment: .top)
         .onAppear {
             viewModel.gatewayId = gatewayId
             viewModel.onCompletion = $onCompletion
         }
     }
-
 }
 
 struct CardDetailsView_Previews: PreviewProvider {
