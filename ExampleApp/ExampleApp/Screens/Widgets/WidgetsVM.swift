@@ -19,6 +19,19 @@ class WidgetsVM: ObservableObject {
     }
 
     private func initialiseMobileSDK() {
+        let lightThemeColors = Theme.Colors(
+            primary: <#T##Color#>,
+            onPrimary: <#T##Color#>,
+            text: <#T##Color#>,
+            success: <#T##Color#>,
+            error: <#T##Color#>,
+            background: <#T##Color#>,
+            border: <#T##Color#>,
+            placeholder: <#T##Color#>)
+        let theme = Theme(lighThemeColorst: lightThemeColors, darkThemeColors: <#T##Theme.Colors.Dark#>)
+        theme.colors
+
+
         var config: MobileSDKConfig
         switch ProjectEnvironment.shared.environment {
         case .production: config = MobileSDKConfig(environment: .production)
