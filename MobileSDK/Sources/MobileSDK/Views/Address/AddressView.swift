@@ -25,7 +25,7 @@ struct AddressView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 0) {
+            VStack(spacing: .spacing) {
                 nameAndLastNameView
                 autocompleteTextFieldView
 
@@ -42,7 +42,7 @@ struct AddressView: View {
 
                 saveButton
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, .spacing)
         }
         .background(Color.backgroundColor)
         .frame(height: 600)
@@ -70,7 +70,7 @@ struct AddressView: View {
         VStack(spacing: 0) {
             nameHeader
 
-            HStack(spacing: 12) {
+            HStack(spacing: .spacing * 0.75) {
                 OutlineTextField(
                     text: $viewModel.addressFormManager.firstNameText,
                     title: viewModel.addressFormManager.firstNameTitle,

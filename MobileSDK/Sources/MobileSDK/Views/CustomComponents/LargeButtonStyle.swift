@@ -20,9 +20,9 @@ struct LargeButtonStyle: ButtonStyle {
             .frame(height: 48)
             .foregroundColor(currentForegroundColor)
             .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.3) : backgroundColor)
-            .cornerRadius(6)
+            .cornerRadius(.cornerRadius)
             .overlay(
-                RoundedRectangle(cornerRadius: 6)
+                RoundedRectangle(cornerRadius: .cornerRadius)
                     .stroke(.clear)
             )
             .font(Font.system(size: 19, weight: .semibold))

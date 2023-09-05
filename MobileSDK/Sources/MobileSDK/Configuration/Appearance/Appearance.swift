@@ -7,14 +7,16 @@
 
 import Foundation
 
-/// An object containing visual configuration for whole application.
+/// An object containing visual configuration for whole SDK.
 struct Appearance {
     /// A color pallete to provide basic set of colors for the Views.
     ///
     /// By providing different object or changing individual colors, you can change the look of the views.
-    var lightThemeColors = Theme.Colors()
+    var lightThemeColors = Colors()
 
-    var darkThemeColors = Theme.Colors()
+    var darkThemeColors = Colors()
+
+    var dimensions = Dimensions()
 
     /// A set of fonts to be used in the Views.
     ///
@@ -27,7 +29,7 @@ struct Appearance {
     //    public var images = Images()
 }
 
-// MARK: - Appearance + Default
+// MARK: - Appearance + shared
 
 extension Appearance {
     static var shared: Appearance = .init()

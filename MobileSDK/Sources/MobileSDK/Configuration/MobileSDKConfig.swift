@@ -27,6 +27,7 @@ public struct MobileSDKConfig {
     private func setupTheme() {
         Appearance.shared.lightThemeColors = theme.lightThemeColors
         Appearance.shared.darkThemeColors = theme.darkThemeColors
+        Appearance.shared.dimensions = theme.dimensions
     }
 
 }

@@ -29,7 +29,7 @@ class WidgetsVM: ObservableObject {
 //            border: Color(red: 0.55, green: 0.55, blue: 0.55),
 //            placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
 
-        let lightThemeColors = Theme.Colors(
+        let lightThemeColors = Colors(
             primary: .brown,
             onPrimary: .blue,
             text: .green,
@@ -39,7 +39,7 @@ class WidgetsVM: ObservableObject {
             border: .orange,
             placeholder: .cyan)
 
-        let darkThemeColors = Theme.Colors(
+        let darkThemeColors = Colors(
             primary: .purple,
             onPrimary: .white,
             text: .white,
@@ -49,7 +49,12 @@ class WidgetsVM: ObservableObject {
             border: Color(red: 0.55, green: 0.55, blue: 0.55),
             placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
 
-        let theme = Theme(lighThemeColorst: lightThemeColors, darkThemeColors: darkThemeColors)
+        let dimensions = Dimensions(cornerRadius: 12, borderWidth: 4, spacing: 40)
+
+        let theme = Theme(
+            lighThemeColorst: lightThemeColors,
+            darkThemeColors: darkThemeColors,
+            dimensions: dimensions)
 
         var config: MobileSDKConfig
         switch ProjectEnvironment.shared.environment {
