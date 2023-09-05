@@ -60,7 +60,7 @@ struct AddressView: View {
         HStack {
             Text("Name")
                 .customFont(.body, weight: .normal)
-                .foregroundColor(.gray)
+                .foregroundColor(.placeholderColor)
             Spacer()
         }
         .padding(.bottom, 20)
@@ -105,7 +105,7 @@ struct AddressView: View {
         HStack {
             Text("Find an address")
                 .customFont(.body, weight: .normal)
-                .foregroundColor(.gray)
+                .foregroundColor(.placeholderColor)
             Spacer()
         }
         .padding(.bottom, 20)

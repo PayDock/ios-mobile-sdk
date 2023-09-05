@@ -32,7 +32,7 @@ struct CardDetailsView: View {
                 HStack {
                     Text("Card information")
                         .customFont(.body, weight: .normal)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.placeholderColor)
                     Spacer()
                 }
                 .padding(.bottom, 12)

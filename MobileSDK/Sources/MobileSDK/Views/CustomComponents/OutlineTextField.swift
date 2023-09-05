@@ -11,7 +11,7 @@ struct OutlineTextField: View {
 
     // MARK: Properties
 
-    @State private var borderColor = Color.placeholderColor
+    @State private var borderColor = Color.borderColor
     @State private var borderWidth = 1.0
 
     @State private var titleBackgroundOpacity = 0.0
@@ -196,7 +196,7 @@ private extension OutlineTextField {
             borderColor = .primaryColor
             validationIconState = .none
         } else {
-            borderColor = .placeholderColor
+            borderColor = .borderColor
             validationIconState = .valid
         }
     }
@@ -222,7 +222,7 @@ private extension OutlineTextField {
 
     func updateTitleColor() {
         if valid {
-            titleColor = editing ? .primaryColor : .placeholderColor
+            titleColor = editing ? .primaryColor : .borderColor
         } else if text.isEmpty {
             titleColor = editing ? .errorColor : .placeholderColor
         } else {
