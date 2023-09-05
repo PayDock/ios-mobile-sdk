@@ -13,13 +13,16 @@ public struct Theme {
     private(set) var lightThemeColors: Colors
     private(set) var darkThemeColors: Colors
     private(set) var dimensions: Dimensions
+    private(set) var font: Font
 
     public init(lighThemeColorst: Colors,
                 darkThemeColors: Colors,
-                dimensions: Dimensions) {
+                dimensions: Dimensions,
+                font: Font = .body) {
         self.lightThemeColors = lighThemeColorst
         self.darkThemeColors = darkThemeColors
         self.dimensions = dimensions
+        self.font = font
     }
 }
 

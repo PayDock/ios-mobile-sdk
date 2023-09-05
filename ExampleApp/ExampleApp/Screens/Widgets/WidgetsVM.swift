@@ -56,6 +56,7 @@ class WidgetsVM: ObservableObject {
             darkThemeColors: darkThemeColors,
             dimensions: dimensions)
 
+        let font: Font = Font(CTFont)
         var config: MobileSDKConfig
         switch ProjectEnvironment.shared.environment {
         case .production: config = MobileSDKConfig(environment: .production, theme: theme)

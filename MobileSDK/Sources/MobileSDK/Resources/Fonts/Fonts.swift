@@ -10,10 +10,10 @@ import SwiftUI
 struct Fonts {
 
     enum AcidGrotesk: String {
-        case light = "FFF-AcidGrotesk-Light"
-        case medium = "FFF-AcidGrotesk-Medium"
+//        case light = "FFF-AcidGrotesk-Light"
+//        case medium = "FFF-AcidGrotesk-Medium"
         case normal = "FFF-AcidGrotesk-Normal"
-        case ultraLight = "FFF-AcidGrotesk-UltraLight"
+//        case ultraLight = "FFF-AcidGrotesk-UltraLight"
 
         enum Size: CGFloat {
             case title = 36
@@ -30,7 +30,7 @@ struct Fonts {
             case body3 = 14
 
             case footnote = 13
-            case caption = 12
+//            case caption = 12
             case caption2 = 10
         }
     }

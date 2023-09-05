@@ -105,6 +105,7 @@ struct AddressView: View {
         HStack {
             Text("Find an address")
                 .customFont(.body, weight: .normal)
+                .font(.largeTitle)
                 .foregroundColor(.placeholderColor)
             Spacer()
         }

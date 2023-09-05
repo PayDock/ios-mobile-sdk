@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 /// An object containing visual configuration for whole SDK.
 struct Appearance {
@@ -21,7 +22,7 @@ struct Appearance {
     /// A set of fonts to be used in the Views.
     ///
     /// By providing different object or changing individual fonts, you can change the look of the views.
-    //    public var fonts = Fonts()
+    var font: UIFont = .systemFont(ofSize: 14)
 
     /// A set of images to be used.
     ///
