@@ -34,7 +34,7 @@ class WidgetsVM: ObservableObject {
             onPrimary: .blue,
             text: .green,
             success: .black,
-            error: .pink,
+            error: .teal,
             background: .yellow,
             border: .orange,
             placeholder: .cyan)
