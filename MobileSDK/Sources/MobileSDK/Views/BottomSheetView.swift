@@ -37,6 +37,7 @@ public struct BottomSheetView<Content: View>: View {
                         .interactiveDismissDisabled(false)
                         .scrollDisabled(false)
                 }
+                .background(Color.backgroundColor)
             }
     }
 
@@ -47,6 +48,7 @@ public struct BottomSheetView<Content: View>: View {
                 isPresented = false
             } label: {
                 Image("round-btn", bundle:Bundle.module)
+                    .foregroundColor(.textColor)
             }
             .padding(.top, 60)
             .padding(.trailing, 16)

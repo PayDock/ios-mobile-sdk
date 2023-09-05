@@ -11,12 +11,12 @@ struct OutlineTextField: View {
 
     // MARK: Properties
 
-    @State private var borderColor = Color.paydockGray
+    @State private var borderColor = Color.placeholderColor
     @State private var borderWidth = 1.0
 
     @State private var titleBackgroundOpacity = 0.0
     @State private var titleBottomPadding = 0.0
-    @State private var titleColor = Color.paydockGray
+    @State private var titleColor = Color.placeholderColor
     @State private var titleFontSize = 16.0
     @State private var titleVerticalPadding: CGFloat = 0
     @State private var titleLeadingPadding: Double
@@ -107,10 +107,12 @@ struct OutlineTextField: View {
     private func textFieldView() -> some View {
         HStack {
             leftImage?
-                .foregroundColor(.paydockGray)
+                .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
             TextField(editing ? placeholder : "", text: $text)
                 .customFont(.body, weight: .normal)
+                .foregroundColor(.textColor)
+                .tint(.primaryColor)
                 .frame(height: 48)
             validationIconView
         }
@@ -122,7 +124,7 @@ struct OutlineTextField: View {
     private func placeholderView() -> some View {
         HStack {
             ZStack {
-                Color(.white)
+                Color.backgroundColor
                     .cornerRadius(4.0)
                     .opacity(titleBackgroundOpacity)
                 Text(title)
@@ -146,7 +148,7 @@ struct OutlineTextField: View {
                 Text(errorMessage)
                     .customFont(.caption)
                     .font(.system(size: 10.0))
-                    .foregroundColor(.errorRed)
+                    .foregroundColor(.placeholderColor)
                     .padding(.leading, 16.0)
             }
             Spacer()
@@ -188,13 +190,13 @@ private extension OutlineTextField {
 
     func updateBorderColor() {
         if !valid {
-            borderColor = .errorRed
+            borderColor = .errorColor
             validationIconState = .invalid
         } else if editing {
             borderColor = .primaryColor
             validationIconState = .none
         } else {
-            borderColor = .paydockGray
+            borderColor = .placeholderColor
             validationIconState = .valid
         }
     }
@@ -220,11 +222,11 @@ private extension OutlineTextField {
 
     func updateTitleColor() {
         if valid {
-            titleColor = editing ? .primaryColor : .paydockGray
+            titleColor = editing ? .primaryColor : .placeholderColor
         } else if text.isEmpty {
-            titleColor = editing ? .errorRed : .paydockGray
+            titleColor = editing ? .errorColor : .placeholderColor
         } else {
-            titleColor = .errorRed
+            titleColor = .errorColor
         }
     }
 

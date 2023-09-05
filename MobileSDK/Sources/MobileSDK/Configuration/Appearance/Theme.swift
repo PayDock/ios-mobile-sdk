@@ -10,8 +10,8 @@ import SwiftUI
 
 public struct Theme {
 
-    private let lightThemeColors: Colors
-    private let darkThemeColors: Colors
+    private(set) var lightThemeColors: Colors
+    private(set) var darkThemeColors: Colors
 
     public init(lighThemeColorst: Colors,
                 darkThemeColors: Colors) {
@@ -30,14 +30,14 @@ public struct Theme {
         public let border: Color
         public let placeholder: Color
 
-        public init(primary: Color,
-                    onPrimary: Color,
-                    text: Color,
-                    success: Color,
-                    error: Color,
-                    background: Color,
-                    border: Color,
-                    placeholder: Color) {
+        public init(primary: Color = Color(red: 0.4, green: 0.31, blue: 0.64),
+                    onPrimary: Color = .white,
+                    text: Color = .black,
+                    success: Color = Color(red: 0.55, green: 0.55, blue: 0.55),
+                    error: Color = Color(red: 0.7, green: 0.15, blue: 0.12),
+                    background: Color = .white,
+                    border: Color = Color(red: 0.55, green: 0.55, blue: 0.55),
+                    placeholder: Color = Color(red: 0.55, green: 0.55, blue: 0.55)) {
             self.primary = primary
             self.onPrimary = onPrimary
             self.text = text

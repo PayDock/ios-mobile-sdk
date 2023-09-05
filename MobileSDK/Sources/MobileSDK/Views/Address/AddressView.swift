@@ -44,6 +44,7 @@ struct AddressView: View {
             }
             .padding(.horizontal, 16)
         }
+        .background(Color.backgroundColor)
         .frame(height: 600)
         .onAppear {
             viewModel.addressFormManager.updateFormWith(address: address)
