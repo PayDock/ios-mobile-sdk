@@ -91,6 +91,7 @@ struct AutocompleteTextField: View {
                         if options.isEmpty {
                             Text("No results")
                                 .customFont(.body)
+                                .foregroundColor(.textColor)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                         } else {
@@ -98,6 +99,7 @@ struct AutocompleteTextField: View {
                                 HStack {
                                     Text(option)
                                         .customFont(.body)
+                                        .foregroundColor(.textColor)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
                                         .onTapGesture {
@@ -112,7 +114,7 @@ struct AutocompleteTextField: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .foregroundColor(.primaryLight)
+                            .foregroundColor(.primaryLightColor)
                             .shadow(radius: 4)
                     )
                     .opacity(popupOpacity)
@@ -130,6 +132,7 @@ struct AutocompleteTextField: View {
                     }
                 }
             }
+            .background(Color.backgroundColor)
         }
     }
 

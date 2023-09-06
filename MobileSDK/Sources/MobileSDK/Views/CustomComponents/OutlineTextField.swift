@@ -11,12 +11,12 @@ struct OutlineTextField: View {
 
     // MARK: Properties
 
-    @State private var borderColor = Color.paydockGray
-    @State private var borderWidth = 1.0
+    @State private var borderColor = Color.borderColor
+    @State private var borderWidth: CGFloat = .borderWidth
 
     @State private var titleBackgroundOpacity = 0.0
     @State private var titleBottomPadding = 0.0
-    @State private var titleColor = Color.paydockGray
+    @State private var titleColor = Color.placeholderColor
     @State private var titleFontSize = 16.0
     @State private var titleVerticalPadding: CGFloat = 0
     @State private var titleLeadingPadding: Double
@@ -107,29 +107,30 @@ struct OutlineTextField: View {
     private func textFieldView() -> some View {
         HStack {
             leftImage?
-                .foregroundColor(.paydockGray)
+                .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
             TextField(editing ? placeholder : "", text: $text)
-                .customFont(.body, weight: .normal)
+                .customFont(.body)
+                .foregroundColor(.textColor)
+                .tint(.primaryColor)
                 .frame(height: 48)
             validationIconView
         }
         .padding([.leading, .trailing], 16.0)
-        .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+        .background(RoundedRectangle(cornerRadius: .cornerRadius, style: .continuous)
             .stroke(borderColor, lineWidth: borderWidth))
     }
 
     private func placeholderView() -> some View {
         HStack {
             ZStack {
-                Color(.white)
-                    .cornerRadius(4.0)
+                Color.backgroundColor
                     .opacity(titleBackgroundOpacity)
                 Text(title)
                     .foregroundColor(.white)
                     .colorMultiply(titleColor)
                     .animatableFont(size: titleFontSize)
-                    .padding([.leading, .trailing], 2.0)
+                    .padding([.leading, .trailing], 4.0)
                     .layoutPriority(1)
             }
             .padding([.leading], titleLeadingPadding)
@@ -146,7 +147,7 @@ struct OutlineTextField: View {
                 Text(errorMessage)
                     .customFont(.caption)
                     .font(.system(size: 10.0))
-                    .foregroundColor(.errorRed)
+                    .foregroundColor(.placeholderColor)
                     .padding(.leading, 16.0)
             }
             Spacer()
@@ -168,8 +169,12 @@ struct OutlineTextField: View {
     private var validationIconView: some View {
         HStack {
             switch validationIconState {
-            case .valid: Image("tick-circle", bundle: Bundle.module)
-            case .invalid: Image("exclamation-circle", bundle: Bundle.module)
+            case .valid:
+                Image("tick-circle", bundle: Bundle.module)
+                    .foregroundColor(.successColor)
+            case .invalid:
+                Image("exclamation-circle", bundle: Bundle.module)
+                    .foregroundColor(.errorColor)
             case .none: EmptyView()
             }
         }
@@ -188,19 +193,19 @@ private extension OutlineTextField {
 
     func updateBorderColor() {
         if !valid {
-            borderColor = .errorRed
+            borderColor = .errorColor
             validationIconState = .invalid
         } else if editing {
             borderColor = .primaryColor
             validationIconState = .none
         } else {
-            borderColor = .paydockGray
+            borderColor = .borderColor
             validationIconState = .valid
         }
     }
 
     func updateBorderWidth() {
-        borderWidth = editing ? 2.0 : 1.0
+        borderWidth = editing ? .borderWidth * 2 : .borderWidth
     }
 
     func updateTitle() {
@@ -220,11 +225,11 @@ private extension OutlineTextField {
 
     func updateTitleColor() {
         if valid {
-            titleColor = editing ? .primaryColor : .paydockGray
+            titleColor = editing ? .primaryColor : .borderColor
         } else if text.isEmpty {
-            titleColor = editing ? .errorRed : .paydockGray
+            titleColor = editing ? .errorColor : .placeholderColor
         } else {
-            titleColor = .errorRed
+            titleColor = .errorColor
         }
     }
 

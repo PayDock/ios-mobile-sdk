@@ -19,8 +19,8 @@ extension View {
       modifier(AnimatableCustomFontModifier(size: size))
     }
 
-    func customFont(_ size: Fonts.AcidGrotesk.Size, weight: Fonts.AcidGrotesk = .normal) -> some View {
-        font(.custom(weight.rawValue, size: size.rawValue))
+    func customFont(_ size: Fonts.Size) -> some View {
+        font(.custom(Appearance.shared.fontName, size: size.rawValue))
     }
 
 }

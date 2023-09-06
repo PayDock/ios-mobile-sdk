@@ -25,7 +25,7 @@ struct AddressView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 0) {
+            VStack(spacing: .spacing) {
                 nameAndLastNameView
                 autocompleteTextFieldView
 
@@ -42,8 +42,9 @@ struct AddressView: View {
 
                 saveButton
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, .spacing)
         }
+        .background(Color.backgroundColor)
         .frame(height: 600)
         .onAppear {
             viewModel.addressFormManager.updateFormWith(address: address)
@@ -58,8 +59,8 @@ struct AddressView: View {
     private var nameHeader: some View {
         HStack {
             Text("Name")
-                .customFont(.body, weight: .normal)
-                .foregroundColor(.gray)
+                .customFont(.body)
+                .foregroundColor(.placeholderColor)
             Spacer()
         }
         .padding(.bottom, 20)
@@ -69,7 +70,7 @@ struct AddressView: View {
         VStack(spacing: 0) {
             nameHeader
 
-            HStack(spacing: 12) {
+            HStack(spacing: .spacing * 0.75) {
                 OutlineTextField(
                     text: $viewModel.addressFormManager.firstNameText,
                     title: viewModel.addressFormManager.firstNameTitle,
@@ -103,8 +104,9 @@ struct AddressView: View {
     private var findAnAddressHeader: some View {
         HStack {
             Text("Find an address")
-                .customFont(.body, weight: .normal)
-                .foregroundColor(.gray)
+                .customFont(.body)
+                .font(.largeTitle)
+                .foregroundColor(.placeholderColor)
             Spacer()
         }
         .padding(.bottom, 20)

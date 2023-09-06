@@ -31,13 +31,13 @@ struct CardDetailsView: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("Card information")
-                        .customFont(.body, weight: .normal)
-                        .foregroundColor(.gray)
+                        .customFont(.body)
+                        .foregroundColor(.placeholderColor)
                     Spacer()
                 }
                 .padding(.bottom, 12)
 
-                VStack(spacing: 0) {
+                VStack(spacing: .spacing) {
                     OutlineTextField(
                         text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
@@ -65,7 +65,7 @@ struct CardDetailsView: View {
                         viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                     }
 
-                    HStack(spacing: 12) {
+                    HStack(spacing: .spacing * 0.75) {
                         OutlineTextField(
                             text: viewModel.cardDetailsFormManager.expiryDateBinding,
                             title: viewModel.cardDetailsFormManager.expiryDateTitle,
@@ -96,10 +96,11 @@ struct CardDetailsView: View {
                 LargeButton(title: "Save card") {
                     viewModel.tokeniseCardDetails()
                 }
-                .padding(.vertical, 16)
+                .padding(.bottom, 16)
+                .padding(.top, .spacing)
                 .customFont(.body)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, max(16, .spacing))
         }
         .frame(height: 380, alignment: .top)
         .onAppear {
