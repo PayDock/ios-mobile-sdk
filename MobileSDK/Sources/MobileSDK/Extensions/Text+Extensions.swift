@@ -9,7 +9,7 @@ import SwiftUI
 
 extension Text {
 
-    func customFont(_ size: Fonts.AcidGrotesk.Size, weight: Fonts.AcidGrotesk = .normal) -> Text {
-        font(.custom(weight.rawValue, size: size.rawValue))
+    func customFont(_ size: Fonts.Size) -> Text {
+        font(.custom(Appearance.shared.fontName, size: size.rawValue))
     }
 }

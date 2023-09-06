@@ -110,7 +110,7 @@ struct OutlineTextField: View {
                 .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
             TextField(editing ? placeholder : "", text: $text)
-                .customFont(.body, weight: .normal)
+                .customFont(.body)
                 .foregroundColor(.textColor)
                 .tint(.primaryColor)
                 .frame(height: 48)

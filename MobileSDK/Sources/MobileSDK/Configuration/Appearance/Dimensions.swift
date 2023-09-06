@@ -15,7 +15,7 @@ public struct Dimensions {
 
     public init(cornerRadius: Double = 4,
                 borderWidth: Double = 1,
-                spacing: CGFloat = 0) {
+                spacing: CGFloat = 16) {
         self.cornerRadius = cornerRadius
         self.borderWidth = borderWidth
         self.spacing = spacing

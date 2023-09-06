@@ -31,7 +31,7 @@ struct CardDetailsView: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("Card information")
-                        .customFont(.body, weight: .normal)
+                        .customFont(.body)
                         .foregroundColor(.placeholderColor)
                     Spacer()
                 }
@@ -100,7 +100,7 @@ struct CardDetailsView: View {
                 .padding(.top, .spacing)
                 .customFont(.body)
             }
-            .padding(.horizontal, .spacing)
+            .padding(.horizontal, max(16, .spacing))
         }
         .frame(height: 380, alignment: .top)
         .onAppear {

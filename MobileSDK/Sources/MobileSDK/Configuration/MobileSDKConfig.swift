@@ -28,6 +28,7 @@ public struct MobileSDKConfig {
         Appearance.shared.lightThemeColors = theme.lightThemeColors
         Appearance.shared.darkThemeColors = theme.darkThemeColors
         Appearance.shared.dimensions = theme.dimensions
+        Appearance.shared.fontName = theme.fontName
     }
 
 }
