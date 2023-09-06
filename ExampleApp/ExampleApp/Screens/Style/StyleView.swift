@@ -28,9 +28,11 @@ struct StyleView: View {
                     PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: {_ in })
                     divider
 
+                    sectionTitle("Design")
                     HStack {
-                        designTextView(title: "Corner Radius", text: $viewModel.cornerRadius)
+                        designTextView(title: "Corner", text: $viewModel.cornerRadius)
                         designTextView(title: "Padding", text: $viewModel.padding)
+                        designTextView(title: "Border Width", text: $viewModel.borderWidth)
                     }
                     .padding(.trailing, 16)
                     divider
@@ -69,13 +71,13 @@ struct StyleView: View {
 
     private var colorListView: some View {
         VStack {
-            colorFieldView(title: "Primary", text: $viewModel.primaryColor)
-            colorFieldView(title: "On Primary", text: $viewModel.onPrimaryColor)
-            colorFieldView(title: "Text", text: $viewModel.textColor)
-            colorFieldView(title: "Success", text: $viewModel.successColor)
-            colorFieldView(title: "Error", text: $viewModel.errorColor)
-            colorFieldView(title: "Background", text: $viewModel.backgroundColor)
-            colorFieldView(title: "Placeholder", text: $viewModel.placeholderColor)
+            colorFieldView(title: "Primary", text: $viewModel.primaryColorHex)
+            colorFieldView(title: "On Primary", text: $viewModel.onPrimaryColorHex)
+            colorFieldView(title: "Text", text: $viewModel.textColorHex)
+            colorFieldView(title: "Success", text: $viewModel.successColorHex)
+            colorFieldView(title: "Error", text: $viewModel.errorColorHex)
+            colorFieldView(title: "Background", text: $viewModel.backgroundColorHex)
+            colorFieldView(title: "Placeholder", text: $viewModel.placeholderColorHex)
         }
     }
 

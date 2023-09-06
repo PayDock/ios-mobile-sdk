@@ -17,19 +17,20 @@ class StyleVM: ObservableObject {
 
     // MARK: - Properties
 
-    @Published var primaryColor = "000000"
-    @Published var onPrimaryColor = "000000"
-    @Published var textColor = "FFFFFF"
-    @Published var successColor = "FFFFFF"
-    @Published var errorColor = "FFFFFF"
-    @Published var backgroundColor = "FFFFFF"
-    @Published var borderColor = "FFFFFF"
-    @Published var placeholderColor = "FFFFFF"
+    @Published var primaryColorHex = "6750A4"
+    @Published var onPrimaryColorHex = "FFFFFF"
+    @Published var textColorHex = "000000"
+    @Published var successColorHex = "1ABA1A"
+    @Published var errorColorHex = "B3261E"
+    @Published var backgroundColorHex = "FFFFFF"
+    @Published var borderColorHex = "8C8C8C"
+    @Published var placeholderColorHex = "8C8C8C"
 
-    @Published var fontName = "San Francisco"
+    @Published var fontName = "FFF-AcidGrotesk-Normal"
 
-    @Published var cornerRadius = "0"
-    @Published var padding = "0"
+    @Published var cornerRadius = "4"
+    @Published var padding = "16"
+    @Published var borderWidth = "1"
 
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
 
@@ -43,26 +44,26 @@ class StyleVM: ObservableObject {
 
     private func initialiseMobileSDK() {
         let lightThemeColors = Colors(
-            primary: Color(red: 0.4, green: 0.31, blue: 0.64),
-            onPrimary: .white,
-            text: .black,
-            success: Color(red: 0.55, green: 0.55, blue: 0.55),
-            error: Color(red: 0.7, green: 0.15, blue: 0.12),
-            background: .white,
-            border: Color(red: 0.55, green: 0.55, blue: 0.55),
-            placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
+            primary: Color(hex: "#\(primaryColorHex)"),
+            onPrimary: Color(hex: "#\(onPrimaryColorHex)"),
+            text: Color(hex: "#\(textColorHex)"),
+            success: Color(hex: "#\(successColorHex)"),
+            error: Color(hex: "#\(errorColorHex)"),
+            background: Color(hex: "#\(backgroundColorHex)"),
+            border: Color(hex: "#\(borderColorHex)"),
+            placeholder: Color(hex: "#\(placeholderColorHex)"))
 
         let darkThemeColors = Colors(
-            primary: .purple,
-            onPrimary: .white,
-            text: .white,
-            success: Color(red: 0.55, green: 0.55, blue: 0.55),
-            error: .red,
-            background: .black,
-            border: Color(red: 0.55, green: 0.55, blue: 0.55),
-            placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
+            primary: Color(hex: "#\(primaryColorHex)"),
+            onPrimary: Color(hex: "#\(onPrimaryColorHex)"),
+            text: Color(hex: "#\(textColorHex)"),
+            success: Color(hex: "#\(successColorHex)"),
+            error: Color(hex: "#\(errorColorHex)"),
+            background: Color(hex: "#\(backgroundColorHex)"),
+            border: Color(hex: "#\(borderColorHex)"),
+            placeholder: Color(hex: "#\(placeholderColorHex)"))
 
-        let dimensions = Dimensions(cornerRadius: 4, borderWidth: 1, spacing: 16)
+        let dimensions = Dimensions(cornerRadius: Double(cornerRadius) ?? 4, borderWidth: Double(borderWidth) ?? 1, spacing: Double(padding) ?? 16)
 
         let theme = Theme(
             lighThemeColorst: lightThemeColors,
