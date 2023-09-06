@@ -10,7 +10,7 @@ import Foundation
 public class MobileSDK {
 
     public static let shared = MobileSDK()
-    var config: MobileSDKConfig?
+    private(set) var config: MobileSDKConfig?
     private let cardService: CardService
     private let fontRegistration: FontRegistration
 
@@ -25,14 +25,6 @@ public class MobileSDK {
     public func configureMobileSDK(config: MobileSDKConfig) {
         self.config = config
         self.registerFonts()
-    }
-
-    public func printCurrentEnvironment() {
-        guard let config = config else {
-            print("No environment set!")
-            return
-        }
-        print(config.environment)
     }
 
     private func registerFonts() {

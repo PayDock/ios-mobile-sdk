@@ -34,12 +34,12 @@ class WidgetsVM: ObservableObject {
             onPrimary: .white,
             text: .white,
             success: Color(red: 0.55, green: 0.55, blue: 0.55),
-            error: Color(red: 0.7, green: 0.15, blue: 0.12),
+            error: .red,
             background: .black,
             border: Color(red: 0.55, green: 0.55, blue: 0.55),
             placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
 
-        let dimensions = Dimensions(cornerRadius: 12, borderWidth: 4, spacing: 40)
+        let dimensions = Dimensions(cornerRadius: 4, borderWidth: 1, spacing: 16)
 
         let theme = Theme(
             lighThemeColorst: lightThemeColors,
@@ -54,7 +54,6 @@ class WidgetsVM: ObservableObject {
         }
 
         mobileSDK.configureMobileSDK(config: config)
-        mobileSDK.printCurrentEnvironment()
     }
     
 }

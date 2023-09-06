@@ -11,13 +11,17 @@ struct StyleView: View {
 
     @ObservedObject var viewModel = StyleVM()
 
+    init() {
+        styleNavigation()
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack {
                     sectionTitle("Colours")
-                    colorFieldView(title: "Primary", text: $viewModel.primaryColor)
-                    colorFieldView(title: "Secondary", text: $viewModel.secondaryColor)
+                    colorListView
+
                     divider
 
                     sectionTitle("Font")
@@ -44,6 +48,7 @@ struct StyleView: View {
             }
             .background(Color(hex: "#EAE0D7"))
         }
+        .foregroundColor(.black)
     }
 
     private var divider: some View {
@@ -60,6 +65,18 @@ struct StyleView: View {
             Spacer()
         }
         .padding(16)
+    }
+
+    private var colorListView: some View {
+        VStack {
+            colorFieldView(title: "Primary", text: $viewModel.primaryColor)
+            colorFieldView(title: "On Primary", text: $viewModel.onPrimaryColor)
+            colorFieldView(title: "Text", text: $viewModel.textColor)
+            colorFieldView(title: "Success", text: $viewModel.successColor)
+            colorFieldView(title: "Error", text: $viewModel.errorColor)
+            colorFieldView(title: "Background", text: $viewModel.backgroundColor)
+            colorFieldView(title: "Placeholder", text: $viewModel.placeholderColor)
+        }
     }
 
     private func colorFieldView(title: String, text: Binding<String>) -> some View {
@@ -113,6 +130,12 @@ struct StyleView: View {
                 }
             }
         }
+    }
+
+    private func styleNavigation() {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().barTintColor = .white
     }
 }
 
