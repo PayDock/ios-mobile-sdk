@@ -36,6 +36,9 @@ class StyleVM: ObservableObject {
 
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
 
+    var savedLightThemeColors = Colors()
+    var savedDarkThemeColors = Colors()
+
     // MARK: - Initialisation
 
     init(mobileSDK: MobileSDK = MobileSDK.shared) {
@@ -83,5 +86,15 @@ class StyleVM: ObservableObject {
 
     func saveStyle() {
         initialiseMobileSDK()
+    }
+
+    func colorSchemeChangedTo(_ colorScheme: ColorScheme) {
+        switch colorScheme {
+        case .light:
+
+        case .dark:
+
+        @unknown default: break
+        }
     }
 }

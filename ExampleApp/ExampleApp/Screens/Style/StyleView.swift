@@ -10,6 +10,7 @@ import SwiftUI
 struct StyleView: View {
 
     @ObservedObject var viewModel = StyleVM()
+    @Environment(\.colorScheme) var colorScheme
 
     init() {
         styleNavigation()
@@ -55,6 +56,9 @@ struct StyleView: View {
             .background(Color(hex: "#EAE0D7"))
         }
         .foregroundColor(.black)
+        .onChange(of: colorScheme) { newValue in
+            viewModel.colorSchemeChangedTo(newValue)
+        }
     }
 
     private var divider: some View {
