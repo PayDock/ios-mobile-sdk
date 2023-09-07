@@ -25,7 +25,10 @@ struct StyleView: View {
                     divider
 
                     sectionTitle("Font")
-                    PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: {_ in })
+                    PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: { fontName in
+                        viewModel.fontName = fontName
+
+                    })
                     divider
 
                     sectionTitle("Design")
@@ -45,6 +48,7 @@ struct StyleView: View {
                     .foregroundColor(.white)
                     .background(Color.black)
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
                 .navigationTitle("Style")
             }

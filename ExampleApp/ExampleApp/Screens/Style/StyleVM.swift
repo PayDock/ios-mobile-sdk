@@ -11,6 +11,8 @@ import MobileSDK
 
 class StyleVM: ObservableObject {
 
+    @Environment(\.colorScheme) var colorScheme
+
     // MARK: - Dependencies
 
     private let mobileSDK: MobileSDK
@@ -38,8 +40,6 @@ class StyleVM: ObservableObject {
 
     init(mobileSDK: MobileSDK = MobileSDK.shared) {
         self.mobileSDK = mobileSDK
-
-        initialiseMobileSDK()
     }
 
     private func initialiseMobileSDK() {
@@ -68,7 +68,8 @@ class StyleVM: ObservableObject {
         let theme = Theme(
             lighThemeColorst: lightThemeColors,
             darkThemeColors: darkThemeColors,
-            dimensions: dimensions)
+            dimensions: dimensions,
+            fontName: fontName)
 
         var config: MobileSDKConfig
         switch ProjectEnvironment.shared.environment {
@@ -81,6 +82,6 @@ class StyleVM: ObservableObject {
     }
 
     func saveStyle() {
-        
+        initialiseMobileSDK()
     }
 }

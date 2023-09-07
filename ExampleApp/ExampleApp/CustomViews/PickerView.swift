@@ -36,6 +36,7 @@ struct PickerView: View {
                             Text(selected.isEmpty ? placeholder : selected)
                                 .foregroundColor(.black)
                                 .padding(.leading, 32)
+                                .font(.custom(selected, size: 14))
                             Spacer()
                             Image("angle-down")
                                 .padding(.trailing, 32)

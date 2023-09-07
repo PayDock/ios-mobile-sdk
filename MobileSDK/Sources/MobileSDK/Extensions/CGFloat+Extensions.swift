@@ -9,8 +9,8 @@ import Foundation
 
 extension CGFloat {
 
-    static var cornerRadius = Appearance.shared.dimensions.cornerRadius
-    static var borderWidth = Appearance.shared.dimensions.borderWidth
-    static var spacing = Appearance.shared.dimensions.spacing
+    static var cornerRadius: CGFloat { Appearance.shared.dimensions.cornerRadius }
+    static var borderWidth: CGFloat { Appearance.shared.dimensions.borderWidth }
+    static var spacing: CGFloat { Appearance.shared.dimensions.spacing }
 
 }
