@@ -11,22 +11,31 @@ struct StyleView: View {
 
     @ObservedObject var viewModel = StyleVM()
 
+    init() {
+        styleNavigation()
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack {
                     sectionTitle("Colours")
-                    colorFieldView(title: "Primary", text: $viewModel.primaryColor)
-                    colorFieldView(title: "Secondary", text: $viewModel.secondaryColor)
+                    colorListView
+
                     divider
 
                     sectionTitle("Font")
-                    PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: {_ in })
+                    PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: { fontName in
+                        viewModel.fontName = fontName
+
+                    })
                     divider
 
+                    sectionTitle("Design")
                     HStack {
-                        designTextView(title: "Corner Radius", text: $viewModel.cornerRadius)
+                        designTextView(title: "Corner", text: $viewModel.cornerRadius)
                         designTextView(title: "Padding", text: $viewModel.padding)
+                        designTextView(title: "Border Width", text: $viewModel.borderWidth)
                     }
                     .padding(.trailing, 16)
                     divider
@@ -39,11 +48,13 @@ struct StyleView: View {
                     .foregroundColor(.white)
                     .background(Color.black)
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
                 .navigationTitle("Style")
             }
             .background(Color(hex: "#EAE0D7"))
         }
+        .foregroundColor(.black)
     }
 
     private var divider: some View {
@@ -60,6 +71,18 @@ struct StyleView: View {
             Spacer()
         }
         .padding(16)
+    }
+
+    private var colorListView: some View {
+        VStack {
+            colorFieldView(title: "Primary", text: $viewModel.primaryColorHex)
+            colorFieldView(title: "On Primary", text: $viewModel.onPrimaryColorHex)
+            colorFieldView(title: "Text", text: $viewModel.textColorHex)
+            colorFieldView(title: "Success", text: $viewModel.successColorHex)
+            colorFieldView(title: "Error", text: $viewModel.errorColorHex)
+            colorFieldView(title: "Background", text: $viewModel.backgroundColorHex)
+            colorFieldView(title: "Placeholder", text: $viewModel.placeholderColorHex)
+        }
     }
 
     private func colorFieldView(title: String, text: Binding<String>) -> some View {
@@ -113,6 +136,12 @@ struct StyleView: View {
                 }
             }
         }
+    }
+
+    private func styleNavigation() {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().barTintColor = .white
     }
 }
 

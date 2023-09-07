@@ -11,6 +11,10 @@ struct WidgetsView: View {
     
     @StateObject private var viewModel = WidgetsVM()
 
+    init() {
+        styleNavigation()
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -38,6 +42,7 @@ struct WidgetsView: View {
             .listStyle(.plain)
 
         }
+        .foregroundColor(.black)
         .padding(.trailing, -28)
         .background(Color(hex: "#EAE0D7"))
     }
@@ -65,6 +70,12 @@ struct WidgetsView: View {
             Image("chevron-right")
         }
         .listRowBackground(Color(hex: "#EAE0D7"))
+    }
+
+    private func styleNavigation() {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().barTintColor = .white
     }
 
 }

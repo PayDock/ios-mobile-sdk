@@ -10,10 +10,10 @@ import Foundation
 public struct MobileSDKConfig {
 
     var environment: SDKEnvironment
-    let theme: Theme
+    let theme: Theme?
 
     public init(environment: SDKEnvironment,
-                theme: Theme) {
+                theme: Theme? = nil) {
         self.environment = environment
         self.theme = theme
 
@@ -25,6 +25,8 @@ public struct MobileSDKConfig {
     }
 
     private func setupTheme() {
+        guard let theme = theme else { return }
+        
         Appearance.shared.lightThemeColors = theme.lightThemeColors
         Appearance.shared.darkThemeColors = theme.darkThemeColors
         Appearance.shared.dimensions = theme.dimensions

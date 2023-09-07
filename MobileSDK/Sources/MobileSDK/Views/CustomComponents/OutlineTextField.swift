@@ -147,7 +147,7 @@ struct OutlineTextField: View {
                 Text(errorMessage)
                     .customFont(.caption)
                     .font(.system(size: 10.0))
-                    .foregroundColor(.placeholderColor)
+                    .foregroundColor(.errorColor)
                     .padding(.leading, 16.0)
             }
             Spacer()
