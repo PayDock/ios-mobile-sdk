@@ -192,7 +192,11 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardholderName() {
-        if !cardholderNameText.isEmpty {
+        if cardIssuerValidator.isValidCreditCardNumber(number: cardholderNameText) {
+            cardHolderNameValid = false
+            cardholderNameError = "Card number is in wrong field!"
+
+        } else if !cardholderNameText.isEmpty {
             cardHolderNameValid = true
             cardholderNameError = ""
 
@@ -203,13 +207,12 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardNumber() {
-        if case .other = cardIssuerValidator.detectCardIssuer(number: cardNumberText) {
-            cardNumberValid = false
-            cardNumberError = "Invalid card number"
-
-        } else {
+        if cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText) {
             cardNumberValid = true
             cardNumberError = ""
+        } else {
+            cardNumberValid = false
+            cardNumberError = "Invalid card number"
         }
     }
 

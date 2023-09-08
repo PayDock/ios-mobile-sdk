@@ -61,4 +61,36 @@ class CardIssuerValidator {
         return .other
     }
 
+    /// Validates card PAN number using Luhn's algorithm.
+    ///
+    /// - Parameters:
+    ///    - number: Card PAN number that contains only digits with or without whitespaces.
+    ///    - Returns: true if valid, false otherwise.
+    func isValidCreditCardNumber(number: String) -> Bool {
+        let cleanNumber = number.filter { !$0.isWhitespace }
+        guard containsOnlyNumbers(input: cleanNumber), !cleanNumber.isEmpty else { return false }
+        
+        let reversedString = cleanNumber.reversed().compactMap { Int(String($0)) }
+
+        var s1 = 0
+        var s2 = 0
+
+        for (index, value) in reversedString.enumerated() {
+
+            if index % 2 == 0 {
+                s1 += value
+            } else {
+                let doubled = value * 2
+                s2 += (doubled > 9) ? (doubled - 9) : doubled
+            }
+        }
+
+        return (s1 + s2) % 10 == 0
+    }
+
+    private func containsOnlyNumbers(input: String) -> Bool {
+        return input.allSatisfy { chr in
+            "1234567890".contains(chr)
+        }
+    }
 }

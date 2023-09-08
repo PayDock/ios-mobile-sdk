@@ -17,7 +17,7 @@ struct Appearance {
 
     var dimensions = Dimensions()
 
-    var fontName: String = ""
+    var fontName: String = "FFF-AcidGrotesk-Normal"
 }
 
 // MARK: - Appearance + shared
