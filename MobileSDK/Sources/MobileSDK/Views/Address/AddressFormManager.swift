@@ -11,15 +11,15 @@ class AddressFormManager: ObservableObject {
 
     // MARK: - Properties
 
-    @Published var firstNameError = ""
-    @Published var lastNameError = ""
-    @Published var addressSearchError = ""
-    @Published var addressLine1Error = ""
-    @Published var addressLine2Error = ""
-    @Published var cityError = ""
-    @Published var stateError = ""
-    @Published var postcodeError = ""
-    @Published var countryError = ""
+    @Published var firstNameError = " "
+    @Published var lastNameError = " "
+    @Published var addressSearchError = " "
+    @Published var addressLine1Error = " "
+    @Published var addressLine2Error = " "
+    @Published var cityError = " "
+    @Published var stateError = " "
+    @Published var postcodeError = " "
+    @Published var countryError = " "
 
     @Published var editingFirstName = false
     @Published var editingLastName = false
@@ -94,7 +94,7 @@ class AddressFormManager: ObservableObject {
 
     // MARK: - Validations
 
-    private func validateAllTextFields() {
+    func validateAllTextFields() {
         AddressFocusable.allCases.forEach {
             validateTextField($0)
         }

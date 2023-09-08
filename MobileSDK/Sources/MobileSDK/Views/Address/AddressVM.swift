@@ -106,6 +106,7 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Logic
 
     func saveAddress() {
+        addressFormManager.validateAllTextFields()
         let address = Address(
             firstName: addressFormManager.firstNameText,
             lastName: addressFormManager.lastNameText,
