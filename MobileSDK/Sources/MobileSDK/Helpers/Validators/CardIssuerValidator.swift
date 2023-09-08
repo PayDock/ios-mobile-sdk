@@ -90,7 +90,7 @@ class CardIssuerValidator {
 
     private func containsOnlyNumbers(input: String) -> Bool {
         return input.allSatisfy { chr in
-            "1234567890.-".contains(chr)
+            "1234567890".contains(chr)
         }
     }
 }
