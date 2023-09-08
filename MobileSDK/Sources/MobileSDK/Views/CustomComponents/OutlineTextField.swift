@@ -37,6 +37,7 @@ struct OutlineTextField: View {
 
     private let title: String
     private let placeholder: String
+    private let validationIconEnabled: Bool
 
 
     // MARK: - Initialization
@@ -55,7 +56,8 @@ struct OutlineTextField: View {
                 errorMessage: Binding<String>,
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
-                valid: Binding<Bool>) {
+                valid: Binding<Bool>,
+                validationIconEnabled: Bool = true) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -63,6 +65,7 @@ struct OutlineTextField: View {
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
+        self.validationIconEnabled = validationIconEnabled
 
         titleLeadingPadding = (leftImage != nil) ? 52 : 12
     }
@@ -114,7 +117,9 @@ struct OutlineTextField: View {
                 .foregroundColor(.textColor)
                 .tint(.primaryColor)
                 .frame(height: 48)
-            validationIconView
+            if validationIconEnabled {
+                validationIconView
+            }
         }
         .padding([.leading, .trailing], 16.0)
         .background(RoundedRectangle(cornerRadius: .cornerRadius, style: .continuous)

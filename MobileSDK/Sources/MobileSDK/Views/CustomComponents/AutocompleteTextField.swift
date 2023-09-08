@@ -72,7 +72,8 @@ struct AutocompleteTextField: View {
                 placeholder: placeholder,
                 errorMessage: $errorMessage,
                 editing: $editing,
-                valid: $valid)
+                valid: $valid,
+                validationIconEnabled: false)
             .overlay(
                 autocompletePopup
                     .offset(x: -1, y: 52), alignment: .topLeading
