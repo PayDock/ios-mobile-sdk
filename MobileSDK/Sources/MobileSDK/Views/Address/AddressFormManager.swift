@@ -113,36 +113,43 @@ class AddressFormManager: ObservableObject {
 
         switch textField {
         case .firstName:
-            firstNameValid = !firstNameText.isEmpty
-            firstNameError = firstNameText.isEmpty ? "Mandatory field" : ""
+            let isValid = !firstNameText.isEmpty && !firstNameText.trimmingCharacters(in: .whitespaces).isEmpty
+            firstNameValid = isValid
+            firstNameError = isValid ? "" : "Mandatory field"
 
         case .lastName:
-            lastNameValid = !lastNameText.isEmpty
-            lastNameError = lastNameText.isEmpty ? "Mandatory field" : ""
+            let isValid = !lastNameText.isEmpty && !lastNameText.trimmingCharacters(in: .whitespaces).isEmpty
+            lastNameValid = isValid
+            lastNameError = isValid ? "" : "Mandatory field"
 
         case .searchAddress: break // Search field - no need to validate
 
         case .addressLine1:
-            addressLine1Valid = !addressLine1Text.isEmpty
-            addressLine1Error = addressLine1Text.isEmpty ? "Mandatory field" : ""
+            let isValid = !addressLine1Text.isEmpty && !addressLine1Text.trimmingCharacters(in: .whitespaces).isEmpty
+            addressLine1Valid = isValid
+            addressLine1Error = isValid ? "" : "Mandatory field"
 
         case .addressLine2: break
 
         case .city:
-            cityValid = !cityText.isEmpty
-            cityError = cityText.isEmpty ? "Mandatory field" : ""
+            let isValid = !cityText.isEmpty && !cityText.trimmingCharacters(in: .whitespaces).isEmpty
+            cityValid = isValid
+            cityError = isValid ? "" : "Mandatory field"
 
         case .state:
-            stateValid = !stateText.isEmpty
-            stateError = stateText.isEmpty ? "Mandatory field" : ""
+            let isValid = !stateText.isEmpty && !stateText.trimmingCharacters(in: .whitespaces).isEmpty
+            stateValid = isValid
+            stateError = isValid ? "" : "Mandatory field"
 
         case .postcode:
-            postcodeValid = !postcodeText.isEmpty
-            postcodeError = postcodeText.isEmpty ? "Mandatory field" : ""
+            let isValid = !postcodeText.isEmpty && !postcodeText.trimmingCharacters(in: .whitespaces).isEmpty
+            postcodeValid = isValid
+            postcodeError = isValid ? "" : "Mandatory field"
 
         case .country:
-            countryValid = !countryText.isEmpty
-            countryError = countryText.isEmpty ? "Mandatory field" : ""
+            let isValid = !countryText.isEmpty && !countryText.trimmingCharacters(in: .whitespaces).isEmpty
+            countryValid = isValid
+            countryError = isValid ? "" : "Mandatory field"
         }
     }
 
