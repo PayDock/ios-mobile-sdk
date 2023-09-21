@@ -37,7 +37,7 @@ struct CardDetailsView: View {
                 }
                 .padding(.bottom, 12)
 
-                VStack(spacing: .spacing) {
+                VStack(spacing: max(max(.spacing - 10, 0), 0)) {
                     OutlineTextField(
                         text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,

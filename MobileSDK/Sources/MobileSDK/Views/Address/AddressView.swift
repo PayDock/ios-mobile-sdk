@@ -25,7 +25,7 @@ struct AddressView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: .spacing) {
+            VStack(spacing: max(max(.spacing - 12, 0), 0)) {
                 nameAndLastNameView
                 autocompleteTextFieldView
 
