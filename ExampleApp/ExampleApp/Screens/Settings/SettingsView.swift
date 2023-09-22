@@ -79,7 +79,7 @@ struct SettingsView: View {
                     Button(action: {
                         viewModel.copySecretKey()
                     }) {
-                        Image("clone")
+                        Image(.clone)
                             .padding(.horizontal, 32)
                     }
                 }

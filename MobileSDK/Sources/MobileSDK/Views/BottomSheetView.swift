@@ -47,7 +47,7 @@ public struct BottomSheetView<Content: View>: View {
             Button {
                 isPresented = false
             } label: {
-                Image("round-btn", bundle:Bundle.module)
+                Image(.roundBtn)
                     .foregroundColor(.textColor)
             }
             .padding(.top, 60)
