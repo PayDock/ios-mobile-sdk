@@ -34,7 +34,7 @@ class CardDetailsFormManager: ObservableObject {
     @Published var expiryDateValid = true
     @Published var securityCodeValid = true
 
-    @Published var cardImage: Image? = Image(.creditCard)// Image(.creditCard, bundle: Bundle.module)
+    @Published var cardImage: Image? = Image(.creditCard)
 
     let cardholderNameTitle = "Cardholder name"
     let cardNumberTitle = "Card number"
@@ -163,18 +163,18 @@ class CardDetailsFormManager: ObservableObject {
 
     private func getCardIssuerIcon(for cardIssuerType: CardIssuerType) -> Image {
         switch cardIssuerType {
-        case .amex: return Image("amex", bundle: Bundle.module)
-        case .diners: return Image("diners", bundle: Bundle.module)
-        case .discover: return Image("discover", bundle: Bundle.module)
-        case .instaPayment: return Image("insta-payment", bundle: Bundle.module)
-        case .interPay: return Image("inter-payment", bundle: Bundle.module)
-        case .jcb: return Image("jcb", bundle: Bundle.module)
-        case .maestro: return Image("maestro", bundle: Bundle.module)
-        case .mastercard: return Image("mastercard", bundle: Bundle.module)
-        case .uatp: return Image("uatp", bundle: Bundle.module)
-        case .unionPay: return Image("union-pay", bundle: Bundle.module)
-        case .visa: return Image("visa", bundle: Bundle.module)
-        case .other: return Image("credit-card", bundle: Bundle.module)
+        case .amex: return Image(.amex)
+        case .diners: return Image(.diners)
+        case .discover: return Image(.discover)
+        case .instaPayment: return Image(.instaPayment)
+        case .interPay: return Image(.interPayment)
+        case .jcb: return Image(.jcb)
+        case .maestro: return Image(.maestro)
+        case .mastercard: return Image(.mastercard)
+        case .uatp: return Image(.uatp)
+        case .unionPay: return Image(.unionPay)
+        case .visa: return Image(.visa)
+        case .other: return Image(.creditCard)
         }
     }
 
