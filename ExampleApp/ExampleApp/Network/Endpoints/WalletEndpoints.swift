@@ -34,7 +34,7 @@ extension WalletEndpoints: Endpoint {
         switch self {
         case .initialiseWalletCharge:
             return [
-                "x-user-public-key": "\(accessToken)",
+                "x-user-secret-key": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }
