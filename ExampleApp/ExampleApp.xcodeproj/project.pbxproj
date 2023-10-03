@@ -29,6 +29,17 @@
 		28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
+		28E86F582ACC1189008E827E /* NetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F572ACC1189008E827E /* NetworkLogger.swift */; };
+		28E86F5B2ACC11C8008E827E /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F5A2ACC11C8008E827E /* Endpoint.swift */; };
+		28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F5C2ACC11E0008E827E /* HTTPClient.swift */; };
+		28E86F5F2ACC11F6008E827E /* RequestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F5E2ACC11F6008E827E /* RequestError.swift */; };
+		28E86F612ACC120B008E827E /* RequestMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F602ACC120B008E827E /* RequestMethod.swift */; };
+		28E86F632ACC1324008E827E /* SSLPinningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F622ACC1324008E827E /* SSLPinningManager.swift */; };
+		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
+		28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */; };
+		28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6D2ACC213F008E827E /* WalletService.swift */; };
+		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
+		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +89,17 @@
 		28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetView.swift; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28D541F92A6FFC290041BAE0 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
+		28E86F572ACC1189008E827E /* NetworkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogger.swift; sourceTree = "<group>"; };
+		28E86F5A2ACC11C8008E827E /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		28E86F5C2ACC11E0008E827E /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		28E86F5E2ACC11F6008E827E /* RequestError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestError.swift; sourceTree = "<group>"; };
+		28E86F602ACC120B008E827E /* RequestMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestMethod.swift; sourceTree = "<group>"; };
+		28E86F622ACC1324008E827E /* SSLPinningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLPinningManager.swift; sourceTree = "<group>"; };
+		28E86F662ACC1361008E827E /* WalletEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEndpoints.swift; sourceTree = "<group>"; };
+		28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeReq.swift; sourceTree = "<group>"; };
+		28E86F6D2ACC213F008E827E /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
+		28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeRes.swift; sourceTree = "<group>"; };
+		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -198,8 +220,9 @@
 			isa = PBXGroup;
 			children = (
 				28962E762AA79C3E003272A3 /* Info.plist */,
-				28A3A9C22A69632D004A8D34 /* Extensions */,
 				28A3A9C12A6962C2004A8D34 /* CustomViews */,
+				28A3A9C22A69632D004A8D34 /* Extensions */,
+				28E86F592ACC11A2008E827E /* Network */,
 				282D315B2A66A61800E3ECAD /* Screens */,
 				2889B7D42A558F1800D6C7BE /* ExampleApp.swift */,
 				288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */,
@@ -270,6 +293,64 @@
 				28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */,
 			);
 			path = Address;
+			sourceTree = "<group>";
+		};
+		28E86F592ACC11A2008E827E /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F642ACC1348008E827E /* Base */,
+				28E86F652ACC1350008E827E /* Endpoints */,
+				28E86F682ACC1399008E827E /* Requests */,
+				28E86F692ACC13A1008E827E /* Responses */,
+				28E86F6A2ACC13AD008E827E /* Services */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		28E86F642ACC1348008E827E /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F5A2ACC11C8008E827E /* Endpoint.swift */,
+				28E86F5C2ACC11E0008E827E /* HTTPClient.swift */,
+				28E86F572ACC1189008E827E /* NetworkLogger.swift */,
+				28E86F5E2ACC11F6008E827E /* RequestError.swift */,
+				28E86F602ACC120B008E827E /* RequestMethod.swift */,
+				28E86F622ACC1324008E827E /* SSLPinningManager.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		28E86F652ACC1350008E827E /* Endpoints */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F662ACC1361008E827E /* WalletEndpoints.swift */,
+			);
+			path = Endpoints;
+			sourceTree = "<group>";
+		};
+		28E86F682ACC1399008E827E /* Requests */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */,
+			);
+			path = Requests;
+			sourceTree = "<group>";
+		};
+		28E86F692ACC13A1008E827E /* Responses */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */,
+				28E86F712ACC2480008E827E /* ErrorRes.swift */,
+			);
+			path = Responses;
+			sourceTree = "<group>";
+		};
+		28E86F6A2ACC13AD008E827E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F6D2ACC213F008E827E /* WalletService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		28EA57082A5B40200003774F /* Frameworks */ = {
@@ -425,17 +506,28 @@
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
+				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
+				28E86F632ACC1324008E827E /* SSLPinningManager.swift in Sources */,
+				28E86F612ACC120B008E827E /* RequestMethod.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
+				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
+				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
+				28E86F5B2ACC11C8008E827E /* Endpoint.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
+				28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */,
+				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
 				28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
+				28E86F5F2ACC11F6008E827E /* RequestError.swift in Sources */,
+				28E86F582ACC1189008E827E /* NetworkLogger.swift in Sources */,
+				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
