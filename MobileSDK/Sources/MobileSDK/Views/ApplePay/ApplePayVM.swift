@@ -40,7 +40,7 @@ class ApplePayVM: NSObject, ObservableObject {
 extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
-
+        // TODO: - Finalise this once the charge enpoint is implemented
     }
 
 }
