@@ -12,6 +12,7 @@
 		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
 		282D31662A66B82900E3ECAD /* StyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31652A66B82900E3ECAD /* StyleView.swift */; };
 		282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31672A66B83100E3ECAD /* SettingsView.swift */; };
+		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
 		285920A72A5B49E700EA42D7 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 285920A62A5B49E700EA42D7 /* MobileSDK */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
@@ -66,6 +67,7 @@
 		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 		282D31652A66B82900E3ECAD /* StyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleView.swift; sourceTree = "<group>"; };
 		282D31672A66B83100E3ECAD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -200,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */,
+				2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */,
 			);
 			path = ApplePay;
 			sourceTree = "<group>";
@@ -541,6 +544,7 @@
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
+				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
 				28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,

@@ -30,11 +30,11 @@ extension WalletEndpoints: Endpoint {
 
     var header: [String: String]? {
         // TODO: - Change this token down the line to be initialized from Example app config
-        let accessToken = "90ad3038ae37b947dc225cf35c41b1cfe4295cf9"
+        let secretKey = "2d7fa96060b38a942a5fe97f244580a5322971b5"
         switch self {
         case .initialiseWalletCharge:
             return [
-                "x-user-secret-key": "\(accessToken)",
+                "x-user-secret-key": "\(secretKey)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }

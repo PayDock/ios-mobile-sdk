@@ -9,13 +9,20 @@ import SwiftUI
 
 public struct ApplePaySheetView: View {
 
+    @State var applePayRequest: ApplePayRequest
+
     @Binding var isPresented: Bool
-    @Binding var onCompletion: String
+    @Binding var onCompletion: ChargeResponse?
+    @Binding var onFailure: ApplePayError?
 
     public init(isPresented: Binding<Bool>,
-                onCompletion: Binding<String>) {
+                applePayRequest: ApplePayRequest,
+                onCompletion: Binding<ChargeResponse?>,
+                onFailure: Binding<ApplePayError?>) {
         self._isPresented = isPresented
+        self.applePayRequest = applePayRequest
         self._onCompletion = onCompletion
+        self._onFailure = onFailure
     }
 
     public var body: some View {
@@ -23,11 +30,14 @@ public struct ApplePaySheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            ApplePayView(onCompletion: $onCompletion)
+            ApplePayView(
+                applePayRequest: applePayRequest,
+                onCompletion: $onCompletion
+                ,onFailure: $onFailure)
         }
     }
 }
 
-#Preview {
-    ApplePaySheetView(isPresented: .constant(true), onCompletion: .constant("Data"))
-}
+//#Preview {
+//    ApplePaySheetView(isPresented: .constant(true), onCompletion: .constant("Data"))
+//}

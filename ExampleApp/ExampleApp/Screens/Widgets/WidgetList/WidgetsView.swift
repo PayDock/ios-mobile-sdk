@@ -36,7 +36,7 @@ struct WidgetsView: View {
                 .listSectionSeparator(.hidden, edges: .top)
                 .listRowBackground(Color(hex: "#EAE0D7"))
 
-                NavigationLink(destination: AddressWidgetView()) {
+                NavigationLink(destination: ApplePayWidgetView()) {
                     cell(
                         title: "Apple Pay",
                         subtitle: "Standalone Apple Pay flow")

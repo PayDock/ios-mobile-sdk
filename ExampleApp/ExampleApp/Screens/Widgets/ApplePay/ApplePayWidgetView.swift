@@ -10,7 +10,12 @@ import SwiftUI
 import MobileSDK
 
 struct ApplePayWidgetView: View {
+
+    @StateObject private var viewModel = ApplePayWidgetVM()
     @State var isSheetPresented = false
+    // TODO: - Update to response model after other tickets are completed
+    @State var onCompletion: ChargeResponse?
+    @State var onFailure: ApplePayError?
 
     var body: some View {
         NavigationStack {
@@ -20,11 +25,20 @@ struct ApplePayWidgetView: View {
                     Button("Launch Apple Pay sheet") {
                         isSheetPresented = true
                     }
+                    .disabled(!viewModel.applePayButtonEnabled)
                     .padding()
+                    ApplePaySheetView(
+                        isPresented: $isSheetPresented,
+                        applePayRequest: viewModel.getApplePayRequest(),
+                        onCompletion: $onCompletion,
+                        onFailure: $onFailure)
                     Spacer()
                 }
             }
             .background(Color(hex: "#EAE0D7"))
+        }
+        .onAppear {
+            viewModel.initializeWalletCharge()
         }
     }
 }
