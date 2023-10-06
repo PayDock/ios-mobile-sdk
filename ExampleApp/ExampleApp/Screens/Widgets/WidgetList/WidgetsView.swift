@@ -21,7 +21,7 @@ struct WidgetsView: View {
                 NavigationLink(destination: CardDetailsWidgetView()) {
                     cell(
                         title: "Card Details",
-                        subtitle: "Tokenise card details") {}
+                        subtitle: "Tokenise card details")
                 }
                 .listRowSeparatorTint(.black)
                 .listSectionSeparator(.hidden, edges: .top)
@@ -30,8 +30,16 @@ struct WidgetsView: View {
                 NavigationLink(destination: AddressWidgetView()) {
                     cell(
                         title: "Address",
-                        subtitle: "Capture customer address form",
-                        onTap: {})
+                        subtitle: "Capture customer address form")
+                }
+                .listRowSeparatorTint(.black)
+                .listSectionSeparator(.hidden, edges: .top)
+                .listRowBackground(Color(hex: "#EAE0D7"))
+
+                NavigationLink(destination: ApplePayWidgetView()) {
+                    cell(
+                        title: "Apple Pay",
+                        subtitle: "Standalone Apple Pay flow")
                 }
                 .listRowSeparatorTint(.black)
                 .listSectionSeparator(.hidden, edges: .top)
@@ -47,7 +55,7 @@ struct WidgetsView: View {
         .background(Color(hex: "#EAE0D7"))
     }
 
-    func cell(title: String, subtitle: String, onTap: () -> Void) -> some View {
+    func cell(title: String, subtitle: String) -> some View {
         HStack {
             VStack {
                 HStack {
@@ -65,7 +73,6 @@ struct WidgetsView: View {
                 }
 
             }
-
             Spacer()
             Image(.chevronRight)
         }
