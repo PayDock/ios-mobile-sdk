@@ -35,6 +35,7 @@ public class MobileSDK {
 // MARK: - Apple Pay helpers
 
 extension MobileSDK {
+
     public static func createApplePayRequest(
         amount: Decimal,
         amountLabel: String,
@@ -59,4 +60,5 @@ extension MobileSDK {
             paymentRequest.shippingMethods = shippingOptions
             return paymentRequest
     }
+
 }

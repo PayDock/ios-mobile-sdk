@@ -5,44 +5,92 @@
 //  Created by Domagoj Grizelj on 04.10.2023..
 //
 
-import Foundation
+import SwiftUI
 import PassKit
 
 class ApplePayVM: NSObject, ObservableObject {
 
+    // MARK: - Dependencies
+
+    private let walletService: WalletService
+    let applePayRequest: ApplePayRequest
+
+    // MARK: - Properties
+
     var paymentController: PKPaymentAuthorizationController?
     var paymentSummaryItems = [PKPaymentSummaryItem]()
     var paymentStatus = PKPaymentAuthorizationStatus.failure
-    let applePayRequest: ApplePayRequest
+    var chargeData: ChargeResponse?
+    var error: ApplePayError?
 
-    init(applePayRequest: ApplePayRequest) {
+    // MARK: - Handlers
+
+    private var onCompletion: Binding<ChargeResponse?>
+    private var onFailure: Binding<ApplePayError?>
+
+    init(applePayRequest: ApplePayRequest,
+         walletService: WalletService = WalletServiceImpl(),
+         onCompletion: Binding<ChargeResponse?>,
+         onFailure: Binding<ApplePayError?>) {
         self.applePayRequest = applePayRequest
+        self.walletService = walletService
+        self.onCompletion = onCompletion
+        self.onFailure = onFailure
     }
 
     func startPayment() {
         let paymentRequest = applePayRequest.request
-
-        // Display our payment request
         paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         paymentController?.delegate = self
-        paymentController?.present(completion: { (presented: Bool) in
-            if presented {
-                NSLog("Presented payment controller")
-            } else {
-                NSLog("Failed to present payment controller")
-            }
-        })
-        // TODO: - Finalise this once other endpoints are implemented
+        paymentController?.present()
     }
-
 }
+
+// MARK: - PKPaymentAuthorizationControllerDelegate
 
 extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
-    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
-        // TODO: - Finalise this once the charge enpoint is implemented
+    func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
+                                        didAuthorizePayment payment: PKPayment,
+                                        completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
+        // Check if we need some additonal validation config before firing
+        if false {
+            paymentStatus = .failure
+            completion(paymentStatus)
+        } else {
+            Task {
+                do {
+                    let refToken = String(data: payment.token.paymentData, encoding: .utf8)
+                    let chargeResponse = try await self.walletService.captureCharge(
+                        token: self.applePayRequest.token,
+                        paymentMethodId: nil,
+                        payerId: nil,
+                        refToken: refToken)
+
+                    paymentStatus = .success
+                    onCompletion.wrappedValue = chargeResponse
+                    completion(paymentStatus)
+
+                } catch {
+                    paymentStatus = .failure
+                    self.error = .paymentFailed
+                    completion(paymentStatus)
+                }
+            }
+        }
     }
 
+    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
+        controller.dismiss {
+            DispatchQueue.main.async {
+                if self.paymentStatus == .success, let chargeData = self.chargeData {
+                    self.onCompletion.wrappedValue = chargeData
+                } else {
+                    self.onFailure.wrappedValue = self.error
+                }
+            }
+        }
+    }
 }
 
 

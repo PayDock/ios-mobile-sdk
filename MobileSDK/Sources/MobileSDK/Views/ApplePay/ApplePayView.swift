@@ -17,7 +17,10 @@ struct ApplePayView: View {
                 onFailure: Binding<ApplePayError?>) {
         self._onCompletion = onCompletion
         self._onFailure = onFailure
-        _viewModel = StateObject(wrappedValue: ApplePayVM(applePayRequest: applePayRequest))
+        _viewModel = StateObject(wrappedValue: ApplePayVM(
+            applePayRequest: applePayRequest,
+            onCompletion: onCompletion,
+            onFailure: onFailure))
     }
 
     var body: some View {

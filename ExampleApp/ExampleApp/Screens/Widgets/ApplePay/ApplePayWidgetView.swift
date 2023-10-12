@@ -27,11 +27,13 @@ struct ApplePayWidgetView: View {
                     }
                     .disabled(!viewModel.applePayButtonEnabled)
                     .padding()
-                    ApplePaySheetView(
-                        isPresented: $isSheetPresented,
-                        applePayRequest: viewModel.getApplePayRequest(),
-                        onCompletion: $onCompletion,
-                        onFailure: $onFailure)
+                    if !viewModel.walletToken.isEmpty {
+                        ApplePaySheetView(
+                            isPresented: $isSheetPresented,
+                            applePayRequest: viewModel.getApplePayRequest(),
+                            onCompletion: $onCompletion,
+                            onFailure: $onFailure)
+                    }
                     Spacer()
                 }
             }
