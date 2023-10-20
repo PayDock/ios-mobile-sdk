@@ -38,7 +38,7 @@ struct PickerView: View {
                                 .padding(.leading, 32)
                                 .font(.custom(selected, size: 14))
                             Spacer()
-                            Image(.angleDown)
+                            Image("angle-down")
                                 .padding(.trailing, 32)
                         }
                     }

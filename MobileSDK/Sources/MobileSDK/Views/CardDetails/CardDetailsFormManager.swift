@@ -9,32 +9,32 @@ import Foundation
 import SwiftUI
 
 class CardDetailsFormManager: ObservableObject {
-
+    
     // MARK: - Dependencies
-
+    
     private let cardIssuerValidator: CardIssuerValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
     private let cardDetailsFormatter: CardDetailsFormatter
-
+    
     // MARK: - Properties
-
+    
     @Published var cardholderNameError = ""
     @Published var cardNumberError = ""
     @Published var expiryDateError = ""
     @Published var securityCodeError = ""
-
+    
     @Published var editingCardholderName = false
     @Published var editingCardNumber = false
     @Published var editingExpiryDate = false
     @Published var editingSecurityCode = false
-
+    
     @Published var cardHolderNameValid = true
     @Published var cardNumberValid = true
     @Published var expiryDateValid = true
     @Published var securityCodeValid = true
-
-    @Published var cardImage: Image? = Image(.creditCard)
+    
+    @Published var cardImage: Image? = Image("credit-card")
 
     let cardholderNameTitle = "Cardholder name"
     let cardNumberTitle = "Card number"
@@ -163,18 +163,18 @@ class CardDetailsFormManager: ObservableObject {
 
     private func getCardIssuerIcon(for cardIssuerType: CardIssuerType) -> Image {
         switch cardIssuerType {
-        case .amex: return Image(.amex)
-        case .diners: return Image(.diners)
-        case .discover: return Image(.discover)
-        case .instaPayment: return Image(.instaPayment)
-        case .interPay: return Image(.interPayment)
-        case .jcb: return Image(.jcb)
-        case .maestro: return Image(.maestro)
-        case .mastercard: return Image(.mastercard)
-        case .uatp: return Image(.uatp)
-        case .unionPay: return Image(.unionPay)
-        case .visa: return Image(.visa)
-        case .other: return Image(.creditCard)
+        case .amex: return Image("amex")
+        case .diners: return Image("diners")
+        case .discover: return Image("discover")
+        case .instaPayment: return Image("insta-payment")
+        case .interPay: return Image("inter-payment")
+        case .jcb: return Image("jcb")
+        case .maestro: return Image("maestro")
+        case .mastercard: return Image("mastercard")
+        case .uatp: return Image("uatp")
+        case .unionPay: return Image("union-pay")
+        case .visa: return Image("visa")
+        case .other: return Image("credit-card")
         }
     }
 
