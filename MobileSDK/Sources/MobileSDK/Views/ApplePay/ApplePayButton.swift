@@ -19,9 +19,11 @@ struct ApplePayButton: View {
     }
 }
 
-#Preview {
-    ApplePayButton(action: {})
-        .previewLayout(.sizeThatFits)
+struct ApplePayButton_Previews: PreviewProvider {
+    static var previews: some View {
+        ApplePayButton(action: {})
+            .previewLayout(.sizeThatFits)
+    }
 }
 
 extension ApplePayButton {
