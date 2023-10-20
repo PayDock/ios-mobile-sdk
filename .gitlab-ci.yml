@@ -26,6 +26,7 @@ test_exampleApp:
     - .macos_saas_runners
   stage: test
   script: 
+    - bundle install
     - bundle exec fastlane build_and_test device:'iPhone 14 Pro' output:'fastlane/test_output'
   artifacts:
     paths:
@@ -36,6 +37,7 @@ export_exampleApp:
     - .macos_saas_runners
   stage: build
   script:
+    - bundle install
     - bundle exec fastlane archive output:'fastlane/test_output'
   artifacts:
     paths:
