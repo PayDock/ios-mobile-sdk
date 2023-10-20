@@ -48,7 +48,7 @@ extension WalletEndpoints: Endpoint {
 
     var parameters: [URLQueryItem] {
         switch self {
-        case .initialiseWalletCharge: [URLQueryItem(name: "capture", value: "true")]
+        case .initialiseWalletCharge: return [URLQueryItem(name: "capture", value: "true")]
         }
     }
 
