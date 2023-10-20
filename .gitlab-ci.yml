@@ -18,7 +18,7 @@ variables:
 .macos_saas_runners:
   tags:
     - saas-macos-medium-m1
-  image: macos-12-xcode-14
+  image: macos-13-xcode-14
 
 
 test_exampleApp:
