@@ -38,6 +38,7 @@ export_exampleApp:
   stage: build
   script:
     - bundle install
+    - bundle exec fastlane adhoc_certs
     - bundle exec fastlane archive output:'fastlane/test_output'
   artifacts:
     paths:

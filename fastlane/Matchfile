@@ -1,4 +1,5 @@
-git_url("git@gitlab.paydock.com:envoyrecharge/match-ios-certificates.git")
+gitlab_host("https://gitlab.paydock.com")
+gitlab_project("envoyrecharge/match-ios-certificates")
 git_branch("main")
 storage_mode("git")
 
