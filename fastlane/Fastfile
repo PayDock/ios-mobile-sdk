@@ -31,8 +31,9 @@ lane :adhoc_certs do
     match(
         app_identifier: "com.paydock.ExampleApp",
         type: "adhoc",
-        readonly: false,
-        force_for_new_devices: true
+        readonly: true,
+        force_for_new_devices: false,
+        clone_branch_directly: true
     )
 end
 
@@ -40,7 +41,7 @@ lane :dev_certs do
     match(
         app_identifier: "com.paydock.ExampleApp",
         type: "development",
-        readonly: false,
-        force_for_new_devices: true
+        readonly: true,
+        force_for_new_devices: false
     )
 end
