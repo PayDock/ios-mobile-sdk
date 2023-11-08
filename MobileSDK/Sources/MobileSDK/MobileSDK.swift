@@ -42,7 +42,7 @@ extension MobileSDK {
         countryCode: String,
         currencyCode: String,
         merchantIdentifier: String,
-        merchantCapabilities: PKMerchantCapability = [.credit, .debit, .threeDSecure],
+        merchantCapabilities: PKMerchantCapability = [.capabilityCredit, .capabilityDebit, .capability3DS],
         supportedNetworks: [PKPaymentNetwork] = [.visa, .masterCard, .amex, .discover],
         requireBillingAddress: Bool = true,
         requireShippingAddress: Bool = false,
