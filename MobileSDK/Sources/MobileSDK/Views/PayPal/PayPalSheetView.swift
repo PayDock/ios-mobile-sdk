@@ -1,26 +1,25 @@
 //
-//  ApplePaySheetView.swift
+//  PayPalSheetView.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 04.10.2023..
+//  Created by Domagoj Grizelj on 26.10.2023..
 //
 
 import SwiftUI
 
-public struct ApplePaySheetView: View {
+public struct PayPalSheetView: View {
 
-    @State var applePayRequest: ApplePayRequest
-
+    @State var payPalToken: String
     @Binding var isPresented: Bool
     @Binding var onCompletion: ChargeResponse?
-    @Binding var onFailure: ApplePayError?
+    @Binding var onFailure: PayPalError?
 
     public init(isPresented: Binding<Bool>,
-                applePayRequest: ApplePayRequest,
+                payPalToken: String,
                 onCompletion: Binding<ChargeResponse?>,
-                onFailure: Binding<ApplePayError?>) {
+                onFailure: Binding<PayPalError?>) {
         self._isPresented = isPresented
-        self.applePayRequest = applePayRequest
+        self.payPalToken = payPalToken
         self._onCompletion = onCompletion
         self._onFailure = onFailure
     }
@@ -30,14 +29,14 @@ public struct ApplePaySheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            ApplePayView(
-                applePayRequest: applePayRequest,
+            PayPalView(
+                payPalToken: payPalToken,
                 onCompletion: $onCompletion,
                 onFailure: $onFailure)
         }
     }
 }
 
-//#Preview {
-//    ApplePaySheetView(isPresented: .constant(true), onCompletion: .constant("Data"))
-//}
+#Preview {
+    PayPalSheetView(isPresented: .constant(true), payPalToken: "", onCompletion: .constant(ChargeResponse(status: "", amount: 10, currency: "")), onFailure: .constant(.requestFailed))
+}

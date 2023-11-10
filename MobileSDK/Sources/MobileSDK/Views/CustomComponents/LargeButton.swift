@@ -13,11 +13,13 @@ struct LargeButton: View {
     var foregroundColor: Color
 
     private let title: String
+    private let image: Image?
     private let action: () -> Void
 
     private let disabled: Bool
 
     init(title: String,
+         image: Image? = nil,
          disabled: Bool = false,
          backgroundColor: Color = .primaryColor,
          foregroundColor: Color = .white,
@@ -25,16 +27,20 @@ struct LargeButton: View {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
         self.title = title
+        self.image = image
         self.action = action
         self.disabled = disabled
     }
 
     var body: some View {
         HStack {
-            Button(action:self.action) {
-                Text(self.title)
-                
-                    .frame(maxWidth:.infinity)
+            Button(action: self.action) {
+                if image != nil {
+                    image?.resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 20)
+                } else {
+                    Text(self.title)
+                        .frame(maxWidth:.infinity)
+                }
             }
             .buttonStyle(LargeButtonStyle(
                 backgroundColor: backgroundColor,

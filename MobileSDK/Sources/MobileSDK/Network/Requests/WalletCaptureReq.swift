@@ -12,6 +12,11 @@ struct WalletCaptureReq: Codable {
     let paymentMethodId: String?
     let customer: Customer
 
+    enum CodingKeys: String, CodingKey {
+        case paymentMethodId = "payment_method_id"
+        case customer = "customer"
+    }
+
     struct Customer: Codable {
         let paymentSource: PaymentSource
 
