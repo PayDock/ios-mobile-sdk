@@ -53,6 +53,15 @@ struct WidgetsView: View {
                 .listRowSeparatorTint(.black)
                 .listSectionSeparator(.hidden, edges: .top)
                 .listRowBackground(Color(hex: "#EAE0D7"))
+
+                NavigationLink(destination: GiftCardWidgetView()) {
+                    cell(
+                        title: "Gift Card",
+                        subtitle: "Standalone Gift Card form")
+                }
+                .listRowSeparatorTint(.black)
+                .listSectionSeparator(.hidden, edges: .top)
+                .listRowBackground(Color(hex: "#EAE0D7"))
             }
             .navigationTitle("Widgets")
             .background(Color(hex: "#EAE0D7"))
