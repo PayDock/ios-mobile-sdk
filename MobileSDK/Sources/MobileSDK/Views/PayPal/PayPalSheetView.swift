@@ -37,6 +37,8 @@ public struct PayPalSheetView: View {
     }
 }
 
-#Preview {
-    PayPalSheetView(isPresented: .constant(true), payPalToken: "", onCompletion: .constant(ChargeResponse(status: "", amount: 10, currency: "")), onFailure: .constant(.requestFailed))
+struct PayPalSheetView_Previews: PreviewProvider {
+    static var previews: some View {
+        PayPalSheetView(isPresented: .constant(true), payPalToken: "", onCompletion: .constant(ChargeResponse(status: "", amount: 10, currency: "")), onFailure: .constant(.requestFailed))
+    }
 }
