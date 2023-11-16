@@ -92,7 +92,7 @@ struct WidgetsView: View {
 
             }
             Spacer()
-            Image(.chevronRight)
+            Image("chevron-right")
         }
         .listRowBackground(Color(hex: "#EAE0D7"))
     }
