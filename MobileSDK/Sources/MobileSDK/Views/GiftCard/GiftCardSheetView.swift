@@ -12,14 +12,17 @@ public struct GiftCardSheetView: View {
     // MARK: - Properties
 
     @Binding var isPresented: Bool
+    @State var storePin: Bool
     @Binding var onCompletion: String?
     @Binding var onFailure: Error?
 
     // MARK: - Initialisation
 
-    public init(isPresented: Binding<Bool>,
+    public init(storePin: Bool = true,
+                isPresented: Binding<Bool>,
                 onCompletion: Binding<String?>,
                 onFailure: Binding<Error?>) {
+        self.storePin = storePin
         self._isPresented = isPresented
         self._onCompletion = onCompletion
         self._onFailure = onFailure
@@ -30,7 +33,7 @@ public struct GiftCardSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            GiftCardView(onCompletion: $onCompletion, onFailure: $onFailure)
+            GiftCardView(storePin: storePin, onCompletion: $onCompletion, onFailure: $onFailure)
         }
     }
 }
@@ -38,6 +41,7 @@ public struct GiftCardSheetView: View {
 struct GiftCardSheetView_Previews: PreviewProvider {
     static var previews: some View {
         GiftCardSheetView(
+            storePin: true,
             isPresented: .constant(true),
             onCompletion: .constant(""), onFailure: .constant(.none))
     }

@@ -20,16 +20,22 @@ class GiftCardVM: ObservableObject {
     private var onCompletion: Binding<String?>
     private var onFailure: Binding<Error?>
 
+    // MARK: - Properties
+
+    private let storePin: Bool
+
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
 
     init(giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
          cardService: CardService = CardServiceImpl(),
+         storePin: Bool,
          onCompletion: Binding<String?>,
          onFailure: Binding<Error?>) {
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
+        self.storePin = storePin
         self.onCompletion = onCompletion
         self.onFailure = onFailure
 
@@ -42,7 +48,8 @@ class GiftCardVM: ObservableObject {
         Task {
             let tokeniseGiftCardReq = TokeniseGiftCardReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
-                pin: giftCardFormManager.pinText)
+                pin: giftCardFormManager.pinText,
+                storePin: storePin)
 
             do {
                 let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq)

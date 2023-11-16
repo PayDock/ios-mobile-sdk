@@ -12,9 +12,11 @@ struct GiftCardView: View {
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
 
     // TODO: - Add proper data passing once endpoints are implemented
-    public init(onCompletion: Binding<String?>,
+    public init(storePin: Bool = true,
+                onCompletion: Binding<String?>,
                 onFailure: Binding<Error?>) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(
+            storePin: storePin,
             onCompletion: onCompletion,
             onFailure: onFailure))
     }
