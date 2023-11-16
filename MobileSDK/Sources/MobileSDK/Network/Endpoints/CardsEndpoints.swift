@@ -10,6 +10,7 @@ import Foundation
 enum CardsEndpoints {
 
     case cardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq)
+    case giftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq)
 
 }
 
@@ -17,13 +18,14 @@ extension CardsEndpoints: Endpoint {
 
     var path: String {
         switch self {
-        case .cardToken: return "/v1/payment_sources/tokens"
+        case .cardToken, .giftCardToken: return "/v1/payment_sources/tokens"
         }
     }
 
     var method: RequestMethod {
         switch self {
         case .cardToken: return .post
+        case .giftCardToken: return .post
         }
     }
 
@@ -31,7 +33,7 @@ extension CardsEndpoints: Endpoint {
         // TODO: - Change this token down the line to be initialized from SDK configuration
         let accessToken = "90ad3038ae37b947dc225cf35c41b1cfe4295cf9"
         switch self {
-        case .cardToken:
+        case .cardToken, .giftCardToken:
             return [
                 "x-user-public-key": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -42,6 +44,7 @@ extension CardsEndpoints: Endpoint {
     var body: Data? {
         switch self {
         case .cardToken(let tokeniseCardDetailsReq): return try? JSONEncoder().encode(tokeniseCardDetailsReq)
+        case .giftCardToken(let tokeniseGiftCardReq): return try? JSONEncoder().encode(tokeniseGiftCardReq)
         }
     }
     

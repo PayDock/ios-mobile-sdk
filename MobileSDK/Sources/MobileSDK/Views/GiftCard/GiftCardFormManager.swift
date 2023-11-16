@@ -9,8 +9,6 @@ import SwiftUI
 
 class GiftCardFormManager: ObservableObject {
 
-    private let cardIssuerValidator: CardIssuerValidator
-    private let cardSecurityCodeValidator: CardSecurityCodeValidator
     private let cardDetailsFormatter: CardDetailsFormatter
 
     @Published var cardNumberError = ""
@@ -26,7 +24,7 @@ class GiftCardFormManager: ObservableObject {
     let pinTitle = "PIN"
 
     var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"
-    @Published var pinPlaceholder = "XXX"
+    @Published var pinPlaceholder = "XXXX"
 
     private(set) var cardNumberText: String = ""
     private(set) var pinText = ""
@@ -61,11 +59,7 @@ class GiftCardFormManager: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
-         cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
-         cardDetailsFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
-        self.cardIssuerValidator = cardIssuerValidator
-        self.cardSecurityCodeValidator = cardSecurityCodeValidator
+    init(cardDetailsFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
         self.cardDetailsFormatter = cardDetailsFormatter
     }
 
@@ -93,7 +87,9 @@ class GiftCardFormManager: ObservableObject {
     }
 
     private func validateCardNumber() {
-        if cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText) {
+        let cardNumberProper = cardNumberText.replacingOccurrences(of: " ", with: "")
+
+        if cardNumberProper.count >= 14 && cardNumberProper.count <= 25 {
             cardNumberValid = true
             cardNumberError = ""
         } else {
@@ -103,7 +99,13 @@ class GiftCardFormManager: ObservableObject {
     }
 
     private func validatePin() {
-        // TODO: Add pin validation
+        if CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText)) {
+            pinValid = true
+            pinError = ""
+        } else {
+            pinValid = false
+            pinError = "Invalid PIN number"
+        }
     }
 
     // MARK: - Formatting

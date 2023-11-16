@@ -13,7 +13,8 @@ struct GiftCardWidgetView: View {
 
     @StateObject private var viewModel = GiftCardWidgetVM()
     @State var isSheetPresented = false
-    @State var onCompletion: String = ""
+    @State var onCompletion: String?
+    @State var onFailure: Error?
 
     var body: some View {
         NavigationStack {
@@ -25,8 +26,10 @@ struct GiftCardWidgetView: View {
                     }
                     .padding()
                     EmptyView()
-                    GiftCardSheetView(isPresented: $isSheetPresented, onCompletion: $onCompletion)
-
+                    GiftCardSheetView(
+                        isPresented: $isSheetPresented,
+                        onCompletion: $onCompletion,
+                        onFailure: $onFailure)
                     Spacer()
                 }
             }
