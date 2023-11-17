@@ -39,6 +39,7 @@ struct GiftCardView: View {
                             title: viewModel.giftCardFormManager.cardNumberTitle,
                             placeholder: viewModel.giftCardFormManager.cardNumberPlaceholder,
                             errorMessage: $viewModel.giftCardFormManager.cardNumberError,
+                            leftImage: .constant(Image("credit-card", bundle: Bundle.module)),
                             editing: $viewModel.giftCardFormManager.editingCardNumber,
                             valid: $viewModel.giftCardFormManager.cardNumberValid)
                         .keyboardType(.numberPad)

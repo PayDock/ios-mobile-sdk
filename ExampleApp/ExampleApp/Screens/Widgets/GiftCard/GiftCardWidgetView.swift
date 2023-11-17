@@ -20,18 +20,20 @@ struct GiftCardWidgetView: View {
         NavigationStack {
             ScrollView {
                 HStack {
-                    Spacer()
-                    Button("Launch Gift Card sheet") {
-                        isSheetPresented = true
-                    }
-                    .padding()
-                    EmptyView()
-                    GiftCardSheetView(
-                        isPresented: $isSheetPresented,
-                        onCompletion: $onCompletion,
-                        onFailure: $onFailure)
-                    Spacer()
+                        Spacer()
+                        Button("Launch Gift Card sheet") {
+                            isSheetPresented = true
+                        }
+                        .padding()
+                        EmptyView()
+                        GiftCardSheetView(
+                            isPresented: $isSheetPresented,
+                            onCompletion: $onCompletion,
+                            onFailure: $onFailure)
+                        Spacer()
                 }
+                Text(onCompletion ?? "")
+
             }
             .background(Color(hex: "#EAE0D7"))
         }
