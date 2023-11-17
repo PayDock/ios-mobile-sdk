@@ -7,8 +7,6 @@
 //
 
 import Foundation
-
-import Foundation
 import MobileSDK
 
 class PayPalWidgetVM: NSObject, ObservableObject {

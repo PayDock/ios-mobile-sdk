@@ -44,6 +44,8 @@
 		28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6D2ACC213F008E827E /* WalletService.swift */; };
 		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
 		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
+		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
+		28F19D2F2B029F50002F5526 /* GiftCardWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2E2B029F50002F5526 /* GiftCardWidgetVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +111,8 @@
 		28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeRes.swift; sourceTree = "<group>"; };
 		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
+		28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetView.swift; sourceTree = "<group>"; };
+		28F19D2E2B029F50002F5526 /* GiftCardWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +177,7 @@
 				28A65CA12A94CE4E002A04CA /* Address */,
 				2867ADD72ACEE53400DB5319 /* ApplePay */,
 				280EB39B2AFE42920036E575 /* PayPal */,
+				28F19D2B2B029F2E002F5526 /* GiftCard */,
 				2867ADD82ACEE54200DB5319 /* WidgetList */,
 			);
 			path = Widgets;
@@ -404,6 +409,15 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		28F19D2B2B029F2E002F5526 /* GiftCard */ = {
+			isa = PBXGroup;
+			children = (
+				28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */,
+				28F19D2E2B029F50002F5526 /* GiftCardWidgetVM.swift */,
+			);
+			path = GiftCard;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -560,6 +574,7 @@
 				28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
+				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
 				28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
@@ -569,6 +584,7 @@
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,
+				28F19D2F2B029F50002F5526 /* GiftCardWidgetVM.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
