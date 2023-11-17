@@ -8,7 +8,7 @@
 
 stages:
   - test
-# - build
+  - build
 
 variables:
   LC_ALL: "en_US.UTF-8"
@@ -30,14 +30,13 @@ test_exampleApp:
   artifacts:
     paths:
       - fastlane/test_output
-# export_exampleApp:
-#   extends:
-#     - .macos_saas_runners
-#   stage: build
-#   script:
-#     - bundle install
-#     - bundle exec fastlane adhoc_certs
-#     - bundle exec fastlane archive output:'fastlane/test_output'
-#   artifacts:
-#     paths:
-#     - fastlane/test_output
+export_exampleApp:
+  extends:
+    - .macos_saas_runners
+  stage: build
+  script:
+    - bundle install
+    - bundle exec fastlane archive_ci output:'fastlane/test_output'
+  artifacts:
+    paths:
+      - fastlane/test_output
