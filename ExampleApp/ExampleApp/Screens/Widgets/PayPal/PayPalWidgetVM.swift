@@ -1,15 +1,17 @@
 //
-//  ApplePayWidgetVM.swift
+//  PayPalWidgetVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 04.10.2023..
+//  Created by Domagoj Grizelj on 26.10.2023..
 //  Copyright © 2023 Paydock Ltd. All rights reserved.
 //
 
 import Foundation
+
+import Foundation
 import MobileSDK
 
-class ApplePayWidgetVM: NSObject, ObservableObject {
+class PayPalWidgetVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
 
@@ -18,7 +20,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
     // MARK: - Properties
 
     @Published var walletToken = ""
-    @Published var applePayButtonEnabled = false
+    @Published var payPalButtonEnabled = false
 
     // MARK: - Initialisation
 
@@ -29,12 +31,12 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
     func initializeWalletCharge() {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "65144f9bfee65245ecd2db17")
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "6481c786d9cc9c39993e5933")
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Tom",
                 lastName: "Taylor",
-                email: "tom.taylor@tommy.com",
+                email: "novaba9346@hondabbs.com",
                 phone: "+11234567890",
                 paymentSource: paymentSource)
 
@@ -44,15 +46,15 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
                 customer: customer,
                 amount: 10,
                 currency: "USD",
-                reference: "Test purchase",
-                description: "Test purchase",
+                reference: UUID().uuidString,
+                description: "Test transaction for PayPal",
                 meta: metaData)
 
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
                     self.walletToken = token
-                    self.applePayButtonEnabled = true
+                    self.payPalButtonEnabled = true
                 }
             } catch {
                 // TODO: Add example app error handling
@@ -60,22 +62,5 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             }
         }
     }
-
-    func getApplePayRequest() -> ApplePayRequest {
-        let paymentRequest = MobileSDK.createApplePayRequest(
-            amount: 5.50,
-            amountLabel: "Amount",
-            countryCode: "AU",
-            currencyCode: "AUD",
-            merchantIdentifier: "merchant.test-paydock")
-
-        let applePayRequest = ApplePayRequest(
-            token: walletToken,
-            merchanIdentifier: "merchant.test-paydock",
-            request: paymentRequest)
-
-        return applePayRequest
-    }
-
 
 }

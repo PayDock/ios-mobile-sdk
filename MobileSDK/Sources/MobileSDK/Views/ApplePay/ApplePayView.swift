@@ -9,14 +9,10 @@ import SwiftUI
 
 struct ApplePayView: View {
     @StateObject private var viewModel: ApplePayVM
-    @Binding private var onCompletion: ChargeResponse?
-    @Binding private var onFailure: ApplePayError?
 
     public init(applePayRequest: ApplePayRequest,
                 onCompletion: Binding<ChargeResponse?>,
                 onFailure: Binding<ApplePayError?>) {
-        self._onCompletion = onCompletion
-        self._onFailure = onFailure
         _viewModel = StateObject(wrappedValue: ApplePayVM(
             applePayRequest: applePayRequest,
             onCompletion: onCompletion,
@@ -29,12 +25,12 @@ struct ApplePayView: View {
         }
         .padding()
     }
-    
+
 }
 
 //#Preview {
 //    ApplePayView(
-//        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: .),
+//        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: PKPa),
 //        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
 //        , onFailure: .constant(.paymentFailed))
 //}

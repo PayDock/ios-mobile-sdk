@@ -32,8 +32,8 @@ public struct ApplePaySheetView: View {
         .bottomSheet(isPresented: $isPresented) {
             ApplePayView(
                 applePayRequest: applePayRequest,
-                onCompletion: $onCompletion
-                ,onFailure: $onFailure)
+                onCompletion: $onCompletion,
+                onFailure: $onFailure)
         }
     }
 }

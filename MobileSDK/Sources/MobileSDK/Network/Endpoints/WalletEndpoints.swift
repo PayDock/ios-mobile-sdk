@@ -35,7 +35,7 @@ extension WalletEndpoints: Endpoint {
         case .walletCapture(let token, _), .walletCallback(let token, _):
             return [
                 "x-access-token": "\(token)",
-                "Content-Type": "application/json;charset=utf-8"
+                "Content-Type": "application/json"
             ]
         }
     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WidgetsView: View {
-    
+
     @StateObject private var viewModel = WidgetsVM()
 
     init() {
@@ -26,7 +26,7 @@ struct WidgetsView: View {
                 .listRowSeparatorTint(.black)
                 .listSectionSeparator(.hidden, edges: .top)
                 .listRowBackground(Color(hex: "#EAE0D7"))
-                
+
                 NavigationLink(destination: AddressWidgetView()) {
                     cell(
                         title: "Address",
@@ -40,6 +40,15 @@ struct WidgetsView: View {
                     cell(
                         title: "Apple Pay",
                         subtitle: "Standalone Apple Pay flow")
+                }
+                .listRowSeparatorTint(.black)
+                .listSectionSeparator(.hidden, edges: .top)
+                .listRowBackground(Color(hex: "#EAE0D7"))
+
+                NavigationLink(destination: PayPalWidgetView()) {
+                    cell(
+                        title: "PayPal",
+                        subtitle: "Standalone PayPal button")
                 }
                 .listRowSeparatorTint(.black)
                 .listSectionSeparator(.hidden, edges: .top)

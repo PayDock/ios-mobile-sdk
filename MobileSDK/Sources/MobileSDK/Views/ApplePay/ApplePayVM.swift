@@ -53,29 +53,23 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
                                         didAuthorizePayment payment: PKPayment,
                                         completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
-        // Check if we need some additonal validation config before firing
-        if false {
-            paymentStatus = .failure
-            completion(paymentStatus)
-        } else {
-            Task {
-                do {
-                    let refToken = String(data: payment.token.paymentData, encoding: .utf8)
-                    let chargeResponse = try await self.walletService.captureCharge(
-                        token: self.applePayRequest.token,
-                        paymentMethodId: nil,
-                        payerId: nil,
-                        refToken: refToken)
+        Task {
+            do {
+                let refToken = String(data: payment.token.paymentData, encoding: .utf8)
+                let chargeResponse = try await self.walletService.captureCharge(
+                    token: self.applePayRequest.token,
+                    paymentMethodId: nil,
+                    payerId: nil,
+                    refToken: refToken)
 
-                    paymentStatus = .success
-                    onCompletion.wrappedValue = chargeResponse
-                    completion(paymentStatus)
+                paymentStatus = .success
+                onCompletion.wrappedValue = chargeResponse
+                completion(paymentStatus)
 
-                } catch {
-                    paymentStatus = .failure
-                    self.error = .paymentFailed
-                    completion(paymentStatus)
-                }
+            } catch {
+                paymentStatus = .failure
+                self.error = .paymentFailed
+                completion(paymentStatus)
             }
         }
     }
