@@ -25,18 +25,20 @@ test_exampleApp:
     - .macos_saas_runners
   stage: test
   script:
+    - cd MobileSDK/
     - bundle install
-    - bundle exec fastlane build_and_test device:'iPhone 14 Pro' output:'fastlane/test_output'
+    - bundle exec fastlane build_and_test device:'iPhone 14 Pro'
   artifacts:
     paths:
-      - fastlane/test_output
+      - MobileSDK/fastlane/test_output
 export_exampleApp:
   extends:
     - .macos_saas_runners
   stage: build
   script:
+    - cd ExampleApp/
     - bundle install
-    - bundle exec fastlane archive_ci output:'fastlane/test_output'
+    - bundle exec fastlane archive_ci
   artifacts:
     paths:
-      - fastlane/test_output
+      - ExampleApp/fastlane/test_output
