@@ -22,18 +22,18 @@ struct Integrated3DSWidgetView: View {
             ScrollView {
                 HStack {
                     Spacer()
-                    Button("Launch 3DS sheet") {
-                        isSheetPresented = true
-                    }
-                    .disabled(!viewModel.payPalButtonEnabled)
-                    .padding()
-                    if !viewModel.walletToken.isEmpty {
-                        PayPalSheetView(
-                            isPresented: $isSheetPresented,
-                            payPalToken: viewModel.walletToken,
-                            onCompletion: $onCompletion,
-                            onFailure: $onFailure)
-                    }
+                        .sheet(isPresented: $viewModel.showWebView) {
+                            NavigationStack {
+                                VStack {
+                                    WebView3DS(
+                                        delegate: viewModel.paydockDelegate,
+                                        token: viewModel.token3DS,
+                                        baseURL: viewModel.getBaseUrl())
+                                    .navigationTitle("3DS Check")
+                                    .navigationBarTitleDisplayMode(.inline)
+                                }
+                            }
+                        }
                     Spacer()
                 }
             }

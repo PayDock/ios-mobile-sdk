@@ -17,8 +17,9 @@ class Integrated3DSVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
-    @Published var walletToken = ""
-    @Published var payPalButtonEnabled = false
+    private(set) var token3DS = ""
+    @Published var showWebView = false
+    weak var paydockDelegate: PayDockDelegate?
 
     // MARK: - Initialisation
 
@@ -30,7 +31,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
     func tokeniseCardDetails() {
         Task {
             let req = TokeniseCardDetailsReq(
-                gatewayId: "65144f9bfee65245ecd2db17",
+                gatewayId: "65283088143e65d1f4166f99",
                 cardName: "Carlie Kuvalis",
                 cardNumber: "2223000000000007",
                 expireMonth: "08",
@@ -50,14 +51,55 @@ class Integrated3DSVM: NSObject, ObservableObject {
     private func create3dsToken(cardToken: String) {
         Task {
             let req = Integrated3DSReq(amount: "10", currency: "AUD", _3ds: .init(browserDetails: .init()), token: cardToken)
-
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
-                print(token3DS)
+                DispatchQueue.main.async {
+                    self.token3DS = token3DS
+                    self.showWebView = true
+                }
             } catch {
                 print(error)
             }
         }
     }
 
+    func getBaseUrl() -> URL? {
+        let urlString = "https://paydock.com"
+        return URL(string: urlString)
+    }
+
+}
+
+extension Integrated3DSVM: PayDockDelegate {
+    func didLoad() {
+        print("---Did Load")
+    }
+
+    func didSubmit() {
+        print("---Did Submit")
+    }
+
+    func didFinish() {
+        print("---Did Finish")
+    }
+
+    func onValidation() {
+        print("---On Validation")
+    }
+
+    func onValidationFail() {
+        print("---Validation Failed")
+    }
+
+    func onSystemError() {
+        print("---System Error")
+    }
+
+    func metaDidChange() {
+        print("---Meta change")
+    }
+
+    func onResize() {
+        print("---Did resize")
+    }
 }
