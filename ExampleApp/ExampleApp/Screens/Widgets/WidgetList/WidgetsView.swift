@@ -24,6 +24,7 @@ struct WidgetsView: View {
                 stylizedNavigationLink(destination: PayPalWidgetView(), title: "PayPal", subtitle: "Standalone PayPal button")
                 stylizedNavigationLink(destination: GiftCardWidgetView(), title: "Gift Card", subtitle: "Standalone Gift Card form")
                 stylizedNavigationLink(destination: Integrated3DSWidgetView(), title: "Integrated 3DS", subtitle: "Integrated 3DS widget")
+                stylizedNavigationLink(destination: Standalone3DSWidgetView(), title: "Standalone 3DS", subtitle: "Standalone 3DS widget")
             }
             .navigationTitle("Widgets")
             .background(Color(hex: "#EAE0D7"))

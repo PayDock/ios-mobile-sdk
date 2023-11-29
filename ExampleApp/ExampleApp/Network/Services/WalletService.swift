@@ -15,6 +15,8 @@ protocol WalletService {
     func initialiseWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq) async throws -> String
     func createCardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> String
     func createIntegrated3DSToken(request: Integrated3DSReq) async throws -> String
+    func createVaultToken(request: TokeniseCardDetailsReq) async throws -> String
+    func createStandalone3DSToken(request: Standalone3DSReq) async throws -> String
 
 }
 
@@ -32,6 +34,16 @@ struct WalletServiceImpl: HTTPClient, WalletService {
 
     func createIntegrated3DSToken(request: Integrated3DSReq) async throws -> String {
         let response = try await sendRequest(endpoint: WalletEndpoints.integrated3ds(request: request), responseModel: Integrated3DSRes.self)
+        return response.resource.data.threeDS.token
+    }
+
+    func createVaultToken(request: TokeniseCardDetailsReq) async throws -> String {
+        let response = try await sendRequest(endpoint: WalletEndpoints.vaultToken(request: request), responseModel: VaultTokenRes.self)
+        return response.resource.data.token
+    }
+
+    func createStandalone3DSToken(request: Standalone3DSReq) async throws -> String {
+        let response = try await sendRequest(endpoint: WalletEndpoints.standalone3ds(request: request), responseModel: Integrated3DSRes.self)
         return response.resource.data.threeDS.token
     }
 

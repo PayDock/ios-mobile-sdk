@@ -9,7 +9,7 @@
 import Foundation
 
 struct Standalone3DSReq: Codable {
-    let amount: Decimal
+    let amount: String
     let currency: String
     let reference: String
     let customer: Customer
