@@ -22,15 +22,20 @@ struct Standalone3DSWidgetView: View {
             ScrollView {
                 HStack {
                     Spacer()
-                        .sheet(isPresented: $viewModel.showWebView) {
+                        .sheet(isPresented: $viewModel.showWebView, onDismiss: {
+                            if !viewModel.alertMessage.isEmpty {
+                                viewModel.showAlert = true
+                            }
+                        }) {
                             NavigationStack {
                                 VStack {
                                     WebView3DS(
-                                        delegate: viewModel.paydockDelegate,
+                                        delegate: viewModel,
                                         token: viewModel.token3DS,
                                         baseURL: viewModel.getBaseUrl())
                                     .navigationTitle("3DS Check")
                                     .navigationBarTitleDisplayMode(.inline)
+
                                 }
                             }
                         }
@@ -39,6 +44,9 @@ struct Standalone3DSWidgetView: View {
             }
             .background(Color(hex: "#EAE0D7"))
         }
+        .alert("3DS", isPresented: $viewModel.showAlert, actions: {}, message: {
+            Text(viewModel.alertMessage)
+        })
         .onAppear {
             viewModel.getValutToken()
         }

@@ -19,7 +19,8 @@ class Integrated3DSVM: NSObject, ObservableObject {
 
     private(set) var token3DS = ""
     @Published var showWebView = false
-    weak var paydockDelegate: PayDockDelegate?
+    @Published var showAlert = false
+    @Published var alertMessage = ""
 
     // MARK: - Initialisation
 
@@ -81,6 +82,8 @@ extension Integrated3DSVM: PayDockDelegate {
 
     func didFinish() {
         print("---Did Finish")
+        showWebView = false
+        alertMessage = "3DS auth success!"
     }
 
     func onValidation() {
@@ -89,6 +92,8 @@ extension Integrated3DSVM: PayDockDelegate {
 
     func onValidationFail() {
         print("---Validation Failed")
+        showWebView = false
+        alertMessage = "3DS auth success!"
     }
 
     func onSystemError() {

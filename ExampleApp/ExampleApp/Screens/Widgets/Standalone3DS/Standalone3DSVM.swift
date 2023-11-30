@@ -19,7 +19,9 @@ class Standalone3DSVM: NSObject, ObservableObject {
 
     private(set) var token3DS = ""
     @Published var showWebView = false
-    weak var paydockDelegate: PayDockDelegate?
+    @Published var showAlert = false
+    @Published var alertMessage = ""
+
 
     // MARK: - Initialisation
 
@@ -31,11 +33,11 @@ class Standalone3DSVM: NSObject, ObservableObject {
     func getValutToken() {
         Task {
             let req = TokeniseCardDetailsReq(
-                gatewayId: "65283088143e65d1f4166f99",
-                cardName: "Carlie Kuvalis",
-                cardNumber: "2223000000000007",
+                gatewayId: "6478973c43a3a364d9f148a4",
+                cardName: "Test Card",
+                cardNumber: "4100000000005000",
                 expireMonth: "08",
-                expireYear: "29",
+                expireYear: "25",
                 cardCcv: "123")
 
             do {
@@ -56,7 +58,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
-                    service_id: "65283088143e65d1f4166f99",
+                    service_id: "6478973c43a3a364d9f148a4",
                     authentication: .init(
                         type: "01",
                         date: "2023-06-01T13:00:00.521Z",
@@ -107,6 +109,8 @@ extension Standalone3DSVM: PayDockDelegate {
 
     func didFinish() {
         print("---Did Finish")
+        showWebView = false
+        alertMessage = "3DS auth success!"
     }
 
     func onValidation() {
@@ -115,6 +119,8 @@ extension Standalone3DSVM: PayDockDelegate {
 
     func onValidationFail() {
         print("---Validation Failed")
+        showWebView = false
+        alertMessage = "3DS auth failure!"
     }
 
     func onSystemError() {

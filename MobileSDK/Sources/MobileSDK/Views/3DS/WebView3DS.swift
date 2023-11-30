@@ -34,6 +34,7 @@ public protocol PayDockDelegate: AnyObject {
 enum Status: String {
     case pending
     case authenticated
+    case success
     case failed
 }
 
@@ -90,7 +91,7 @@ public struct WebView3DS: UIViewRepresentable {
             case .pending:
                 print("---3DS Pending: \(token)")
                 delegate?.didLoad()
-            case .authenticated:
+            case .authenticated, .success:
                 print("---3DS Success: \(token)")
                 delegate?.didFinish()
             case .failed:
