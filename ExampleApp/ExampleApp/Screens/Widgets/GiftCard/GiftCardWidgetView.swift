@@ -13,22 +13,27 @@ struct GiftCardWidgetView: View {
 
     @StateObject private var viewModel = GiftCardWidgetVM()
     @State var isSheetPresented = false
-    @State var onCompletion: String = ""
+    @State var onCompletion: String?
+    @State var onFailure: Error?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 HStack {
-                    Spacer()
-                    Button("Launch Gift Card sheet") {
-                        isSheetPresented = true
-                    }
-                    .padding()
-                    EmptyView()
-                    GiftCardSheetView(isPresented: $isSheetPresented, onCompletion: $onCompletion)
-
-                    Spacer()
+                        Spacer()
+                        Button("Launch Gift Card sheet") {
+                            isSheetPresented = true
+                        }
+                        .padding()
+                        EmptyView()
+                        GiftCardSheetView(
+                            isPresented: $isSheetPresented,
+                            onCompletion: $onCompletion,
+                            onFailure: $onFailure)
+                        Spacer()
                 }
+                Text(onCompletion ?? "")
+
             }
             .background(Color(hex: "#EAE0D7"))
         }

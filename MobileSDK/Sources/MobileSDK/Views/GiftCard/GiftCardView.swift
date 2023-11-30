@@ -8,16 +8,17 @@
 import SwiftUI
 
 struct GiftCardView: View {
-    @StateObject private var viewModel = GiftCardVM()
+    @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
-    @State private var gatewayId: String
-    @Binding private var onCompletion: String
 
     // TODO: - Add proper data passing once endpoints are implemented
-    public init(gatewayId: String,
-                onCompletion: Binding<String>) {
-        self._onCompletion = onCompletion
-        self.gatewayId = gatewayId
+    public init(storePin: Bool = true,
+                onCompletion: Binding<String?>,
+                onFailure: Binding<Error?>) {
+        _viewModel = StateObject(wrappedValue: GiftCardVM(
+            storePin: storePin,
+            onCompletion: onCompletion,
+            onFailure: onFailure))
     }
 
     var body: some View {
@@ -38,6 +39,7 @@ struct GiftCardView: View {
                             title: viewModel.giftCardFormManager.cardNumberTitle,
                             placeholder: viewModel.giftCardFormManager.cardNumberPlaceholder,
                             errorMessage: $viewModel.giftCardFormManager.cardNumberError,
+                            leftImage: .constant(Image("credit-card", bundle: Bundle.module)),
                             editing: $viewModel.giftCardFormManager.editingCardNumber,
                             valid: $viewModel.giftCardFormManager.cardNumberValid)
                         .keyboardType(.numberPad)
@@ -55,6 +57,7 @@ struct GiftCardView: View {
                             errorMessage: $viewModel.giftCardFormManager.pinError,
                             editing: $viewModel.giftCardFormManager.editingPin,
                             valid: $viewModel.giftCardFormManager.pinValid)
+                        .keyboardType(.numberPad)
                         .focused($textFieldInFocus, equals: .pin)
                         .onTapGesture {
                             self.textFieldInFocus = .pin
@@ -62,8 +65,9 @@ struct GiftCardView: View {
                         }
                     }
                 }
-                LargeButton(title: "Add") {
-                    
+                let plusIcon = Image(systemName: "plus.circle")
+                LargeButton(title: "Add", image: plusIcon) {
+                    viewModel.tokeniseGiftCard()
                 }
                 .padding(.bottom, 16)
                 .padding(.top, .spacing)
@@ -71,13 +75,12 @@ struct GiftCardView: View {
             }
             .padding(.horizontal, max(16, .spacing))
         }
-        .frame(height: 180, alignment: .top)
+        .frame(height: 200, alignment: .top)
     }
 }
 
-//#Preview {
-//    PayPalView(
-//        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: .),
-//        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
-//        , onFailure: .constant(.paymentFailed))
-//}
+struct GiftCardView_Previews: PreviewProvider {
+    static var previews: some View {
+        GiftCardView(onCompletion: .constant(.none), onFailure: .constant(.none))
+    }
+}

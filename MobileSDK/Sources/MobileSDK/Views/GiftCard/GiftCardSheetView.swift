@@ -9,13 +9,23 @@ import SwiftUI
 
 public struct GiftCardSheetView: View {
 
-    @Binding var isPresented: Bool
-    @Binding var onCompletion: String
+    // MARK: - Properties
 
-    public init(isPresented: Binding<Bool>,
-                onCompletion: Binding<String>) {
+    @Binding var isPresented: Bool
+    @State var storePin: Bool
+    @Binding var onCompletion: String?
+    @Binding var onFailure: Error?
+
+    // MARK: - Initialisation
+
+    public init(storePin: Bool = true,
+                isPresented: Binding<Bool>,
+                onCompletion: Binding<String?>,
+                onFailure: Binding<Error?>) {
+        self.storePin = storePin
         self._isPresented = isPresented
         self._onCompletion = onCompletion
+        self._onFailure = onFailure
     }
 
     public var body: some View {
@@ -23,8 +33,7 @@ public struct GiftCardSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            // TODO: - Add proper data passing after endpoints are implemented
-            GiftCardView(gatewayId: "", onCompletion: $onCompletion)
+            GiftCardView(storePin: storePin, onCompletion: $onCompletion, onFailure: $onFailure)
         }
     }
 }
@@ -32,7 +41,8 @@ public struct GiftCardSheetView: View {
 struct GiftCardSheetView_Previews: PreviewProvider {
     static var previews: some View {
         GiftCardSheetView(
+            storePin: true,
             isPresented: .constant(true),
-            onCompletion: .constant(""))
+            onCompletion: .constant(""), onFailure: .constant(.none))
     }
 }

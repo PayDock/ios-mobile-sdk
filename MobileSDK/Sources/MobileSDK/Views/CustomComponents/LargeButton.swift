@@ -36,10 +36,15 @@ struct LargeButton: View {
         HStack {
             Button(action: self.action) {
                 if image != nil {
-                    image?.resizable().scaledToFit().frame(maxWidth: .infinity, maxHeight: 20)
+                    HStack {
+                        image?.resizable().scaledToFit().frame(maxHeight: 20)
+                            .font(.system(size: 32, weight: .light))
+                        Text(self.title)
+                    }
+                    .frame(maxWidth: .infinity)
                 } else {
                     Text(self.title)
-                        .frame(maxWidth:.infinity)
+                        .frame(maxWidth: .infinity)
                 }
             }
             .buttonStyle(LargeButtonStyle(
