@@ -1,8 +1,9 @@
 //
 //  TokeniseCardDetailsReq.swift
-//  MobileSDK
+//  ExampleApp
 //
-//  Created by Domagoj Grizelj on 27.07.2023..
+//  Created by Domagoj Grizelj on 27.11.2023..
+//  Copyright © 2023 Paydock Ltd. All rights reserved.
 //
 
 import Foundation

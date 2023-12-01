@@ -18,50 +18,13 @@ struct WidgetsView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink(destination: CardDetailsWidgetView()) {
-                    cell(
-                        title: "Card Details",
-                        subtitle: "Tokenise card details")
-                }
-                .listRowSeparatorTint(.black)
-                .listSectionSeparator(.hidden, edges: .top)
-                .listRowBackground(Color(hex: "#EAE0D7"))
-
-                NavigationLink(destination: AddressWidgetView()) {
-                    cell(
-                        title: "Address",
-                        subtitle: "Capture customer address form")
-                }
-                .listRowSeparatorTint(.black)
-                .listSectionSeparator(.hidden, edges: .top)
-                .listRowBackground(Color(hex: "#EAE0D7"))
-
-                NavigationLink(destination: ApplePayWidgetView()) {
-                    cell(
-                        title: "Apple Pay",
-                        subtitle: "Standalone Apple Pay flow")
-                }
-                .listRowSeparatorTint(.black)
-                .listSectionSeparator(.hidden, edges: .top)
-                .listRowBackground(Color(hex: "#EAE0D7"))
-
-                NavigationLink(destination: PayPalWidgetView()) {
-                    cell(
-                        title: "PayPal",
-                        subtitle: "Standalone PayPal button")
-                }
-                .listRowSeparatorTint(.black)
-                .listSectionSeparator(.hidden, edges: .top)
-                .listRowBackground(Color(hex: "#EAE0D7"))
-
-                NavigationLink(destination: GiftCardWidgetView()) {
-                    cell(
-                        title: "Gift Card",
-                        subtitle: "Standalone Gift Card form")
-                }
-                .listRowSeparatorTint(.black)
-                .listSectionSeparator(.hidden, edges: .top)
-                .listRowBackground(Color(hex: "#EAE0D7"))
+                stylizedNavigationLink(destination: CardDetailsWidgetView(), title: "Card Details", subtitle: "Tokenise card details")
+                stylizedNavigationLink(destination: AddressWidgetView(), title: "Address", subtitle: "Capture customer address form")
+                stylizedNavigationLink(destination: ApplePayWidgetView(), title: "Apple Pay", subtitle: "Standalone Apple Pay flow")
+                stylizedNavigationLink(destination: PayPalWidgetView(), title: "PayPal", subtitle: "Standalone PayPal button")
+                stylizedNavigationLink(destination: GiftCardWidgetView(), title: "Gift Card", subtitle: "Standalone Gift Card form")
+                stylizedNavigationLink(destination: Integrated3DSWidgetView(), title: "Integrated 3DS", subtitle: "Integrated 3DS widget")
+                stylizedNavigationLink(destination: Standalone3DSWidgetView(), title: "Standalone 3DS", subtitle: "Standalone 3DS widget")
             }
             .navigationTitle("Widgets")
             .background(Color(hex: "#EAE0D7"))
@@ -71,6 +34,15 @@ struct WidgetsView: View {
         .foregroundColor(.black)
         .padding(.trailing, -28)
         .background(Color(hex: "#EAE0D7"))
+    }
+
+    func stylizedNavigationLink(destination: some View, title: String, subtitle: String) -> some View {
+        return NavigationLink(destination: destination) {
+            cell(title: title, subtitle: subtitle)
+        }
+        .listRowSeparatorTint(.black)
+        .listSectionSeparator(.hidden, edges: .top)
+        .listRowBackground(Color(hex: "#EAE0D7"))
     }
 
     func cell(title: String, subtitle: String) -> some View {
