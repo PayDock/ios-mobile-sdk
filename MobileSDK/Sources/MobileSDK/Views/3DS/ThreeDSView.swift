@@ -9,14 +9,7 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
-enum Status: String {
-    case pending
-    case authenticated
-    case success
-    case failed
-}
-
-public struct Event {
+public struct ThreeDSResult {
   public let event: EventType
   public let charge3dsId: String
 
@@ -30,12 +23,12 @@ public struct Event {
   }
 }
 
-public struct WebView3DS: UIViewRepresentable {
+public struct ThreeDSView: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?
-    private let completionHandler: (Event) -> Void
+    private let completionHandler: (ThreeDSResult) -> Void
 
-    public init(token: String, baseURL: URL?, completionHandler: @escaping (Event) -> Void) {
+    public init(token: String, baseURL: URL?, completionHandler: @escaping (ThreeDSResult) -> Void) {
         self.token = token
         self.baseUrl = baseURL
         self.completionHandler = completionHandler
@@ -52,7 +45,7 @@ public struct WebView3DS: UIViewRepresentable {
 
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            let html = WebView3DS.html(token)
+            let html = ThreeDSView.html(token)
             webView.loadHTMLString(html, baseURL: baseUrl)
         }
     }
@@ -62,23 +55,23 @@ public struct WebView3DS: UIViewRepresentable {
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        private let completionHandler: (Event) -> Void
+        private let completionHandler: (ThreeDSResult) -> Void
         var isLoaded = false
 
-        init(completionHandler: @escaping (Event) -> Void) {
+        init(completionHandler: @escaping (ThreeDSResult) -> Void) {
             self.completionHandler = completionHandler
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard let data = message.body as? [String: Any],
                   let eventRaw = data["event"] as? String,
-                  let event = Event.EventType(rawValue: eventRaw),
+                  let event = ThreeDSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completionHandler(Event(event: .error, charge3dsId: ""))
+                completionHandler(ThreeDSResult(event: .error, charge3dsId: ""))
                 return
             }
-            completionHandler(Event(event: event, charge3dsId: token))
+            completionHandler(ThreeDSResult(event: event, charge3dsId: token))
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -186,5 +179,6 @@ public struct WebView3DS: UIViewRepresentable {
                 </script>
             </body>
         </html>
-        """    }
+        """
+    }
 }

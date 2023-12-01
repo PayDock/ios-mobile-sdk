@@ -94,7 +94,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
         return URL(string: urlString)
     }
 
-    func handle3dsEvent(_ event: Event) {
+    func handle3dsEvent(_ event: ThreeDSResult) {
         switch event.event {
         case .chargeAuthChallenge: break
         case .chargeAuthDecoupled: break
