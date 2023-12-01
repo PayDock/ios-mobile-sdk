@@ -71,40 +71,20 @@ class Integrated3DSVM: NSObject, ObservableObject {
 
 }
 
-extension Integrated3DSVM: PayDockDelegate {
-    func didLoad() {
-        print("---Did Load")
+extension Integrated3DSVM: ThreeDSDelegate {
+    func didLoad(token: String) {
+
     }
 
-    func didSubmit() {
-        print("---Did Submit")
-    }
-
-    func didFinish() {
+    func didFinish(token: String) {
         print("---Did Finish")
         showWebView = false
-        alertMessage = "3DS auth success!"
+        alertMessage = token
     }
 
-    func onValidation() {
-        print("---On Validation")
-    }
-
-    func onValidationFail() {
+    func onValidationFail(token: String) {
         print("---Validation Failed")
         showWebView = false
-        alertMessage = "3DS auth success!"
-    }
-
-    func onSystemError() {
-        print("---System Error")
-    }
-
-    func metaDidChange() {
-        print("---Meta change")
-    }
-
-    func onResize() {
-        print("---Did resize")
+        alertMessage = "3DS Failed!"
     }
 }

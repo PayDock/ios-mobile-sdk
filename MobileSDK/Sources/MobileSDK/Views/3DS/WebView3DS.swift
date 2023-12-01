@@ -20,15 +20,10 @@ enum Event: String {
     case resize
 }
 
-public protocol PayDockDelegate: AnyObject {
-    func didLoad()
-    func didSubmit()
-    func didFinish()
-    func onValidation()
-    func onValidationFail()
-    func onSystemError()
-    func metaDidChange()
-    func onResize()
+public protocol ThreeDSDelegate: AnyObject {
+    func didLoad(token: String)
+    func didFinish(token: String)
+    func onValidationFail(token: String)
 }
 
 enum Status: String {
@@ -39,11 +34,11 @@ enum Status: String {
 }
 
 public struct WebView3DS: UIViewRepresentable {
-    private weak var delegate: PayDockDelegate?
+    private weak var delegate: ThreeDSDelegate?
     private let token: String
     private let baseUrl: URL?
 
-    public init(delegate: PayDockDelegate? = nil, token: String, baseURL: URL?) {
+    public init(delegate: ThreeDSDelegate? = nil, token: String, baseURL: URL?) {
         self.delegate = delegate
         self.token = token
         self.baseUrl = baseURL
@@ -70,10 +65,10 @@ public struct WebView3DS: UIViewRepresentable {
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        weak var delegate: PayDockDelegate?
+        weak var delegate: ThreeDSDelegate?
         var isLoaded = false
 
-        init(delegate: PayDockDelegate? = nil) {
+        init(delegate: ThreeDSDelegate? = nil) {
             self.delegate = delegate
         }
 
@@ -90,13 +85,13 @@ public struct WebView3DS: UIViewRepresentable {
             switch status {
             case .pending:
                 print("---3DS Pending: \(token)")
-                delegate?.didLoad()
+                delegate?.didLoad(token: token as? String ?? "")
             case .authenticated, .success:
                 print("---3DS Success: \(token)")
-                delegate?.didFinish()
+                delegate?.didFinish(token: token as? String ?? "")
             case .failed:
                 print("---3DS Failed: \(token)")
-                delegate?.onValidationFail()
+                delegate?.onValidationFail(token: token as? String ?? "")
             }
         }
 
