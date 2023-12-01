@@ -94,25 +94,19 @@ class Standalone3DSVM: NSObject, ObservableObject {
         return URL(string: urlString)
     }
 
-}
-
-// MARK: - PayDockDelegate
-
-extension Standalone3DSVM: ThreeDSDelegate {
-    func didLoad(token: String) {
-
-    }
-
-    func didFinish(token: String) {
-        print("---Did Finish")
-        showWebView = false
-        alertMessage = token
-    }
-    
-    func onValidationFail(token: String) {
-        print("---Validation Failed")
-        showWebView = false
-        alertMessage = "3DS Failed!"
+    func handle3dsEvent(_ event: Event) {
+        switch event.event {
+        case .chargeAuthChallenge: break
+        case .chargeAuthDecoupled: break
+        case .chargeAuthInfo: break
+        case .chargeAuthSuccess:
+            showWebView = false
+            alertMessage = event.charge3dsId
+        case .chargeAuthReject: break
+        case .error:
+            showWebView = false
+            alertMessage = "3DS failed!"
+        }
     }
 
 }

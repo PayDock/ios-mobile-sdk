@@ -9,23 +9,6 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
-enum Event: String {
-    case afterLoad
-    case submit
-    case finish
-    case validation
-    case validationError
-    case systemError
-    case metaChange
-    case resize
-}
-
-public protocol ThreeDSDelegate: AnyObject {
-    func didLoad(token: String)
-    func didFinish(token: String)
-    func onValidationFail(token: String)
-}
-
 enum Status: String {
     case pending
     case authenticated
@@ -33,15 +16,29 @@ enum Status: String {
     case failed
 }
 
+public struct Event {
+  public let event: EventType
+  public let charge3dsId: String
+
+  public enum EventType: String {
+    case chargeAuthSuccess
+    case chargeAuthReject
+    case chargeAuthChallenge
+    case chargeAuthDecoupled
+    case chargeAuthInfo
+    case error
+  }
+}
+
 public struct WebView3DS: UIViewRepresentable {
-    private weak var delegate: ThreeDSDelegate?
     private let token: String
     private let baseUrl: URL?
+    private let completionHandler: (Event) -> Void
 
-    public init(delegate: ThreeDSDelegate? = nil, token: String, baseURL: URL?) {
-        self.delegate = delegate
+    public init(token: String, baseURL: URL?, completionHandler: @escaping (Event) -> Void) {
         self.token = token
         self.baseUrl = baseURL
+        self.completionHandler = completionHandler
     }
 
     public func makeUIView(context: Context) -> WKWebView {
@@ -61,38 +58,27 @@ public struct WebView3DS: UIViewRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(delegate: delegate)
+        .init(completionHandler: completionHandler)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        weak var delegate: ThreeDSDelegate?
+        private let completionHandler: (Event) -> Void
         var isLoaded = false
 
-        init(delegate: ThreeDSDelegate? = nil) {
-            self.delegate = delegate
+        init(completionHandler: @escaping (Event) -> Void) {
+            self.completionHandler = completionHandler
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard
-                let data = message.body as? [String: Any],
-                let statusRaw = data["status"] as? String,
-                let status = Status(rawValue: statusRaw),
-                let token = data["charge_3ds_id"]
+            guard let data = message.body as? [String: Any],
+                  let eventRaw = data["event"] as? String,
+                  let event = Event.EventType(rawValue: eventRaw),
+                  let token = data["charge3dsId"] as? String
             else {
-                print("No status found")
+                completionHandler(Event(event: .error, charge3dsId: ""))
                 return
             }
-            switch status {
-            case .pending:
-                print("---3DS Pending: \(token)")
-                delegate?.didLoad(token: token as? String ?? "")
-            case .authenticated, .success:
-                print("---3DS Success: \(token)")
-                delegate?.didFinish(token: token as? String ?? "")
-            case .failed:
-                print("---3DS Failed: \(token)")
-                delegate?.onValidationFail(token: token as? String ?? "")
-            }
+            completionHandler(Event(event: event, charge3dsId: token))
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -130,15 +116,18 @@ public struct WebView3DS: UIViewRepresentable {
 
     static func html(_ token: String) -> String {
         return """
-            <!DOCTYPE html>
-            <html lang="en">
+        <!DOCTYPE html>
+        <html lang="en">
             <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-                <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-                <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-                <link rel="manifest" href="/site.webmanifest">
+                <meta charset="UTF-8" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+                />
+                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+                <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+                <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+                <link rel="manifest" href="/site.webmanifest" />
                 <title>3DS</title>
                 <style>
                     iframe {
@@ -162,48 +151,40 @@ public struct WebView3DS: UIViewRepresentable {
                 </style>
             </head>
             <body>
-            <div id="widget"></div>
+                <div id="widget"></div>
+                <script src="https://widget.paydock.com/sdk/latest/widget.umd.min.js"></script>
+                <script>
+                    var meta = document.createElement("meta");
+                    meta.name = "viewport";
+                    meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+                    var head = document.getElementsByTagName("head")[0];
+                    head.appendChild(meta);
 
-            <script src="https://widget.paydock.com/sdk/latest/widget.umd.min.js" ></script>
+                    const token = "\(token)";
+                    var canvas3ds = new paydock.Canvas3ds("#widget", token);
+                    canvas3ds.setEnv("sandbox");
 
-            <script>
-                var meta = document.createElement('meta');
-                meta.name = 'viewport';
-                meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-                var head = document.getElementsByTagName('head')[0];
-                head.appendChild(meta);
+                    const watchEvent = (event) => {
+                        canvas3ds.on(event, function (data) {
+                            if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
+                                window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
+                                    event,
+                                    charge3dsId: data.charge_3ds_id,
+                                });
+                            }
+                        });
+                    };
 
-                const token = "\(token)"
-                var canvas3ds = new paydock.Canvas3ds('#widget', token)
-                canvas3ds.setEnv('sandbox');
-                canvas3ds.on("chargeAuthSuccess", function (data) {
-                    console.log(data);
-                    window.webkit.messageHandlers.PayDockMobileSDK.postMessage(data);
-                });
-                canvas3ds.on("chargeAuthReject", function (data) {
-                    console.log(data);
-                    window.webkit.messageHandlers.PayDockMobileSDK.postMessage(data);
-                });
-                canvas3ds.on("chargeAuthChallenge", function (data) {
-                    console.log(data);
-                    window.webkit.messageHandlers.PayDockMobileSDK.postMessage(data);
-                });
-                canvas3ds.on("chargeAuthDecoupled", function (data) {
-                    console.log(data.result.description);
-                    window.webkit.messageHandlers.PayDockMobileSDK.postMessage(data);
-                });
-                canvas3ds.on("chargeAuthInfo", function (data) {
-                    console.log(data.info);
-                    window.webkit.messageHandlers.PayDockMobileSDK.postMessage(data);
-                });
-                canvas3ds.on("error", function ({ charge_3ds_id, error }) {
-                    console.log(error);
-                    window.webkit.messageHandlers.PayDockMobileSDK.postMessage(error);
-                });
-                canvas3ds.load();
-            </script>
+                    watchEvent("chargeAuthSuccess");
+                    watchEvent("chargeAuthReject");
+                    watchEvent("chargeAuthChallenge");
+                    watchEvent("chargeAuthDecoupled");
+                    watchEvent("chargeAuthInfo");
+                    watchEvent("error");
+
+                    canvas3ds.load();
+                </script>
             </body>
-            </html>
-        """
-    }
+        </html>
+        """    }
 }

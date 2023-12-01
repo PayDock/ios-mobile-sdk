@@ -30,9 +30,11 @@ struct Standalone3DSWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     WebView3DS(
-                                        delegate: viewModel,
                                         token: viewModel.token3DS,
-                                        baseURL: viewModel.getBaseUrl())
+                                        baseURL: viewModel.getBaseUrl(),
+                                        completionHandler: { event in
+                                            viewModel.handle3dsEvent(event)
+                                        })
                                     .navigationTitle("3DS Check")
                                     .navigationBarTitleDisplayMode(.inline)
 
