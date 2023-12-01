@@ -41,6 +41,9 @@ struct Standalone3DSWidgetView: View {
                                 }
                             }
                         }
+                    if viewModel.alertMessage.isEmpty {
+                        ProgressView()
+                    }
                     Spacer()
                 }
             }

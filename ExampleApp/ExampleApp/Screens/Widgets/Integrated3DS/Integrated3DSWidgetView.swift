@@ -39,6 +39,9 @@ struct Integrated3DSWidgetView: View {
                                 }
                             }
                         }
+                    if viewModel.alertMessage.isEmpty {
+                        ProgressView()
+                    }
                     Spacer()
                 }
             }
