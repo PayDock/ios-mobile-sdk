@@ -33,7 +33,7 @@ public struct GiftCardSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            GiftCardView(storePin: storePin, onCompletion: $onCompletion, onFailure: $onFailure)
+            GiftCardWidget(storePin: storePin, onCompletion: $onCompletion, onFailure: $onFailure)
         }
     }
 }

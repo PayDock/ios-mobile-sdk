@@ -1,5 +1,5 @@
 //
-//  PayPalView.swift
+//  PayPalWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 25.10.2023..
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PayPalView: View {
+struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
     public init(payPalToken: String,
@@ -46,9 +46,6 @@ struct PayPalView: View {
 
 }
 
-//#Preview {
-//    PayPalView(
-//        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: .),
-//        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
-//        , onFailure: .constant(.paymentFailed))
-//}
+#Preview {
+    PayPalWidget(payPalToken: "", onCompletion: .constant(nil), onFailure: .constant(nil))
+}

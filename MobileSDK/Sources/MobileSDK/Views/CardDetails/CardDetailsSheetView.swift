@@ -26,7 +26,7 @@ public struct CardDetailsSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            CardDetailsView(gatewayId: gatewayId, onCompletion: $onCompletion)
+            CardDetailsWidget(gatewayId: gatewayId, onCompletion: $onCompletion)
         }
     }
 }

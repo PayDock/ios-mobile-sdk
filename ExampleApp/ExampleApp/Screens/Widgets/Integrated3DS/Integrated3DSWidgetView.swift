@@ -29,7 +29,7 @@ struct Integrated3DSWidgetView: View {
                         }) {
                             NavigationStack {
                                 VStack {
-                                    ThreeDSView(
+                                    ThreeDSWidget(
                                         token: viewModel.token3DS,
                                         baseURL: viewModel.getBaseUrl(), completionHandler: { event in
                                             viewModel.handle3dsEvent(event)

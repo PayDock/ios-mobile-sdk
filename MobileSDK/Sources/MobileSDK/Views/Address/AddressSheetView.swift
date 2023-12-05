@@ -23,7 +23,7 @@ public struct AddressSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            AddressView(onCompletion: $onCompletion)
+            AddressWidget(onCompletion: $onCompletion)
         }
     }
 }

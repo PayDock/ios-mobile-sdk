@@ -1,5 +1,5 @@
 //
-//  WebView3DS.swift
+//  ThreeDSWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 27.11.2023..
@@ -23,7 +23,7 @@ public struct ThreeDSResult {
   }
 }
 
-public struct ThreeDSView: UIViewRepresentable {
+public struct ThreeDSWidget: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?
     private let completionHandler: (ThreeDSResult) -> Void
@@ -45,7 +45,7 @@ public struct ThreeDSView: UIViewRepresentable {
 
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            let html = ThreeDSView.html(token)
+            let html = ThreeDSWidget.html(token)
             webView.loadHTMLString(html, baseURL: baseUrl)
         }
     }

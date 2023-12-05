@@ -30,7 +30,7 @@ public struct ApplePaySheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            ApplePayView(
+            ApplePayWidget(
                 applePayRequest: applePayRequest,
                 onCompletion: $onCompletion,
                 onFailure: $onFailure)

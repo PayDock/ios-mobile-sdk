@@ -29,7 +29,7 @@ public struct PayPalSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            PayPalView(
+            PayPalWidget(
                 payPalToken: payPalToken,
                 onCompletion: $onCompletion,
                 onFailure: $onFailure)

@@ -1,13 +1,14 @@
 //
-//  ApplePayView.swift
+//  ApplePayWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 04.10.2023..
 //
 
 import SwiftUI
+import PassKit
 
-struct ApplePayView: View {
+struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
 
     public init(applePayRequest: ApplePayRequest,
@@ -28,9 +29,9 @@ struct ApplePayView: View {
 
 }
 
-//#Preview {
-//    ApplePayView(
-//        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: PKPa),
-//        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
-//        , onFailure: .constant(.paymentFailed))
-//}
+#Preview {
+    ApplePayWidget(
+        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: PKPaymentRequest()),
+        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
+        , onFailure: .constant(.paymentFailed))
+}

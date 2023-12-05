@@ -1,5 +1,5 @@
 //
-//  AddressView.swift
+//  AddressWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 21.08.2023..
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddressView: View {
+struct AddressWidget: View {
 
     @StateObject var viewModel = AddressVM()
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
@@ -257,7 +257,7 @@ struct AddressView: View {
 
 struct AddressView_Previews: PreviewProvider {
     static var previews: some View {
-        AddressView(
+        AddressWidget(
             onCompletion: .constant(
                 Address(
                     firstName: "John",

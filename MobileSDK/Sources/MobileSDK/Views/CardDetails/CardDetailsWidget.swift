@@ -1,5 +1,5 @@
 //
-//  CardDetailsView.swift
+//  CardDetailsWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 01.08.2023..
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CardDetailsView: View {
+struct CardDetailsWidget: View {
 
     // MARK: - Properties
 
@@ -112,7 +112,7 @@ struct CardDetailsView: View {
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsView(gatewayId: "asdf", onCompletion: .constant("asdf"))
+        CardDetailsWidget(gatewayId: "asdf", onCompletion: .constant("asdf"))
             .previewLayout(.sizeThatFits)
     }
 }
