@@ -21,25 +21,22 @@ class PayPalVM: ObservableObject {
 
     // MARK: - Handlers
 
-    private var onCompletion: Binding<ChargeResponse?>
-    private var onFailure: Binding<PayPalError?>
+    private var completion: (Result<ChargeResponse, PayPalError>) -> Void
 
     // MARK: - Initialisation
 
     init(payPalToken: String,
          walletService: WalletService = WalletServiceImpl(),
-         onCompletion: Binding<ChargeResponse?>,
-         onFailure: Binding<PayPalError?>) {
+         completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self.payPalToken = payPalToken
         self.walletService = walletService
-        self.onCompletion = onCompletion
-        self.onFailure = onFailure
+        self.completion = completion
     }
 
     func getPayPalURL() {
         Task {
             do {
-                let payPalUrlString = try await walletService.getCallback(token: self.payPalToken)
+                let payPalUrlString = try await walletService.getCallback(token: self.payPalToken, shipping: false)
                 DispatchQueue.main.async {
                     self.payPalUrl = URL(string: payPalUrlString)
                     self.showWebView = true
@@ -47,7 +44,7 @@ class PayPalVM: ObservableObject {
             } catch {
                 DispatchQueue.main.async {
                     self.showWebView = false
-                    self.onFailure.wrappedValue = .webViewFailed
+                    self.completion(.failure(.webViewFailed))
                 }
             }
         }
@@ -58,12 +55,13 @@ class PayPalVM: ObservableObject {
             do {
                 let charge = try await walletService.captureCharge(token: payPalToken, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
                 DispatchQueue.main.async {
-                    self.onCompletion.wrappedValue = charge
+                    self.completion(.success(charge))
+
                     self.showWebView = false
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.onFailure.wrappedValue = .requestFailed
+                    self.completion(.failure(.requestFailed))
                     self.showWebView = false
                 }
             }
@@ -71,7 +69,7 @@ class PayPalVM: ObservableObject {
     }
 
     func handleWebViewFailure(_ error: PayPalError) {
-        onFailure.wrappedValue = error
+        completion(.failure(error))
     }
 
 }

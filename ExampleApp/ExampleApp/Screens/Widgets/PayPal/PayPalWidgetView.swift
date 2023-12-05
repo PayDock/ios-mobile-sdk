@@ -14,8 +14,6 @@ struct PayPalWidgetView: View {
 
     @StateObject private var viewModel = PayPalWidgetVM()
     @State var isSheetPresented = false
-    @State var onCompletion: ChargeResponse?
-    @State var onFailure: PayPalError?
 
     var body: some View {
         NavigationStack {
@@ -30,9 +28,9 @@ struct PayPalWidgetView: View {
                     if !viewModel.walletToken.isEmpty {
                         PayPalSheetView(
                             isPresented: $isSheetPresented,
-                            payPalToken: viewModel.walletToken,
-                            onCompletion: $onCompletion,
-                            onFailure: $onFailure)
+                            payPalToken: viewModel.walletToken) { result in
+                                
+                            }
                     }
                     Spacer()
                 }

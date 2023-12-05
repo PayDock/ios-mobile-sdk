@@ -11,17 +11,14 @@ public struct PayPalSheetView: View {
 
     @State var payPalToken: String
     @Binding var isPresented: Bool
-    @Binding var onCompletion: ChargeResponse?
-    @Binding var onFailure: PayPalError?
+    private var completion: (Result<ChargeResponse, PayPalError>) -> Void
 
     public init(isPresented: Binding<Bool>,
                 payPalToken: String,
-                onCompletion: Binding<ChargeResponse?>,
-                onFailure: Binding<PayPalError?>) {
+                completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self._isPresented = isPresented
         self.payPalToken = payPalToken
-        self._onCompletion = onCompletion
-        self._onFailure = onFailure
+        self.completion = completion
     }
 
     public var body: some View {
@@ -31,14 +28,16 @@ public struct PayPalSheetView: View {
         .bottomSheet(isPresented: $isPresented) {
             PayPalWidget(
                 payPalToken: payPalToken,
-                onCompletion: $onCompletion,
-                onFailure: $onFailure)
+                completion: completion)
         }
     }
 }
 
 struct PayPalSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        PayPalSheetView(isPresented: .constant(true), payPalToken: "", onCompletion: .constant(ChargeResponse(status: "", amount: 10, currency: "")), onFailure: .constant(.requestFailed))
+        PayPalSheetView(
+            isPresented: .constant(true),
+            payPalToken: "",
+            completion: {_ in })
     }
 }

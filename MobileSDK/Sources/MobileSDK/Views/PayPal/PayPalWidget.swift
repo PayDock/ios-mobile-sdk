@@ -7,19 +7,15 @@
 
 import SwiftUI
 
-struct PayPalWidget: View {
+public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
     public init(payPalToken: String,
-                onCompletion: Binding<ChargeResponse?>,
-                onFailure: Binding<PayPalError?>) {
-        _viewModel = StateObject(wrappedValue: PayPalVM(
-            payPalToken: payPalToken,
-            onCompletion: onCompletion,
-            onFailure: onFailure))
+                completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: PayPalVM(payPalToken: payPalToken, completion: completion))
     }
 
-    var body: some View {
+    public var body: some View {
         VStack {
             LargeButton(title: "", image: Image("pay-pal", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
                 viewModel.getPayPalURL()
@@ -37,7 +33,6 @@ struct PayPalWidget: View {
                         .navigationTitle("Checkout with PayPal")
                         .navigationBarTitleDisplayMode(.inline)
                     }
-
                 }
             }
         }
@@ -47,5 +42,5 @@ struct PayPalWidget: View {
 }
 
 #Preview {
-    PayPalWidget(payPalToken: "", onCompletion: .constant(nil), onFailure: .constant(nil))
+    PayPalWidget(payPalToken: "", completion: { _ in })
 }
