@@ -71,7 +71,6 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
         let applePayRequest = ApplePayRequest(
             token: walletToken,
-            merchanIdentifier: "merchant.test-paydock",
             request: paymentRequest)
 
         return applePayRequest

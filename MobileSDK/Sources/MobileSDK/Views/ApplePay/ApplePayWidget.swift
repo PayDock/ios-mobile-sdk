@@ -31,7 +31,7 @@ struct ApplePayWidget: View {
 
 #Preview {
     ApplePayWidget(
-        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: PKPaymentRequest()),
+        applePayRequest: .init(token: "asdf", request: PKPaymentRequest()),
         onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
         , onFailure: .constant(.paymentFailed))
 }
