@@ -15,11 +15,6 @@ class PayPalWidgetVM: NSObject, ObservableObject {
 
     private let walletService: WalletService
 
-    // MARK: - Properties
-
-    @Published var walletToken = ""
-    @Published var payPalButtonEnabled = false
-
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
@@ -27,7 +22,7 @@ class PayPalWidgetVM: NSObject, ObservableObject {
         super.init()
     }
 
-    func initializeWalletCharge() {
+    func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "6481c786d9cc9c39993e5933")
 
@@ -51,8 +46,7 @@ class PayPalWidgetVM: NSObject, ObservableObject {
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
-                    self.walletToken = token
-                    self.payPalButtonEnabled = true
+                    completion(token)
                 }
             } catch {
                 // TODO: Add example app error handling

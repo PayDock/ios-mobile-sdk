@@ -13,32 +13,24 @@ import MobileSDK
 struct PayPalWidgetView: View {
 
     @StateObject private var viewModel = PayPalWidgetVM()
-    @State var isSheetPresented = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 HStack {
                     Spacer()
-                    Button("Launch PayPal sheet") {
-                        isSheetPresented = true
-                    }
-                    .disabled(!viewModel.payPalButtonEnabled)
-                    .padding()
-                    if !viewModel.walletToken.isEmpty {
-                        PayPalSheetView(
-                            isPresented: $isSheetPresented,
-                            payPalToken: viewModel.walletToken) { result in
-                                
-                            }
+                    PayPalWidget { onPayPalButtonTap in
+                        viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
+                    } completion: { result in
+                        switch result {
+                        case .success(let chargeResponse): break
+                        case .failure(let error): break
+                        }
                     }
                     Spacer()
                 }
             }
             .background(Color(hex: "#EAE0D7"))
-        }
-        .onAppear {
-            viewModel.initializeWalletCharge()
         }
     }
 }

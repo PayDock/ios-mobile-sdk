@@ -10,7 +10,7 @@ import SwiftUI
 public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
-    public init(payPalToken: String,
+    public init(payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalVM(payPalToken: payPalToken, completion: completion))
     }
@@ -18,7 +18,7 @@ public struct PayPalWidget: View {
     public var body: some View {
         VStack {
             LargeButton(title: "", image: Image("pay-pal", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
-                viewModel.getPayPalURL()
+                viewModel.handleButtonTap()
             }
         }
         .sheet(isPresented: $viewModel.showWebView) {
@@ -41,6 +41,6 @@ public struct PayPalWidget: View {
 
 }
 
-#Preview {
-    PayPalWidget(payPalToken: "", completion: { _ in })
-}
+//#Preview {
+//    PayPalWidget(payPalToken: "", completion: { _ in })
+//}

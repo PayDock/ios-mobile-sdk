@@ -11,7 +11,6 @@ import MobileSDK
 
 struct GiftCardWidgetView: View {
 
-    @StateObject private var viewModel = GiftCardWidgetVM()
     @State var isSheetPresented = false
     @State var text = ""
 
