@@ -25,7 +25,12 @@ struct CardDetailsWidgetView: View {
                     CardDetailsSheetView(
                         isPresented: $isSheetPresented,
                         gatewayId: "5cbede1f151b842653e987be",
-                        onCompletion: $cardToken)
+                        completion: { result in
+                            switch result {
+                            case .success(let token): cardToken = token
+                            case .failure(let error): cardToken = error.customMessage
+                            }
+                        })
                 }
                 Text(cardToken)
             }

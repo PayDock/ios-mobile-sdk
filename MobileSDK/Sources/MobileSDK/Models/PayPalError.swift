@@ -12,7 +12,7 @@ public enum PayPalError: Error {
     case requestFailed
     case webViewFailed
 
-    var customMessage: String {
+    public var customMessage: String {
         switch self {
         case .requestFailed:
             return "PayPal payment request has failed! There was an issue with your request."

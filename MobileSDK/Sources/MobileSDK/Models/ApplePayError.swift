@@ -12,7 +12,7 @@ public enum ApplePayError: Error {
     case initFailed
     case paymentFailed
 
-    var customMessage: String {
+    public var customMessage: String {
         switch self {
         case .initFailed:
             return "Initialisation of Apple Pay has failed!"

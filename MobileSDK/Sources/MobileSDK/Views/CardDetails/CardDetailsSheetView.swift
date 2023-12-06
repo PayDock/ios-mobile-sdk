@@ -11,14 +11,14 @@ public struct CardDetailsSheetView: View {
 
     @State private var gatewayId: String
     @Binding var isPresented: Bool
-    @Binding var onCompletion: String
+    private let completion: (Result<String, CardDetailsError>) -> Void
 
     public init(isPresented: Binding<Bool>,
                 gatewayId: String,
-                onCompletion: Binding<String>) {
+                completion: @escaping (Result<String, CardDetailsError>) -> Void) {
         self._isPresented = isPresented
         self.gatewayId = gatewayId
-        self._onCompletion = onCompletion
+        self.completion = completion
     }
 
     public var body: some View {
@@ -26,13 +26,13 @@ public struct CardDetailsSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            CardDetailsWidget(gatewayId: gatewayId, onCompletion: $onCompletion)
+            CardDetailsWidget(gatewayId: gatewayId, completion: completion)
         }
     }
 }
 
 struct CardDetailsSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsSheetView(isPresented: .constant(true), gatewayId: "a1234", onCompletion: .constant("Asd"))
+        CardDetailsSheetView(isPresented: .constant(true), gatewayId: "a1234", completion: { _ in })
     }
 }

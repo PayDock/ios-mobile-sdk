@@ -13,19 +13,16 @@ public struct GiftCardSheetView: View {
 
     @Binding var isPresented: Bool
     @State var storePin: Bool
-    @Binding var onCompletion: String?
-    @Binding var onFailure: Error?
+    private let completion: (Result<String, Error>) -> Void
 
     // MARK: - Initialisation
 
     public init(storePin: Bool = true,
                 isPresented: Binding<Bool>,
-                onCompletion: Binding<String?>,
-                onFailure: Binding<Error?>) {
+                completion: @escaping (Result<String, Error>) -> Void) {
         self.storePin = storePin
         self._isPresented = isPresented
-        self._onCompletion = onCompletion
-        self._onFailure = onFailure
+        self.completion = completion
     }
 
     public var body: some View {
@@ -33,7 +30,7 @@ public struct GiftCardSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            GiftCardWidget(storePin: storePin, onCompletion: $onCompletion, onFailure: $onFailure)
+            GiftCardWidget(storePin: storePin, completion: completion)
         }
     }
 }
@@ -43,6 +40,6 @@ struct GiftCardSheetView_Previews: PreviewProvider {
         GiftCardSheetView(
             storePin: true,
             isPresented: .constant(true),
-            onCompletion: .constant(""), onFailure: .constant(.none))
+            completion: { _ in })
     }
 }

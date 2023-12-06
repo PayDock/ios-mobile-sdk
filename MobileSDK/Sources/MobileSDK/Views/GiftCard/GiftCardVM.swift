@@ -17,8 +17,7 @@ class GiftCardVM: ObservableObject {
     
     // MARK: - Handlers
 
-    private var onCompletion: Binding<String?>
-    private var onFailure: Binding<Error?>
+    private let completion: (Result<String, Error>) -> Void
 
     // MARK: - Properties
 
@@ -31,13 +30,11 @@ class GiftCardVM: ObservableObject {
     init(giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
          cardService: CardService = CardServiceImpl(),
          storePin: Bool,
-         onCompletion: Binding<String?>,
-         onFailure: Binding<Error?>) {
+         completion: @escaping (Result<String, Error>) -> Void) {
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
         self.storePin = storePin
-        self.onCompletion = onCompletion
-        self.onFailure = onFailure
+        self.completion = completion
 
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
@@ -53,10 +50,9 @@ class GiftCardVM: ObservableObject {
 
             do {
                 let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq)
-                onCompletion.wrappedValue = cardToken
-
+                completion(.success(cardToken))
             } catch {
-                onFailure.wrappedValue = error
+                completion(.failure(error))
             }
         }
     }

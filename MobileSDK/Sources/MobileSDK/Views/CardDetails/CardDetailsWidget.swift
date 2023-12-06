@@ -11,17 +11,14 @@ struct CardDetailsWidget: View {
 
     // MARK: - Properties
 
-    @StateObject private var viewModel = CardDetailsVM()
+    @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
-    @Binding private var onCompletion: String
-    @State private var gatewayId: String
 
     // MARK: - Initialisation
 
     public init(gatewayId: String,
-                onCompletion: Binding<String>) {
-        self._onCompletion = onCompletion
-        self.gatewayId = gatewayId
+                completion: @escaping (Result<String, CardDetailsError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: CardDetailsVM(gatewayId: gatewayId, completion: completion))
     }
 
     // MARK: - View protocol properties
@@ -103,16 +100,12 @@ struct CardDetailsWidget: View {
             .padding(.horizontal, max(16, .spacing))
         }
         .frame(height: 380, alignment: .top)
-        .onAppear {
-            viewModel.gatewayId = gatewayId
-            viewModel.onCompletion = $onCompletion
-        }
     }
 }
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsWidget(gatewayId: "asdf", onCompletion: .constant("asdf"))
+        CardDetailsWidget(gatewayId: "asdf", completion: { _ in })
             .previewLayout(.sizeThatFits)
     }
 }

@@ -12,12 +12,12 @@ import AuthenticationServices
 public struct ThreeDSWidget: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?
-    private let completionHandler: (ThreeDSResult) -> Void
+    private let completion: (ThreeDSResult) -> Void
 
-    public init(token: String, baseURL: URL?, completionHandler: @escaping (ThreeDSResult) -> Void) {
+    public init(token: String, baseURL: URL?, completion: @escaping (ThreeDSResult) -> Void) {
         self.token = token
         self.baseUrl = baseURL
-        self.completionHandler = completionHandler
+        self.completion = completion
     }
 
     public func makeUIView(context: Context) -> WKWebView {
@@ -37,15 +37,15 @@ public struct ThreeDSWidget: UIViewRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(completionHandler: completionHandler)
+        .init(completion: completion)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        private let completionHandler: (ThreeDSResult) -> Void
+        private let completion: (ThreeDSResult) -> Void
         var isLoaded = false
 
-        init(completionHandler: @escaping (ThreeDSResult) -> Void) {
-            self.completionHandler = completionHandler
+        init(completion: @escaping (ThreeDSResult) -> Void) {
+            self.completion = completion
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -54,10 +54,10 @@ public struct ThreeDSWidget: UIViewRepresentable {
                   let event = ThreeDSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completionHandler(ThreeDSResult(event: .error, charge3dsId: ""))
+                completion(ThreeDSResult(event: .error, charge3dsId: ""))
                 return
             }
-            completionHandler(ThreeDSResult(event: event, charge3dsId: token))
+            completion(ThreeDSResult(event: event, charge3dsId: token))
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

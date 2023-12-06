@@ -18,17 +18,21 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Properties
 
-    var gatewayId: String = ""
-    var onCompletion: Binding<String>?
+    private let gatewayId: String
+    private let completion: (Result<String, CardDetailsError>) -> Void
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
-         cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager()) {
+         cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager(),
+         gatewayId: String,
+         completion: @escaping (Result<String, CardDetailsError>) -> Void) {
         self.cardService = cardService
         self.cardDetailsFormManager = cardDetailsFormManager
+        self.gatewayId = gatewayId
+        self.completion = completion
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
@@ -54,11 +58,10 @@ class CardDetailsVM: ObservableObject {
 
             do {
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
-                onCompletion?.wrappedValue = cardToken
+                completion(.success(cardToken))
 
             } catch {
-                // TODO: - Error popups and handling once designs are finalised.
-                onCompletion?.wrappedValue = "Error tokenising card!"
+                completion(.failure(.errorTokenisingCard))
             }
         }
     }

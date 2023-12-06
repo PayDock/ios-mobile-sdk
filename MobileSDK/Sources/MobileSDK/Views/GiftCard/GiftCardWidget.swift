@@ -13,12 +13,10 @@ struct GiftCardWidget: View {
 
     // TODO: - Add proper data passing once endpoints are implemented
     public init(storePin: Bool = true,
-                onCompletion: Binding<String?>,
-                onFailure: Binding<Error?>) {
+                completion: @escaping (Result<String, Error>) -> Void) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(
             storePin: storePin,
-            onCompletion: onCompletion,
-            onFailure: onFailure))
+            completion: completion))
     }
 
     var body: some View {
@@ -81,6 +79,6 @@ struct GiftCardWidget: View {
 
 struct GiftCardView_Previews: PreviewProvider {
     static var previews: some View {
-        GiftCardWidget(onCompletion: .constant(.none), onFailure: .constant(.none))
+        GiftCardWidget(completion: { _ in })
     }
 }

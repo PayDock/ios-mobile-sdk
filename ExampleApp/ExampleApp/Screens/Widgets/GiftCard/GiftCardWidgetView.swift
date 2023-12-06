@@ -13,8 +13,7 @@ struct GiftCardWidgetView: View {
 
     @StateObject private var viewModel = GiftCardWidgetVM()
     @State var isSheetPresented = false
-    @State var onCompletion: String?
-    @State var onFailure: Error?
+    @State var text = ""
 
     var body: some View {
         NavigationStack {
@@ -28,11 +27,15 @@ struct GiftCardWidgetView: View {
                         EmptyView()
                         GiftCardSheetView(
                             isPresented: $isSheetPresented,
-                            onCompletion: $onCompletion,
-                            onFailure: $onFailure)
+                            completion: { result in
+                                switch result {
+                                case .success(let text): self.text = text
+                                case .failure(let error): self.text = error.localizedDescription
+                                }
+                            })
                         Spacer()
                 }
-                Text(onCompletion ?? "")
+                Text(text)
 
             }
             .background(Color(hex: "#EAE0D7"))
@@ -42,7 +45,7 @@ struct GiftCardWidgetView: View {
 
 struct GiftCardWidgetView_Previews: PreviewProvider {
     static var previews: some View {
-        GiftCardWidgetView(onCompletion: "")
+        GiftCardWidgetView()
     }
 }
 
