@@ -10,12 +10,12 @@ import SwiftUI
 public struct AddressSheetView: View {
 
     @Binding var isPresented: Bool
-    @Binding var onCompletion: Address
+    let completion: (Result<Address, Error>) -> Void
 
     public init(isPresented: Binding<Bool>,
-                onCompletion: Binding<Address>) {
+                completion: @escaping (Result<Address, Error>) -> Void) {
         self._isPresented = isPresented
-        self._onCompletion = onCompletion
+        self.completion = completion
     }
 
     public var body: some View {
@@ -23,24 +23,13 @@ public struct AddressSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            AddressWidget(onCompletion: $onCompletion)
+            AddressWidget(completion: completion)
         }
     }
 }
 
 struct AddressSheetView_Previews: PreviewProvider {
     static var previews: some View {
-        AddressSheetView(
-            isPresented: .constant(true),
-            onCompletion: .constant(
-                Address(
-                    firstName: "John",
-                    lastName: "Smith",
-                    addressLine1: "John's Address 22",
-                    addressLine2: "",
-                    city: "Johnstown",
-                    state: "Johnstate",
-                    postcode: "10000",
-                    country: "Johnnystan")))
+        AddressSheetView(isPresented: .constant(true), completion: { _ in })
     }
 }

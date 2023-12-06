@@ -9,20 +9,6 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
-public struct ThreeDSResult {
-  public let event: EventType
-  public let charge3dsId: String
-
-  public enum EventType: String {
-    case chargeAuthSuccess
-    case chargeAuthReject
-    case chargeAuthChallenge
-    case chargeAuthDecoupled
-    case chargeAuthInfo
-    case error
-  }
-}
-
 public struct ThreeDSWidget: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?

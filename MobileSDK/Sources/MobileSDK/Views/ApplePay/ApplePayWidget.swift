@@ -12,12 +12,10 @@ struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
 
     public init(applePayRequest: ApplePayRequest,
-                onCompletion: Binding<ChargeResponse?>,
-                onFailure: Binding<ApplePayError?>) {
+                completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
             applePayRequest: applePayRequest,
-            onCompletion: onCompletion,
-            onFailure: onFailure))
+            completion: completion))
     }
 
     var body: some View {
@@ -31,7 +29,5 @@ struct ApplePayWidget: View {
 
 #Preview {
     ApplePayWidget(
-        applePayRequest: .init(token: "asdf", request: PKPaymentRequest()),
-        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
-        , onFailure: .constant(.paymentFailed))
+        applePayRequest: .init(token: "asdf", request: PKPaymentRequest()), completion: { _ in })
 }

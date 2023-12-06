@@ -9,17 +9,16 @@ import SwiftUI
 
 struct AddressWidget: View {
 
-    @StateObject var viewModel = AddressVM()
+    @StateObject var viewModel: AddressVM
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
 
-    @Binding private var onCompletion: Address
     @State private var address: Address?
 
     // MARK: - Initialisation
 
     public init(address: Address? = nil,
-                onCompletion: Binding<Address>) {
-        self._onCompletion = onCompletion
+                completion: @escaping (Result<Address, Error>) -> Void) {
+        _viewModel = StateObject(wrappedValue: AddressVM(completion: completion))
         self.address = address
     }
 
@@ -48,7 +47,6 @@ struct AddressWidget: View {
         .frame(height: 600)
         .onAppear {
             viewModel.addressFormManager.updateFormWith(address: address)
-            viewModel.onCompletion = $onCompletion
         }
         .onTapGesture {
             viewModel.addressFormManager.setEditingTextField(focusedField: nil)
@@ -257,16 +255,6 @@ struct AddressWidget: View {
 
 struct AddressView_Previews: PreviewProvider {
     static var previews: some View {
-        AddressWidget(
-            onCompletion: .constant(
-                Address(
-                    firstName: "John",
-                    lastName: "Smith",
-                    addressLine1: "John's Address 22",
-                    addressLine2: "",
-                    city: "Johnstown",
-                    state: "Johnstate",
-                    postcode: "10000",
-                    country: "Johnnystan")))
+        AddressWidget(completion: { _ in})
     }
 }

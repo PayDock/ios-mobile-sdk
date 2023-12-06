@@ -13,9 +13,6 @@ struct ApplePayWidgetView: View {
 
     @StateObject private var viewModel = ApplePayWidgetVM()
     @State var isSheetPresented = false
-    // TODO: - Update to response model after other tickets are completed
-    @State var onCompletion: ChargeResponse?
-    @State var onFailure: ApplePayError?
 
     var body: some View {
         NavigationStack {
@@ -30,9 +27,12 @@ struct ApplePayWidgetView: View {
                     if !viewModel.walletToken.isEmpty {
                         ApplePaySheetView(
                             isPresented: $isSheetPresented,
-                            applePayRequest: viewModel.getApplePayRequest(),
-                            onCompletion: $onCompletion,
-                            onFailure: $onFailure)
+                            applePayRequest: viewModel.getApplePayRequest()) { result in
+                                switch result {
+                                case .success: break
+                                case .failure: break
+                                }
+                            }
                     }
                     Spacer()
                 }
