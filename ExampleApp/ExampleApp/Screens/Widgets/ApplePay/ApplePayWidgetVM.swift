@@ -15,11 +15,6 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
     private let walletService: WalletService
 
-    // MARK: - Properties
-
-    @Published var walletToken = ""
-    @Published var applePayButtonEnabled = false
-
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
@@ -27,19 +22,16 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
         super.init()
     }
 
-    func initializeWalletCharge() {
+    func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "65144f9bfee65245ecd2db17")
-
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Tom",
                 lastName: "Taylor",
                 email: "tom.taylor@tommy.com",
                 phone: "+11234567890",
                 paymentSource: paymentSource)
-
             let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", storeId: "1234556")
-
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 10,
@@ -51,17 +43,16 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
-                    self.walletToken = token
-                    self.applePayButtonEnabled = true
+                    let applePayRequest = self.getApplePayRequest(walletToken: token)
+                    completion(applePayRequest)
                 }
             } catch {
-                // TODO: Add example app error handling
                 print("ERROR: Error fetching wallet token!")
             }
         }
     }
 
-    func getApplePayRequest() -> ApplePayRequest {
+    func getApplePayRequest(walletToken: String) -> ApplePayRequest {
         let paymentRequest = MobileSDK.createApplePayRequest(
             amount: 5.50,
             amountLabel: "Amount",
@@ -75,6 +66,4 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
         return applePayRequest
     }
-
-
 }

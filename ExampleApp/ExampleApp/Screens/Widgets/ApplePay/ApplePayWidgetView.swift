@@ -17,30 +17,17 @@ struct ApplePayWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                HStack {
-                    Spacer()
-                    Button("Launch Apple Pay sheet") {
-                        isSheetPresented = true
+                ApplePayWidget { onApplePayButtonTap in
+                    viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
+                } completion: { result in
+                    switch result {
+                    case .success(let chargeResponse): break
+                    case .failure(let error): break
                     }
-                    .disabled(!viewModel.applePayButtonEnabled)
-                    .padding()
-                    if !viewModel.walletToken.isEmpty {
-                        ApplePaySheetView(
-                            isPresented: $isSheetPresented,
-                            applePayRequest: viewModel.getApplePayRequest()) { result in
-                                switch result {
-                                case .success: break
-                                case .failure: break
-                                }
-                            }
-                    }
-                    Spacer()
                 }
+
             }
             .background(Color(hex: "#EAE0D7"))
-        }
-        .onAppear {
-            viewModel.initializeWalletCharge()
         }
     }
 }

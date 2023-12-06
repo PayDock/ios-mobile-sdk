@@ -13,10 +13,10 @@ class ApplePayVM: NSObject, ObservableObject {
     // MARK: - Dependencies
 
     private let walletService: WalletService
-    let applePayRequest: ApplePayRequest
 
     // MARK: - Properties
 
+    private var applePayRequest: ApplePayRequest?
     var paymentController: PKPaymentAuthorizationController?
     var paymentSummaryItems = [PKPaymentSummaryItem]()
     var paymentStatus = PKPaymentAuthorizationStatus.failure
@@ -26,18 +26,31 @@ class ApplePayVM: NSObject, ObservableObject {
     // MARK: - Handlers
 
     private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
+    private let applePayRequestHandler: (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void
 
     // MARK: - Initialisation
 
-    init(applePayRequest: ApplePayRequest,
+    init(applePayRequestHandler: @escaping (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
-        self.applePayRequest = applePayRequest
+        self.applePayRequestHandler = applePayRequestHandler
         self.walletService = walletService
         self.completion = completion
     }
 
-    func startPayment() {
+    func handleButtonTap() {
+        applePayRequestHandler { applePayRequest in
+            self.applePayRequest = applePayRequest
+            self.startPayment()
+        }
+    }
+
+    private func startPayment() {
+        guard let applePayRequest = applePayRequest else {
+            completion(.failure(.paymentFailed))
+            return
+        }
+
         let paymentRequest = applePayRequest.request
         paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         paymentController?.delegate = self
@@ -52,11 +65,16 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
                                         didAuthorizePayment payment: PKPayment,
                                         completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
+        guard let applePayRequest = applePayRequest else {
+            self.completion(.failure(.paymentFailed))
+            return
+        }
+
         Task {
             do {
                 let refToken = String(data: payment.token.paymentData, encoding: .utf8)
                 let chargeResponse = try await self.walletService.captureCharge(
-                    token: self.applePayRequest.token,
+                    token: applePayRequest.token,
                     paymentMethodId: nil,
                     payerId: nil,
                     refToken: refToken)
