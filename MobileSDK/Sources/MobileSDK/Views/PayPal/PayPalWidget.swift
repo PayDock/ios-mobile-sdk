@@ -16,29 +16,23 @@ public struct PayPalWidget: View {
     }
 
     public var body: some View {
-        VStack {
-            LargeButton(title: "", image: Image("pay-pal", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
-                viewModel.handleButtonTap()
-            }
+        LargeButton(title: "", image: Image("pay-pal", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
+            viewModel.handleButtonTap()
         }
         .sheet(isPresented: $viewModel.showWebView) {
             NavigationStack {
-                VStack {
-                    if let url = viewModel.payPalUrl {
-                        PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
-                            viewModel.capturePayPalPayment(paymentMethodId: paymentMethodId, payerId: payerId)
-                        }, onFailure: { error in
-                            // TODO: Handle error
-                        })
-                        .navigationTitle("Checkout with PayPal")
-                        .navigationBarTitleDisplayMode(.inline)
-                    }
+                if let url = viewModel.payPalUrl {
+                    PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
+                        viewModel.capturePayPalPayment(paymentMethodId: paymentMethodId, payerId: payerId)
+                    }, onFailure: { error in
+                        // TODO: Handle error
+                    })
+                    .navigationTitle("Checkout with PayPal")
+                    .navigationBarTitleDisplayMode(.inline)
                 }
             }
         }
-        .padding()
     }
-
 }
 
 //#Preview {

@@ -17,18 +17,15 @@ struct PayPalWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                HStack {
-                    Spacer()
-                    PayPalWidget { onPayPalButtonTap in
-                        viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
-                    } completion: { result in
-                        switch result {
-                        case .success(let chargeResponse): break
-                        case .failure(let error): break
-                        }
+                PayPalWidget { onPayPalButtonTap in
+                    viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
+                } completion: { result in
+                    switch result {
+                    case .success(let chargeResponse): break
+                    case .failure(let error): break
                     }
-                    Spacer()
                 }
+                .padding()
             }
             .background(Color(hex: "#EAE0D7"))
         }

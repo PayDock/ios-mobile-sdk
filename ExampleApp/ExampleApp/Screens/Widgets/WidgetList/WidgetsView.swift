@@ -32,7 +32,6 @@ struct WidgetsView: View {
 
         }
         .foregroundColor(.black)
-        .padding(.trailing, -28)
         .background(Color(hex: "#EAE0D7"))
     }
 
@@ -64,7 +63,6 @@ struct WidgetsView: View {
 
             }
             Spacer()
-            Image("chevron-right")
         }
         .listRowBackground(Color(hex: "#EAE0D7"))
     }
