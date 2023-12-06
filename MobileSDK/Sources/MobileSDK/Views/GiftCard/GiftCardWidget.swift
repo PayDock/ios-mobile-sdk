@@ -11,7 +11,6 @@ struct GiftCardWidget: View {
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
 
-    // TODO: - Add proper data passing once endpoints are implemented
     public init(storePin: Bool = true,
                 completion: @escaping (Result<String, Error>) -> Void) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(

@@ -34,6 +34,18 @@ public struct ApplePaySheetView: View {
     }
 }
 
-//#Preview {
-//    ApplePaySheetView(isPresented: .constant(true), onCompletion: .constant("Data"))
-//}
+struct ApplePaySheetView_Previews: PreviewProvider {
+    static var previews: some View {
+            ApplePaySheetView(
+                isPresented: .constant(true),
+                applePayRequest: ApplePayRequest(
+                    token: "",
+                    request: MobileSDK.createApplePayRequest(
+                        amount: 10,
+                        amountLabel: "AUD",
+                        countryCode: "AU",
+                        currencyCode: "AUD",
+                        merchantIdentifier: "")),
+                completion: { _ in })
+    }
+}
