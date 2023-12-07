@@ -24,13 +24,14 @@ struct CardDetailsWidgetView: View {
                     Spacer()
                     CardDetailsSheetView(
                         isPresented: $isSheetPresented,
-                        gatewayId: "5cbede1f151b842653e987be",
+                        gatewayId: "657045c00b76c9392bf5e36d",
                         completion: { result in
                             switch result {
                             case .success(let token): cardToken = token
                             case .failure(let error): cardToken = error.customMessage
                             }
-                        })
+                        }
+                    )
                 }
                 Text(cardToken)
             }

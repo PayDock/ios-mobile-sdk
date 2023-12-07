@@ -30,12 +30,10 @@ extension CardsEndpoints: Endpoint {
     }
 
     var header: [String: String]? {
-        // TODO: - Change this token down the line to be initialized from SDK configuration
-        let accessToken = "90ad3038ae37b947dc225cf35c41b1cfe4295cf9"
         switch self {
         case .cardToken, .giftCardToken:
             return [
-                "x-user-public-key": "\(accessToken)",
+                "x-user-public-key": "\(Constants.publicKey)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }

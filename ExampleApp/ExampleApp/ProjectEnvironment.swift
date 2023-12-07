@@ -16,15 +16,15 @@ struct ProjectEnvironment {
     private(set) var environment: Environment = .production
 
     private init() {
-        #if PRODUCTION
+#if PRODUCTION
         self.environment = .production
-        #elseif SANDBOX
+#elseif SANDBOX
         self.environment = .sandbox
-        #elseif STAGING
+#elseif STAGING
         self.environment = .staging
-        #else
+#else
         fatalError("Error setting up environment!")
-        #endif
+#endif
 
         print("[ENVIRONMENT] Working environment set to \(environment)")
     }
@@ -33,14 +33,27 @@ struct ProjectEnvironment {
         case production, sandbox, staging
     }
 
-    func getEnvironmentEndpoint(for environmentString: String) -> String {
-        let environment = Environment(rawValue: environmentString)
-        
+    func getEnvironmentEndpoint() -> String {
         switch environment {
         case .production: return "api.paydock.com"
         case .sandbox: return "api-sandbox.paydock.com"
         case .staging: return "apista.paydock.com"
-        case .none: return ""
+        }
+    }
+
+    func getPublicKey() -> String {
+        switch environment {
+        case .production: return ""
+        case .sandbox: return "b3e5eafcbf585cd298fc66fdc6b449505e64bf8d"
+        case .staging: return ""
+        }
+    }
+
+    func getSecretKey() -> String {
+        switch environment {
+        case .production: return ""
+        case .sandbox: return "ee7c98ebab4780bcd2d8f562e1499d2ce806f7c1"
+        case .staging: return ""
         }
     }
 }
