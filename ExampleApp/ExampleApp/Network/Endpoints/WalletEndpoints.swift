@@ -42,8 +42,8 @@ extension WalletEndpoints: Endpoint {
 
     var header: [String: String]? {
         // TODO: - Change this token down the line to be initialized from Example app config
-        let secretKey = "2d7fa96060b38a942a5fe97f244580a5322971b5"
-        let accessToken = "90ad3038ae37b947dc225cf35c41b1cfe4295cf9"
+        let secretKey = ProjectEnvironment.shared.getSecretKey()
+        let publicKey =  ProjectEnvironment.shared.getPublicKey()
         switch self {
         case .initialiseWalletCharge, .vaultToken, .standalone3ds:
             return [
@@ -52,7 +52,7 @@ extension WalletEndpoints: Endpoint {
             ]
         case .cardToken, .integrated3ds:
             return [
-                "x-user-public-key": "\(accessToken)",
+                "x-user-public-key": "\(publicKey)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }

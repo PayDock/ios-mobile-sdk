@@ -33,7 +33,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
     func getValutToken() {
         Task {
             let req = TokeniseCardDetailsReq(
-                gatewayId: "6478973c43a3a364d9f148a4",
+                gatewayId: "656dd1c6b5ae553ab9c4421e",
                 cardName: "Test Card",
                 cardNumber: "4100000000005000",
                 expireMonth: "08",

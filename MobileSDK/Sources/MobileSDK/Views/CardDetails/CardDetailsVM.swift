@@ -47,7 +47,7 @@ class CardDetailsVM: ObservableObject {
             let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
                 gatewayId: gatewayId,
                 cardName: cardDetailsFormManager.cardholderNameText,
-                cardNumber: cardDetailsFormManager.cardNumberText,
+                cardNumber: cardDetailsFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 expireMonth: String(expireMonth),
                 expireYear: String(expireYear),
                 cardCcv: cardDetailsFormManager.securityCodeText)
