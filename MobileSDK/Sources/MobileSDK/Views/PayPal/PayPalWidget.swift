@@ -41,6 +41,8 @@ public struct PayPalWidget: View {
 
 }
 
-#Preview {
-    PayPalWidget(payPalToken: "", completion: { _ in })
+struct PayPalWidget_Previews: PreviewProvider {
+    static var previews: some View {
+        PayPalWidget(payPalToken: "", completion: { _ in })
+    }
 }

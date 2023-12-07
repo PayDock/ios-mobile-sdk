@@ -27,7 +27,9 @@ struct ApplePayWidget: View {
 
 }
 
-#Preview {
-    ApplePayWidget(
-        applePayRequest: .init(token: "asdf", request: PKPaymentRequest()), completion: { _ in })
+struct ApplePayWidget_Previews: PreviewProvider {
+    static var previews: some View {
+        ApplePayWidget(
+            applePayRequest: .init(token: "asdf", request: PKPaymentRequest()), completion: { _ in })
+    }
 }
