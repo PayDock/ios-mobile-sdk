@@ -15,9 +15,10 @@ class PayPalVM: ObservableObject {
 
     // MARK: - Properties
 
-    private let payPalToken: String
+    private let payPalToken: (_ payPalToken: @escaping (String) -> Void) -> Void
     var payPalUrl: URL?
     @Published var showWebView = false
+    private var token = ""
 
     // MARK: - Handlers
 
@@ -25,7 +26,7 @@ class PayPalVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(payPalToken: String,
+    init(payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self.payPalToken = payPalToken
@@ -33,10 +34,10 @@ class PayPalVM: ObservableObject {
         self.completion = completion
     }
 
-    func getPayPalURL() {
+    func getPayPalURL(token: String) {
         Task {
             do {
-                let payPalUrlString = try await walletService.getCallback(token: self.payPalToken, shipping: false)
+                let payPalUrlString = try await walletService.getCallback(token: token, shipping: false)
                 DispatchQueue.main.async {
                     self.payPalUrl = URL(string: payPalUrlString)
                     self.showWebView = true
@@ -51,20 +52,32 @@ class PayPalVM: ObservableObject {
     }
 
     func capturePayPalPayment(paymentMethodId: String, payerId: String) {
+        guard !token.isEmpty else {
+            completion(.failure(.requestFailed))
+            return
+        }
+
         Task {
             do {
-                let charge = try await walletService.captureCharge(token: payPalToken, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
+                let charge = try await walletService.captureCharge(token: token, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
                 DispatchQueue.main.async {
                     self.completion(.success(charge))
-
                     self.showWebView = false
                 }
+
             } catch {
                 DispatchQueue.main.async {
                     self.completion(.failure(.requestFailed))
                     self.showWebView = false
                 }
             }
+        }
+    }
+
+    func handleButtonTap() {
+        payPalToken { token in
+            self.token = token
+            self.getPayPalURL(token: token)
         }
     }
 

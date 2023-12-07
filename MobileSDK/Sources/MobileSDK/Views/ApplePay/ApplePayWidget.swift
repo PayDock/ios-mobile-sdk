@@ -8,19 +8,19 @@
 import SwiftUI
 import PassKit
 
-struct ApplePayWidget: View {
+public struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
 
-    public init(applePayRequest: ApplePayRequest,
+    public init(applePayRequestHandler: @escaping (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
-            applePayRequest: applePayRequest,
+            applePayRequestHandler: applePayRequestHandler,
             completion: completion))
     }
 
-    var body: some View {
+    public var body: some View {
         ApplePayButton {
-            viewModel.startPayment()
+            viewModel.handleButtonTap()
         }
         .padding()
     }
@@ -29,7 +29,6 @@ struct ApplePayWidget: View {
 
 struct ApplePayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayWidget(
-            applePayRequest: .init(token: "asdf", request: PKPaymentRequest()), completion: { _ in })
+        ApplePayWidget(applePayRequestHandler: { _ in }, completion: { _ in })
     }
 }

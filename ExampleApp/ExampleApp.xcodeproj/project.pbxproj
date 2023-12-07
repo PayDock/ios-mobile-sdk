@@ -55,7 +55,6 @@
 		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
 		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
 		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
-		28F19D2F2B029F50002F5526 /* GiftCardWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2E2B029F50002F5526 /* GiftCardWidgetVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,7 +131,6 @@
 		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 		28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetView.swift; sourceTree = "<group>"; };
-		28F19D2E2B029F50002F5526 /* GiftCardWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -459,7 +457,6 @@
 			isa = PBXGroup;
 			children = (
 				28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */,
-				28F19D2E2B029F50002F5526 /* GiftCardWidgetVM.swift */,
 			);
 			path = GiftCard;
 			sourceTree = "<group>";
@@ -639,7 +636,6 @@
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,
-				28F19D2F2B029F50002F5526 /* GiftCardWidgetVM.swift in Sources */,
 				28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
