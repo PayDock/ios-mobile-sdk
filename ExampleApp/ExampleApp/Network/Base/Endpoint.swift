@@ -27,7 +27,7 @@ extension Endpoint {
     }
 
     var host: String {
-        return ProjectEnvironment.shared.getEnvironmentEndpoint(for: ProjectEnvironment.shared.environment.rawValue)
+        return ProjectEnvironment.shared.getEnvironmentEndpoint()
     }
 
 }

@@ -32,7 +32,7 @@ class SettingsVM: ObservableObject {
     }
 
     func getSelectedEnvironmentEndpoint() -> String {
-        return projectEnvironment.getEnvironmentEndpoint(for: selectedEnvironment)
+        return projectEnvironment.getEnvironmentEndpoint()
     }
 
     func copySecretKey() {

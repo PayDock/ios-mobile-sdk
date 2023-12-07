@@ -24,7 +24,8 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "65144f9bfee65245ecd2db17")
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "657045c00b76c9392bf5e36d")
+
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Tom",
                 lastName: "Taylor",
