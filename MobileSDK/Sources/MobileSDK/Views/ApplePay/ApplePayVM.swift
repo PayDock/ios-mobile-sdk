@@ -25,17 +25,16 @@ class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Handlers
 
-    private var onCompletion: Binding<ChargeResponse?>
-    private var onFailure: Binding<ApplePayError?>
+    private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
+
+    // MARK: - Initialisation
 
     init(applePayRequest: ApplePayRequest,
          walletService: WalletService = WalletServiceImpl(),
-         onCompletion: Binding<ChargeResponse?>,
-         onFailure: Binding<ApplePayError?>) {
+         completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         self.applePayRequest = applePayRequest
         self.walletService = walletService
-        self.onCompletion = onCompletion
-        self.onFailure = onFailure
+        self.completion = completion
     }
 
     func startPayment() {
@@ -63,7 +62,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
                     refToken: refToken)
 
                 paymentStatus = .success
-                onCompletion.wrappedValue = chargeResponse
+                self.completion(.success(chargeResponse))
                 completion(paymentStatus)
 
             } catch {
@@ -78,9 +77,9 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             DispatchQueue.main.async {
                 if self.paymentStatus == .success, let chargeData = self.chargeData {
-                    self.onCompletion.wrappedValue = chargeData
+                    self.completion(.success(chargeData))
                 } else {
-                    self.onFailure.wrappedValue = self.error
+                    self.completion(.failure(self.error ?? .paymentFailed))
                 }
             }
         }

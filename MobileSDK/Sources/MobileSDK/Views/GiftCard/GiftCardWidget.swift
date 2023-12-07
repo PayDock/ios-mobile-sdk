@@ -1,5 +1,5 @@
 //
-//  GiftCardView.swift
+//  GiftCardWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 09.11.2023..
@@ -7,18 +7,15 @@
 
 import SwiftUI
 
-struct GiftCardView: View {
+struct GiftCardWidget: View {
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
 
-    // TODO: - Add proper data passing once endpoints are implemented
     public init(storePin: Bool = true,
-                onCompletion: Binding<String?>,
-                onFailure: Binding<Error?>) {
+                completion: @escaping (Result<String, Error>) -> Void) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(
             storePin: storePin,
-            onCompletion: onCompletion,
-            onFailure: onFailure))
+            completion: completion))
     }
 
     var body: some View {
@@ -81,6 +78,6 @@ struct GiftCardView: View {
 
 struct GiftCardView_Previews: PreviewProvider {
     static var previews: some View {
-        GiftCardView(onCompletion: .constant(.none), onFailure: .constant(.none))
+        GiftCardWidget(completion: { _ in })
     }
 }

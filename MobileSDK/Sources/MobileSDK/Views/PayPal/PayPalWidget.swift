@@ -1,5 +1,5 @@
 //
-//  PayPalView.swift
+//  PayPalWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 25.10.2023..
@@ -7,19 +7,15 @@
 
 import SwiftUI
 
-struct PayPalView: View {
+public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
     public init(payPalToken: String,
-                onCompletion: Binding<ChargeResponse?>,
-                onFailure: Binding<PayPalError?>) {
-        _viewModel = StateObject(wrappedValue: PayPalVM(
-            payPalToken: payPalToken,
-            onCompletion: onCompletion,
-            onFailure: onFailure))
+                completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: PayPalVM(payPalToken: payPalToken, completion: completion))
     }
 
-    var body: some View {
+    public var body: some View {
         VStack {
             LargeButton(title: "", image: Image("pay-pal", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
                 viewModel.getPayPalURL()
@@ -37,7 +33,6 @@ struct PayPalView: View {
                         .navigationTitle("Checkout with PayPal")
                         .navigationBarTitleDisplayMode(.inline)
                     }
-
                 }
             }
         }
@@ -46,9 +41,8 @@ struct PayPalView: View {
 
 }
 
-//#Preview {
-//    PayPalView(
-//        applePayRequest: .init(token: "asdf", merchanIdentifier: "asdf", request: .),
-//        onCompletion: .constant(.init(status: "asd", amount: 10, currency: "USD"))
-//        , onFailure: .constant(.paymentFailed))
-//}
+struct PayPalWidget_Previews: PreviewProvider {
+    static var previews: some View {
+        PayPalWidget(payPalToken: "", completion: { _ in })
+    }
+}

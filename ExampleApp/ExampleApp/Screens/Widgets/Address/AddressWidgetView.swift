@@ -23,8 +23,13 @@ struct AddressWidgetView: View {
                     .padding()
                     Spacer()
                     AddressSheetView(
-                        isPresented: $isSheetPresented,
-                        onCompletion: $address)
+                        isPresented: $isSheetPresented) { result in
+                            switch result {
+                            case .success(let address):
+                                self.address = address
+                            case .failure: break
+                            }
+                        }
                 }
                 Text(address.addressLine1)
             }

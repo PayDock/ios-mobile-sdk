@@ -9,14 +9,12 @@ import PassKit
 
 public struct ApplePayRequest {
 
-    public init(token: String, merchanIdentifier: String, request: PKPaymentRequest) {
+    public init(token: String, request: PKPaymentRequest) {
         self.token = token
-        self.merchanIdentifier = merchanIdentifier
         self.request = request
     }
     
     public let token: String
-    public let merchanIdentifier: String
     public let request: PKPaymentRequest
 
 }

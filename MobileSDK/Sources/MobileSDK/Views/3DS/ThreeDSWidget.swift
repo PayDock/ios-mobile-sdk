@@ -1,5 +1,5 @@
 //
-//  WebView3DS.swift
+//  ThreeDSWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 27.11.2023..
@@ -9,29 +9,15 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
-public struct ThreeDSResult {
-  public let event: EventType
-  public let charge3dsId: String
-
-  public enum EventType: String {
-    case chargeAuthSuccess
-    case chargeAuthReject
-    case chargeAuthChallenge
-    case chargeAuthDecoupled
-    case chargeAuthInfo
-    case error
-  }
-}
-
-public struct ThreeDSView: UIViewRepresentable {
+public struct ThreeDSWidget: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?
-    private let completionHandler: (ThreeDSResult) -> Void
+    private let completion: (ThreeDSResult) -> Void
 
-    public init(token: String, baseURL: URL?, completionHandler: @escaping (ThreeDSResult) -> Void) {
+    public init(token: String, baseURL: URL?, completion: @escaping (ThreeDSResult) -> Void) {
         self.token = token
         self.baseUrl = baseURL
-        self.completionHandler = completionHandler
+        self.completion = completion
     }
 
     public func makeUIView(context: Context) -> WKWebView {
@@ -45,21 +31,21 @@ public struct ThreeDSView: UIViewRepresentable {
 
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            let html = ThreeDSView.html(token)
+            let html = ThreeDSWidget.html(token)
             webView.loadHTMLString(html, baseURL: baseUrl)
         }
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(completionHandler: completionHandler)
+        .init(completion: completion)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        private let completionHandler: (ThreeDSResult) -> Void
+        private let completion: (ThreeDSResult) -> Void
         var isLoaded = false
 
-        init(completionHandler: @escaping (ThreeDSResult) -> Void) {
-            self.completionHandler = completionHandler
+        init(completion: @escaping (ThreeDSResult) -> Void) {
+            self.completion = completion
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -68,10 +54,10 @@ public struct ThreeDSView: UIViewRepresentable {
                   let event = ThreeDSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completionHandler(ThreeDSResult(event: .error, charge3dsId: ""))
+                completion(ThreeDSResult(event: .error, charge3dsId: ""))
                 return
             }
-            completionHandler(ThreeDSResult(event: event, charge3dsId: token))
+            completion(ThreeDSResult(event: event, charge3dsId: token))
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {

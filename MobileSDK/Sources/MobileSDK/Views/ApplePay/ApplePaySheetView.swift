@@ -12,17 +12,14 @@ public struct ApplePaySheetView: View {
     @State var applePayRequest: ApplePayRequest
 
     @Binding var isPresented: Bool
-    @Binding var onCompletion: ChargeResponse?
-    @Binding var onFailure: ApplePayError?
+    private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
 
     public init(isPresented: Binding<Bool>,
                 applePayRequest: ApplePayRequest,
-                onCompletion: Binding<ChargeResponse?>,
-                onFailure: Binding<ApplePayError?>) {
+                completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         self._isPresented = isPresented
         self.applePayRequest = applePayRequest
-        self._onCompletion = onCompletion
-        self._onFailure = onFailure
+        self.completion = completion
     }
 
     public var body: some View {
@@ -30,14 +27,25 @@ public struct ApplePaySheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            ApplePayView(
+            ApplePayWidget(
                 applePayRequest: applePayRequest,
-                onCompletion: $onCompletion,
-                onFailure: $onFailure)
+                completion: completion)
         }
     }
 }
 
-//#Preview {
-//    ApplePaySheetView(isPresented: .constant(true), onCompletion: .constant("Data"))
-//}
+struct ApplePaySheetView_Previews: PreviewProvider {
+    static var previews: some View {
+            ApplePaySheetView(
+                isPresented: .constant(true),
+                applePayRequest: ApplePayRequest(
+                    token: "",
+                    request: MobileSDK.createApplePayRequest(
+                        amount: 10,
+                        amountLabel: "AUD",
+                        countryCode: "AU",
+                        currencyCode: "AUD",
+                        merchantIdentifier: "")),
+                completion: { _ in })
+    }
+}

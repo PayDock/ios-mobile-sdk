@@ -22,7 +22,7 @@ class AddressVM: NSObject, ObservableObject {
     @Published var addressSearchSuggestions: Array<String> = [""]
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
-    var onCompletion: Binding<Address>?
+    let completion: (Result<Address, Error>) -> Void
 
     // MARK: - Custom bindings
 
@@ -40,9 +40,11 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Initialisation
 
     init(addressFormManager: AddressFormManager = AddressFormManager(),
-         localSearchCompleter: MKLocalSearchCompleter = MKLocalSearchCompleter()) {
+         localSearchCompleter: MKLocalSearchCompleter = MKLocalSearchCompleter(),
+         completion: @escaping (Result<Address, Error>) -> Void) {
         self.addressFormManager = addressFormManager
         self.localSearchCompleter = localSearchCompleter
+        self.completion = completion
 
         super.init()
         setup()
@@ -117,7 +119,7 @@ class AddressVM: NSObject, ObservableObject {
             postcode: addressFormManager.postcodeText,
             country: addressFormManager.countryText)
 
-        onCompletion?.wrappedValue = address
+        completion(.success(address))
     }
 
 }

@@ -14,8 +14,6 @@ struct Standalone3DSWidgetView: View {
 
     @StateObject private var viewModel = Standalone3DSVM()
     @State var isSheetPresented = false
-    @State var onCompletion: ChargeResponse?
-    @State var onFailure: PayPalError?
 
     var body: some View {
         NavigationStack {
@@ -29,10 +27,10 @@ struct Standalone3DSWidgetView: View {
                         }) {
                             NavigationStack {
                                 VStack {
-                                    ThreeDSView(
+                                    ThreeDSWidget(
                                         token: viewModel.token3DS,
                                         baseURL: viewModel.getBaseUrl(),
-                                        completionHandler: { event in
+                                        completion: { event in
                                             viewModel.handle3dsEvent(event)
                                         })
                                     .navigationTitle("3DS Check")
