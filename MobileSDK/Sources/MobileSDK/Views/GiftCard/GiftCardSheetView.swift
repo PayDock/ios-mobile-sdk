@@ -30,7 +30,12 @@ public struct GiftCardSheetView: View {
             Text("")
         }
         .bottomSheet(isPresented: $isPresented) {
-            GiftCardWidget(storePin: storePin, completion: completion)
+            GiftCardWidget(storePin: storePin) { result in
+                switch result {
+                case .success(let token): break
+                case .failure(let error): break
+                }
+            }
         }
     }
 }
