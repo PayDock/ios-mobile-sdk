@@ -13,7 +13,6 @@ struct CardDetailsWidget: View {
 
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
-    @State var isLoading = false
 
     // MARK: - Initialisation
 
@@ -92,7 +91,6 @@ struct CardDetailsWidget: View {
                     }
                 }
                 LargeButton(title: "Save card") {
-                    isLoading = true
                     viewModel.tokeniseCardDetails()
                 }
                 .padding(.bottom, 16)
@@ -101,7 +99,7 @@ struct CardDetailsWidget: View {
             }
             .padding(.horizontal, max(16, .spacing))
         }
-        .modifier(ActivityIndicatorModifier(isLoading: isLoading))
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .frame(height: 380, alignment: .top)
     }
 }

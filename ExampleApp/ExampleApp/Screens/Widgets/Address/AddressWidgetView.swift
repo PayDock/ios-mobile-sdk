@@ -22,13 +22,6 @@ struct AddressWidgetView: View {
                     }
                     .padding()
                     Spacer()
-                    
-                    AddressWidget { result in
-                        switch result {
-                        case .success(let address): break
-                        case .failure(let error): break
-                        }
-                    }
                     AddressSheetView(
                         isPresented: $isSheetPresented) { result in
                             switch result {

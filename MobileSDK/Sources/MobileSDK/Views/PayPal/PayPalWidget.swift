@@ -32,6 +32,7 @@ public struct PayPalWidget: View {
                 }
             }
         }
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
 

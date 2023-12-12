@@ -73,6 +73,7 @@ struct GiftCardWidget: View {
             .padding(.horizontal, max(16, .spacing))
         }
         .frame(height: 200, alignment: .top)
+//        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
 
