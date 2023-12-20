@@ -9,31 +9,23 @@ import SwiftUI
 import MobileSDK
 
 struct AddressWidgetView: View {
-    @State var address: Address = Address()
-    @State var isSheetPresented = false
+    @State var showAlert = false
+    @State var alertMessage = ""
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                HStack {
-                    Spacer()
-                    Button("Launch address sheet") {
-                        isSheetPresented = true
+                AddressWidget(address: nil) { result in
+                    switch result {
+                    case .success(let address): alertMessage = address.addressLine1
+                    case .failure(let error): alertMessage = error.localizedDescription
                     }
-                    .padding()
-                    Spacer()
-                    AddressSheetView(
-                        isPresented: $isSheetPresented) { result in
-                            switch result {
-                            case .success(let address):
-                                self.address = address
-                            case .failure: break
-                            }
-                        }
+                    showAlert = true
                 }
-                Text(address.addressLine1)
             }
-            .background(Color(hex: "#EAE0D7"))
+            .alert("Address", isPresented: $showAlert, actions: {}, message: {
+                Text(alertMessage)
+            })
         }
     }
 }
