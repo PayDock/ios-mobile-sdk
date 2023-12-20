@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GiftCardWidget: View {
+public struct GiftCardWidget: View {
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
 
@@ -18,7 +18,7 @@ struct GiftCardWidget: View {
             completion: completion))
     }
 
-    var body: some View {
+    public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
                 HStack {
@@ -73,7 +73,7 @@ struct GiftCardWidget: View {
             .padding(.horizontal, max(16, .spacing))
         }
         .frame(height: 200, alignment: .top)
-//        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
 

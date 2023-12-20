@@ -176,10 +176,10 @@ struct OutlineTextField: View {
         HStack {
             switch validationIconState {
             case .valid:
-                Image("tick-circle")
+                Image("tick-circle", bundle: Bundle.module)
                     .foregroundColor(.successColor)
             case .invalid:
-                Image("exclamation-circle")
+                Image("exclamation-circle", bundle: Bundle.module)
                     .foregroundColor(.errorColor)
             case .none: EmptyView()
             }
