@@ -22,7 +22,7 @@ class GiftCardVM: ObservableObject {
     // MARK: - Properties
 
     private let storePin: Bool
-
+    @Published var isLoading = false
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
@@ -43,6 +43,7 @@ class GiftCardVM: ObservableObject {
 
     func tokeniseGiftCard() {
         Task {
+            isLoading = true
             let tokeniseGiftCardReq = TokeniseGiftCardReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 pin: giftCardFormManager.pinText,
@@ -50,8 +51,10 @@ class GiftCardVM: ObservableObject {
 
             do {
                 let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq)
+                isLoading = false
                 completion(.success(cardToken))
             } catch {
+                isLoading = false
                 completion(.failure(error))
             }
         }

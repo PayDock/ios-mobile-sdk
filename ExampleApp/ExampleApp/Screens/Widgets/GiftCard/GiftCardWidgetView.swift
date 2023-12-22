@@ -11,33 +11,23 @@ import MobileSDK
 
 struct GiftCardWidgetView: View {
 
-    @State var isSheetPresented = false
-    @State var text = ""
+    @State var showAlert = false
+    @State var alertMessage = ""
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                HStack {
-                        Spacer()
-                        Button("Launch Gift Card sheet") {
-                            isSheetPresented = true
-                        }
-                        .padding()
-                        EmptyView()
-                        GiftCardSheetView(
-                            isPresented: $isSheetPresented,
-                            completion: { result in
-                                switch result {
-                                case .success(let text): self.text = text
-                                case .failure(let error): self.text = error.localizedDescription
-                                }
-                            })
-                        Spacer()
+                GiftCardWidget(storePin: false) { result in
+                    switch result {
+                    case .success(let text): self.alertMessage = text
+                    case .failure(let error): self.alertMessage = error.localizedDescription
+                    }
+                    showAlert = true
                 }
-                Text(text)
-
             }
-            .background(Color(hex: "#EAE0D7"))
+            .alert("Gift Card", isPresented: $showAlert, actions: {}, message: {
+                Text(alertMessage)
+            })
         }
     }
 }

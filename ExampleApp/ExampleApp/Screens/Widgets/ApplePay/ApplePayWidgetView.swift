@@ -25,7 +25,6 @@ struct ApplePayWidgetView: View {
                     case .failure(let error): break
                     }
                 }
-
             }
             .background(Color(hex: "#EAE0D7"))
         }

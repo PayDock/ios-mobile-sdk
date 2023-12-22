@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CardDetailsWidget: View {
+public struct CardDetailsWidget: View {
 
     // MARK: - Properties
 
@@ -23,7 +23,7 @@ struct CardDetailsWidget: View {
 
     // MARK: - View protocol properties
 
-    var body: some View {
+    public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
                 HStack {
@@ -99,6 +99,7 @@ struct CardDetailsWidget: View {
             }
             .padding(.horizontal, max(16, .spacing))
         }
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .frame(height: 380, alignment: .top)
     }
 }

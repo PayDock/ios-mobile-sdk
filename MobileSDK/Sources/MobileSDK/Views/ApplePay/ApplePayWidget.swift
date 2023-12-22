@@ -22,6 +22,7 @@ public struct ApplePayWidget: View {
         ApplePayButton {
             viewModel.handleButtonTap()
         }
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .padding()
     }
 

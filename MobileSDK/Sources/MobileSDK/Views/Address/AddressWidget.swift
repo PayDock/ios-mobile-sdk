@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddressWidget: View {
+public struct AddressWidget: View {
 
     @StateObject var viewModel: AddressVM
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
@@ -22,7 +22,7 @@ struct AddressWidget: View {
         self.address = address
     }
 
-    var body: some View {
+    public var body: some View {
         ScrollView {
             VStack(spacing: max(max(.spacing - 12, 0), 0)) {
                 nameAndLastNameView

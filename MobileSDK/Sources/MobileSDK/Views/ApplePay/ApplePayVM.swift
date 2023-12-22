@@ -16,6 +16,7 @@ class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
+    @Published var isLoading = false
     private var applePayRequest: ApplePayRequest?
     var paymentController: PKPaymentAuthorizationController?
     var paymentSummaryItems = [PKPaymentSummaryItem]()
@@ -39,7 +40,9 @@ class ApplePayVM: NSObject, ObservableObject {
     }
 
     func handleButtonTap() {
+        isLoading = true
         applePayRequestHandler { applePayRequest in
+            self.isLoading = false
             self.applePayRequest = applePayRequest
             self.startPayment()
         }
@@ -81,6 +84,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
                 paymentStatus = .success
                 self.completion(.success(chargeResponse))
+                isLoading = false
                 completion(paymentStatus)
 
             } catch {

@@ -14,6 +14,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Dependencies
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
+    @Published var isLoading = false
     private let cardService: CardService
 
     // MARK: - Properties
@@ -57,11 +58,13 @@ class CardDetailsVM: ObservableObject {
                 cardCcv: cardDetailsFormManager.securityCodeText)
 
             do {
+                isLoading = true
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
+                isLoading = false
                 completion(.success(cardToken))
-
             } catch {
                 completion(.failure(.errorTokenisingCard))
+                isLoading = false
             }
         }
     }
