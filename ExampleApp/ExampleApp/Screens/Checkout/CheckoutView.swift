@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CheckoutView: View {
+
+    @State var isSheetPresented = true
+
     let items: [BasketItem] = [
         .init(
             id: "1",
@@ -43,7 +46,7 @@ struct CheckoutView: View {
                     TotalRowView(title: "Total", value: "£5,498", color: .black)
                 }
                 Button("Checkout") {
-                    print("checkout tapped")
+                    isSheetPresented = true
                 }
                 .foregroundStyle(.white)
                 .font(Font.system(size: 16, weight: .semibold))
@@ -51,16 +54,19 @@ struct CheckoutView: View {
                 .frame(maxWidth:.infinity)
                 .background(Color(hex: "6750A4"))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-                    
+
             }.padding(16)
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    Image("demoLogo")
+                .toolbar {
+                    ToolbarItem(placement: .navigation) {
+                        Image("demoLogo")
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Image(systemName: "person")
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: "person")
+                .bottomSheet(isPresented: $isSheetPresented) {
+                    PaymentMethodSelector()
                 }
-            }
         }
     }
 }

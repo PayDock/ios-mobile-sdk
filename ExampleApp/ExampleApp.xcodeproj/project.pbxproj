@@ -17,6 +17,9 @@
 		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
 		282D31662A66B82900E3ECAD /* StyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31652A66B82900E3ECAD /* StyleView.swift */; };
 		282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31672A66B83100E3ECAD /* SettingsView.swift */; };
+		282D3A7F2B389A4D00C4ABC6 /* PaymentMethodSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A7E2B389A4D00C4ABC6 /* PaymentMethodSelector.swift */; };
+		282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */; };
+		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
 		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
 		285920A72A5B49E700EA42D7 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 285920A62A5B49E700EA42D7 /* MobileSDK */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
@@ -85,6 +88,9 @@
 		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 		282D31652A66B82900E3ECAD /* StyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleView.swift; sourceTree = "<group>"; };
 		282D31672A66B83100E3ECAD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		282D3A7E2B389A4D00C4ABC6 /* PaymentMethodSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSelector.swift; sourceTree = "<group>"; };
+		282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
+		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
 		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
@@ -224,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				282D31632A66B81C00E3ECAD /* CheckoutView.swift */,
+				282D3A7E2B389A4D00C4ABC6 /* PaymentMethodSelector.swift */,
 			);
 			path = Checkout;
 			sourceTree = "<group>";
@@ -343,7 +350,9 @@
 			isa = PBXGroup;
 			children = (
 				28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */,
+				282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */,
 				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
+				282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -609,6 +618,7 @@
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				28A81F532B14E13E0068FE75 /* CardTokenRes.swift in Sources */,
+				282D3A7F2B389A4D00C4ABC6 /* PaymentMethodSelector.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
@@ -635,6 +645,8 @@
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
+				282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */,
+				282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,
 				28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */,
 			);
@@ -798,13 +810,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2AJAJKLBKP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -827,8 +837,7 @@
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.ExampleApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development com.paydock.ExampleApp";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.paydock.ExampleApp";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

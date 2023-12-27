@@ -1,8 +1,9 @@
 //
 //  BottomSheetView.swift
-//  MobileSDK
+//  ExampleApp
 //
-//  Created by Domagoj Grizelj on 01.08.2023..
+//  Created by Domagoj Grizelj on 26.12.2023..
+//  Copyright © 2023 Paydock Ltd. All rights reserved.
 //
 
 import SwiftUI
@@ -37,7 +38,7 @@ public struct BottomSheetView<Content: View>: View {
                         .interactiveDismissDisabled(false)
                         .scrollDisabled(false)
                 }
-                .background(Color.backgroundColor)
+                .background(.white)
             }
     }
 
@@ -48,7 +49,7 @@ public struct BottomSheetView<Content: View>: View {
                 isPresented = false
             } label: {
                 Image("round-btn")
-                    .foregroundColor(.textColor)
+                    .foregroundColor(.black)
             }
             .padding(.top, 60)
             .padding(.trailing, 16)
