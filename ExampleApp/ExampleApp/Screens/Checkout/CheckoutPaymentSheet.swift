@@ -28,20 +28,21 @@ struct CheckoutPaymentSheet: View {
                 })
             case .applePay:
                 ApplePayWidget { onApplePayButtonTap in
-//                    viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
+                    viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
                 } completion: { result in
-//                    switch result {
-//                    case .success(let chargeResponse): break
-//                    case .failure(let error): break
+                    switch result {
+                    case .success(let chargeResponse): break
+                    case .failure(let error): break
+                    }
                 }
             case .payPal:
                 PayPalWidget { onPayPalButtonTap in
-//                    viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
+                    viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
-//                    switch result {
-//                    case .success(let chargeResponse): break
-//                    case .failure(let error): break
-//                    }
+                    switch result {
+                    case .success(let chargeResponse): break
+                    case .failure(let error): break
+                    }
                 }
             }
         }
