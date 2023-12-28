@@ -53,7 +53,7 @@ struct LargeButton: View {
                 isDisabled: disabled))
             .disabled(self.disabled)
         }
-        .frame(maxWidth:.infinity)
+        .frame(maxWidth:.infinity, minHeight: 50)
     }
 }
 

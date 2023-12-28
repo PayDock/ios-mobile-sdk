@@ -9,7 +9,7 @@
 import Foundation
 import MobileSDK
 
-class PayPalWidgetVM: NSObject, ObservableObject {
+class PayPalWidgetVM: ObservableObject {
 
     // MARK: - Dependencies
 
@@ -19,7 +19,6 @@ class PayPalWidgetVM: NSObject, ObservableObject {
 
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
-        super.init()
     }
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {

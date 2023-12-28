@@ -19,6 +19,7 @@ public struct PayPalWidget: View {
         LargeButton(title: "", image: Image("pay-pal", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
             viewModel.handleButtonTap()
         }
+        .padding()
         .sheet(isPresented: $viewModel.showWebView) {
             NavigationStack {
                 if let url = viewModel.payPalUrl {
