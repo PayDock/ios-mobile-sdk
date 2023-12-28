@@ -1,5 +1,5 @@
 //
-//  PaymentMethodSelector.swift
+//  CheckoutPaymentSheet.swift
 //  ExampleApp
 //
 //  Created by Domagoj Grizelj on 15.12.2023..
@@ -9,15 +9,19 @@
 import SwiftUI
 import MobileSDK
 
-struct PaymentMethodSelector: View {
+struct CheckoutPaymentSheet: View {
 
-    @State var selectedMethod: PaymentMethod = .card
+    @StateObject private var viewModel: CheckoutPaymentVM
+
+    init(viewModel: CheckoutPaymentVM = CheckoutPaymentVM()) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
         VStack {
             title()
             selector()
-            switch selectedMethod {
+            switch viewModel.selectedMethod {
             case .card:
                 CardDetailsWidget(gatewayId: "", completion: { result in
 
@@ -41,7 +45,6 @@ struct PaymentMethodSelector: View {
                 }
             }
         }
-//        .frame(height: 60)
     }
 
     func title() -> some View {
@@ -66,7 +69,7 @@ struct PaymentMethodSelector: View {
         .scrollIndicators(.hidden)
     }
 
-    func paymentMethodCell(type: PaymentMethod, logo: Image, title: String? = nil) -> some View {
+    func paymentMethodCell(type: CheckoutPaymentVM.PaymentMethod, logo: Image, title: String? = nil) -> some View {
         HStack {
             logo
             if let title = title {
@@ -78,23 +81,18 @@ struct PaymentMethodSelector: View {
         .frame(width: 90, height: 49)
         .overlay(
             RoundedRectangle(cornerRadius: 4)
-                .stroke( type == selectedMethod ? Color(red: 0.4, green: 0.31, blue: 0.64) : .black, lineWidth: type == selectedMethod ? 2 : 1/3)
+                .stroke( type == viewModel.selectedMethod ? Color(red: 0.4, green: 0.31, blue: 0.64) : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
         )
         .onTapGesture {
-            selectedMethod = type
+            viewModel.selectedMethod = type
         }
     }
 
-    enum PaymentMethod {
-        case card
-        case applePay
-        case payPal
-    }
 
 }
 
 struct PaymentMethodSelector_Previews: PreviewProvider {
     static var previews: some View {
-        PaymentMethodSelector()
+        CheckoutPaymentSheet()
     }
 }
