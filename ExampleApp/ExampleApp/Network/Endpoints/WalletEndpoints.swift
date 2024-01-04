@@ -13,8 +13,11 @@ enum WalletEndpoints {
     case initialiseWalletCharge(initialiseWalletChargeReq: InitialiseWalletChargeReq)
     case cardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq)
     case integrated3ds(request: Integrated3DSReq)
+    case integrated3dsVault(request: Integrated3DSVaultReq)
     case standalone3ds(request: Standalone3DSReq)
     case vaultToken(request: TokeniseCardDetailsReq)
+    case convertToVaultToken(request: ConvertToVaultTokenReq)
+    case captureCharge(request: CaptureChargeReq)
 
 }
 
@@ -24,9 +27,10 @@ extension WalletEndpoints: Endpoint {
         switch self {
         case .initialiseWalletCharge: return "/v1/charges/wallet"
         case .cardToken: return "/v1/payment_sources/tokens"
-        case .integrated3ds: return "/v1/charges/3ds"
+        case .integrated3ds, .integrated3dsVault: return "/v1/charges/3ds"
         case .standalone3ds: return "/v1/charges/standalone-3ds"
-        case .vaultToken: return "/v1/vault/payment_sources"
+        case .vaultToken, .convertToVaultToken: return "/v1/vault/payment_sources"
+        case .captureCharge: return "/v1/charges"
         }
     }
 
@@ -35,22 +39,24 @@ extension WalletEndpoints: Endpoint {
         case .initialiseWalletCharge: return .post
         case .cardToken: return .post
         case .integrated3ds: return .post
+        case .integrated3dsVault: return .post
         case .standalone3ds: return .post
         case .vaultToken: return .post
+        case .convertToVaultToken: return .post
+        case .captureCharge: return .post
         }
     }
 
     var header: [String: String]? {
-        // TODO: - Change this token down the line to be initialized from Example app config
         let secretKey = ProjectEnvironment.shared.getSecretKey()
         let publicKey =  ProjectEnvironment.shared.getPublicKey()
         switch self {
-        case .initialiseWalletCharge, .vaultToken, .standalone3ds:
+        case .initialiseWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge:
             return [
                 "x-user-secret-key": "\(secretKey)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
-        case .cardToken, .integrated3ds:
+        case .cardToken, .integrated3ds, .integrated3dsVault:
             return [
                 "x-user-public-key": "\(publicKey)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -63,15 +69,18 @@ extension WalletEndpoints: Endpoint {
         case .initialiseWalletCharge(let request): return try? JSONEncoder().encode(request)
         case .cardToken(let request): return try? JSONEncoder().encode(request)
         case .integrated3ds(let request): return try? JSONEncoder().encode(request)
+        case .integrated3dsVault(let request): return try? JSONEncoder().encode(request)
         case .standalone3ds(let request): return try? JSONEncoder().encode(request)
         case .vaultToken(let request): return try? JSONEncoder().encode(request)
+        case .convertToVaultToken(let request): return try? JSONEncoder().encode(request)
+        case .captureCharge(let request): return try? JSONEncoder().encode(request)
         }
     }
 
     var parameters: [URLQueryItem] {
         switch self {
         case .initialiseWalletCharge: return [URLQueryItem(name: "capture", value: "true")]
-        case .cardToken, .integrated3ds, .standalone3ds, .vaultToken: return []
+        case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
         }
     }
 

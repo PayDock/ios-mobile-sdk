@@ -55,7 +55,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
                 DispatchQueue.main.async {
-                    self.token3DS = token3DS
+                    self.token3DS = token3DS ?? ""
                     self.showWebView = true
                 }
             } catch {

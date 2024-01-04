@@ -23,9 +23,20 @@ struct CheckoutPaymentSheet: View {
             selector()
             switch viewModel.selectedMethod {
             case .card:
-                CardDetailsWidget(gatewayId: "", completion: { result in
+                VStack {
+                    CardDetailsWidget(gatewayId: "", completion: { result in
+                        switch result {
+                        case .success(let token): viewModel.saveCardToken(token)
+                        case .failure(let error): break
+                        }
+                    })
+                    .frame(height: 380)
+                    LargeButton(title: "Pay", image: Image("lock-alt"), disabled: false, backgroundColor: .primaryColor, foregroundColor: .white) {
+                        viewModel.payWithCard()
+                    }
+                    .padding()
+                }
 
-                })
             case .applePay:
                 ApplePayWidget { onApplePayButtonTap in
                     viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
@@ -46,9 +57,28 @@ struct CheckoutPaymentSheet: View {
                 }
             }
         }
+        .sheet(isPresented: $viewModel.showWebView, onDismiss: {
+//            if !viewModel.alertMessage.isEmpty {
+//                viewModel.showAlert = true
+//            }
+        }) {
+            NavigationStack {
+                VStack {
+                    ThreeDSWidget(
+                        token: viewModel.token3DS,
+                        baseURL: viewModel.getBaseUrl(),
+                        completion: { event in
+                            viewModel.handle3dsEvent(event)
+                        })
+                    .navigationTitle("3DS Check")
+                    .navigationBarTitleDisplayMode(.inline)
+
+                }
+            }
+        }
     }
 
-    func title() -> some View {
+    private func title() -> some View {
         HStack {
             Text("Payment Method")
                 .font(.title3)
@@ -57,20 +87,19 @@ struct CheckoutPaymentSheet: View {
         }
     }
 
-    func selector() -> some View {
+    private func selector() -> some View {
         ScrollView(.horizontal) {
             HStack(spacing: 12) {
                 paymentMethodCell(type: .card, logo: Image("credit-card"), title: "Card")
                 paymentMethodCell(type: .applePay, logo: Image("applePay"))
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
-
             }
             .padding()
         }
         .scrollIndicators(.hidden)
     }
 
-    func paymentMethodCell(type: CheckoutPaymentVM.PaymentMethod, logo: Image, title: String? = nil) -> some View {
+    private func paymentMethodCell(type: CheckoutPaymentVM.PaymentMethod, logo: Image, title: String? = nil) -> some View {
         HStack {
             logo
             if let title = title {
@@ -88,8 +117,6 @@ struct CheckoutPaymentSheet: View {
             viewModel.selectedMethod = type
         }
     }
-
-
 }
 
 struct PaymentMethodSelector_Previews: PreviewProvider {

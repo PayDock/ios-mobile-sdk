@@ -22,6 +22,7 @@
 		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
 		282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */; };
 		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
+		284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */; };
 		285920A72A5B49E700EA42D7 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 285920A62A5B49E700EA42D7 /* MobileSDK */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
@@ -33,6 +34,8 @@
 		2889B7F12A558F1A00D6C7BE /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F02A558F1A00D6C7BE /* ExampleAppUITests.swift */; };
 		2889B7F32A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */; };
 		288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */; };
+		289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289D76C02B45FABA002601BB /* CaptureChargeReq.swift */; };
+		28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */; };
 		28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */; };
 		28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C32A696341004A8D34 /* View+Extensions.swift */; };
 		28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */; };
@@ -94,6 +97,7 @@
 		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
 		282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentVM.swift; sourceTree = "<group>"; };
 		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
+		2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultReq.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +116,8 @@
 		288E33A62A5C874200DB2A41 /* Staging.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Staging.xcconfig; sourceTree = "<group>"; };
 		288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEnvironment.swift; sourceTree = "<group>"; };
 		28962E762AA79C3E003272A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		289D76C02B45FABA002601BB /* CaptureChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq.swift; sourceTree = "<group>"; };
+		28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVaultTokenReq.swift; sourceTree = "<group>"; };
 		28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleVM.swift; sourceTree = "<group>"; };
 		28A3A9C32A696341004A8D34 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusablePadding.swift; sourceTree = "<group>"; };
@@ -426,6 +432,9 @@
 				28A81F502B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift */,
 				28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */,
 				28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */,
+				2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */,
+				28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */,
+				289D76C02B45FABA002601BB /* CaptureChargeReq.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -632,6 +641,7 @@
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				28E86F5B2ACC11C8008E827E /* Endpoint.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
+				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
@@ -647,8 +657,10 @@
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
+				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
+				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
 				282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */,
 				282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,

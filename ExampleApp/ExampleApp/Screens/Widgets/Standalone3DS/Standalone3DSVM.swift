@@ -80,7 +80,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
             do {
                 let token3DS = try await walletService.createStandalone3DSToken(request: request)
                 DispatchQueue.main.async {
-                    self.token3DS = token3DS
+                    self.token3DS = token3DS ?? ""
                     self.showWebView = true
                 }
             } catch {

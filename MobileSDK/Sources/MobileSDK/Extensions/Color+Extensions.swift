@@ -16,7 +16,7 @@ extension Color {
         self.init(UIColor(light: UIColor(lightModeColor()), dark: UIColor(darkModeColor())))
     }
 
-    static var primaryColor: Self {
+    public static var primaryColor: Self {
         Self(light: Appearance.shared.lightThemeColors.primary,
              dark: Appearance.shared.darkThemeColors.primary)
     }
