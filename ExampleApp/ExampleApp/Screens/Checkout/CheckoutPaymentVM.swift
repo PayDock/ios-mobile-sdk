@@ -16,12 +16,17 @@ class CheckoutPaymentVM: ObservableObject {
     private let walletService: WalletService
 
     // MARK: - Properties
-
-    @Published var selectedMethod: PaymentMethod = .card
-    private let gatewayId = "657045c00b76c9392bf5e36d"
+//    let gatewayId = "656dd1c6b5ae553ab9c4421e"
+    let gatewayId = "657045c00b76c9392bf5e36d"
     private var cardToken = ""
+    private var vaultToken = ""
     private(set) var token3DS = ""
+
     @Published var showWebView = false
+    @Published var selectedMethod: PaymentMethod = .card
+    @Published var showAlert = false
+    var alertTitle = ""
+    var alertMessage = ""
 
     // MARK: - Initialisation
 
@@ -39,7 +44,9 @@ class CheckoutPaymentVM: ObservableObject {
                     completion(token)
                 }
             } catch {
-                print("ERROR: Error fetching wallet token!")
+                showAlert = true
+                alertTitle = "Error"
+                alertMessage = "Error fetching wallet token!"
             }
         }
     }
@@ -53,7 +60,9 @@ class CheckoutPaymentVM: ObservableObject {
                     completion(applePayRequest)
                 }
             } catch {
-                print("ERROR: Error fetching wallet token!")
+                showAlert = true
+                alertTitle = "Error"
+                alertMessage = "Error fetching wallet token!"
             }
         }
     }
@@ -106,70 +115,37 @@ class CheckoutPaymentVM: ObservableObject {
         Task {
             do {
                 let vaultToken = try await walletService.convertCardTokenToVaultToken(request: request)
-                attempt3dsTokenCreation(vaultToken: vaultToken)
-                print(vaultToken)
+                self.vaultToken = vaultToken
+                attempt3dsTokenCreation()
             } catch {
-                print(error)
+                showAlert = true
+                alertTitle = "Error"
+                alertMessage = "Error converting to vault token!"
             }
         }
     }
 
-    private func attempt3dsTokenCreation(vaultToken: String) {
+    private func attempt3dsTokenCreation() {
         let request = Integrated3DSVaultReq(amount: "10", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gayewayId: gatewayId)), _3ds: .init(browserDetails: .init()))
         Task {
             do {
-                let status = try await walletService.createIntegrated3DSVaultToken(request: request)
-                handleAuthStatus(status, vaultToken: vaultToken)
+                let response = try await walletService.createIntegrated3DSVaultToken(request: request)
+                handleAuthStatus(response)
             } catch {
-                print(error)
+                showAlert = true
+                alertTitle = "Error"
+                alertMessage = "Error creating integrated 3DS token!"
             }
         }
     }
 
-    private func handleAuthStatus(_ status: Integrated3DSRes.AuthStatus?, vaultToken: String) {
-        switch status {
-        case .notSupported: captureCharge(vaultToken: vaultToken)
-        case .pending: create3dsToken(vaultToken: vaultToken)
+    private func handleAuthStatus(_ response: Integrated3DSRes) {
+        switch response.authStatus {
+        case .notSupported: captureCharge()
+        case .pending:
+            token3DS = response.resource.data.threeDS.token ?? ""
+            showWebView = true
         case .none: break
-        }
-    }
-
-    private func create3dsToken(vaultToken: String) {
-        Task {
-            let request = Standalone3DSReq(
-                amount: "10",
-                currency: "AUD",
-                reference: UUID().uuidString,
-                customer: .init(paymentSource: .init(token: vaultToken)),
-                data: .init(
-                    service_id: "6478973c43a3a364d9f148a4",
-                    authentication: .init(
-                        type: "01",
-                        date: "2023-06-01T13:00:00.521Z",
-                        version: "2.2.0",
-                        customer: .init(
-                            created: "2023-05-31T13:06:05.521Z",
-                            updated: "2023-05-31T13:06:05.521Z",
-                            credsUpdated: "2023-05-31T13:06:05.521Z",
-                            suspicious: false,
-                            source: .init(
-                                created: "2023-05-31T13:06:05.521Z",
-                                attempts: ["2023-05-31T13:06:05.521Z"],
-                                cardType: "02"
-                            )
-                        )
-                    )
-                )
-            )
-            do {
-                let token3DS = try await walletService.createStandalone3DSToken(request: request)
-                DispatchQueue.main.async {
-                    self.token3DS = token3DS ?? ""
-                    self.showWebView = true
-                }
-            } catch {
-                print(error)
-            }
         }
     }
 
@@ -180,7 +156,7 @@ class CheckoutPaymentVM: ObservableObject {
         case .chargeAuthInfo: break
         case .chargeAuthSuccess:
             showWebView = false
-//            alertMessage = event.charge3dsId
+            captureCharge()
         case .chargeAuthReject: break
         case .error:
             showWebView = false
@@ -188,14 +164,15 @@ class CheckoutPaymentVM: ObservableObject {
         }
     }
 
-    private func captureCharge(vaultToken: String) {
+    private func captureCharge() {
         Task {
             let request = CaptureChargeReq(amount: "10", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken)))
             do {
                 let result = try await walletService.captureCharge(request: request)
-                print(result)
+                alertTitle = "Success"
+                alertMessage = "\(result.amount) \(result.currency) successfully charged!"
+                showAlert = true
             } catch {
-                print(error)
             }
         }
     }

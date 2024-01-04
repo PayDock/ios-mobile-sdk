@@ -42,8 +42,15 @@ struct CheckoutPaymentSheet: View {
                     viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
                 } completion: { result in
                     switch result {
-                    case .success(let chargeResponse): break
-                    case .failure(let error): break
+                    case .success(let chargeResponse):
+                        viewModel.alertTitle = "Success"
+                        viewModel.alertMessage = chargeResponse.status
+                        viewModel.showAlert = true
+                    
+                    case .failure(let error):
+                        viewModel.alertTitle = "Failure"
+                        viewModel.alertMessage = error.customMessage
+                        viewModel.showAlert = true
                     }
                 }
             case .payPal:
@@ -51,16 +58,24 @@ struct CheckoutPaymentSheet: View {
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
                     switch result {
-                    case .success(let chargeResponse): break
-                    case .failure(let error): break
+                    case .success(let chargeResponse):
+                        viewModel.alertTitle = "Success"
+                        viewModel.alertMessage = chargeResponse.status
+                        viewModel.showAlert = true
+                    
+                    case .failure(let error):
+                        viewModel.alertTitle = "Failure"
+                        viewModel.alertMessage = error.customMessage
+                        viewModel.showAlert = true
                     }
                 }
             }
         }
+        .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+            Text(viewModel.alertMessage)
+        })
         .sheet(isPresented: $viewModel.showWebView, onDismiss: {
-//            if !viewModel.alertMessage.isEmpty {
-//                viewModel.showAlert = true
-//            }
+//            viewModel.showAlert = true
         }) {
             NavigationStack {
                 VStack {

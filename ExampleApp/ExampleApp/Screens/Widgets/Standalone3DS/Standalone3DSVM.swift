@@ -58,7 +58,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
-                    service_id: "6478973c43a3a364d9f148a4",
+                    service_id: "656dd1c6b5ae553ab9c4421e",
                     authentication: .init(
                         type: "01",
                         date: "2023-06-01T13:00:00.521Z",
