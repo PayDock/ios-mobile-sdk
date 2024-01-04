@@ -74,9 +74,7 @@ struct CheckoutPaymentSheet: View {
         .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
             Text(viewModel.alertMessage)
         })
-        .sheet(isPresented: $viewModel.showWebView, onDismiss: {
-//            viewModel.showAlert = true
-        }) {
+        .sheet(isPresented: $viewModel.showWebView, onDismiss: { }) {
             NavigationStack {
                 VStack {
                     ThreeDSWidget(
@@ -129,7 +127,9 @@ struct CheckoutPaymentSheet: View {
                 .stroke( type == viewModel.selectedMethod ? Color(red: 0.4, green: 0.31, blue: 0.64) : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
         )
         .onTapGesture {
-            viewModel.selectedMethod = type
+            withAnimation {
+                viewModel.selectedMethod = type
+            }
         }
     }
 }
