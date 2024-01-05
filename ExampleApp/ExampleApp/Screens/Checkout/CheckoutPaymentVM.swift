@@ -25,8 +25,8 @@ class CheckoutPaymentVM: ObservableObject {
     @Published var selectedMethod: PaymentMethod = .card
     @Published var showAlert = false
     @Published var isLoading = false
-    private(set) var alertTitle = ""
-    private(set) var alertMessage = ""
+    var alertTitle = ""
+    var alertMessage = ""
 
     // MARK: - Initialisation
 
