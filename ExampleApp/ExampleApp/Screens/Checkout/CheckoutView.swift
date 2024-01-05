@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CheckoutView: View {
 
-    @State var isSheetPresented = true
+    @State var isSheetPresented = false
 
     let items: [BasketItem] = [
         .init(
