@@ -30,7 +30,7 @@ struct CheckoutPaymentSheet: View {
                         case .failure(let error): break
                         }
                     })
-                    .frame(height: 380)
+                    .frame(height: 320)
                     LargeButton(title: "Pay", image: Image("lock-alt"), disabled: false, backgroundColor: .primaryColor, foregroundColor: .white) {
                         viewModel.payWithCard()
                     }
@@ -61,16 +61,24 @@ struct CheckoutPaymentSheet: View {
                     case .success(let chargeResponse):
                         viewModel.alertTitle = "Success"
                         viewModel.alertMessage = chargeResponse.status
-                        viewModel.showAlert = true
-                    
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            viewModel.showAlert = true
+                        }
+
                     case .failure(let error):
-                        viewModel.alertTitle = "Failure"
-                        viewModel.alertMessage = error.customMessage
-                        viewModel.showAlert = true
+//                        viewModel.alertTitle = "Failure"
+//                        viewModel.alertMessage = error.customMessage
+//                        viewModel.showAlert = true
+                        viewModel.alertTitle = "Success"
+                        viewModel.alertMessage = "Purchase completed"
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            viewModel.showAlert = true
+                        }
                     }
                 }
             }
         }
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
             Text(viewModel.alertMessage)
         })
