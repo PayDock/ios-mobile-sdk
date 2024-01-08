@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 class PayPalVM: ObservableObject {
 
     // MARK: - Dependencies
@@ -40,13 +41,13 @@ class PayPalVM: ObservableObject {
             do {
                 isLoading = true
                 let payPalUrlString = try await walletService.getCallback(token: token, shipping: false)
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isLoading = false
                     self.payPalUrl = URL(string: payPalUrlString)
                     self.showWebView = true
                 }
             } catch {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isLoading = false
                     self.showWebView = false
                     self.completion(.failure(.webViewFailed))
@@ -64,14 +65,14 @@ class PayPalVM: ObservableObject {
         Task {
             do {
                 let charge = try await walletService.captureCharge(token: token, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isLoading = false
                     self.completion(.success(charge))
                     self.showWebView = false
                 }
 
             } catch {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isLoading = false
                     self.completion(.failure(.requestFailed))
                     self.showWebView = false
