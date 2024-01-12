@@ -81,7 +81,7 @@ struct OutlineTextField: View {
             if showErrorView {
                 errorView()
             }
-            Spacer()
+//            Spacer()
         }
         .padding(.top, 2)
         .padding(.bottom, 2)
@@ -106,6 +106,7 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
+//        .frame(height: errorMessage.isEmpty ? 56 : 72)
     }
 
     private func textFieldView() -> some View {
@@ -149,7 +150,7 @@ struct OutlineTextField: View {
     private func errorView() -> some View {
         HStack {
             VStack {
-                Spacer()
+//                Spacer()
                 Text(errorMessage)
                     .customFont(.caption)
                     .font(.system(size: 10.0))

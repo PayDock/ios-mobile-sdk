@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public struct BottomSheetView<Content: View>: View {
+struct BottomSheetView<Content: View>: View {
 
     @ViewBuilder private let content: Content
     @Binding var isPresented: Bool
@@ -19,7 +19,7 @@ public struct BottomSheetView<Content: View>: View {
         self.content = content()
     }
 
-    public var body: some View {
+    var body: some View {
         Text("")
             .sheet(isPresented: $isPresented) {
                 VStack {
@@ -37,6 +37,7 @@ public struct BottomSheetView<Content: View>: View {
                         .presentationDetents([.height(sheetHeight)])
                         .interactiveDismissDisabled(false)
                         .scrollDisabled(false)
+                    Spacer()
                 }
                 .background(.white)
             }

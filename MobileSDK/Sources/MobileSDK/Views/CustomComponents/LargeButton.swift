@@ -7,18 +7,17 @@
 
 import SwiftUI
 
-struct LargeButton: View {
+public struct LargeButton: View {
 
-    var backgroundColor: Color
-    var foregroundColor: Color
-
+    private var backgroundColor: Color
+    private var foregroundColor: Color
     private let title: String
     private let image: Image?
     private let action: () -> Void
 
     private let disabled: Bool
 
-    init(title: String,
+    public init(title: String,
          image: Image? = nil,
          disabled: Bool = false,
          backgroundColor: Color = .primaryColor,
@@ -32,7 +31,7 @@ struct LargeButton: View {
         self.disabled = disabled
     }
 
-    var body: some View {
+    public var body: some View {
         HStack {
             Button(action: self.action) {
                 if image != nil {

@@ -35,8 +35,8 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", storeId: "1234556")
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
-                amount: 10,
-                currency: "USD",
+                amount: 5.50,
+                currency: "AUD",
                 reference: "Test purchase",
                 description: "Test purchase",
                 meta: metaData)

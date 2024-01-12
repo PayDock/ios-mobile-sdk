@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct WalletCaptureRes: Codable {
-    let status: Int
-    let resource: Resource
+public struct WalletCaptureRes: Codable {
+    public let status: Int
+    public let resource: Resource
 
-    struct Resource: Codable {
-        let type: String
-        let data: ChargeResponse
+    public struct Resource: Codable {
+        public let type: String
+        public let data: ChargeResponse
     }
 }

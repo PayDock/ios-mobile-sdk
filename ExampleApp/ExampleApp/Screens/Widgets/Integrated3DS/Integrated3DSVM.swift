@@ -32,7 +32,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
     func tokeniseCardDetails() {
         Task {
             let req = TokeniseCardDetailsReq(
-                gatewayId: "65283088143e65d1f4166f99",
+                gatewayId: "657045c00b76c9392bf5e36d",
                 cardName: "Carlie Kuvalis",
                 cardNumber: "2223000000000007",
                 expireMonth: "08",
@@ -55,7 +55,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
                 DispatchQueue.main.async {
-                    self.token3DS = token3DS
+                    self.token3DS = token3DS ?? ""
                     self.showWebView = true
                 }
             } catch {

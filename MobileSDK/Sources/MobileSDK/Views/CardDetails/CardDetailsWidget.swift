@@ -100,7 +100,6 @@ public struct CardDetailsWidget: View {
             .padding(.horizontal, max(16, .spacing))
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
-        .frame(height: 380, alignment: .top)
     }
 }
 
