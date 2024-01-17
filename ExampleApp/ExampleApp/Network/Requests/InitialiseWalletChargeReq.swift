@@ -32,9 +32,13 @@ struct InitialiseWalletChargeReq: Codable {
         }
 
         struct PaymentSource: Codable {
+            let addressLine1: String
+            let addressPostcode: String
             let gatewayId: String
 
             enum CodingKeys: String, CodingKey {
+                case addressLine1 = "address_line1"
+                case addressPostcode = "address_postcode"
                 case gatewayId = "gateway_id"
             }
         }
@@ -42,10 +46,12 @@ struct InitialiseWalletChargeReq: Codable {
 
     struct MetaData: Codable {
         let storeName: String
+        let merchantName: String
         let storeId: String
 
         enum CodingKeys: String, CodingKey {
             case storeName = "store_name"
+            case merchantName = "merchant_name"
             case storeId = "store_id"
         }
     }

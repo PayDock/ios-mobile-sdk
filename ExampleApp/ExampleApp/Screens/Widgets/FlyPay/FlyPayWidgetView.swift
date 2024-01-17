@@ -1,26 +1,26 @@
 //
-//  PayPalWidgetView.swift
+//  FlyPayWidgetView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 26.10.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
+//  Created by Domagoj Grizelj on 11.01.2024..
+//  Copyright © 2024 Paydock Ltd. All rights reserved.
 //
 
 import SwiftUI
 import MobileSDK
 
-struct PayPalWidgetView: View {
+struct FlyPayWidgetView: View {
 
-    @StateObject private var viewModel = PayPalWidgetVM()
+    @StateObject private var viewModel = FlyPayWidgetVM()
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                PayPalWidget { onPayPalButtonTap in
-                    viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
+                FlyPayWidget { onFlyPayButtonTap in
+                    viewModel.initializeWalletCharge(completion: onFlyPayButtonTap)
                 } completion: { result in
                     switch result {
-                    case .success(let chargeResponse): viewModel.handleSuccess(charge: chargeResponse)
+                    case .success: viewModel.handleSuccess()
                     case .failure(let error): viewModel.handleError(error: error)
                     }
                 }
@@ -34,7 +34,7 @@ struct PayPalWidgetView: View {
     }
 }
 
-struct PayPalWidgetView_Previews: PreviewProvider {
+struct FlyPayWidgetView_Previews: PreviewProvider {
     static var previews: some View {
         ApplePayWidgetView()
     }

@@ -1,15 +1,15 @@
 //
-//  PayPalWidgetVM.swift
+//  FlyPayWidgetVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 26.10.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
+//  Created by Domagoj Grizelj on 11.01.2024..
+//  Copyright © 2024 Paydock Ltd. All rights reserved.
 //
 
 import Foundation
 import MobileSDK
 
-class PayPalWidgetVM: ObservableObject {
+class FlyPayWidgetVM: ObservableObject {
 
     // MARK: - Dependencies
 
@@ -29,27 +29,27 @@ class PayPalWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: "656dc6f13831577a1b43c526")
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: "65772f5b8e193151df5d7a23")
 
             let customer = InitialiseWalletChargeReq.Customer(
-                firstName: "Tom",
-                lastName: "Taylor",
-                email: "novaba9346@hondabbs.com",
-                phone: "+11234567890",
+                firstName: "Wanda",
+                lastName: "Mertz",
+                email: "wanda.mertz@example.com",
+                phone: "+1234567890",
                 paymentSource: paymentSource)
 
             let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", merchantName: "Tom's store", storeId: "1234556")
 
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
-                amount: 10,
-                currency: "USD",
-                reference: UUID().uuidString,
-                description: "Test transaction for PayPal",
+                amount: 5,
+                currency: "AUD",
+                reference: "reference1234",
+                description: "Test transaction for FlyPay",
                 meta: metaData)
 
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
+                let token = try await walletService.initialiseFlyPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
                     completion(token)
                 }
@@ -68,9 +68,9 @@ class PayPalWidgetVM: ObservableObject {
         }
     }
 
-    func handleSuccess(charge: ChargeResponse) {
+    func handleSuccess() {
         alertTitle = "Success"
-        alertMessage = "\(charge.amount) \(charge.currency) charged!"
+        alertMessage = "FlyPay passed!"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.showAlert = true
         }

@@ -26,6 +26,8 @@
 		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
 		284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */; };
 		285920A72A5B49E700EA42D7 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 285920A62A5B49E700EA42D7 /* MobileSDK */; };
+		2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */; };
+		2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
@@ -102,6 +104,8 @@
 		282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentVM.swift; sourceTree = "<group>"; };
 		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
 		2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultReq.swift; sourceTree = "<group>"; };
+		2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyPayWidgetView.swift; sourceTree = "<group>"; };
+		2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyPayWidgetVM.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -218,6 +222,7 @@
 		282D315C2A66A64900E3ECAD /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				2865B22B2B56E4C700EBE2DD /* FlyPay */,
 				2808B3402A7056E300E86C7E /* CardDetails */,
 				28A65CA12A94CE4E002A04CA /* Address */,
 				2867ADD72ACEE53400DB5319 /* ApplePay */,
@@ -264,6 +269,15 @@
 				28D541F92A6FFC290041BAE0 /* SettingsVM.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		2865B22B2B56E4C700EBE2DD /* FlyPay */ = {
+			isa = PBXGroup;
+			children = (
+				2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */,
+				2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */,
+			);
+			path = FlyPay;
 			sourceTree = "<group>";
 		};
 		2867ADD72ACEE53400DB5319 /* ApplePay */ = {
@@ -623,6 +637,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
+				2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
@@ -660,6 +675,7 @@
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
 				28E86F5F2ACC11F6008E827E /* RequestError.swift in Sources */,
 				28E86F582ACC1189008E827E /* NetworkLogger.swift in Sources */,
+				2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
@@ -834,11 +850,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 2AJAJKLBKP;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -862,6 +880,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.ExampleApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.paydock.ExampleApp";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
