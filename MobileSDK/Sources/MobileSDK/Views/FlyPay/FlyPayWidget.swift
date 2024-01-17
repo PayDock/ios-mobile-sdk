@@ -17,7 +17,7 @@ public struct FlyPayWidget: View {
     }
 
     public var body: some View {
-        LargeButton(title: "", image: Image("", bundle: Bundle.module), backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
+        LargeButton(title: "Pay with FlyPay", image: nil, backgroundColor: .primaryColor) {
             viewModel.handleButtonTap()
         }
         .padding()
