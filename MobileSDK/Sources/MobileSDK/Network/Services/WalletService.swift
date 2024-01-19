@@ -11,6 +11,7 @@ protocol WalletService {
 
     func captureCharge(token: String, paymentMethodId: String?, payerId: String?, refToken: String?) async throws -> ChargeResponse
     func getCallback(token: String, shipping: Bool) async throws -> String
+    func getFlyPayCallback(token: String) async throws -> String
 
 }
 
@@ -29,7 +30,7 @@ struct WalletServiceImpl: HTTPClient, WalletService {
     }
 
     func getCallback(token: String, shipping: Bool) async throws -> String {
-        let walletCallbackReq = WalletCallbackReq(type: "CREATE_TRANSACTION", shipping: false, sessionId: nil, walletType: nil)
+        let walletCallbackReq = WalletCallbackReq(type: "CREATE_TRANSACTION", shipping: shipping, sessionId: nil, walletType: nil)
 
         let response = try await sendRequest(
             endpoint: WalletEndpoints.walletCallback(
@@ -40,4 +41,15 @@ struct WalletServiceImpl: HTTPClient, WalletService {
         return response.resource.data.callbackUrl
     }
 
+    func getFlyPayCallback(token: String) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(type: "CREATE_SESSION", shipping: nil, sessionId: nil, walletType: "flypay")
+
+        let response = try await sendRequest(
+            endpoint: WalletEndpoints.walletCallback(
+                token: token,
+                walletCallbackReq: walletCallbackReq),
+            responseModel: FlyPayCallbackRes.self)
+
+        return response.resource.data.id
+    }
 }

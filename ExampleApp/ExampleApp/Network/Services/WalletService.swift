@@ -12,6 +12,7 @@ import MobileSDK
 protocol WalletService {
 
     func initialiseWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq) async throws -> String
+    func initialiseFlyPayWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq) async throws -> String
     func createCardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> String
     func createIntegrated3DSToken(request: Integrated3DSReq) async throws -> String?
     func createIntegrated3DSVaultToken(request: Integrated3DSVaultReq) async throws -> Integrated3DSRes
@@ -25,6 +26,11 @@ protocol WalletService {
 struct WalletServiceImpl: HTTPClient, WalletService {
     func initialiseWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq) async throws -> String {
         let response = try await sendRequest(endpoint: WalletEndpoints.initialiseWalletCharge(initialiseWalletChargeReq: initializeWalletChargeReq), responseModel: InitialiseWalletChargeRes.self)
+        return response.resource.data.token
+    }
+
+    func initialiseFlyPayWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq) async throws -> String {
+        let response = try await sendRequest(endpoint: WalletEndpoints.initialiseFlyPayWalletCharge(initialiseWalletChargeReq: initializeWalletChargeReq), responseModel: InitialiseWalletChargeRes.self)
         return response.resource.data.token
     }
 

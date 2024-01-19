@@ -9,7 +9,7 @@ import Foundation
 
 struct WalletCallbackReq: Codable {
     let type: String
-    let shipping: Bool
+    let shipping: Bool?
     let sessionId: String?
     let walletType: String?
 

@@ -1,34 +1,33 @@
 //
-//  PayPalWebView.swift
+//  FlyPayWebView.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 26.10.2023..
+//  Created by Domagoj Grizelj on 11.01.2024..
 //
 
-import WebKit
 import SwiftUI
+import WebKit
+import AuthenticationServices
 
-struct PayPalWebView: UIViewRepresentable {
+struct FlyPayWebView: UIViewRepresentable {
 
-    typealias OnApprove = (_ paymentId: String, _ payerId: String) -> Void
-    typealias OnFailure = (_ payPalError: PayPalError) -> Void
+    typealias OnApprove = () -> Void
+    typealias OnFailure = (FlyPayError) -> Void
 
-    static private let callbackHost = "paydock-mobile.sdk"
-    static private let callbackPath = "/paypal/success"
-    static private let callbackUrl = "https://\(callbackHost)\(callbackPath)"
-
-    private let url: URL
+    private let flyPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure
 
-    init(url: URL, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
-        self.url = url
+    init(flyPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
+        self.flyPayOrderId = flyPayOrderId
         self.onApprove = onApprove
         self.onFailure = onFailure
     }
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
+        configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
+
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         return webView
@@ -36,29 +35,32 @@ struct PayPalWebView: UIViewRepresentable {
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            let redirectQueryItem = URLQueryItem(name: "redirect_uri", value: PayPalWebView.callbackUrl)
-            let nativeXOQueryItem = URLQueryItem(name: "native_xo", value: "1")
-
-            var checkoutURLComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
-            checkoutURLComponents?.queryItems?.append(redirectQueryItem)
-            checkoutURLComponents?.queryItems?.append(nativeXOQueryItem)
-
-            if let finalUrl = checkoutURLComponents?.url {
-                webView.load(.init(url: finalUrl))
+            guard let urlRequest = getFlyPayUrlRequest() else {
+                onFailure(.webViewFailed)
+                return
             }
+            webView.load(urlRequest)
         }
+    }
+
+    private func getFlyPayUrlRequest() -> URLRequest? {
+        let urlString = "https://checkout.release.cxbflypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.sdk"
+        guard let url = URL(string: urlString) else {
+            return nil
+        }
+        return URLRequest(url: url)
     }
 
     func makeCoordinator() -> Coordinator {
         .init(onApprove: onApprove, onFailure: onFailure)
     }
 
-    // MARK: - Coordinator
-
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+
         var onApprove: OnApprove
         var onFailure: OnFailure
         var isLoaded = false
+        private let redirectUrlString = "https://paydock.sdk"
 
         init(onApprove: @escaping OnApprove,
              onFailure: @escaping OnFailure) {
@@ -66,41 +68,38 @@ struct PayPalWebView: UIViewRepresentable {
             self.onFailure = onFailure
         }
 
-        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) { }
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            print(message)
+        }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            print("Finish")
             isLoaded = true
         }
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed)
+            print("Failed")
+            print(error)
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            guard let webUrl = webView.url,
-                  webUrl.host() == PayPalWebView.callbackHost,
-                  webUrl.path() == PayPalWebView.callbackPath,
-                  let queries = webUrl.query() else { return }
-
-            let params: [String: String] = queries
-                .split(separator: "&")
-                .reduce(into: [:], { partialResult, query in
-                    let parts = String(query).split(separator: "=")
-                    partialResult[String(parts[0])] = parts.count > 1 ? String(parts[1]) : ""
-                })
-
-            guard let paymentId = params["token"],
-                  let payerId = params["PayerID"] else { return }
-
-            onApprove(paymentId, payerId)
+            print("Prov start")
         }
 
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed)
+            print("Prov fail")
+            print(error)
         }
 
         func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
-            decisionHandler(false)
+            decisionHandler(true)
+        }
+
+        func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+            print(webView.url)
+            if webView.url == URL(string: redirectUrlString) {
+                onApprove()
+            }
         }
 
         func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
@@ -113,4 +112,3 @@ struct PayPalWebView: UIViewRepresentable {
         }
     }
 }
-
