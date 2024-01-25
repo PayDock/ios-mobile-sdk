@@ -111,7 +111,7 @@ struct CheckoutPaymentSheet: View {
     private func selector() -> some View {
         ScrollView(.horizontal) {
             HStack(spacing: 12) {
-                paymentMethodCell(type: .card, logo: Image("credit-card"), title: "Card")
+                paymentMethodCell(type: .card, logo: Image("credit-card-fill"), title: "Card")
                 paymentMethodCell(type: .applePay, logo: Image("applePay"))
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
             }

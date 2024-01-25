@@ -85,7 +85,7 @@ extension CheckoutPaymentVM {
 
     /// Helper method that creates Wallet Charge request
     private func createWalletChargeRequest(walletType: String?) -> InitialiseWalletChargeReq {
-        let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: gatewayId, walletType: walletType )
+        let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: gatewayId, walletType: walletType )
         let customer = InitialiseWalletChargeReq.Customer(
             firstName: "Tom",
             lastName: "Taylor",

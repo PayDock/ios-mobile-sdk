@@ -34,7 +34,7 @@ class CardDetailsFormManager: ObservableObject {
     @Published var expiryDateValid = true
     @Published var securityCodeValid = true
     
-    @Published var cardImage: Image? = Image("credit-card")
+    @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
     let cardholderNameTitle = "Cardholder name"
     let cardNumberTitle = "Card number"
