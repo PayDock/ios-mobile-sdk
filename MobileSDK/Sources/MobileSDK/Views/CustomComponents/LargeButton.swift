@@ -7,40 +7,38 @@
 
 import SwiftUI
 
-public struct LargeButton: View {
+struct LargeButton: View {
 
-    private var backgroundColor: Color
-    private var foregroundColor: Color
     private let title: String
     private let image: Image?
+    private let imageLocation: ImageLocation
+    private let disabled: Bool
+    private var backgroundColor: Color
+    private var foregroundColor: Color
     private let action: () -> Void
 
-    private let disabled: Bool
-
-    public init(title: String,
-         image: Image? = nil,
-         disabled: Bool = false,
-         backgroundColor: Color = .primaryColor,
-         foregroundColor: Color = .white,
-         action: @escaping () -> Void) {
-        self.backgroundColor = backgroundColor
-        self.foregroundColor = foregroundColor
+    init(title: String,
+                image: Image? = nil,
+                imageLocation: ImageLocation = .left,
+                disabled: Bool = false,
+                backgroundColor: Color = .primaryColor,
+                foregroundColor: Color = .white,
+                action: @escaping () -> Void) {
         self.title = title
         self.image = image
-        self.action = action
+        self.imageLocation = imageLocation
         self.disabled = disabled
+        self.backgroundColor = backgroundColor
+        self.foregroundColor = foregroundColor
+        self.action = action
     }
 
-    public var body: some View {
+    var body: some View {
         HStack {
             Button(action: self.action) {
                 if image != nil {
-                    HStack {
-                        image?.resizable().scaledToFit().frame(maxHeight: 20)
-                            .font(.system(size: 32, weight: .light))
-                        Text(self.title)
-                    }
-                    .frame(maxWidth: .infinity)
+                    getImageAndTitle()
+                        .frame(maxWidth: .infinity)
                 } else {
                     Text(self.title)
                         .frame(maxWidth: .infinity)
@@ -53,6 +51,25 @@ public struct LargeButton: View {
             .disabled(self.disabled)
         }
         .frame(maxWidth:.infinity, minHeight: 50)
+    }
+
+    private func getImageAndTitle() -> some View {
+        HStack {
+            if imageLocation == .left {
+                image?.resizable().scaledToFit().frame(maxHeight: 20)
+                    .font(.system(size: 32, weight: .light))
+                Text(self.title)
+            } else {
+                Text(self.title)
+                image?.resizable().scaledToFit().frame(maxHeight: 20)
+                    .font(.system(size: 32, weight: .light))
+            }
+        }
+    }
+
+    enum ImageLocation {
+        case left
+        case right
     }
 }
 

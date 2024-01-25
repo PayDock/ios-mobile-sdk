@@ -15,6 +15,12 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
     private let walletService: WalletService
 
+    // MARK: - Properties
+
+    @Published var showAlert = false
+    @Published var alertTitle = ""
+    @Published var alertMessage = ""
+
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
@@ -66,5 +72,21 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             request: paymentRequest)
 
         return applePayRequest
+    }
+
+    func handleError(error: ApplePayError) {
+        alertTitle = "Error"
+        alertMessage = "\(error.customMessage)"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.showAlert = true
+        }
+    }
+
+    func handleSuccess(charge: ChargeResponse) {
+        alertTitle = "Success"
+        alertMessage = "\(charge.amount) \(charge.currency) charged!"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.showAlert = true
+        }
     }
 }

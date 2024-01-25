@@ -77,8 +77,4 @@ class FlyPayVM: ObservableObject {
         completion(.failure(error))
     }
 
-    func handleWebViewFailure(_ error: FlyPayError) {
-        completion(.failure(error))
-    }
-
 }

@@ -31,9 +31,15 @@ struct CheckoutPaymentSheet: View {
                         }
                     })
                     .frame(height: 320)
-                    LargeButton(title: "Pay", image: Image("lock-alt"), disabled: false, backgroundColor: .primaryColor, foregroundColor: .white) {
+                    Button("Pay") {
                         viewModel.payWithCard()
                     }
+                    .foregroundStyle(.white)
+                    .font(Font.system(size: 16, weight: .semibold))
+                    .frame(height: 48)
+                    .frame(maxWidth:.infinity)
+                    .background(Color(hex: "6750A4"))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                     .padding()
                 }
 
@@ -66,11 +72,8 @@ struct CheckoutPaymentSheet: View {
                         }
 
                     case .failure(let error):
-//                        viewModel.alertTitle = "Failure"
-//                        viewModel.alertMessage = error.customMessage
-//                        viewModel.showAlert = true
-                        viewModel.alertTitle = "Success"
-                        viewModel.alertMessage = "Purchase completed"
+                        viewModel.alertTitle = "Failure"
+                        viewModel.alertMessage = error.customMessage
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             viewModel.showAlert = true
                         }

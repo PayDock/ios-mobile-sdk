@@ -30,6 +30,9 @@ struct CardDetailsWidgetView: View {
                 Text(alertMessage)
             })
         }
+        .alert("Card Details", isPresented: $showAlert, actions: {}, message: {
+            Text(alertMessage)
+        })
     }
 }
 

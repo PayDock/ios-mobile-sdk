@@ -17,6 +17,7 @@ class CheckoutPaymentVM: ObservableObject {
 
     // MARK: - Properties
     let gatewayId = "657045c00b76c9392bf5e36d"
+    let payPalGatewayId = "656dc6f13831577a1b43c526"
     private var cardToken = ""
     private var vaultToken = ""
     private(set) var token3DS = ""
@@ -42,10 +43,9 @@ extension CheckoutPaymentVM {
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: createWalletChargeRequest(walletType: nil))
-                DispatchQueue.main.async {
-                    completion(token)
-                }
+                let request = createWalletChargeRequest(gatewayId: payPalGatewayId, walletType: nil)
+                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
+                completion(token)
             } catch {
                 showAlert(title: .error, message: "Error fetching wallet token!")
             }
@@ -56,11 +56,10 @@ extension CheckoutPaymentVM {
     func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
         Task {
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: createWalletChargeRequest(walletType: "apple"))
-                DispatchQueue.main.async {
-                    let applePayRequest = self.getApplePayRequest(walletToken: token)
-                    completion(applePayRequest)
-                }
+                let request = createWalletChargeRequest(gatewayId: gatewayId, walletType: "apple")
+                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
+                let applePayRequest = self.getApplePayRequest(walletToken: token)
+                completion(applePayRequest)
             } catch {
                 showAlert(title: .error, message: "Error fetching wallet token!")
             }
@@ -84,20 +83,20 @@ extension CheckoutPaymentVM {
     }
 
     /// Helper method that creates Wallet Charge request
-    private func createWalletChargeRequest(walletType: String?) -> InitialiseWalletChargeReq {
+    private func createWalletChargeRequest(gatewayId: String, walletType: String?) -> InitialiseWalletChargeReq {
         let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: gatewayId, walletType: walletType )
         let customer = InitialiseWalletChargeReq.Customer(
             firstName: "Tom",
             lastName: "Taylor",
-            email: "tom.taylor@tommy.com",
+            email: "novaba9346@hondabbs.com",
             phone: "+11234567890",
             paymentSource: paymentSource)
         let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", merchantName: "Tom's store", storeId: "1234556")
         let initializeWalletChargeReq = InitialiseWalletChargeReq(
             customer: customer,
-            amount: 5.50,
-            currency: "AUD",
-            reference: "Test purchase",
+            amount: 10,
+            currency: "USD",
+            reference: UUID().uuidString,
             description: "Test purchase",
             meta: metaData)
 
@@ -148,8 +147,10 @@ extension CheckoutPaymentVM {
         switch response.authStatus {
         case .notSupported: captureCharge()
         case .pending:
-            token3DS = response.resource.data.threeDS.token ?? ""
-            showWebView = true
+            DispatchQueue.main.async {
+                self.token3DS = response.resource.data.threeDS.token ?? ""
+                self.showWebView = true
+            }
         case .none:
             showAlert(title: .error, message: "Error getting 3DS auth status!")
         }
@@ -157,17 +158,19 @@ extension CheckoutPaymentVM {
 
     /// Handles the outcome of 3DS WebView check
     func handle3dsEvent(_ event: ThreeDSResult) {
-        switch event.event {
-        case .chargeAuthChallenge: break
-        case .chargeAuthDecoupled: break
-        case .chargeAuthInfo: break
-        case .chargeAuthSuccess:
-            showWebView = false
-            captureCharge()
-        case .chargeAuthReject: break
-        case .error:
-            showWebView = false
-            showAlert(title: .error, message: "3DS failed!")
+        DispatchQueue.main.async {
+            switch event.event {
+            case .chargeAuthChallenge: break
+            case .chargeAuthDecoupled: break
+            case .chargeAuthInfo: break
+            case .chargeAuthSuccess:
+                self.showWebView = false
+                self.captureCharge()
+            case .chargeAuthReject: break
+            case .error:
+                self.showWebView = false
+                self.showAlert(title: .error, message: "3DS failed!")
+            }
         }
     }
 

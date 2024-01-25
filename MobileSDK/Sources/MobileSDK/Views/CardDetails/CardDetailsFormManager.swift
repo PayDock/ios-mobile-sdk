@@ -33,7 +33,7 @@ class CardDetailsFormManager: ObservableObject {
     @Published var cardNumberValid = true
     @Published var expiryDateValid = true
     @Published var securityCodeValid = true
-    
+
     @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
     let cardholderNameTitle = "Cardholder name"
@@ -67,7 +67,6 @@ class CardDetailsFormManager: ObservableObject {
             }
         )
     }
-
 
     var cardNumberBinding: Binding<String> {
         Binding(
@@ -244,6 +243,12 @@ class CardDetailsFormManager: ObservableObject {
             securityCodeValid = false
             securityCodeError = "Invalid security code"
         }
+    }
+
+    func isFormValid() -> Bool {
+        let isFormFilled = !cardholderNameText.isEmpty && !cardNumberText.isEmpty && !expiryDateText.isEmpty && !securityCodeText.isEmpty
+        let isFormValid = cardHolderNameValid && cardNumberValid && expiryDateValid && securityCodeValid
+        return isFormFilled && isFormValid
     }
 
     // MARK: - Formatting

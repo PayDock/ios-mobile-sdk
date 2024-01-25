@@ -44,14 +44,12 @@ public struct AddressWidget: View {
             .padding(.horizontal, .spacing)
         }
         .background(Color.backgroundColor)
-        .frame(height: 600)
         .onAppear {
             viewModel.addressFormManager.updateFormWith(address: address)
         }
         .onTapGesture {
             viewModel.addressFormManager.setEditingTextField(focusedField: nil)
         }
-
     }
 
     private var nameHeader: some View {
