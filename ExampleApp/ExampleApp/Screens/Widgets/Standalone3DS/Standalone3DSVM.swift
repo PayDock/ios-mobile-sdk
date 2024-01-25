@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class Standalone3DSVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
@@ -58,7 +59,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
-                    service_id: "656dd1c6b5ae553ab9c4421e",
+                    service_id: "65b25e8b95cb9c6c2b8c2179",
                     authentication: .init(
                         type: "01",
                         date: "2023-06-01T13:00:00.521Z",
@@ -84,7 +85,11 @@ class Standalone3DSVM: NSObject, ObservableObject {
                     self.showWebView = true
                 }
             } catch {
-                print(error)
+                DispatchQueue.main.async {
+                    self.showWebView = false
+                    self.alertMessage = "3DS failed!"
+                    self.showAlert = true
+                }
             }
         }
     }
@@ -102,10 +107,12 @@ class Standalone3DSVM: NSObject, ObservableObject {
         case .chargeAuthSuccess:
             showWebView = false
             alertMessage = event.charge3dsId
+            self.showAlert = true
         case .chargeAuthReject: break
         case .error:
             showWebView = false
             alertMessage = "3DS failed!"
+            self.showAlert = true
         }
     }
 

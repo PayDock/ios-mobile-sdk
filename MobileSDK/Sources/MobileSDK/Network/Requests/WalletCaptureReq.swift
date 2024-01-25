@@ -10,7 +10,7 @@ import Foundation
 struct WalletCaptureReq: Codable {
 
     let paymentMethodId: String?
-    let customer: Customer
+    let customer: Customer?
 
     enum CodingKeys: String, CodingKey {
         case paymentMethodId = "payment_method_id"
@@ -18,7 +18,7 @@ struct WalletCaptureReq: Codable {
     }
 
     struct Customer: Codable {
-        let paymentSource: PaymentSource
+        let paymentSource: PaymentSource?
 
         enum CodingKeys: String, CodingKey {
             case paymentSource = "payment_source"

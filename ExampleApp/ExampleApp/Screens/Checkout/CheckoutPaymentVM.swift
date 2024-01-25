@@ -42,7 +42,7 @@ extension CheckoutPaymentVM {
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: createWalletChargeRequest())
+                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: createWalletChargeRequest(walletType: nil))
                 DispatchQueue.main.async {
                     completion(token)
                 }
@@ -56,7 +56,7 @@ extension CheckoutPaymentVM {
     func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
         Task {
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: createWalletChargeRequest())
+                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: createWalletChargeRequest(walletType: "apple"))
                 DispatchQueue.main.async {
                     let applePayRequest = self.getApplePayRequest(walletToken: token)
                     completion(applePayRequest)
@@ -84,8 +84,8 @@ extension CheckoutPaymentVM {
     }
 
     /// Helper method that creates Wallet Charge request
-    private func createWalletChargeRequest() -> InitialiseWalletChargeReq {
-        let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: gatewayId )
+    private func createWalletChargeRequest(walletType: String?) -> InitialiseWalletChargeReq {
+        let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: gatewayId, walletType: walletType )
         let customer = InitialiseWalletChargeReq.Customer(
             firstName: "Tom",
             lastName: "Taylor",
