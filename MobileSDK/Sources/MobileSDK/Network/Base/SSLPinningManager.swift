@@ -36,9 +36,9 @@ final class SSLPinningManager: NSObject {
 extension SSLPinningManager: URLSessionDelegate {
 
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        // TODO: - Replace this with SecTrustCopyCertificateChain when testing on real API
         guard let serverTrust = challenge.protectionSpace.serverTrust,
-              let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) else {
+              let certs = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate],
+              let serverCertificate = certs.first else {
             completionHandler(.cancelAuthenticationChallenge, nil);
             return
         }

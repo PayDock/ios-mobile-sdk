@@ -80,11 +80,12 @@ struct OutlineTextField: View {
             }
             if showErrorView {
                 errorView()
+            } else {
+                Spacer()
             }
-//            Spacer()
         }
-        .padding(.top, 2)
-        .padding(.bottom, 2)
+        .padding(.top, 0)
+        .padding(.bottom, 0)
         .onChange(of: editing) { _ in
             withAnimation(.easeOut(duration: 0.15)) {
                 updateBorder()
@@ -106,7 +107,6 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
-//        .frame(height: errorMessage.isEmpty ? 56 : 72)
     }
 
     private func textFieldView() -> some View {
@@ -150,7 +150,6 @@ struct OutlineTextField: View {
     private func errorView() -> some View {
         HStack {
             VStack {
-//                Spacer()
                 Text(errorMessage)
                     .customFont(.caption)
                     .font(.system(size: 10.0))
@@ -159,7 +158,7 @@ struct OutlineTextField: View {
             }
             Spacer()
         }
-        .padding(.bottom, 4)
+        .padding(.bottom, 10)
         .opacity(errorViewOpacity)
         .onAppear {
             withAnimation(.easeOut(duration: 0.15)) {
@@ -279,7 +278,7 @@ struct OutlineTextField_Previews: PreviewProvider {
 
     static var previews: some View {
         OutlineTextField(
-            text: .constant("Asdf"),
+            text: .constant("Text"),
             title: "Title",
             placeholder: "Placeholder",
             errorMessage: .constant("Error message"),

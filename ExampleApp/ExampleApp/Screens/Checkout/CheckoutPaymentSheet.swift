@@ -31,9 +31,15 @@ struct CheckoutPaymentSheet: View {
                         }
                     })
                     .frame(height: 320)
-                    LargeButton(title: "Pay", image: Image("lock-alt"), disabled: false, backgroundColor: .primaryColor, foregroundColor: .white) {
+                    Button("Pay") {
                         viewModel.payWithCard()
                     }
+                    .foregroundStyle(.white)
+                    .font(Font.system(size: 16, weight: .semibold))
+                    .frame(height: 48)
+                    .frame(maxWidth:.infinity)
+                    .background(Color(hex: "6750A4"))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                     .padding()
                 }
 
@@ -53,6 +59,7 @@ struct CheckoutPaymentSheet: View {
                         viewModel.showAlert = true
                     }
                 }
+                .padding()
             case .payPal:
                 PayPalWidget { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
@@ -66,16 +73,14 @@ struct CheckoutPaymentSheet: View {
                         }
 
                     case .failure(let error):
-//                        viewModel.alertTitle = "Failure"
-//                        viewModel.alertMessage = error.customMessage
-//                        viewModel.showAlert = true
-                        viewModel.alertTitle = "Success"
-                        viewModel.alertMessage = "Purchase completed"
+                        viewModel.alertTitle = "Failure"
+                        viewModel.alertMessage = error.customMessage
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             viewModel.showAlert = true
                         }
                     }
                 }
+                .padding()
             }
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
@@ -111,7 +116,7 @@ struct CheckoutPaymentSheet: View {
     private func selector() -> some View {
         ScrollView(.horizontal) {
             HStack(spacing: 12) {
-                paymentMethodCell(type: .card, logo: Image("credit-card"), title: "Card")
+                paymentMethodCell(type: .card, logo: Image("credit-card-fill"), title: "Card")
                 paymentMethodCell(type: .applePay, logo: Image("applePay"))
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
             }

@@ -150,7 +150,7 @@ struct AutocompleteTextField: View {
 
 struct AutocompleteTextField_Previews: PreviewProvider {
 
-    static var options = ["Afghanistan","America"]
+    static var options = ["Australia", "Canada"]
     static var previews: some View {
         AutocompleteTextField(
             text: .constant("Search countries here"),

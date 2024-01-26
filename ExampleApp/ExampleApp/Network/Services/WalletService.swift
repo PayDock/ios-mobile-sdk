@@ -45,8 +45,8 @@ struct WalletServiceImpl: HTTPClient, WalletService {
     }
 
     func createIntegrated3DSVaultToken(request: Integrated3DSVaultReq) async throws -> Integrated3DSRes {
-        let response = try await sendRequest(endpoint: WalletEndpoints.integrated3dsVault(request: request), responseModel: Integrated3DSRes.self)
-        return response
+            let response = try await sendRequest(endpoint: WalletEndpoints.integrated3dsVault(request: request), responseModel: Integrated3DSRes.self)
+            return response
     }
 
     func createVaultToken(request: TokeniseCardDetailsReq) async throws -> String {

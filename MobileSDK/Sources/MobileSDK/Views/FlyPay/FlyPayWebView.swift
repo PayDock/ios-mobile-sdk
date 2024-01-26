@@ -60,7 +60,7 @@ struct FlyPayWebView: UIViewRepresentable {
         var onApprove: OnApprove
         var onFailure: OnFailure
         var isLoaded = false
-        private let redirectUrlString = "https://paydock.sdk"
+        private let redirectUrlString = "https://paydock.sdk/"
 
         init(onApprove: @escaping OnApprove,
              onFailure: @escaping OnFailure) {
@@ -83,12 +83,12 @@ struct FlyPayWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            print("Prov start")
+            if webView.url?.host() == URL(string: redirectUrlString)?.host() {
+                onApprove()
+            }
         }
 
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            print("Prov fail")
-            print(error)
         }
 
         func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
@@ -96,10 +96,6 @@ struct FlyPayWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-            print(webView.url)
-            if webView.url == URL(string: redirectUrlString) {
-                onApprove()
-            }
         }
 
         func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {

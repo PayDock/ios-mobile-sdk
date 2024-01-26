@@ -21,12 +21,16 @@ struct ApplePayWidgetView: View {
                     viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
                 } completion: { result in
                     switch result {
-                    case .success(let chargeResponse): break
-                    case .failure(let error): break
+                    case .success(let chargeResponse): viewModel.handleSuccess(charge: chargeResponse)
+                    case .failure(let error): viewModel.handleError(error: error)
                     }
                 }
+                .padding()
             }
             .background(Color(hex: "#EAE0D7"))
+            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+                Text(viewModel.alertMessage)
+            })
         }
     }
 }

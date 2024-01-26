@@ -9,8 +9,6 @@ import Foundation
 
 struct ErrorRes: Codable {
 
-    // TODO: - Update model with further relevant properties later if needed
-
     let status: Int
     let error: ErrorObj?
     let resource: Resource?

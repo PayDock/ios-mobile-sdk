@@ -20,7 +20,7 @@ struct WalletServiceImpl: HTTPClient, WalletService {
     func captureCharge(token: String, paymentMethodId: String?, payerId: String?, refToken: String?) async throws -> ChargeResponse {
         let walletCaptureReq = WalletCaptureReq(
             paymentMethodId: paymentMethodId,
-            customer: .init(paymentSource: .init(externalPayerId: payerId, refToken: refToken)))
+            customer: nil)
         
         let response = try await sendRequest(
             endpoint: WalletEndpoints.walletCapture(token: token, walletCaptureReq: walletCaptureReq),

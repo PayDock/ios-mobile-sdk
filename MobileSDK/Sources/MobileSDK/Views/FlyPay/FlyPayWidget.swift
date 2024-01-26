@@ -17,27 +17,28 @@ public struct FlyPayWidget: View {
     }
 
     public var body: some View {
-        LargeButton(title: "Pay with FlyPay", image: nil, backgroundColor: .primaryColor) {
-            viewModel.handleButtonTap()
-        }
-        .padding()
-        .sheet(isPresented: $viewModel.showWebView) {
-            NavigationStack {
-
-                FlyPayWebView(
-                    flyPayOrderId: viewModel.flyPayOrderId,
-                    onApprove: {
-                        viewModel.handleSuccess()
-                    },
-                    onFailure: { error in
-                        viewModel.handleFailure(error: error)
-                    })
-                .navigationTitle("Checkout with FlyPay")
-                .navigationBarTitleDisplayMode(.inline)
+        LargeButton(
+            title: "Pay with",
+            image: Image("flypay", bundle: Bundle.module),
+            imageLocation: .right,
+            backgroundColor: .primaryColor) {
+                viewModel.handleButtonTap()
             }
-
-        }
-        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+            .sheet(isPresented: $viewModel.showWebView) {
+                NavigationStack {
+                    FlyPayWebView(
+                        flyPayOrderId: viewModel.flyPayOrderId,
+                        onApprove: {
+                            viewModel.handleSuccess()
+                        },
+                        onFailure: { error in
+                            viewModel.handleFailure(error: error)
+                        })
+                    .navigationTitle("Checkout with FlyPay")
+                    .navigationBarTitleDisplayMode(.inline)
+                }
+            }
+            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
 

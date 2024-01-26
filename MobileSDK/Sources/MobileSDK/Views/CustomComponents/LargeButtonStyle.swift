@@ -20,7 +20,7 @@ struct LargeButtonStyle: ButtonStyle {
             .imageScale(.small)
             .frame(height: 48)
             .foregroundColor(currentForegroundColor)
-            .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.3) : backgroundColor)
+            .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.8) : backgroundColor)
             .cornerRadius(.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: .cornerRadius)
