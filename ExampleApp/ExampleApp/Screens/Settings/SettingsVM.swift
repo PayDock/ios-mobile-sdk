@@ -2,6 +2,7 @@
 //  SettingsVM.swift
 //  ExampleApp
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 21.07.2023..
 //
 

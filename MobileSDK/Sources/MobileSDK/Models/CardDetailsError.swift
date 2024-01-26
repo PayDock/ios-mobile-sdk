@@ -2,6 +2,7 @@
 //  CardDetailsError.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 06.12.2023..
 //
 

@@ -2,6 +2,7 @@
 //  PayPalVM.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 25.10.2023..
 //
 

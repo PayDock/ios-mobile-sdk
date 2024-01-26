@@ -2,6 +2,7 @@
 //  CardTokenRes.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 27.07.2023..
 //
 

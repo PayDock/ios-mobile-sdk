@@ -1,7 +1,8 @@
 //
-//  File.swift
-//  
+//  Color+Extensions.swift
+//  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 20.08.2023..
 //
 

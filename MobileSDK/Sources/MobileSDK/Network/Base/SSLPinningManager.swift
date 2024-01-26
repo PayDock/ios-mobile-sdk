@@ -2,6 +2,7 @@
 //  SSLPinningManager.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 13.07.2023..
 //
 

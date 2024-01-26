@@ -2,6 +2,7 @@
 //  PayPalWebView.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 26.10.2023..
 //
 

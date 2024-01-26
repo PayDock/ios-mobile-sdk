@@ -2,6 +2,7 @@
 //  Color+Extensions.swift
 //  ExampleApp
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 20.07.2023..
 //
 
