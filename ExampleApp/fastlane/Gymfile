@@ -1,6 +1,6 @@
 export_options({
     method: "ad-hoc",
     provisioningProfiles: {
-        "com.paydock.ExampleApp" => "match AdHoc2 com.paydock.ExampleApp"
+        "com.paydock.ExampleApp" => "match AdHoc com.paydock.ExampleApp"
     }
 })
