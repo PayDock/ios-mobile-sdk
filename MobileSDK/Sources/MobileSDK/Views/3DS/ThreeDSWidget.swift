@@ -2,6 +2,7 @@
 //  ThreeDSWidget.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 27.11.2023..
 //
 

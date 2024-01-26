@@ -2,6 +2,7 @@
 //  CardDetailsWidget.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 01.08.2023..
 //
 
@@ -92,7 +93,7 @@ public struct CardDetailsWidget: View {
                     }
                 }
             }
-            LargeButton(title: "Save card", disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            LargeButton(title: "Submit", disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
                 viewModel.tokeniseCardDetails()
             }
             .padding(.bottom, 16)

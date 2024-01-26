@@ -2,6 +2,7 @@
 //  NetworkLogger.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 12.07.2023..
 //
 

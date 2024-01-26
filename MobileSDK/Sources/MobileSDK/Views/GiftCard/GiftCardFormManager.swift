@@ -2,6 +2,7 @@
 //  GiftCardFormManager.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 13.11.2023..
 //
 

@@ -2,6 +2,7 @@
 //  StyleView.swift
 //  ExampleApp
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 18.07.2023..
 //
 

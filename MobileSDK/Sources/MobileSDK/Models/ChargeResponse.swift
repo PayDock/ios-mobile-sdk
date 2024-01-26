@@ -2,6 +2,7 @@
 //  ChargeResponse.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 05.10.2023..
 //
 

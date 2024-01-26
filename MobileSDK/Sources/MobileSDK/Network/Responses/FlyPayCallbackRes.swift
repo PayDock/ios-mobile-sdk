@@ -2,6 +2,7 @@
 //  FlyPayCallbackRes.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 15.01.2024..
 //
 

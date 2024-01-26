@@ -2,6 +2,7 @@
 //  MobileSDKConfig.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 10.07.2023..
 //
 

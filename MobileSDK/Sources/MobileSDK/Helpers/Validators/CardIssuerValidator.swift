@@ -2,6 +2,7 @@
 //  CardIssuerValidator.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 15.08.2023..
 //
 

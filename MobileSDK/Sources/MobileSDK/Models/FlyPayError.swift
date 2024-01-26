@@ -2,6 +2,7 @@
 //  FlyPayError.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 17.01.2024..
 //
 
