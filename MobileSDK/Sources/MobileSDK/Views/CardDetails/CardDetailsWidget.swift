@@ -2,6 +2,7 @@
 //  CardDetailsWidget.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 01.08.2023..
 //
 

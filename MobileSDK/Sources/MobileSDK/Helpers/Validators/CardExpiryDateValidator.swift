@@ -2,6 +2,7 @@
 //  CardExpiryDateValidator.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 17.08.2023..
 //
 

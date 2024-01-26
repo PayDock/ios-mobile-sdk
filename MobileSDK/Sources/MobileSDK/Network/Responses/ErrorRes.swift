@@ -1,7 +1,8 @@
 //
-//  File.swift
-//  
+//  ErrorRes.swift
+//  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 28.07.2023..
 //
 

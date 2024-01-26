@@ -2,8 +2,8 @@
 //  ActivityIndicatorModifier.swift
 //  ExampleApp
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 05.01.2024..
-//  Copyright © 2024 Paydock Ltd. All rights reserved.
 //
 
 import SwiftUI

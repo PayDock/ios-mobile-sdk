@@ -2,6 +2,7 @@
 //  TokeniseGiftCardReq.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 16.11.2023..
 //
 

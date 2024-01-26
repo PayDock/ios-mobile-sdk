@@ -2,6 +2,7 @@
 //  Endpoint.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 11.07.2023..
 //
 

@@ -2,6 +2,7 @@
 //  Theme.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 31.08.2023..
 //
 

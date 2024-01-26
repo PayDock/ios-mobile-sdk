@@ -2,6 +2,7 @@
 //  LargeButtonStyle.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 19.08.2023..
 //
 

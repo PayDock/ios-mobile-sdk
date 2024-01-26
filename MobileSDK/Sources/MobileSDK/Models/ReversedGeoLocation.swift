@@ -2,6 +2,7 @@
 //  ReversedGeoLocation.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 23.08.2023..
 //
 
