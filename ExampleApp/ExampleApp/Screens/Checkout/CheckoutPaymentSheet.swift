@@ -59,6 +59,7 @@ struct CheckoutPaymentSheet: View {
                         viewModel.showAlert = true
                     }
                 }
+                .padding()
             case .payPal:
                 PayPalWidget { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
@@ -79,6 +80,7 @@ struct CheckoutPaymentSheet: View {
                         }
                     }
                 }
+                .padding()
             }
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
