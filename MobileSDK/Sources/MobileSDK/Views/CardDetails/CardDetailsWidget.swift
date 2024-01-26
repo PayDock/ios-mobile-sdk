@@ -93,7 +93,7 @@ public struct CardDetailsWidget: View {
                     }
                 }
             }
-            LargeButton(title: "Save card", disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            LargeButton(title: "Submit", disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
                 viewModel.tokeniseCardDetails()
             }
             .padding(.bottom, 16)
