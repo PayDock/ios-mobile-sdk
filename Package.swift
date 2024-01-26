@@ -23,13 +23,15 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "MobileSDK",
-            dependencies: []),
+            dependencies: [],
+            path: "MobileSDK/Sources"),
         .testTarget(
             name: "MobileSDKTests",
             dependencies: ["MobileSDK"],
+            path: "MobileSDK/Tests",
             resources: [
-                .copy("Resources/JSON/card_tokenisation_error_response.json"),
-                .copy("Resources/JSON/card_tokenisation_success_response.json")]
+                .copy("MobileSDKTests/Resources/JSON/card_tokenisation_error_response.json"),
+                .copy("MobileSDKTests/Resources/JSON/card_tokenisation_success_response.json")]
         ),
     ]
 )
