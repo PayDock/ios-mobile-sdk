@@ -29,7 +29,7 @@ class PayPalWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(gatewayId: "656dc6f13831577a1b43c526", walletType: nil)
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: "656dc6f13831577a1b43c526", walletType: nil)
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Tom",
