@@ -25,7 +25,7 @@ test_exampleApp:
     - .macos_saas_runners
   stage: test
   script:
-    - cd MobileSDK/
+#    - cd MobileSDK/
     - bundle install
     - bundle exec fastlane build_and_test device:'iPhone 14 Pro'
   artifacts:
