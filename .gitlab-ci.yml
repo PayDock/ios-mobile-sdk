@@ -36,7 +36,7 @@ export_exampleApp:
     - .macos_saas_runners
   stage: build
   script:
-    - cd ExampleApp/
+#    - cd ExampleApp/
     - bundle install
     - bundle exec fastlane archive_ci
   artifacts:
