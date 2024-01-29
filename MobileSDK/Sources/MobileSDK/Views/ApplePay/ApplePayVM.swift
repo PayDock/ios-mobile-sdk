@@ -76,12 +76,12 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
         Task {
             do {
-                let paymentMethodData = String(data: payment.token.paymentData, encoding: .utf8)
+                let refToken = String(data: payment.token.paymentData, encoding: .utf8)
                 let chargeResponse = try await self.walletService.captureCharge(
                     token: applePayRequest.token,
-                    paymentMethodId: paymentMethodData,
+                    paymentMethodId: nil,
                     payerId: nil,
-                    refToken: nil)
+                    refToken: refToken)
 
                 paymentStatus = .success
                 self.completion(.success(chargeResponse))

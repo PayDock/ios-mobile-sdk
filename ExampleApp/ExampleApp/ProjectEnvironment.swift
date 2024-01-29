@@ -58,9 +58,9 @@ struct ProjectEnvironment {
     func getSecretKey() -> String {
         switch environment {
             // TODO: - Change tokens for prod and staging. All environments currently use Sanbox tokens
-        case .production: return "ee7c98ebab4780bcd2d8f562e1499d2ce806f7c1"
-        case .sandbox: return "ee7c98ebab4780bcd2d8f562e1499d2ce806f7c1"
-        case .staging: return "ee7c98ebab4780bcd2d8f562e1499d2ce806f7c1"
+        case .production: return "2d7fa96060b38a942a5fe97f244580a5322971b5"
+        case .sandbox: return "2d7fa96060b38a942a5fe97f244580a5322971b5"
+        case .staging: return "2d7fa96060b38a942a5fe97f244580a5322971b5"
         }
     }
 }
