@@ -97,9 +97,9 @@ class StyleVM: ObservableObject {
 
         let config = {
             switch ProjectEnvironment.shared.environment {
-            case .production: return MobileSDKConfig(environment: .production, theme: theme)
-            case .sandbox: return MobileSDKConfig(environment: .sandbox, theme: theme)
-            case .staging: return MobileSDKConfig(environment: .staging, theme: theme)
+            case .production: return MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey(), theme: theme)
+            case .sandbox: return MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey(), theme: theme)
+            case .staging: return MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey(), theme: theme)
             }
         }()
 
