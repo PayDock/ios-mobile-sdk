@@ -12,17 +12,21 @@ public struct MobileSDKConfig {
 
     var environment: SDKEnvironment
     let theme: Theme?
+    let publicKey: String
 
     public init(environment: SDKEnvironment,
+                publicKey: String,
                 theme: Theme? = nil) {
         self.environment = environment
         self.theme = theme
+        self.publicKey = publicKey
 
         setup()
     }
 
     private func setup() {
         setupTheme()
+        setupKeys()
     }
 
     private func setupTheme() {
@@ -32,6 +36,10 @@ public struct MobileSDKConfig {
         Appearance.shared.darkThemeColors = theme.darkThemeColors
         Appearance.shared.dimensions = theme.dimensions
         Appearance.shared.fontName = theme.fontName
+    }
+
+    private func setupKeys() {
+        Constants.publicKey = publicKey
     }
 
 }

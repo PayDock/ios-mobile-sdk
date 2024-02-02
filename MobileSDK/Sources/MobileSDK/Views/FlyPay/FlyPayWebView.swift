@@ -45,7 +45,13 @@ struct FlyPayWebView: UIViewRepresentable {
     }
 
     private func getFlyPayUrlRequest() -> URLRequest? {
-        let urlString = "https://checkout.release.cxbflypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.sdk"
+        let urlString: String = {
+            switch MobileSDK.shared.config?.environment {
+            case .production: return "https://checkout.beem.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.sdk"
+            case .staging, .sandbox: return "https://release.checkout.beem.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.sdk"
+            case .none: return ""
+            }
+        }()
         guard let url = URL(string: urlString) else {
             return nil
         }

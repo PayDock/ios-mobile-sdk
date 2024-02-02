@@ -25,9 +25,9 @@ struct ExampleApp: App {
     private func setupMobileSDK() {
         var config: MobileSDKConfig
         switch ProjectEnvironment.shared.environment {
-        case .production: config = MobileSDKConfig(environment: .production)
-        case .sandbox: config = MobileSDKConfig(environment: .sandbox)
-        case .staging: config = MobileSDKConfig(environment: .staging)
+        case .production: config = MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey())
+        case .sandbox: config = MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey())
+        case .staging: config = MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey())
         }
 
         MobileSDK.shared.configureMobileSDK(config: config)
