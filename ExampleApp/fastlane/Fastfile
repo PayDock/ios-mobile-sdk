@@ -1,0 +1,35 @@
+lane :archive_ci do
+    setup_ci()
+    match(
+        app_identifier: ENV["BUILD_BUNDLE_ID"],
+        type: "adhoc",
+        readonly: true,
+        keychain_name: "fastlane_tmp_keychain"
+    )
+    gym(
+        project: ENV["BUILD_PROJECT"],
+        derived_data_path: "fastlane/derived_data/",
+        scheme: ENV["BUILD_SCHEME"],
+        configuration: ENV["BUILD_CONFIG"],
+        export_method: "ad-hoc",
+        output_directory: "fastlane/test_output"
+    )
+end
+
+lane :adhoc_certs do
+    match(
+        app_identifier: ENV["BUILD_BUNDLE_ID"],
+        type: "adhoc",
+        readonly: true,
+        force_for_new_devices: false
+    )
+end
+
+lane :dev_certs do
+    match(
+        app_identifier: ENV["BUILD_BUNDLE_ID"],
+        type: "development",
+        readonly: true,
+        force_for_new_devices: false
+    )
+end
