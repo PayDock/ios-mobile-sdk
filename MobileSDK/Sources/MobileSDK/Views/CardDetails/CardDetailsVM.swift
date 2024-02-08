@@ -21,7 +21,7 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Properties
 
-    private let gatewayId: String
+    private let gatewayId: String?
     private let completion: (Result<String, CardDetailsError>) -> Void
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
@@ -30,7 +30,7 @@ class CardDetailsVM: ObservableObject {
 
     init(cardService: CardService = CardServiceImpl(),
          cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager(),
-         gatewayId: String,
+         gatewayId: String?,
          completion: @escaping (Result<String, CardDetailsError>) -> Void) {
         self.cardService = cardService
         self.cardDetailsFormManager = cardDetailsFormManager

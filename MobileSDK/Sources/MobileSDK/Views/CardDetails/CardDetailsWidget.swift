@@ -17,7 +17,7 @@ public struct CardDetailsWidget: View {
 
     // MARK: - Initialisation
 
-    public init(gatewayId: String,
+    public init(gatewayId: String?,
                 completion: @escaping (Result<String, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(gatewayId: gatewayId, completion: completion))
     }
