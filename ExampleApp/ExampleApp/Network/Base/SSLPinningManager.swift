@@ -51,13 +51,11 @@ extension SSLPinningManager: URLSessionDelegate {
         let publicKeyLocal = publicKeyHash
 
         if (serverHashKey == publicKeyLocal) {
-            print("SSL Pinning with Public key successfully completed.")
             completionHandler(.useCredential, URLCredential(trust:serverTrust))
             return
 
         } else {
             completionHandler(.cancelAuthenticationChallenge,nil)
-            print("SSL Pinning with Public key has failed.")
         }
     }
 

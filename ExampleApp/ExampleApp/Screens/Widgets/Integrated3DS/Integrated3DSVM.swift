@@ -42,7 +42,6 @@ class Integrated3DSVM: NSObject, ObservableObject {
             do {
                 let token = try await walletService.createCardToken(tokeniseCardDetailsReq: req)
                 create3dsToken(cardToken: token)
-                print(token)
             } catch {
                 print(error)
             }
