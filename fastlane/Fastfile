@@ -1,0 +1,11 @@
+lane :build_and_test do |options|
+    device_string = options[:device] || UI.user_error!("Missing required parameeter `device`")
+    begin
+        run_tests(
+            package_path: '.',
+            scheme: 'MobileSDK',
+            device: device_string,
+            result_bundle: true,
+        )
+    end
+end

@@ -1,0 +1,8 @@
+{
+   "status":201,
+   "error":null,
+   "resource":{
+      "type":"token",
+      "data":"bc8cb1a5-0c7b-454a-ab33-62a6d874ce3e"
+   }
+}

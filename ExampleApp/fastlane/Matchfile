@@ -1,0 +1,5 @@
+gitlab_project("paydock/mobile/mobile-sdk-ios")
+storage_mode("gitlab_secure_files")
+team_id("2AJAJKLBKP")
+
+username("ihor@paydock.com")
