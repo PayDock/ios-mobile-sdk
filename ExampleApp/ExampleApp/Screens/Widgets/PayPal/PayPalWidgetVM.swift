@@ -54,7 +54,6 @@ class PayPalWidgetVM: ObservableObject {
                     completion(token)
                 }
             } catch {
-                // TODO: Add example app error handling
                 print("ERROR: Error fetching wallet token!")
             }
         }

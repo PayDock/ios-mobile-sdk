@@ -62,21 +62,16 @@ public struct ThreeDSWidget: UIViewRepresentable {
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            print("Finish")
             isLoaded = true
         }
 
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print("Failed")
             print(error)
         }
 
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            print("Prov start")
-        }
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {}
 
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            print("Prov fail")
             print(error)
         }
 

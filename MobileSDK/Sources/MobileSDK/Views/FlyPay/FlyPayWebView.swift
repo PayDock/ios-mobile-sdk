@@ -80,12 +80,10 @@ struct FlyPayWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            print("Finish")
             isLoaded = true
         }
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print("Failed")
             print(error)
         }
 

@@ -44,7 +44,6 @@ class Standalone3DSVM: NSObject, ObservableObject {
             do {
                 let token = try await walletService.createVaultToken(request: req)
                 create3dsToken(vaultToken: token)
-                print(token)
             } catch {
                 print(error)
             }
