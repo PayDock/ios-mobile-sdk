@@ -29,7 +29,7 @@ class FlyPayWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: "65772f5b8e193151df5d7a23", walletType: nil)
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getFlyPayGatewayId() ?? "", walletType: nil)
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Wanda",
