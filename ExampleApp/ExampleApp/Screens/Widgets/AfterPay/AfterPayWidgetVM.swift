@@ -1,15 +1,15 @@
 //
-//  FlyPayWidgetVM.swift
+//  AfterPayWidgetVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 11.01.2024..
+//  Created by Domagoj Grizelj on 19.02.2024..
 //  Copyright © 2024 Paydock Ltd. All rights reserved.
 //
 
 import Foundation
 import MobileSDK
 
-class FlyPayWidgetVM: ObservableObject {
+class AfterPayWidgetVM: ObservableObject {
 
     // MARK: - Dependencies
 
@@ -29,7 +29,7 @@ class FlyPayWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getFlyPayGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterPayGatewayId() ?? "", walletType: nil)
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Wanda",
@@ -42,15 +42,15 @@ class FlyPayWidgetVM: ObservableObject {
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
-                successUrl: nil,
-                errorUrl: nil)
-            
+                successUrl: "www.success.com",
+                errorUrl: "www.error.com")
+
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 5,
                 currency: "AUD",
                 reference: "reference1234",
-                description: "Test transaction for FlyPay",
+                description: "Test transaction for AfterPay",
                 meta: metaData)
 
             do {

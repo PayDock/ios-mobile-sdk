@@ -24,6 +24,7 @@ protocol WalletService {
 }
 
 struct WalletServiceImpl: HTTPClient, WalletService {
+
     func initialiseWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq) async throws -> String {
         let response = try await sendRequest(endpoint: WalletEndpoints.initialiseWalletCharge(initialiseWalletChargeReq: initializeWalletChargeReq), responseModel: InitialiseWalletChargeRes.self)
         return response.resource.data.token

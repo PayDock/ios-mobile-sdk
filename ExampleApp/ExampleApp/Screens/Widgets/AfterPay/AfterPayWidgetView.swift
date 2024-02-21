@@ -1,23 +1,23 @@
 //
-//  FlyPayWidgetView.swift
+//  AfterPayWidgetView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 11.01.2024..
+//  Created by Domagoj Grizelj on 19.02.2024..
 //  Copyright © 2024 Paydock Ltd. All rights reserved.
 //
 
 import SwiftUI
 import MobileSDK
 
-struct FlyPayWidgetView: View {
+struct AfterPayWidgetView: View {
 
-    @StateObject private var viewModel = FlyPayWidgetVM()
+    @StateObject private var viewModel = AfterPayWidgetVM()
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                FlyPayWidget { onFlyPayButtonTap in
-                    viewModel.initializeWalletCharge(completion: onFlyPayButtonTap)
+                AfterPayWidget { onAfterPayButtonTap in
+                    viewModel.initializeWalletCharge(completion: onAfterPayButtonTap)
                 } completion: { result in
                     switch result {
                     case .success: viewModel.handleSuccess()
@@ -34,8 +34,8 @@ struct FlyPayWidgetView: View {
     }
 }
 
-struct FlyPayWidgetView_Previews: PreviewProvider {
+struct AfterPayWidgetView_Previews: PreviewProvider {
     static var previews: some View {
-        FlyPayWidgetView()
+        AfterPayWidgetView()
     }
 }

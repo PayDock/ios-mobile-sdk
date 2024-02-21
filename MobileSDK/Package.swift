@@ -16,6 +16,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
+        .package(url: "https://github.com/afterpay/sdk-ios", from: "5.4.0")
         // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
