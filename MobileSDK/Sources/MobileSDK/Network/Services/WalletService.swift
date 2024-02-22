@@ -56,7 +56,7 @@ struct WalletServiceImpl: HTTPClient, WalletService {
     }
 
     func getAfterPayCallback(token: String) async throws -> String {
-        let walletCallbackReq = WalletCallbackReq(type: "CREATE_SESSION", shipping: nil, sessionId: nil, walletType: "afterpay")
+        let walletCallbackReq = WalletCallbackReq(type: "CREATE_SESSION", shipping: nil, sessionId: nil, walletType: nil)
 
         let response = try await sendRequest(
             endpoint: WalletEndpoints.walletCallback(

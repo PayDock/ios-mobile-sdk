@@ -42,8 +42,8 @@ class AfterPayWidgetVM: ObservableObject {
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
-                successUrl: "www.success.com",
-                errorUrl: "www.error.com")
+                successUrl: "https://widget-sandbox.paydock.com/wallet/afterpay?status=SUCCESS",
+                errorUrl: "https://www.error.com")
 
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,

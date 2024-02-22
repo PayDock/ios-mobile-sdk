@@ -74,6 +74,11 @@ struct AfterPayWebView: UIViewRepresentable {
             self.onFailure = onFailure
         }
 
+        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            print(webView.url)
+            decisionHandler(.allow)
+        }
+
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             print(message)
         }
