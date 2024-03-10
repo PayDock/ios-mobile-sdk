@@ -51,6 +51,8 @@
 		28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */; };
 		28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */; };
 		28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */; };
+		28BBD14F2B8756BB00E88A99 /* AfterPayNativeWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28BBD14E2B8756BB00E88A99 /* AfterPayNativeWidgetView.swift */; };
+		28BBD1512B8756C500E88A99 /* AfterPayNativeWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28BBD1502B8756C500E88A99 /* AfterPayNativeWidgetVM.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
 		28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 28E215FD2B63D28400A0877B /* MobileSDK */; };
@@ -137,6 +139,8 @@
 		28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSReq.swift; sourceTree = "<group>"; };
 		28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSRes.swift; sourceTree = "<group>"; };
 		28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSReq.swift; sourceTree = "<group>"; };
+		28BBD14E2B8756BB00E88A99 /* AfterPayNativeWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterPayNativeWidgetView.swift; sourceTree = "<group>"; };
+		28BBD1502B8756C500E88A99 /* AfterPayNativeWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterPayNativeWidgetVM.swift; sourceTree = "<group>"; };
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28D541F92A6FFC290041BAE0 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
@@ -224,6 +228,7 @@
 		282D315C2A66A64900E3ECAD /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				28BBD14D2B87569D00E88A99 /* AfterPayNative */,
 				28F4E3222B83920600C73065 /* AfterPay */,
 				2865B22B2B56E4C700EBE2DD /* FlyPay */,
 				2808B3402A7056E300E86C7E /* CardDetails */,
@@ -411,6 +416,15 @@
 				28A81F4C2B14DB040068FE75 /* Integrated3DSVM.swift */,
 			);
 			path = Integrated3DS;
+			sourceTree = "<group>";
+		};
+		28BBD14D2B87569D00E88A99 /* AfterPayNative */ = {
+			isa = PBXGroup;
+			children = (
+				28BBD14E2B8756BB00E88A99 /* AfterPayNativeWidgetView.swift */,
+				28BBD1502B8756C500E88A99 /* AfterPayNativeWidgetVM.swift */,
+			);
+			path = AfterPayNative;
 			sourceTree = "<group>";
 		};
 		28E86F592ACC11A2008E827E /* Network */ = {
@@ -674,6 +688,7 @@
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
+				28BBD1512B8756C500E88A99 /* AfterPayNativeWidgetVM.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				28E86F5B2ACC11C8008E827E /* Endpoint.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
@@ -699,6 +714,7 @@
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
 				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
+				28BBD14F2B8756BB00E88A99 /* AfterPayNativeWidgetView.swift in Sources */,
 				282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */,
 				282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,
@@ -864,7 +880,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -894,7 +910,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.ExampleApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AdHoc com.paydock.ExampleApp";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Dev2 com.paydock.ExampleApp";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -914,7 +930,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -944,7 +960,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.ExampleApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.paydock.ExampleApp";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AdHoc com.paydock.ExampleApp";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Dev2 com.paydock.ExampleApp";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
