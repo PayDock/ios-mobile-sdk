@@ -37,6 +37,8 @@
 		2889B7F12A558F1A00D6C7BE /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F02A558F1A00D6C7BE /* ExampleAppUITests.swift */; };
 		2889B7F32A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */; };
 		288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */; };
+		289B83842B9E382500CEA8B4 /* MastercardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83832B9E382500CEA8B4 /* MastercardWidgetView.swift */; };
+		289B83862B9E382F00CEA8B4 /* MastercardWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83852B9E382F00CEA8B4 /* MastercardWidgetVM.swift */; };
 		289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289D76C02B45FABA002601BB /* CaptureChargeReq.swift */; };
 		28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */; };
 		28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */; };
@@ -121,6 +123,8 @@
 		2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEnvironment.swift; sourceTree = "<group>"; };
 		28962E762AA79C3E003272A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		289B83832B9E382500CEA8B4 /* MastercardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastercardWidgetView.swift; sourceTree = "<group>"; };
+		289B83852B9E382F00CEA8B4 /* MastercardWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastercardWidgetVM.swift; sourceTree = "<group>"; };
 		289D76C02B45FABA002601BB /* CaptureChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq.swift; sourceTree = "<group>"; };
 		28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVaultTokenReq.swift; sourceTree = "<group>"; };
 		28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleVM.swift; sourceTree = "<group>"; };
@@ -220,6 +224,7 @@
 		282D315C2A66A64900E3ECAD /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				289B83822B9E381300CEA8B4 /* Mastercard */,
 				2865B22B2B56E4C700EBE2DD /* FlyPay */,
 				2808B3402A7056E300E86C7E /* CardDetails */,
 				28A65CA12A94CE4E002A04CA /* Address */,
@@ -367,6 +372,15 @@
 				28BF0E982B7A87C500ACF513 /* Production.xcconfig */,
 			);
 			path = Configs;
+			sourceTree = "<group>";
+		};
+		289B83822B9E381300CEA8B4 /* Mastercard */ = {
+			isa = PBXGroup;
+			children = (
+				289B83832B9E382500CEA8B4 /* MastercardWidgetView.swift */,
+				289B83852B9E382F00CEA8B4 /* MastercardWidgetVM.swift */,
+			);
+			path = Mastercard;
 			sourceTree = "<group>";
 		};
 		28A3A9C12A6962C2004A8D34 /* CustomViews */ = {
@@ -638,6 +652,7 @@
 				2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */,
+				289B83862B9E382F00CEA8B4 /* MastercardWidgetVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
 				28E86F632ACC1324008E827E /* SSLPinningManager.swift in Sources */,
@@ -680,6 +695,7 @@
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
+				289B83842B9E382500CEA8B4 /* MastercardWidgetView.swift in Sources */,
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
 				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
