@@ -24,8 +24,18 @@ public struct MastercardWebView: UIViewRepresentable {
     public func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
+        let cookie = HTTPCookie(properties: [
+            .domain: "sandbox.src.mastercard.com",
+            .path: "/srci/merchant/2/lib.js?dpaId=&locale=en_US",
+            .name: "MyCookieName",
+            .value: "MyCookieValue",
+            .secure: "TRUE",
+            .expires: NSDate(timeIntervalSinceNow: 31556926)
+        ])!
+        configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
+        webView.contentMode = .scaleToFill
         if #available(iOS 16.4, *) {
             webView.isInspectable = true
         }
@@ -104,7 +114,7 @@ public struct MastercardWebView: UIViewRepresentable {
                 iframe {
                     border: 0;
                     width: 100%;
-                    height: 300px;
+                    height: 1500px;
                 }
             </style>
         </head>
@@ -142,9 +152,13 @@ public struct MastercardWebView: UIViewRepresentable {
             src.on('checkoutError', (error) => {
                 console.log(error);
             });
+
+            src.on('iframeLoaded', () => {
+                console.log("Initial iframe loaded");
+            });
         </script>
         </body>
         </html>
-"""
+        """
     }
 }
