@@ -16,8 +16,9 @@ class CheckoutPaymentVM: ObservableObject {
     private let walletService: WalletService
 
     // MARK: - Properties
-    let gatewayId = "657045c00b76c9392bf5e36d"
-    let payPalGatewayId = "656dc6f13831577a1b43c526"
+    let gatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
+    let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+    
     private var cardToken = ""
     private var vaultToken = ""
     private(set) var token3DS = ""
@@ -201,7 +202,7 @@ extension CheckoutPaymentVM {
     private func showAlert(title: AlertTitle, message: String) {
         alertTitle = title.rawValue
         alertMessage = message
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.showAlert = true
         }
     }

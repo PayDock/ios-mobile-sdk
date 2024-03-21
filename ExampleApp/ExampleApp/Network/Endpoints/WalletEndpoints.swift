@@ -83,7 +83,8 @@ extension WalletEndpoints: Endpoint {
     var parameters: [URLQueryItem] {
         switch self {
         case .initialiseWalletCharge: return [URLQueryItem(name: "capture", value: "true")]
-        case .initialiseFlyPayWalletCharge, .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
+        case .initialiseFlyPayWalletCharge: return [URLQueryItem(name: "capture", value: "false")]
+        case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
         }
     }
 
