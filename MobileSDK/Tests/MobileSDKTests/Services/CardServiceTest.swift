@@ -23,7 +23,7 @@ final class CardServiceTest: XCTestCase {
 
         do {
             let req = TokeniseCardDetailsReq(
-                gatewayId: "5cbede1f151b842653e987be",
+                gatewayId: "SomeID",
                 cardName: "Wanda Mertz",
                 cardNumber: "4242424242424242",
                 expireMonth: "09",

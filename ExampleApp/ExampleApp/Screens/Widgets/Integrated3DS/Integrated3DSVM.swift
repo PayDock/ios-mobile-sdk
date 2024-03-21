@@ -32,7 +32,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
     func tokeniseCardDetails() {
         Task {
             let req = TokeniseCardDetailsReq(
-                gatewayId: "657045c00b76c9392bf5e36d",
+                gatewayId: ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? "",
                 cardName: "Carlie Kuvalis",
                 cardNumber: "2223000000000007",
                 expireMonth: "08",

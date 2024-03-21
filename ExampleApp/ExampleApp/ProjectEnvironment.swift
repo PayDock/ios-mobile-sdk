@@ -12,21 +12,26 @@ struct ProjectEnvironment {
 
     static let shared = ProjectEnvironment()
 
-    /// Main environment variable. Needs to be set externally to the correct value from the main app/extension target upon launch.
-    /// Defaults to .production if not set explicitly
-    private(set) var environment: Environment = .production
-
-    private init() {
-#if PRODUCTION
-        self.environment = .production
-#elseif SANDBOX
-        self.environment = .sandbox
-#elseif STAGING
-        self.environment = .staging
-#else
-        fatalError("Error setting up environment!")
-#endif
+    enum Keys {
+        static let secretKey = "SECRET_KEY"
+        static let publicKey = "PUBLIC_KEY"
+        static let applePayGatewayId = "APPLE_PAY_GATEWAY_ID"
+        static let payPalGatewayId = "PAY_PAL_GATEWAY_ID"
+        static let integrated3dsGatewayId = "INTEGRATED_3DS_GATEWAY_ID"
+        static let standalone3dsGatewayId = "STANDALONE_3DS_GATEWAY_ID"
+        static let flypayGatewayId = "FLYPAY_GATEWAY_ID"
     }
+
+    private static let infoDictionary: [String: Any] = {
+        guard let dict = Bundle.main.infoDictionary else {
+            fatalError(".plist fire not found!")
+        }
+        return dict
+    }()
+
+    /// Main environment variable. Needs to be set externally to the correct value from the main app/extension target upon launch.
+    /// Defaults to .sandbox if not set explicitly
+    private(set) var environment: Environment = .sandbox
 
     enum Environment: String, CaseIterable {
         case production, sandbox, staging
@@ -40,21 +45,57 @@ struct ProjectEnvironment {
         }
     }
 
-    func getPublicKey() -> String {
-        // Enter your own public keys
-        switch environment {
-        case .production: return ""
-        case .sandbox: return ""
-        case .staging: return ""
+    func getSecretKey() -> String {
+        guard let secretKey = Self.infoDictionary[Keys.secretKey] as? String else {
+            fatalError("Secret key not found in .plist!")
         }
+        return secretKey
     }
 
-    func getSecretKey() -> String {
-        // Enter your own secret keys
-        switch environment {
-        case .production: return ""
-        case .sandbox: return ""
-        case .staging: return ""
+    func getPublicKey() -> String {
+        guard let publicKey = Self.infoDictionary[Keys.publicKey] as? String else {
+            fatalError("Public key not found in .plist!")
         }
+        return publicKey
+    }
+
+    func getApplePayGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.applePayGatewayId] as? String else {
+            print("Apple Pay gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
+    func getPayPalGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.payPalGatewayId] as? String else {
+            print("PayPal gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
+    func getIntegrated3dsGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.integrated3dsGatewayId] as? String else {
+            print("Integrated 3DS gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
+    func getStandalone3dsGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.standalone3dsGatewayId] as? String else {
+            print("Standalone 3DS gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
+    func getFlyPayGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.flypayGatewayId] as? String else {
+            print("FlyPay gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
     }
 }
