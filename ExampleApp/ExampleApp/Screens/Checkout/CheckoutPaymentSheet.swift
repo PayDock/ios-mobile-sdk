@@ -68,14 +68,22 @@ struct CheckoutPaymentSheet: View {
                     case .success(let chargeResponse):
                         viewModel.alertTitle = "Success"
                         viewModel.alertMessage = chargeResponse.status
+<<<<<<< HEAD
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+=======
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+>>>>>>> main
                             viewModel.showAlert = true
                         }
 
                     case .failure(let error):
                         viewModel.alertTitle = "Failure"
                         viewModel.alertMessage = error.customMessage
+<<<<<<< HEAD
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+=======
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+>>>>>>> main
                             viewModel.showAlert = true
                         }
                     }

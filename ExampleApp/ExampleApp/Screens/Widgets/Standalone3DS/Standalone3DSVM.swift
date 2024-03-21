@@ -34,12 +34,21 @@ class Standalone3DSVM: NSObject, ObservableObject {
     func getValutToken() {
         Task {
             let req = TokeniseCardDetailsReq(
+<<<<<<< HEAD
                 gatewayId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
                 cardName: "Test Card",
                 cardNumber: "343434343434343",
                 expireMonth: "01",
                 expireYear: "39",
                 cardCcv: "100")
+=======
+                gatewayId: "656dd1c6b5ae553ab9c4421e",
+                cardName: "Test Card",
+                cardNumber: "4100000000005000",
+                expireMonth: "08",
+                expireYear: "25",
+                cardCcv: "123")
+>>>>>>> main
 
             do {
                 let token = try await walletService.createVaultToken(request: req)
@@ -58,7 +67,11 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
+<<<<<<< HEAD
                     service_id: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
+=======
+                    service_id: "65b25e8b95cb9c6c2b8c2179",
+>>>>>>> main
                     authentication: .init(
                         type: "01",
                         date: "2023-06-01T13:00:00.521Z",
@@ -106,16 +119,24 @@ class Standalone3DSVM: NSObject, ObservableObject {
         case .chargeAuthSuccess:
             showWebView = false
             alertMessage = event.charge3dsId
+<<<<<<< HEAD
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 self.showAlert = true
             }
+=======
+            self.showAlert = true
+>>>>>>> main
         case .chargeAuthReject: break
         case .error:
             showWebView = false
             alertMessage = "3DS failed!"
+<<<<<<< HEAD
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 self.showAlert = true
             }
+=======
+            self.showAlert = true
+>>>>>>> main
         }
     }
 

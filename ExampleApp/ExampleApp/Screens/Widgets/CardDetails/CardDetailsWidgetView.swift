@@ -18,7 +18,11 @@ struct CardDetailsWidgetView: View {
         NavigationStack {
             ScrollView {
                 CardDetailsWidget(
+<<<<<<< HEAD
                     gatewayId: nil,
+=======
+                    gatewayId: "657045c00b76c9392bf5e36d",
+>>>>>>> main
                     completion: { result in
                         switch result {
                         case .success(let token): alertMessage = token

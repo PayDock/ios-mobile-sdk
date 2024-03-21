@@ -96,6 +96,13 @@ struct PayPalWebView: UIViewRepresentable {
             onApprove(paymentId, payerId)
         }
 
+<<<<<<< HEAD
+=======
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            onFailure(.webViewFailed)
+        }
+
+>>>>>>> main
         func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(false)
         }
