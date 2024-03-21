@@ -12,7 +12,6 @@ struct ProjectEnvironment {
 
     static let shared = ProjectEnvironment()
 
-<<<<<<< HEAD
     enum Keys {
         static let secretKey = "SECRET_KEY"
         static let publicKey = "PUBLIC_KEY"
@@ -33,23 +32,6 @@ struct ProjectEnvironment {
     /// Main environment variable. Needs to be set externally to the correct value from the main app/extension target upon launch.
     /// Defaults to .sandbox if not set explicitly
     private(set) var environment: Environment = .sandbox
-=======
-    /// Main environment variable. Needs to be set externally to the correct value from the main app/extension target upon launch.
-    /// Defaults to .production if not set explicitly
-    private(set) var environment: Environment = .production
-
-    private init() {
-#if PRODUCTION
-        self.environment = .production
-#elseif SANDBOX
-        self.environment = .sandbox
-#elseif STAGING
-        self.environment = .staging
-#else
-        fatalError("Error setting up environment!")
-#endif
-    }
->>>>>>> main
 
     enum Environment: String, CaseIterable {
         case production, sandbox, staging
@@ -63,7 +45,6 @@ struct ProjectEnvironment {
         }
     }
 
-<<<<<<< HEAD
     func getSecretKey() -> String {
         guard let secretKey = Self.infoDictionary[Keys.secretKey] as? String else {
             fatalError("Secret key not found in .plist!")
@@ -116,23 +97,5 @@ struct ProjectEnvironment {
             return nil
         }
         return gatewayId
-=======
-    func getPublicKey() -> String {
-        // Enter your own public keys
-        switch environment {
-        case .production: return ""
-        case .sandbox: return ""
-        case .staging: return ""
-        }
-    }
-
-    func getSecretKey() -> String {
-        // Enter your own secret keys
-        switch environment {
-        case .production: return ""
-        case .sandbox: return ""
-        case .staging: return ""
-        }
->>>>>>> main
     }
 }

@@ -29,11 +29,7 @@ class PayPalWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-<<<<<<< HEAD
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "", walletType: nil)
-=======
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: "656dc6f13831577a1b43c526", walletType: nil)
->>>>>>> main
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Tom",
@@ -66,11 +62,7 @@ class PayPalWidgetVM: ObservableObject {
     func handleError(error: Error) {
         alertTitle = "Error"
         alertMessage = "\(error.localizedDescription)"
-<<<<<<< HEAD
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-=======
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
->>>>>>> main
             self.showAlert = true
         }
     }
@@ -78,11 +70,7 @@ class PayPalWidgetVM: ObservableObject {
     func handleSuccess(charge: ChargeResponse) {
         alertTitle = "Success"
         alertMessage = "\(charge.amount) \(charge.currency) charged!"
-<<<<<<< HEAD
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-=======
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
->>>>>>> main
             self.showAlert = true
         }
     }
