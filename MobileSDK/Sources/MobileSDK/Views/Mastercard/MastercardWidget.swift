@@ -26,8 +26,8 @@ public struct MastercardWidget: View {
             }
             .sheet(isPresented: $viewModel.showWebView) {
                 NavigationStack {
-                    MastercardWebView(token: "", baseURL: viewModel.getBaseUrl(), completion: { result in
-
+                    MastercardWebView(completion: { _ in
+                        
                     })
                     .navigationTitle("Checkout with Mastercard")
                     .navigationBarTitleDisplayMode(.inline)

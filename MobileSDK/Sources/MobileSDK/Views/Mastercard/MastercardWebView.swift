@@ -10,29 +10,19 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
-public struct MastercardWebView: UIViewRepresentable {
-    private let token: String
-    private let baseUrl: URL?
+struct MastercardWebView: UIViewRepresentable {
     private let completion: (ThreeDSResult) -> Void
 
-    public init(token: String, baseURL: URL?, completion: @escaping (ThreeDSResult) -> Void) {
-        self.token = token
-        self.baseUrl = baseURL
+    init(completion: @escaping (ThreeDSResult) -> Void) {
         self.completion = completion
     }
 
-    public func makeUIView(context: Context) -> WKWebView {
+    func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
-        let cookie = HTTPCookie(properties: [
-            .domain: "sandbox.src.mastercard.com",
-            .path: "/srci/merchant/2/lib.js?dpaId=&locale=en_US",
-            .name: "MyCookieName",
-            .value: "MyCookieValue",
-            .secure: "TRUE",
-            .expires: NSDate(timeIntervalSinceNow: 31556926)
-        ])!
-        configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+        configuration.preferences.javaScriptEnabled = true
+        configuration.websiteDataStore = WKWebsiteDataStore.default()
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.contentMode = .scaleToFill
@@ -40,21 +30,22 @@ public struct MastercardWebView: UIViewRepresentable {
             webView.isInspectable = true
         }
         webView.navigationDelegate = context.coordinator
+        webView.uiDelegate = context.coordinator
         return webView
     }
 
-    public func updateUIView(_ webView: WKWebView, context: Context) {
+    func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            let html = MastercardWebView.html(serviceId: "65c9feb3acf4cf957b1b500d", publicKey: "6d93da51d3c9201063cdd95387eb9244500ab743")
-            webView.loadHTMLString(html, baseURL: baseUrl)
+            let html = html(serviceId: "65c9feb3acf4cf957b1b500d", publicKey: "6d93da51d3c9201063cdd95387eb9244500ab743")
+            webView.loadHTMLString(html, baseURL: nil)
         }
     }
 
-    public func makeCoordinator() -> Coordinator {
+    func makeCoordinator() -> Coordinator {
         .init(completion: completion)
     }
 
-    public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+    class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
         private let completion: (ThreeDSResult) -> Void
         var isLoaded = false
 
@@ -62,8 +53,8 @@ public struct MastercardWebView: UIViewRepresentable {
             self.completion = completion
         }
 
-        public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            print(message)
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            print(message.body)
 //            guard let data = message.body as? [String: Any],
 //                  let eventRaw = data["event"] as? String,
 //                  let event = ThreeDSResult.EventType(rawValue: eventRaw),
@@ -75,25 +66,30 @@ public struct MastercardWebView: UIViewRepresentable {
 //            completion(ThreeDSResult(event: event, charge3dsId: token))
         }
 
-        public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             print("finished navigation")
         }
 
-        public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             print(error)
         }
 
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {}
-
-        public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            print(error)
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            print("Started Navigation:")
+            print(webView.url)
         }
 
-        public func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            print("Failed Navigation:")
+            print(webView.url)
+        }
+
+        func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(true)
         }
 
-        public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+        func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
             DispatchQueue.global(qos: .background).async {
                 let trust = challenge.protectionSpace.serverTrust!
                 let exceptions = SecTrustCopyExceptions(trust)
@@ -101,9 +97,32 @@ public struct MastercardWebView: UIViewRepresentable {
                 completionHandler(.useCredential, URLCredential(trust: trust))
             }
         }
+
+        func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+            if navigationAction.targetFrame == nil {
+                let popupWebView = WKWebView(frame: .zero, configuration: configuration)
+                popupWebView.navigationDelegate = self
+                popupWebView.uiDelegate = self
+
+
+                webView.addSubview(popupWebView)
+                popupWebView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    popupWebView.topAnchor.constraint(equalTo: webView.topAnchor),
+                    popupWebView.bottomAnchor.constraint(equalTo: webView.bottomAnchor),
+                    popupWebView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
+                    popupWebView.trailingAnchor.constraint(equalTo: webView.trailingAnchor)
+                ])
+
+//                self.webViews.append(popupWebView)
+                return popupWebView
+            }
+
+            return nil
+        }
     }
 
-    static func html(serviceId: String, publicKey: String) -> String {
+    func html(serviceId: String, publicKey: String) -> String {
         return """
         <!DOCTYPE html>
         <html lang="en">
@@ -135,27 +154,22 @@ public struct MastercardWebView: UIViewRepresentable {
                     {}
                 );
             src.setEnv('staging_10');
+            const watchEvent = (event) => {
+                src.on(event, function (data) {
+                    if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
+                        window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
+                            event,
+                            data: data
+                        });
+                    }
+                });
+            };
+
+            watchEvent("iframeLoaded");
+            watchEvent("checkoutReady");
+            watchEvent("checkoutCompleted");
+            watchEvent("checkoutError");
             src.load();
-
-            src.on('iframeLoaded', () => {
-                console.log("Initial iframe loaded");
-            });
-
-            src.on('checkoutReady', () => {
-                console.log("Checkout ready to be used");
-            });
-
-            src.on('checkoutCompleted', (token) => {
-                console.log(token);
-            });
-
-            src.on('checkoutError', (error) => {
-                console.log(error);
-            });
-
-            src.on('iframeLoaded', () => {
-                console.log("Initial iframe loaded");
-            });
         </script>
         </body>
         </html>
