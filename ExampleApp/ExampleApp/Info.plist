@@ -14,6 +14,8 @@
 	<string>$(PUBLIC_KEY)</string>
 	<key>SECRET_KEY</key>
 	<string>$(SECRET_KEY)</string>
+	<key>MASTERCARD_SERVICE_ID</key>
+	<string>$(MASTERCARD_SERVICE_ID)</string>
 	<key>STANDALONE_3DS_GATEWAY_ID</key>
 	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
 </dict>

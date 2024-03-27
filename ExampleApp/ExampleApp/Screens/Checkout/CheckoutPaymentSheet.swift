@@ -81,13 +81,37 @@ struct CheckoutPaymentSheet: View {
                     }
                 }
                 .padding()
+
+            case .mastercard:
+                Button("Checkout with Mastercard") {
+                    viewModel.showMastercardWebView = true
+                }
+                .foregroundStyle(.white)
+                .font(Font.system(size: 16, weight: .semibold))
+                .frame(height: 48)
+                .frame(maxWidth:.infinity)
+                .background(Color(hex: "6750A4"))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .padding()
+                .sheet(isPresented: $viewModel.showMastercardWebView, content: {
+                    NavigationStack {
+                        VStack {
+                            MastercardWidget(serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "") { result in
+                                viewModel.handleMastercardResult(result)
+                            }
+                            .navigationTitle("Checkout with Mastercard")
+                            .navigationBarTitleDisplayMode(.inline)
+                        }
+                    }
+
+                })
             }
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
             Text(viewModel.alertMessage)
         })
-        .sheet(isPresented: $viewModel.showWebView, onDismiss: { }) {
+        .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }) {
             NavigationStack {
                 VStack {
                     ThreeDSWidget(
@@ -119,6 +143,7 @@ struct CheckoutPaymentSheet: View {
                 paymentMethodCell(type: .card, logo: Image("credit-card-fill"), title: "Card")
                 paymentMethodCell(type: .applePay, logo: Image("applePay"))
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
+                paymentMethodCell(type: .mastercard, logo: Image("mastercard"))
             }
             .padding()
         }
