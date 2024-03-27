@@ -16,14 +16,24 @@ struct MastercardWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                MastercardWidget()
-                .padding()
+                    EmptyView()
+                        .sheet(isPresented: $viewModel.showWebView, content: {
+                            NavigationStack {
+                                VStack {
+                                    MastercardWidget(serviceId: "65c9feb3acf4cf957b1b500d", completion: { result in
+                                        viewModel.handleMastercardResult(result)
+                                    })
+                                    .navigationTitle("Checkout with mastercard")
+                                    .navigationBarTitleDisplayMode(.inline)
+                                }
+                            }
+                        })
             }
             .background(Color(hex: "#EAE0D7"))
-            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
-                Text(viewModel.alertMessage)
-            })
         }
+        .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: { }, message: {
+            Text(viewModel.alertMessage)
+        })
     }
 }
 

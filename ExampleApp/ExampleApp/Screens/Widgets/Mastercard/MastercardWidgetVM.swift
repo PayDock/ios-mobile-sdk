@@ -9,69 +9,37 @@
 import Foundation
 import MobileSDK
 
-class MastercardWidgetVM: ObservableObject {
-
-    // MARK: - Dependencies
-
-    private let walletService: WalletService
+class MastercardWidgetVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
+    @Published var showWebView = true
     @Published var showAlert = false
-    @Published var alertTitle = ""
     @Published var alertMessage = ""
+    @Published var alertTitle = ""
 
-    // MARK: - Initialisation
-
-    init(walletService: WalletService = WalletServiceImpl()) {
-        self.walletService = walletService
+    func getBaseUrl() -> URL? {
+        let urlString = "https://paydock.com"
+        return URL(string: urlString)
     }
 
-    func initializeWalletCharge(completion: @escaping (String) -> Void) {
-        Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getFlyPayGatewayId() ?? "", walletType: nil)
+    func handleMastercardResult(_ result: MastercardResult) {
+        switch result.event {
+        case .checkoutCompleted:
+            showWebView = false
+            alertTitle = "Checkout successful"
+            alertMessage = "Mastercard token:\n\(result.mastercardToken)"
+            showAlert = true
 
-            let customer = InitialiseWalletChargeReq.Customer(
-                firstName: "Wanda",
-                lastName: "Mertz",
-                email: "wanda.mertz@example.com",
-                phone: "+1234567890",
-                paymentSource: paymentSource)
+        case .checkoutReady:
+            print("Checkout ready")
 
-            let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", merchantName: "Tom's store", storeId: "1234556")
-
-            let initializeWalletChargeReq = InitialiseWalletChargeReq(
-                customer: customer,
-                amount: 5,
-                currency: "AUD",
-                reference: "reference1234",
-                description: "Test transaction for FlyPay",
-                meta: metaData)
-
-            do {
-                let token = try await walletService.initialiseFlyPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
-                DispatchQueue.main.async {
-                    completion(token)
-                }
-            } catch {
-                print("ERROR: Error fetching wallet token!")
-            }
+        case .checkoutError:
+            showWebView = false
+            alertTitle = "Checkout failure"
+            alertMessage = "Please try again."
+            showAlert = true
         }
     }
 
-    func handleError(error: Error) {
-        alertTitle = "Error"
-        alertMessage = "\(error.localizedDescription)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.showAlert = true
-        }
-    }
-
-    func handleSuccess() {
-        alertTitle = "Success"
-        alertMessage = "FlyPay passed!"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.showAlert = true
-        }
-    }
 }
