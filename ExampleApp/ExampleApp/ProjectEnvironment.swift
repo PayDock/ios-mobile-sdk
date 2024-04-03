@@ -41,7 +41,7 @@ struct ProjectEnvironment {
     func getEnvironmentEndpoint() -> String {
         switch environment {
         case .production: return "api.paydock.com"
-        case .sandbox: return "api-sandbox.paydock.com"
+        case .sandbox: return "apista-10.paydock.com"
         case .staging: return "apista.paydock.com"
         }
     }

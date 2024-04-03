@@ -39,7 +39,7 @@ public struct MastercardWidget: UIViewRepresentable {
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
             // Replace test public key with passed in once everything is deployed to sandbox
-            let html = html(serviceId: serviceId, publicKey: "6d93da51d3c9201063cdd95387eb9244500ab743")
+            let html = html(serviceId: serviceId, publicKey: "fc6a7d3eb0025b2e0f2b3ae0b7a08b2a25e50ed2")
             webView.loadHTMLString(html, baseURL: nil)
         }
     }
@@ -57,6 +57,7 @@ public struct MastercardWidget: UIViewRepresentable {
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            print(message.body)
             guard let data = message.body as? [String: Any],
                   let eventRaw = data["event"] as? String,
                   let event = MastercardResult.EventType(rawValue: eventRaw) else {
@@ -84,6 +85,26 @@ public struct MastercardWidget: UIViewRepresentable {
             }
         }
 
+        public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+            return .allow
+        }
+
+        public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            isLoaded = true
+        }
+
+        public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print(error)
+        }
+
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { 
+
+        }
+
+        public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+
+        }
+
         public func webViewDidClose(_ webView: WKWebView) {
             webView.removeFromSuperview()
         }
@@ -107,6 +128,10 @@ public struct MastercardWidget: UIViewRepresentable {
 
             return nil
         }
+
+        public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo) async {
+
+        }
     }
 
     func html(serviceId: String, publicKey: String) -> String {
@@ -114,48 +139,70 @@ public struct MastercardWidget: UIViewRepresentable {
         <!DOCTYPE html>
         <html lang="en">
         <head>
+            <!-- Meta tags for character set and viewport settings -->
             <meta charset="UTF-8">
-            <title>Title</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+            <!-- Links to favicon and site manifest -->
+            <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+            <link rel="icon" type="image/png" href="/favicon-32x32.png">
+            <link rel="icon" type="image/png" href="/favicon-16x16.png">
+            <link rel="manifest" href="/site.webmanifest">
+
+            <!-- Title for the HTML document -->
+            <title>Mastercard SRC</title>
+
+            <!-- Style block for custom styles -->
             <style>
+                /* Insert your custom styles here */
                 iframe {
                     border: 0;
                     width: 100%;
-                    height: 1500px;
+                    height: 100vh;
+                }
+                #loader {
+                    display: flex;
+                    position: fixed;
+                    width: 100%;
+                    height: 100vh;
+                    top: 0;
+                    left: 0;
+                    background: white;
+                    align-items: center;
+                    justify-content: center;
+                    color: black;
+                    font-size: 40px;
                 }
             </style>
         </head>
         <body>
-        <h1>Mastercard SRC test</h1>
-
-        <div id="checkoutIframe"></div>
-
-        <script src="https://widget.paydock.com/sdk/v1.99.9-beta/widget.umd.min.js"></script>
-
-        <script>
-            const serviceId = "\(serviceId)";
-            const publicKey = "\(publicKey)";
-            var src = new paydock.MastercardSRCClickToPay(
-                    "#checkoutIframe",
-                    serviceId,
-                    publicKey,
-                    {}
-                );
-            src.setEnv('staging_10');
-            const watchEvent = (event) => {
-                src.on(event, function (data) {
-                    if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
-                        window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
-                            event,
-                            data: data
-                        });
-                    }
-                });
-            };
-            watchEvent("checkoutReady");
-            watchEvent("checkoutCompleted");
-            watchEvent("checkoutError");
-            src.load();
-        </script>
+            <div id="checkoutIframe"></div>
+            <script src="https://widget.paydock.com/sdk/v1.99.9-beta/widget.umd.min.js"></script>
+            <script>
+                const serviceId = "\(serviceId)";
+                const publicKey = "\(publicKey)";
+                var src = new paydock.MastercardSRCClickToPay(
+                        "#checkoutIframe",
+                        serviceId,
+                        publicKey,
+                        {}
+                    );
+                src.setEnv('staging_10');
+                const watchEvent = (event) => {
+                    src.on(event, function (data) {
+                        if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
+                            window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
+                                event,
+                                data: data
+                            });
+                        }
+                    });
+                };
+                watchEvent("checkoutReady");
+                watchEvent("checkoutCompleted");
+                watchEvent("checkoutError");
+                src.load();
+            </script>
         </body>
         </html>
         """

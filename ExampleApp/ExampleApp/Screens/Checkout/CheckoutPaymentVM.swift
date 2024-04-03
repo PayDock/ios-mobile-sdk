@@ -200,9 +200,12 @@ extension CheckoutPaymentVM {
         switch result.event {
         case .checkoutCompleted:
             showMastercardWebView = false
-            alertTitle = "Checkout successful"
-            alertMessage = "Mastercard token:\n\(result.mastercardToken)"
-            showAlert = true
+            saveCardToken(result.mastercardToken)
+            payWithCard()
+//            alertTitle = "Checkout successful"
+//            alertMessage = "Mastercard token:\n\(result.mastercardToken)"
+//            showAlert = true
+
 
         case .checkoutReady:
             print("Checkout ready")
