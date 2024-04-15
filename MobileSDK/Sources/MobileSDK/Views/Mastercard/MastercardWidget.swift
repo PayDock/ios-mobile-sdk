@@ -24,8 +24,16 @@ public struct MastercardWidget: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
         configuration.websiteDataStore = WKWebsiteDataStore.default()
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
-
+        //        add dummy cookie to webview to sync cookies
+        let cookie = HTTPCookie(properties: [
+            .domain: "sandbox.src.mastercard.com",
+            .path: "/",
+            .name: "MyCookieName",
+            .value: "MyCookieValue",
+            .secure: "TRUE",
+            .expires: NSDate(timeIntervalSinceNow: 31556926)
+        ])!
+        configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.contentMode = .scaleToFill
         if #available(iOS 16.4, *) {
@@ -39,8 +47,10 @@ public struct MastercardWidget: UIViewRepresentable {
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
             // Replace test public key with passed in once everything is deployed to sandbox
-            let html = html(serviceId: serviceId, publicKey: "fc6a7d3eb0025b2e0f2b3ae0b7a08b2a25e50ed2")
-            webView.loadHTMLString(html, baseURL: nil)
+            if let url = URL(string: "https://sandbox.src.mastercard.com") {
+                let html = html(serviceId: serviceId, publicKey: Constants.publicKey)
+                webView.loadHTMLString(html, baseURL: url)
+            }
         }
     }
 
@@ -48,7 +58,7 @@ public struct MastercardWidget: UIViewRepresentable {
         .init(completion: completion)
     }
 
-    public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
+    public class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
         private let completion: (MastercardResult) -> Void
         var isLoaded = false
 
@@ -85,52 +95,12 @@ public struct MastercardWidget: UIViewRepresentable {
             }
         }
 
-        public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-            return .allow
-        }
-
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
         }
 
-        public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print(error)
-        }
-
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { 
-
-        }
-
-        public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-
-        }
-
-        public func webViewDidClose(_ webView: WKWebView) {
-            webView.removeFromSuperview()
-        }
-
-        public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-            if navigationAction.targetFrame == nil {
-                let popupWebView = WKWebView(frame: .zero, configuration: configuration)
-                popupWebView.navigationDelegate = self
-                popupWebView.uiDelegate = self
-
-                webView.addSubview(popupWebView)
-                popupWebView.translatesAutoresizingMaskIntoConstraints = false
-                NSLayoutConstraint.activate([
-                    popupWebView.topAnchor.constraint(equalTo: webView.topAnchor),
-                    popupWebView.bottomAnchor.constraint(equalTo: webView.bottomAnchor),
-                    popupWebView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
-                    popupWebView.trailingAnchor.constraint(equalTo: webView.trailingAnchor)
-                ])
-                return popupWebView
-            }
-
-            return nil
-        }
-
-        public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo) async {
-
+        public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+            decisionHandler(.allow)
         }
     }
 
