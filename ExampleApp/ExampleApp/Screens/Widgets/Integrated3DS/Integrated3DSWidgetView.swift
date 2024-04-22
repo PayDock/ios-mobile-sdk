@@ -13,7 +13,6 @@ import MobileSDK
 struct Integrated3DSWidgetView: View {
 
     @StateObject private var viewModel = Integrated3DSVM()
-    @State var isSheetPresented = false
 
     var body: some View {
         NavigationStack {

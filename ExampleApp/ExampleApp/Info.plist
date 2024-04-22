@@ -2,18 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>SECRET_KEY</key>
-	<string>$(SECRET_KEY)</string>
-	<key>PUBLIC_KEY</key>
-	<string>$(PUBLIC_KEY)</string>
 	<key>APPLE_PAY_GATEWAY_ID</key>
 	<string>$(APPLE_PAY_GATEWAY_ID)</string>
-	<key>PAY_PAL_GATEWAY_ID</key>
-	<string>$(PAY_PAL_GATEWAY_ID)</string>
-	<key>INTEGRATED_3DS_GATEWAY_ID</key>
-	<string>$(INTEGRATED_3DS_GATEWAY_ID)</string>
 	<key>FLYPAY_GATEWAY_ID</key>
 	<string>$(FLYPAY_GATEWAY_ID)</string>
+	<key>INTEGRATED_3DS_GATEWAY_ID</key>
+	<string>$(INTEGRATED_3DS_GATEWAY_ID)</string>
+	<key>PAY_PAL_GATEWAY_ID</key>
+	<string>$(PAY_PAL_GATEWAY_ID)</string>
+	<key>PUBLIC_KEY</key>
+	<string>$(PUBLIC_KEY)</string>
+	<key>SECRET_KEY</key>
+	<string>$(SECRET_KEY)</string>
+	<key>MASTERCARD_SERVICE_ID</key>
+	<string>$(MASTERCARD_SERVICE_ID)</string>
 	<key>STANDALONE_3DS_GATEWAY_ID</key>
 	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
 </dict>
