@@ -27,7 +27,7 @@ struct CheckoutPaymentSheet: View {
                     CardDetailsWidget(gatewayId: "", completion: { result in
                         switch result {
                         case .success(let token): viewModel.saveCardToken(token)
-                        case .failure(let error): break
+                        case .failure: break
                         }
                     })
                     .frame(height: 320)

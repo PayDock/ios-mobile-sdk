@@ -40,7 +40,6 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 expireMonth: "01",
                 expireYear: "39",
                 cardCcv: "100")
-
             do {
                 let token = try await walletService.createVaultToken(request: req)
                 create3dsToken(vaultToken: token)

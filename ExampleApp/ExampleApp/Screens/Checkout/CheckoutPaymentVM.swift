@@ -18,6 +18,7 @@ class CheckoutPaymentVM: ObservableObject {
     // MARK: - Properties
     let gatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+    
     private var cardToken = ""
     private var vaultToken = ""
     private(set) var token3DS = ""
