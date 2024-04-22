@@ -18,14 +18,18 @@ class CheckoutPaymentVM: ObservableObject {
     // MARK: - Properties
     let gatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+    
     private var cardToken = ""
     private var vaultToken = ""
     private(set) var token3DS = ""
 
-    @Published var showWebView = false
+    @Published var show3dsWebView = false
     @Published var selectedMethod: PaymentMethod = .card
     @Published var showAlert = false
     @Published var isLoading = false
+
+    @Published var showMastercardWebView = false
+
     var alertTitle = ""
     var alertMessage = ""
 
@@ -156,7 +160,7 @@ extension CheckoutPaymentVM {
         case .pending:
             DispatchQueue.main.async {
                 self.token3DS = response.resource.data.threeDS.token ?? ""
-                self.showWebView = true
+                self.show3dsWebView = true
             }
         case .none:
             showAlert(title: .error, message: "Error getting 3DS auth status!")
@@ -171,11 +175,11 @@ extension CheckoutPaymentVM {
             case .chargeAuthDecoupled: break
             case .chargeAuthInfo: break
             case .chargeAuthSuccess:
-                self.showWebView = false
+                self.show3dsWebView = false
                 self.captureCharge()
             case .chargeAuthReject: break
             case .error:
-                self.showWebView = false
+                self.show3dsWebView = false
                 self.showAlert(title: .error, message: "3DS failed!")
             }
         }
@@ -194,6 +198,34 @@ extension CheckoutPaymentVM {
             }
         }
     }
+}
+
+// MARK: - Mastercard SRC
+
+extension CheckoutPaymentVM {
+
+    func handleMastercardResult(_ result: MastercardResult) {
+        switch result.event {
+        case .checkoutCompleted:
+            showMastercardWebView = false
+            saveCardToken(result.mastercardToken)
+            payWithCard()
+//            alertTitle = "Checkout successful"
+//            alertMessage = "Mastercard token:\n\(result.mastercardToken)"
+//            showAlert = true
+
+
+        case .checkoutReady:
+            print("Checkout ready")
+
+        case .checkoutError:
+            showMastercardWebView = false
+            alertTitle = "Checkout failure"
+            alertMessage = "Please try again."
+            showAlert = true
+        }
+    }
+
 }
 
 // MARK: - Helpers
@@ -222,5 +254,6 @@ extension CheckoutPaymentVM {
         case card
         case applePay
         case payPal
+        case mastercard
     }
 }
