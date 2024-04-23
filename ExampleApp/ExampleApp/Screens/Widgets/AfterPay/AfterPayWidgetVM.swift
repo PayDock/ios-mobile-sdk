@@ -32,9 +32,9 @@ class AfterPayWidgetVM: ObservableObject {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterPayGatewayId() ?? "", walletType: nil)
 
             let customer = InitialiseWalletChargeReq.Customer(
-                firstName: "Wanda",
-                lastName: "Mertz",
-                email: "wanda.mertz@example.com",
+                firstName: "David",
+                lastName: "Cameron",
+                email: "david.cameron@paydock.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
 
@@ -42,14 +42,14 @@ class AfterPayWidgetVM: ObservableObject {
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
-                successUrl: "https://widget-sandbox.paydock.com/wallet/afterpay?status=SUCCESS",
-                errorUrl: "https://www.error.com")
+                successUrl: "https://paydock-integration.netlify.app/success",
+                errorUrl: "https://paydock-integration.netlify.app/error")
 
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 5,
                 currency: "AUD",
-                reference: "reference1234",
+                reference: UUID().uuidString,
                 description: "Test transaction for AfterPay",
                 meta: metaData)
 

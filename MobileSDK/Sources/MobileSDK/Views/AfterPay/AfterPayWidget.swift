@@ -7,39 +7,24 @@
 //
 
 import SwiftUI
+import Afterpay
 
 public struct AfterPayWidget: View {
-
     @StateObject private var viewModel: AfterPayVM
 
     public init(afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
-                completion: @escaping (Result<Void, AfterPayError>) -> Void) {
+                completion: @escaping (Result<String, AfterPayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: AfterPayVM(afterPayToken: afterPayToken, completion: completion))
     }
 
     public var body: some View {
-        LargeButton(
-            title: "Afterpay",
-            image: Image("flypay", bundle: Bundle.module),
-            imageLocation: .right,
-            backgroundColor:  Color(red: 0.00, green: 0.48, blue: 0.75)) {
-                viewModel.handleButtonTap()
-            }
-            .sheet(isPresented: $viewModel.showWebView) {
-                NavigationStack {
-                    AfterPayWebView(
-                        afterPayOrderId: viewModel.afterPayOrderId,
-                        onApprove: {
-                            viewModel.handleSuccess()
-                        },
-                        onFailure: { error in
-                            viewModel.handleFailure(error: error)
-                        })
-                    .navigationTitle("Checkout with AfterPay")
-                    .navigationBarTitleDisplayMode(.inline)
-                }
-            }
-            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        AfterpayPaymentButton(action: {
+            viewModel.handleButtonTap()
+        })
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        .onChange(of: viewModel.showWebView) { newValue in
+            viewModel.presentAfterpay(self)
+        }
     }
 }
 

@@ -48,4 +48,13 @@ extension WalletEndpoints: Endpoint {
         }
     }
 
+
+    var parameters: [URLQueryItem] {
+        switch self {
+//        case .walletCapture: return [URLQueryItem(name: "capture", value: "true")]
+        case .walletCapture: return []
+        case .walletCallback: return [URLQueryItem(name: "mobile", value: "true")]
+        }
+    }
+
 }
