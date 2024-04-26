@@ -14,17 +14,21 @@ public struct MastercardWidget: UIViewRepresentable {
     private let completion: (MastercardResult) -> Void
     private let serviceId: String
     private let publicKey = Constants.publicKey
+    private let meta: MastercardSrcMeta?
 
-    public init(serviceId: String, completion: @escaping (MastercardResult) -> Void) {
+    public init(serviceId: String,
+                meta: MastercardSrcMeta?,
+                completion: @escaping (MastercardResult) -> Void) {
         self.serviceId = serviceId
         self.completion = completion
+        self.meta = meta
     }
 
     public func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
         configuration.websiteDataStore = WKWebsiteDataStore.default()
-        //        add dummy cookie to webview to sync cookies
+        // adds dummy cookie to webview to sync cookies
         let cookie = HTTPCookie(properties: [
             .domain: "sandbox.src.mastercard.com",
             .path: "/",
@@ -46,9 +50,8 @@ public struct MastercardWidget: UIViewRepresentable {
 
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            // Replace test public key with passed in once everything is deployed to sandbox
             if let url = URL(string: "https://sandbox.src.mastercard.com") {
-                let html = html(serviceId: serviceId, publicKey: Constants.publicKey)
+                let html = html(serviceId: serviceId, publicKey: Constants.publicKey, meta: meta)
                 webView.loadHTMLString(html, baseURL: url)
             }
         }
@@ -104,7 +107,22 @@ public struct MastercardWidget: UIViewRepresentable {
         }
     }
 
-    func html(serviceId: String, publicKey: String) -> String {
+    func html(serviceId: String, publicKey: String, meta: MastercardSrcMeta?) -> String {
+        let jsonString: String = {
+            do {
+                let jsonData = try JSONEncoder().encode(meta)
+                if let jsonString = String(data: jsonData, encoding: .utf8) {
+                    return jsonString
+                } else {
+                    print("Error converting SRC meta to JSON")
+                    return ""
+                }
+            } catch {
+                print("Error converting SRC meta to JSON")
+                return ""
+            }
+        }()
+
         return """
         <!DOCTYPE html>
         <html lang="en">
@@ -151,6 +169,7 @@ public struct MastercardWidget: UIViewRepresentable {
             <script>
                 const serviceId = "\(serviceId)";
                 const publicKey = "\(publicKey)";
+                const meta = "\(jsonString)"
                 var src = new paydock.MastercardSRCClickToPay(
                         "#checkoutIframe",
                         serviceId,

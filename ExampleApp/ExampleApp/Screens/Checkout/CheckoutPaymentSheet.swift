@@ -96,7 +96,9 @@ struct CheckoutPaymentSheet: View {
                 .sheet(isPresented: $viewModel.showMastercardWebView, content: {
                     NavigationStack {
                         VStack {
-                            MastercardWidget(serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "") { result in
+                            MastercardWidget(
+                                serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                meta: nil) { result in
                                 viewModel.handleMastercardResult(result)
                             }
                             .navigationTitle("Checkout with Mastercard")
