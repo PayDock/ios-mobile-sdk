@@ -13,7 +13,8 @@ public struct AfterPayWidget: View {
     @StateObject private var viewModel: AfterPayVM
     @State var buttonWidth: CGFloat
 
-    public init(afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
+    public init(configuration: AfterpaySdkConfig,
+                afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
                 buttonWidth: CGFloat,
                 completion: @escaping (Result<String, AfterPayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: AfterPayVM(afterPayToken: afterPayToken, completion: completion))

@@ -27,6 +27,9 @@ class AfterPayVM: ObservableObject {
     // MARK: - Handlers
 
     private var completion: (Result<String, AfterPayError>) -> Void
+    private var onAddressChange: ShippingAddressDidChangeClosure?
+    private var onShippingChange: ShippingOptionDidChangeClosure?
+
 
     // MARK: - Initialisation
 
@@ -50,18 +53,17 @@ class AfterPayVM: ObservableObject {
         guard let vc = vc else { return }
         Afterpay.presentCheckoutV2Modally(over: vc, animated: true, options: .init()) { completion in
             completion(.success(self.afterPayOrderId))
-            print("did Comence checkout")
         } shippingAddressDidChange: { address, completion in
-            print("address change")
+            completion(.success(onAddressChange(address)))
+
+            completion(onAddressChange)
         } shippingOptionDidChange: { shippingOption, complete in
-            print("shipping change")
         } completion: { [weak self] result in
             switch result {
             case .success(let token):
-                print("Got the token: \(token)")
                 self?.captureWaletCharge()
             case .cancelled(let reason):
-                print("Reason for failure: \(reason)")
+                completion(.failure(.webViewFailed))
             }
         }
     }
