@@ -54,7 +54,7 @@ class AfterPayWidgetVM: ObservableObject {
                 meta: metaData)
 
             do {
-                let token = try await walletService.initialiseFlyPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
+                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
                     completion(token)
                 }
@@ -66,16 +66,16 @@ class AfterPayWidgetVM: ObservableObject {
 
     func handleError(error: Error) {
         alertTitle = "Error"
-        alertMessage = "\(error.localizedDescription)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        alertMessage = "Transaction canceled"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.showAlert = true
         }
     }
 
     func handleSuccess() {
         alertTitle = "Success"
-        alertMessage = "FlyPay passed!"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        alertMessage = "Charge completed"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.showAlert = true
         }
     }

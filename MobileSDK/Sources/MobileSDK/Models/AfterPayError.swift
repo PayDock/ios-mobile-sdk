@@ -16,9 +16,9 @@ public enum AfterPayError: Error {
     public var customMessage: String {
         switch self {
         case .requestFailed:
-            return "AfterPay payment request has failed! There was an issue with your request."
+            return "Afterpay payment request has failed! There was an issue with your request."
         case .webViewFailed:
-            return "AfterPay WebView widget has failed"
+            return "Afterpay WebView widget has failed"
         }
     }
 }

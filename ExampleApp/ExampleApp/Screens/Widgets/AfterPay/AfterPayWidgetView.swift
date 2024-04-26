@@ -16,9 +16,9 @@ struct AfterPayWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                AfterPayWidget { onAfterPayButtonTap in
+                AfterPayWidget(afterPayToken: { onAfterPayButtonTap in
                     viewModel.initializeWalletCharge(completion: onAfterPayButtonTap)
-                } completion: { result in
+                }, buttonWidth: 360.0) { result in
                     switch result {
                     case .success: viewModel.handleSuccess()
                     case .failure(let error): viewModel.handleError(error: error)

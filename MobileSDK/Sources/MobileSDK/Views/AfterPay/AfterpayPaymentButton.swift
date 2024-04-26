@@ -11,16 +11,17 @@ import UIKit
 import Afterpay
 
 struct AfterpayPaymentButton: View {
+    var width: CGFloat
     var action: () -> Void
 
     var body: some View {
-        Representable(action: action)
+        Representable(action: action, width: width)
     }
 }
 
 struct AfterpayPaymentButton_Previews: PreviewProvider {
     static var previews: some View {
-        AfterpayPaymentButton(action: {})
+        AfterpayPaymentButton( width: 320, action: {})
             .previewLayout(.sizeThatFits)
     }
 }
@@ -28,9 +29,10 @@ struct AfterpayPaymentButton_Previews: PreviewProvider {
 extension AfterpayPaymentButton {
     struct Representable: UIViewRepresentable {
         var action: () -> Void
+        var width: CGFloat
 
         func makeCoordinator() -> Coordinator {
-            Coordinator(action: action)
+            Coordinator(width: width, action: action)
         }
 
         func makeUIView(context: Context) -> some UIView {
@@ -39,15 +41,18 @@ extension AfterpayPaymentButton {
 
         func updateUIView(_ uiView: UIViewType, context: Context) {
             context.coordinator.action = action
+            context.coordinator.width = width
         }
     }
 
     class Coordinator: NSObject {
+        var width: CGFloat
         var action: () -> Void
         var button = PaymentButton(colorScheme: .dynamic(lightPalette: .blackOnMint, darkPalette: .mintOnBlack), buttonKind: .payNow)
 
-        init(action: @escaping () -> Void) {
+        init(width: CGFloat, action: @escaping () -> Void) {
             self.action = action
+            self.width = width
             super.init()
 
             setup()
@@ -55,8 +60,7 @@ extension AfterpayPaymentButton {
 
         private func setup() {
             NSLayoutConstraint.activate([
-                button.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.8),
-                button.heightAnchor.constraint(equalToConstant: 50),
+                button.widthAnchor.constraint(equalToConstant: width),
             ])
             button.addTarget(self, action: #selector(callback(_:)), for: .touchUpInside)
         }

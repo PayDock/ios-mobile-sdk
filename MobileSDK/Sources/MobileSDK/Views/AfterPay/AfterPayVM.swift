@@ -41,7 +41,7 @@ class AfterPayVM: ObservableObject {
 
     private func setupConfig() {
         let config = try? Configuration(
-            minimumAmount: "1.00", maximumAmount: "2000.00", currencyCode: "AUD", locale: Locale(identifier: "en_AU"), environment: .sandbox)
+            minimumAmount: "1.00", maximumAmount: "100.00", currencyCode: "AUD", locale: Locale(identifier: "en_AU"), environment: .sandbox)
         Afterpay.setConfiguration(config)
     }
 
@@ -92,13 +92,17 @@ class AfterPayVM: ObservableObject {
             do {
                 let chargeResponse = try await self.walletService.captureCharge(
                     token: self.token,
-                    paymentMethodId: self.afterPayOrderId,
+                    paymentMethodId: nil,
                     payerId: nil,
-                    refToken: nil)
-
+                    refToken: self.afterPayOrderId)
+                isLoading = false
+                completion(.success("Success"))
 
             } catch {
                 print("error")
+                isLoading = false
+                completion(.failure(.webViewFailed))
+
             }
         }
     }

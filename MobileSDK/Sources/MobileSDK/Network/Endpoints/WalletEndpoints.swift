@@ -10,7 +10,7 @@ import Foundation
 
 enum WalletEndpoints {
 
-    case walletCapture(token: String, walletCaptureReq: WalletCaptureReq)
+    case walletCapture(capture: Bool, token: String, walletCaptureReq: WalletCaptureReq)
     case walletCallback(token: String, walletCallbackReq: WalletCallbackReq)
 
 }
@@ -33,7 +33,7 @@ extension WalletEndpoints: Endpoint {
 
     var header: [String: String]? {
         switch self {
-        case .walletCapture(let token, _), .walletCallback(let token, _):
+        case let .walletCapture(_, token, _), .walletCallback(let token, _):
             return [
                 "x-access-token": "\(token)",
                 "Content-Type": "application/json"
@@ -43,7 +43,7 @@ extension WalletEndpoints: Endpoint {
 
     var body: Data? {
         switch self {
-        case .walletCapture(_, let walletCaptureReq): return try? JSONEncoder().encode(walletCaptureReq)
+        case .walletCapture(_, _, let walletCaptureReq): return try? JSONEncoder().encode(walletCaptureReq)
         case .walletCallback(_, let walletCallbackReq): return try? JSONEncoder().encode(walletCallbackReq)
         }
     }
@@ -51,8 +51,8 @@ extension WalletEndpoints: Endpoint {
 
     var parameters: [URLQueryItem] {
         switch self {
-//        case .walletCapture: return [URLQueryItem(name: "capture", value: "true")]
-        case .walletCapture: return []
+        case let .walletCapture(capture, _, _):
+            return capture ? [URLQueryItem(name: "capture", value: "true")] : []
         case .walletCallback: return [URLQueryItem(name: "mobile", value: "true")]
         }
     }
