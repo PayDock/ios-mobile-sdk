@@ -12,9 +12,12 @@ import MobileSDK
 struct CheckoutPaymentSheet: View {
 
     @StateObject private var viewModel: CheckoutPaymentVM
+    private let onCloseSheet: () -> Void
 
-    init(viewModel: CheckoutPaymentVM = CheckoutPaymentVM()) {
+    init(viewModel: CheckoutPaymentVM = CheckoutPaymentVM(),
+         onCloseSheet: @escaping () -> Void) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onCloseSheet = onCloseSheet
     }
 
     var body: some View {
@@ -82,6 +85,26 @@ struct CheckoutPaymentSheet: View {
                 }
                 .padding()
 
+            case .afterpay:
+                AfterPayWidget(
+                    configuration: viewModel.getAfterpayConfig(),
+                    afterPayToken: { onAfterPayButtonTap in
+                        viewModel.initializeAfterpayWalletCharge(completion: onAfterPayButtonTap)
+                        onCloseSheet()
+                    }, buttonWidth: 320) { result in
+                        switch result {
+                        case .success:
+                            viewModel.alertTitle = "Success"
+                            viewModel.alertMessage = "Charge successful"
+                            viewModel.showAlert = true
+                        case .failure:
+                            viewModel.alertTitle = "Error"
+                            viewModel.alertMessage = "Charge failed"
+                            viewModel.showAlert = true
+                        }
+                    }
+                    .padding()
+
             case .mastercard:
                 Button("Checkout with Mastercard") {
                     viewModel.showMastercardWebView = true
@@ -143,6 +166,7 @@ struct CheckoutPaymentSheet: View {
                 paymentMethodCell(type: .card, logo: Image("credit-card-fill"), title: "Card")
                 paymentMethodCell(type: .applePay, logo: Image("applePay"))
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
+                paymentMethodCell(type: .afterpay, logo: Image("afterpay"))
                 paymentMethodCell(type: .mastercard, logo: Image("mastercard"))
             }
             .padding()
@@ -174,6 +198,6 @@ struct CheckoutPaymentSheet: View {
 
 struct PaymentMethodSelector_Previews: PreviewProvider {
     static var previews: some View {
-        CheckoutPaymentSheet()
+        CheckoutPaymentSheet(onCloseSheet: {})
     }
 }

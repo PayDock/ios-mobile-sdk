@@ -55,8 +55,10 @@ class AfterPayVM: ObservableObject {
         Afterpay.setConfiguration(afterpayConfig)
     }
 
-    func presentAfterpay(_ sender: some View) {
-        let vc = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.last?.rootViewController
+    func presentAfterpay() {
+        let vc = UIApplication.shared.keyWindow?.rootViewController
+
+//        let vc = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.last?.rootViewController
         guard let vc = vc else { return }
         Afterpay.presentCheckoutV2Modally(over: vc, animated: true, options: .init()) { completion in
             completion(.success(self.afterPayOrderId))
@@ -78,6 +80,7 @@ class AfterPayVM: ObservableObject {
                 await MainActor.run {
                     self.isLoading = false
                     self.afterPayOrderId = afterPayOrderId
+                    self.presentAfterpay()
                     self.showWebView = true
                 }
             } catch {

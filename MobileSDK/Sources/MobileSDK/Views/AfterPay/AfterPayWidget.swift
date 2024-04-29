@@ -34,9 +34,6 @@ public struct AfterPayWidget: View {
             Spacer()
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
-        .onChange(of: viewModel.showWebView) { newValue in
-            viewModel.presentAfterpay(self)
-        }
     }
 }
 
