@@ -16,6 +16,7 @@ protocol Endpoint {
     var method: RequestMethod { get }
     var header: [String: String]? { get }
     var body: Data? { get }
+    var parameters: [URLQueryItem] { get }
 
 }
 

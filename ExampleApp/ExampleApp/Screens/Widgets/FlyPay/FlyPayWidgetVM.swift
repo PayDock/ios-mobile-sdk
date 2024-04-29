@@ -38,8 +38,13 @@ class FlyPayWidgetVM: ObservableObject {
                 phone: "+1234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", merchantName: "Tom's store", storeId: "1234556")
-
+            let metaData = InitialiseWalletChargeReq.MetaData(
+                storeName: "Tom Taylor Ltd.",
+                merchantName: "Tom's store",
+                storeId: "1234556",
+                successUrl: nil,
+                errorUrl: nil)
+            
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 5,

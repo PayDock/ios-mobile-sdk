@@ -20,6 +20,7 @@ struct ProjectEnvironment {
         static let integrated3dsGatewayId = "INTEGRATED_3DS_GATEWAY_ID"
         static let standalone3dsGatewayId = "STANDALONE_3DS_GATEWAY_ID"
         static let flypayGatewayId = "FLYPAY_GATEWAY_ID"
+        static let afterpayGatewayId = "AFTERPAY_GATEWAY_ID"
         static let mastercardServiceId = "MASTERCARD_SERVICE_ID"
     }
 
@@ -100,7 +101,15 @@ struct ProjectEnvironment {
         return gatewayId
     }
 
-    func getMastercardServiceId() -> String? {
+    func getAfterPayGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.afterpayGatewayId] as? String else {
+            print("AfterPay gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
+        func getMastercardServiceId() -> String? {
         guard let serviceId = Self.infoDictionary[Keys.mastercardServiceId] as? String else {
             print("Mastercard service ID not found in .plist!")
             return nil

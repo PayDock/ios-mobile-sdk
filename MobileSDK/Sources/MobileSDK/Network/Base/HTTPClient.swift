@@ -38,6 +38,7 @@ extension HTTPClient {
         urlComponents.scheme = endpoint.scheme
         urlComponents.host = endpoint.host
         urlComponents.path = endpoint.path
+        urlComponents.queryItems = endpoint.parameters
 
         guard let url = urlComponents.url else {
             throw RequestError.invalidURL

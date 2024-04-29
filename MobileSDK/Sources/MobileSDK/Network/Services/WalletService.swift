@@ -13,6 +13,8 @@ protocol WalletService {
     func captureCharge(token: String, paymentMethodId: String?, payerId: String?, refToken: String?) async throws -> ChargeResponse
     func getCallback(token: String, shipping: Bool) async throws -> String
     func getFlyPayCallback(token: String) async throws -> String
+    func getAfterPayCallback(token: String) async throws -> String
+    func declineWalletTransaction(token: String, chargeId: String) async throws -> String
 
 }
 
@@ -22,11 +24,11 @@ struct WalletServiceImpl: HTTPClient, WalletService {
         let walletCaptureReq = WalletCaptureReq(
             paymentMethodId: paymentMethodId,
             customer: .init(paymentSource: .init(externalPayerId: nil, refToken: refToken)))
-        
+
         let response = try await sendRequest(
-            endpoint: WalletEndpoints.walletCapture(token: token, walletCaptureReq: walletCaptureReq),
+            endpoint: WalletEndpoints.walletCapture(capture: true, token: token, walletCaptureReq: walletCaptureReq),
             responseModel: WalletCaptureRes.self)
-        
+
         return response.resource.data
     }
 
@@ -53,4 +55,24 @@ struct WalletServiceImpl: HTTPClient, WalletService {
 
         return response.resource.data.id
     }
+
+    func getAfterPayCallback(token: String) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(type: "CREATE_SESSION", shipping: nil, sessionId: nil, walletType: nil)
+
+        let response = try await sendRequest(
+            endpoint: WalletEndpoints.walletCallback(
+                token: token,
+                walletCallbackReq: walletCallbackReq),
+            responseModel: AfterPayCallbackRes.self)
+
+        return response.resource.data.refToken
+    }
+
+    func declineWalletTransaction(token: String, chargeId: String) async throws -> String {
+        let endpoint = WalletEndpoints.declineWalletTransaction(token: token, chargeId: chargeId)
+        let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self)
+        return response.resource.status
+
+    }
+
 }

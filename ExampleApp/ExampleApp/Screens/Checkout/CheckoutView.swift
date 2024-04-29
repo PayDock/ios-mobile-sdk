@@ -66,7 +66,9 @@ struct CheckoutView: View {
                     }
                 }
                 .bottomSheet(isPresented: $isSheetPresented) {
-                    CheckoutPaymentSheet()
+                    CheckoutPaymentSheet {
+                        isSheetPresented = false
+                    }
                 }
         }
     }

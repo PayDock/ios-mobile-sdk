@@ -46,5 +46,11 @@ extension CardsEndpoints: Endpoint {
         case .giftCardToken(let tokeniseGiftCardReq): return try? JSONEncoder().encode(tokeniseGiftCardReq)
         }
     }
-    
+
+    var parameters: [URLQueryItem] {
+        switch self {
+        default: return []
+        }
+    }
+
 }

@@ -1,10 +1,10 @@
 // !$*UTF8*$!
 {
-    archiveVersion = 1;
-    classes = {
-    };
-    objectVersion = 56;
-    objects = {
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
 
 /* Begin PBXBuildFile section */
 		2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808B3412A7056F100E86C7E /* CardDetailsWidgetView.swift */; };
@@ -68,23 +68,25 @@
 		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
 		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
 		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
+		28F4E3242B83921500C73065 /* AfterPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3232B83921500C73065 /* AfterPayWidgetView.swift */; };
+		28F4E3262B83922100C73065 /* AfterPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3252B83922100C73065 /* AfterPayWidgetVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-        2889B7E32A558F1A00D6C7BE /* PBXContainerItemProxy */ = {
-            isa = PBXContainerItemProxy;
-            containerPortal = 2889B7C92A558F1800D6C7BE /* Project object */;
-            proxyType = 1;
-            remoteGlobalIDString = 2889B7D02A558F1800D6C7BE;
-            remoteInfo = ExampleApp;
-        };
-        2889B7ED2A558F1A00D6C7BE /* PBXContainerItemProxy */ = {
-            isa = PBXContainerItemProxy;
-            containerPortal = 2889B7C92A558F1800D6C7BE /* Project object */;
-            proxyType = 1;
-            remoteGlobalIDString = 2889B7D02A558F1800D6C7BE;
-            remoteInfo = ExampleApp;
-        };
+		2889B7E32A558F1A00D6C7BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2889B7C92A558F1800D6C7BE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2889B7D02A558F1800D6C7BE;
+			remoteInfo = ExampleApp;
+		};
+		2889B7ED2A558F1A00D6C7BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2889B7C92A558F1800D6C7BE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2889B7D02A558F1800D6C7BE;
+			remoteInfo = ExampleApp;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -155,31 +157,33 @@
 		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 		28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetView.swift; sourceTree = "<group>"; };
+		28F4E3232B83921500C73065 /* AfterPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterPayWidgetView.swift; sourceTree = "<group>"; };
+		28F4E3252B83922100C73065 /* AfterPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterPayWidgetVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-        2889B7CE2A558F1800D6C7BE /* Frameworks */ = {
-            isa = PBXFrameworksBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-                28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */,
-            );
-            runOnlyForDeploymentPostprocessing = 0;
-        };
-        2889B7DF2A558F1A00D6C7BE /* Frameworks */ = {
-            isa = PBXFrameworksBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-            );
-            runOnlyForDeploymentPostprocessing = 0;
-        };
-        2889B7E92A558F1A00D6C7BE /* Frameworks */ = {
-            isa = PBXFrameworksBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-            );
-            runOnlyForDeploymentPostprocessing = 0;
-        };
+		2889B7CE2A558F1800D6C7BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2889B7DF2A558F1A00D6C7BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2889B7E92A558F1A00D6C7BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -224,6 +228,7 @@
 		282D315C2A66A64900E3ECAD /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				28F4E3222B83920600C73065 /* AfterPay */,
 				289B83822B9E381300CEA8B4 /* Mastercard */,
 				2865B22B2B56E4C700EBE2DD /* FlyPay */,
 				2808B3402A7056E300E86C7E /* CardDetails */,
@@ -512,135 +517,144 @@
 			path = GiftCard;
 			sourceTree = "<group>";
 		};
+		28F4E3222B83920600C73065 /* AfterPay */ = {
+			isa = PBXGroup;
+			children = (
+				28F4E3232B83921500C73065 /* AfterPayWidgetView.swift */,
+				28F4E3252B83922100C73065 /* AfterPayWidgetVM.swift */,
+			);
+			path = AfterPay;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-        2889B7D02A558F1800D6C7BE /* ExampleApp */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = 2889B7F62A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleApp" */;
-            buildPhases = (
-                2889B7CD2A558F1800D6C7BE /* Sources */,
-                2889B7CE2A558F1800D6C7BE /* Frameworks */,
-                2889B7CF2A558F1800D6C7BE /* Resources */,
-            );
-            buildRules = (
-            );
-            dependencies = (
-            );
-            name = ExampleApp;
-            packageProductDependencies = (
-                28E215FD2B63D28400A0877B /* MobileSDK */,
-            );
-            productName = ExampleApp;
-            productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
-            productType = "com.apple.product-type.application";
-        };
-        2889B7E12A558F1A00D6C7BE /* ExampleAppTests */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = 2889B7F92A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppTests" */;
-            buildPhases = (
-                2889B7DE2A558F1A00D6C7BE /* Sources */,
-                2889B7DF2A558F1A00D6C7BE /* Frameworks */,
-                2889B7E02A558F1A00D6C7BE /* Resources */,
-            );
-            buildRules = (
-            );
-            dependencies = (
-                2889B7E42A558F1A00D6C7BE /* PBXTargetDependency */,
-            );
-            name = ExampleAppTests;
-            productName = ExampleAppTests;
-            productReference = 2889B7E22A558F1A00D6C7BE /* ExampleAppTests.xctest */;
-            productType = "com.apple.product-type.bundle.unit-test";
-        };
-        2889B7EB2A558F1A00D6C7BE /* ExampleAppUITests */ = {
-            isa = PBXNativeTarget;
-            buildConfigurationList = 2889B7FC2A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppUITests" */;
-            buildPhases = (
-                2889B7E82A558F1A00D6C7BE /* Sources */,
-                2889B7E92A558F1A00D6C7BE /* Frameworks */,
-                2889B7EA2A558F1A00D6C7BE /* Resources */,
-            );
-            buildRules = (
-            );
-            dependencies = (
-                2889B7EE2A558F1A00D6C7BE /* PBXTargetDependency */,
-            );
-            name = ExampleAppUITests;
-            productName = ExampleAppUITests;
-            productReference = 2889B7EC2A558F1A00D6C7BE /* ExampleAppUITests.xctest */;
-            productType = "com.apple.product-type.bundle.ui-testing";
-        };
+		2889B7D02A558F1800D6C7BE /* ExampleApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2889B7F62A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleApp" */;
+			buildPhases = (
+				2889B7CD2A558F1800D6C7BE /* Sources */,
+				2889B7CE2A558F1800D6C7BE /* Frameworks */,
+				2889B7CF2A558F1800D6C7BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ExampleApp;
+			packageProductDependencies = (
+				28E215FD2B63D28400A0877B /* MobileSDK */,
+			);
+			productName = ExampleApp;
+			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		2889B7E12A558F1A00D6C7BE /* ExampleAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2889B7F92A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppTests" */;
+			buildPhases = (
+				2889B7DE2A558F1A00D6C7BE /* Sources */,
+				2889B7DF2A558F1A00D6C7BE /* Frameworks */,
+				2889B7E02A558F1A00D6C7BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2889B7E42A558F1A00D6C7BE /* PBXTargetDependency */,
+			);
+			name = ExampleAppTests;
+			productName = ExampleAppTests;
+			productReference = 2889B7E22A558F1A00D6C7BE /* ExampleAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		2889B7EB2A558F1A00D6C7BE /* ExampleAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2889B7FC2A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppUITests" */;
+			buildPhases = (
+				2889B7E82A558F1A00D6C7BE /* Sources */,
+				2889B7E92A558F1A00D6C7BE /* Frameworks */,
+				2889B7EA2A558F1A00D6C7BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2889B7EE2A558F1A00D6C7BE /* PBXTargetDependency */,
+			);
+			name = ExampleAppUITests;
+			productName = ExampleAppUITests;
+			productReference = 2889B7EC2A558F1A00D6C7BE /* ExampleAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-        2889B7C92A558F1800D6C7BE /* Project object */ = {
-            isa = PBXProject;
-            attributes = {
-                BuildIndependentTargetsInParallel = 1;
-                LastSwiftUpdateCheck = 1430;
-                LastUpgradeCheck = 1500;
-                ORGANIZATIONNAME = "Paydock Ltd.";
-                TargetAttributes = {
-                    2889B7D02A558F1800D6C7BE = {
-                        CreatedOnToolsVersion = 14.3.1;
-                    };
-                    2889B7E12A558F1A00D6C7BE = {
-                        CreatedOnToolsVersion = 14.3.1;
-                        TestTargetID = 2889B7D02A558F1800D6C7BE;
-                    };
-                    2889B7EB2A558F1A00D6C7BE = {
-                        CreatedOnToolsVersion = 14.3.1;
-                        TestTargetID = 2889B7D02A558F1800D6C7BE;
-                    };
-                };
-            };
-            buildConfigurationList = 2889B7CC2A558F1800D6C7BE /* Build configuration list for PBXProject "ExampleApp" */;
-            compatibilityVersion = "Xcode 14.0";
-            developmentRegion = en;
-            hasScannedForEncodings = 0;
-            knownRegions = (
-                en,
-                Base,
-            );
-            mainGroup = 2889B7C82A558F1800D6C7BE;
-            packageReferences = (
-            );
-            productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
-            projectDirPath = "";
-            projectRoot = "";
-            targets = (
-                2889B7D02A558F1800D6C7BE /* ExampleApp */,
-                2889B7E12A558F1A00D6C7BE /* ExampleAppTests */,
-                2889B7EB2A558F1A00D6C7BE /* ExampleAppUITests */,
-            );
-        };
+		2889B7C92A558F1800D6C7BE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1500;
+				ORGANIZATIONNAME = "Paydock Ltd.";
+				TargetAttributes = {
+					2889B7D02A558F1800D6C7BE = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+					2889B7E12A558F1A00D6C7BE = {
+						CreatedOnToolsVersion = 14.3.1;
+						TestTargetID = 2889B7D02A558F1800D6C7BE;
+					};
+					2889B7EB2A558F1A00D6C7BE = {
+						CreatedOnToolsVersion = 14.3.1;
+						TestTargetID = 2889B7D02A558F1800D6C7BE;
+					};
+				};
+			};
+			buildConfigurationList = 2889B7CC2A558F1800D6C7BE /* Build configuration list for PBXProject "ExampleApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2889B7C82A558F1800D6C7BE;
+			packageReferences = (
+			);
+			productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2889B7D02A558F1800D6C7BE /* ExampleApp */,
+				2889B7E12A558F1A00D6C7BE /* ExampleAppTests */,
+				2889B7EB2A558F1A00D6C7BE /* ExampleAppUITests */,
+			);
+		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-        2889B7CF2A558F1800D6C7BE /* Resources */ = {
-            isa = PBXResourcesBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-                2889B7DD2A558F1A00D6C7BE /* Preview Assets.xcassets in Resources */,
-                2889B7D92A558F1A00D6C7BE /* Assets.xcassets in Resources */,
-            );
-            runOnlyForDeploymentPostprocessing = 0;
-        };
-        2889B7E02A558F1A00D6C7BE /* Resources */ = {
-            isa = PBXResourcesBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-            );
-            runOnlyForDeploymentPostprocessing = 0;
-        };
-        2889B7EA2A558F1A00D6C7BE /* Resources */ = {
-            isa = PBXResourcesBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-            );
-            runOnlyForDeploymentPostprocessing = 0;
-        };
+		2889B7CF2A558F1800D6C7BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2889B7DD2A558F1A00D6C7BE /* Preview Assets.xcassets in Resources */,
+				2889B7D92A558F1A00D6C7BE /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2889B7E02A558F1A00D6C7BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2889B7EA2A558F1A00D6C7BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -669,6 +683,7 @@
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
 				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
+				28F4E3242B83921500C73065 /* AfterPayWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
@@ -695,6 +710,7 @@
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
+				28F4E3262B83922100C73065 /* AfterPayWidgetVM.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* MastercardWidgetView.swift in Sources */,
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
@@ -726,16 +742,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-        2889B7E42A558F1A00D6C7BE /* PBXTargetDependency */ = {
-            isa = PBXTargetDependency;
-            target = 2889B7D02A558F1800D6C7BE /* ExampleApp */;
-            targetProxy = 2889B7E32A558F1A00D6C7BE /* PBXContainerItemProxy */;
-        };
-        2889B7EE2A558F1A00D6C7BE /* PBXTargetDependency */ = {
-            isa = PBXTargetDependency;
-            target = 2889B7D02A558F1800D6C7BE /* ExampleApp */;
-            targetProxy = 2889B7ED2A558F1A00D6C7BE /* PBXContainerItemProxy */;
-        };
+		2889B7E42A558F1A00D6C7BE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2889B7D02A558F1800D6C7BE /* ExampleApp */;
+			targetProxy = 2889B7E32A558F1A00D6C7BE /* PBXContainerItemProxy */;
+		};
+		2889B7EE2A558F1A00D6C7BE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2889B7D02A558F1800D6C7BE /* ExampleApp */;
+			targetProxy = 2889B7ED2A558F1A00D6C7BE /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1063,50 +1079,50 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-        2889B7CC2A558F1800D6C7BE /* Build configuration list for PBXProject "ExampleApp" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                2889B7F42A558F1A00D6C7BE /* Debug (Production) */,
-                2889B7F52A558F1A00D6C7BE /* Release (Production) */,
-            );
-            defaultConfigurationIsVisible = 0;
-            defaultConfigurationName = "Release (Production)";
-        };
-        2889B7F62A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleApp" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                2889B7F72A558F1A00D6C7BE /* Debug (Production) */,
-                2889B7F82A558F1A00D6C7BE /* Release (Production) */,
-            );
-            defaultConfigurationIsVisible = 0;
-            defaultConfigurationName = "Release (Production)";
-        };
-        2889B7F92A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppTests" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                2889B7FA2A558F1A00D6C7BE /* Debug (Production) */,
-                2889B7FB2A558F1A00D6C7BE /* Release (Production) */,
-            );
-            defaultConfigurationIsVisible = 0;
-            defaultConfigurationName = "Release (Production)";
-        };
-        2889B7FC2A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppUITests" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                2889B7FD2A558F1A00D6C7BE /* Debug (Production) */,
-                2889B7FE2A558F1A00D6C7BE /* Release (Production) */,
-            );
-            defaultConfigurationIsVisible = 0;
-            defaultConfigurationName = "Release (Production)";
-        };
+		2889B7CC2A558F1800D6C7BE /* Build configuration list for PBXProject "ExampleApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2889B7F42A558F1A00D6C7BE /* Debug (Production) */,
+				2889B7F52A558F1A00D6C7BE /* Release (Production) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release (Production)";
+		};
+		2889B7F62A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2889B7F72A558F1A00D6C7BE /* Debug (Production) */,
+				2889B7F82A558F1A00D6C7BE /* Release (Production) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release (Production)";
+		};
+		2889B7F92A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2889B7FA2A558F1A00D6C7BE /* Debug (Production) */,
+				2889B7FB2A558F1A00D6C7BE /* Release (Production) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release (Production)";
+		};
+		2889B7FC2A558F1A00D6C7BE /* Build configuration list for PBXNativeTarget "ExampleAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2889B7FD2A558F1A00D6C7BE /* Debug (Production) */,
+				2889B7FE2A558F1A00D6C7BE /* Release (Production) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release (Production)";
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-        28E215FD2B63D28400A0877B /* MobileSDK */ = {
-            isa = XCSwiftPackageProductDependency;
-            productName = MobileSDK;
-        };
+		28E215FD2B63D28400A0877B /* MobileSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MobileSDK;
+		};
 /* End XCSwiftPackageProductDependency section */
-    };
-    rootObject = 2889B7C92A558F1800D6C7BE /* Project object */;
+	};
+	rootObject = 2889B7C92A558F1800D6C7BE /* Project object */;
 }
