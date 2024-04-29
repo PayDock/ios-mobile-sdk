@@ -12,27 +12,29 @@ import Afterpay
 
 struct AfterpayPaymentButton: View {
     var width: CGFloat
+    var config: AfterpaySdkConfig.ButtonTheme
     var action: () -> Void
 
     var body: some View {
-        Representable(action: action, width: width)
+        Representable(config: config, action: action, width: width)
     }
 }
 
 struct AfterpayPaymentButton_Previews: PreviewProvider {
     static var previews: some View {
-        AfterpayPaymentButton( width: 320, action: {})
+        AfterpayPaymentButton(width: 320, config: .init(), action: {})
             .previewLayout(.sizeThatFits)
     }
 }
 
 extension AfterpayPaymentButton {
     struct Representable: UIViewRepresentable {
+        var config: AfterpaySdkConfig.ButtonTheme
         var action: () -> Void
         var width: CGFloat
 
         func makeCoordinator() -> Coordinator {
-            Coordinator(width: width, action: action)
+            Coordinator(config: config, width: width, action: action)
         }
 
         func makeUIView(context: Context) -> some UIView {
@@ -46,11 +48,14 @@ extension AfterpayPaymentButton {
     }
 
     class Coordinator: NSObject {
+        var config: AfterpaySdkConfig.ButtonTheme
         var width: CGFloat
         var action: () -> Void
-        var button = PaymentButton(colorScheme: .dynamic(lightPalette: .blackOnMint, darkPalette: .mintOnBlack), buttonKind: .payNow)
 
-        init(width: CGFloat, action: @escaping () -> Void) {
+        lazy var button = PaymentButton(colorScheme: config.colorScheme)
+
+        init(config: AfterpaySdkConfig.ButtonTheme, width: CGFloat, action: @escaping () -> Void) {
+            self.config = config
             self.action = action
             self.width = width
             super.init()

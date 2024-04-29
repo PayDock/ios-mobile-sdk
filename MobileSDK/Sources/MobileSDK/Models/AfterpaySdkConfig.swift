@@ -9,29 +9,65 @@
 import Afterpay
 import Foundation
 
-struct AfterpaySdkConfig {
-    let buttonTheme: ButtonTheme
-    let config: AfterPayConfiguration
-    let options: CheckoutOptions
+public struct AfterpaySdkConfig {
+    public var buttonTheme: ButtonTheme
+    public var config: AfterPayConfiguration
+    public var environment: Environment
+    public var options: CheckoutOptions
 
-    struct ButtonTheme {
-        let buttonType: ButtonKind = .buyNow
-        let colorScheme: ColorScheme = .static(.blackOnMint)
+    public init(buttonTheme: ButtonTheme, config: AfterPayConfiguration, environment: Environment, options: CheckoutOptions) {
+        self.buttonTheme = buttonTheme
+        self.config = config
+        self.environment = environment
+        self.options = options
     }
 
-    struct CheckoutOptions {
-        let pickup: Bool? = nil
-        let buyNow: Bool? = nil
-        let shippingOptionRequired: Bool? = nil
-        let enableSingleShippingOptionUpdate: Bool? = nil
+    public struct ButtonTheme {
+        public var buttonType: ButtonKind
+        public var colorScheme: ColorScheme
+
+        public init(buttonType: ButtonKind = .buyNow, 
+                    colorScheme: ColorScheme = .static(.blackOnMint)) {
+            self.buttonType = buttonType
+            self.colorScheme = colorScheme
+        }
     }
 
-    struct AfterPayConfiguration {
-        let minimumAmount: String? = nil
-        let maximumAmount: String
-        let currency: String
-        let language: String = Locale.current.language.languageCode?.identifier ?? "EN_au"
-        let country: String = Locale.current.region?.identifier ?? "AU"
+    public struct CheckoutOptions {
+        public var pickup: Bool? = nil
+        public var buyNow: Bool? = nil
+        public var shippingOptionRequired: Bool? = nil
+        public var enableSingleShippingOptionUpdate: Bool? = nil
+
+        public init(pickup: Bool? = nil,
+                    buyNow: Bool? = nil,
+                    shippingOptionRequired: Bool? = nil,
+                    enableSingleShippingOptionUpdate: Bool? = nil) {
+            self.pickup = pickup
+            self.buyNow = buyNow
+            self.shippingOptionRequired = shippingOptionRequired
+            self.enableSingleShippingOptionUpdate = enableSingleShippingOptionUpdate
+        }
+    }
+
+    public struct AfterPayConfiguration {
+        public var minimumAmount: String? = nil
+        public var maximumAmount: String
+        public var currency: String
+        public var language: String
+        public var country: String
+
+        public init(minimumAmount: String? = nil,
+                    maximumAmount: String,
+                    currency: String,
+                    language: String = Locale.current.language.languageCode?.identifier ?? "en_AU",
+                    country: String = Locale.current.region?.identifier ?? "AU") {
+            self.minimumAmount = minimumAmount
+            self.maximumAmount = maximumAmount
+            self.currency = currency
+            self.language = language
+            self.country = country
+        }
     }
 
 }

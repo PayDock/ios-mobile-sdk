@@ -16,11 +16,12 @@ struct AfterPayWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                AfterPayWidget(afterPayToken: { onAfterPayButtonTap in
+                AfterPayWidget(configuration: viewModel.getAfterpayConfig(),
+                               afterPayToken: { onAfterPayButtonTap in
                     viewModel.initializeWalletCharge(completion: onAfterPayButtonTap)
                 }, buttonWidth: 360.0) { result in
                     switch result {
-                    case .success: viewModel.handleSuccess()
+                    case .success(let chargeData): viewModel.handleSuccess(chargeData)
                     case .failure(let error): viewModel.handleError(error: error)
                     }
                 }

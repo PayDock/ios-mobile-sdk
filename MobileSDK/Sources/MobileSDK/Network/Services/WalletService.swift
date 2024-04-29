@@ -14,6 +14,7 @@ protocol WalletService {
     func getCallback(token: String, shipping: Bool) async throws -> String
     func getFlyPayCallback(token: String) async throws -> String
     func getAfterPayCallback(token: String) async throws -> String
+    func declineWalletTransaction(token: String, chargeId: String) async throws -> String
 
 }
 
@@ -25,7 +26,7 @@ struct WalletServiceImpl: HTTPClient, WalletService {
             customer: .init(paymentSource: .init(externalPayerId: nil, refToken: refToken)))
 
         let response = try await sendRequest(
-            endpoint: WalletEndpoints.walletCapture(token: token, walletCaptureReq: walletCaptureReq),
+            endpoint: WalletEndpoints.walletCapture(capture: true, token: token, walletCaptureReq: walletCaptureReq),
             responseModel: WalletCaptureRes.self)
 
         return response.resource.data
@@ -66,4 +67,12 @@ struct WalletServiceImpl: HTTPClient, WalletService {
 
         return response.resource.data.refToken
     }
+
+    func declineWalletTransaction(token: String, chargeId: String) async throws -> String {
+        let endpoint = WalletEndpoints.declineWalletTransaction(token: token, chargeId: chargeId)
+        let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self)
+        return response.resource.status
+
+    }
+
 }

@@ -18,6 +18,7 @@ class AfterPayVM: ObservableObject {
 
     // MARK: - Properties
 
+    let configuration: AfterpaySdkConfig
     private let afterPayToken: (_ afterPayToken: @escaping (String) -> Void) -> Void
     @Published var showWebView = false
     @Published var isLoading = false
@@ -26,16 +27,18 @@ class AfterPayVM: ObservableObject {
 
     // MARK: - Handlers
 
-    private var completion: (Result<String, AfterPayError>) -> Void
+    private var completion: (Result<ChargeResponse, AfterPayError>) -> Void
     private var onAddressChange: ShippingAddressDidChangeClosure?
     private var onShippingChange: ShippingOptionDidChangeClosure?
 
 
     // MARK: - Initialisation
 
-    init(afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
+    init(configuration: AfterpaySdkConfig,
+         afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
-         completion: @escaping (Result<String, AfterPayError>) -> Void) {
+         completion: @escaping (Result<ChargeResponse, AfterPayError>) -> Void) {
+        self.configuration = configuration
         self.afterPayToken = afterPayToken
         self.walletService = walletService
         self.completion = completion
@@ -43,27 +46,26 @@ class AfterPayVM: ObservableObject {
     }
 
     private func setupConfig() {
-        let config = try? Configuration(
-            minimumAmount: "1.00", maximumAmount: "100.00", currencyCode: "AUD", locale: Locale(identifier: "en_AU"), environment: .sandbox)
-        Afterpay.setConfiguration(config)
+        let afterpayConfig =  try? Configuration(
+            minimumAmount: configuration.config.minimumAmount,
+            maximumAmount: configuration.config.maximumAmount,
+            currencyCode: configuration.config.currency,
+            locale: Locale(identifier: configuration.config.language),
+            environment: configuration.environment)
+        Afterpay.setConfiguration(afterpayConfig)
     }
 
     func presentAfterpay(_ sender: some View) {
-        let vc = UIApplication.shared.keyWindow?.rootViewController
+        let vc = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.last?.rootViewController
         guard let vc = vc else { return }
         Afterpay.presentCheckoutV2Modally(over: vc, animated: true, options: .init()) { completion in
             completion(.success(self.afterPayOrderId))
-        } shippingAddressDidChange: { address, completion in
-            completion(.success(onAddressChange(address)))
-
-            completion(onAddressChange)
-        } shippingOptionDidChange: { shippingOption, complete in
         } completion: { [weak self] result in
             switch result {
-            case .success(let token):
+            case .success:
                 self?.captureWaletCharge()
-            case .cancelled(let reason):
-                completion(.failure(.webViewFailed))
+            case .cancelled:
+                self?.declineWalletTransaction()
             }
         }
     }
@@ -98,13 +100,11 @@ class AfterPayVM: ObservableObject {
                     payerId: nil,
                     refToken: self.afterPayOrderId)
                 isLoading = false
-                completion(.success("Success"))
+                completion(.success(chargeResponse))
 
             } catch {
-                print("error")
                 isLoading = false
-                completion(.failure(.webViewFailed))
-
+                completion(.failure(.requestFailed))
             }
         }
     }
@@ -117,16 +117,59 @@ class AfterPayVM: ObservableObject {
         }
     }
 
-    func handleSuccess() {
-        isLoading = false
-        showWebView = false
-        completion(.success(("TADAA")))
+    func declineWalletTransaction() {
+        isLoading = true
+        Task {
+            do {
+                guard let chargeId = decodeChargeId(jwtToken: token) else { return }
+                _ = try await walletService.declineWalletTransaction(token: self.token, chargeId: chargeId)
+                isLoading = false
+                completion(.failure(.webViewFailed))
+            } catch {
+                print("error")
+                isLoading = false
+                completion(.failure(.webViewFailed))
+            }
+        }
+    }
+}
+
+// MARK: - JWT Handling
+
+extension AfterPayVM {
+    private func decodeChargeId(jwtToken jwt: String) -> String? {
+        let segments = jwt.components(separatedBy: ".")
+        let parts = decodeJWTPart(segments[1]) ?? [:]
+        guard let meta = parts["meta"] as? String else {
+            print("Error decoding meta token!")
+            return nil
+        }
+        let innerMeta = decodeJWTPart(meta)?["meta"] as? [String: Any]
+        let charge = innerMeta?["charge"] as? [String: Any]
+        let chargeId = charge?["id"] as? String
+        return chargeId
     }
 
-    func handleFailure(error: AfterPayError) {
-        isLoading = false
-        showWebView = false
-        completion(.failure(error))
+    private func base64UrlDecode(_ value: String) -> Data? {
+        var base64 = value
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+
+        let length = Double(base64.lengthOfBytes(using: String.Encoding.utf8))
+        let requiredLength = 4 * ceil(length / 4.0)
+        let paddingLength = requiredLength - length
+        if paddingLength > 0 {
+            let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
+            base64 = base64 + padding
+        }
+        return Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
     }
 
+    private func decodeJWTPart(_ value: String) -> [String: Any]? {
+        guard let bodyData = base64UrlDecode(value),
+              let json = try? JSONSerialization.jsonObject(with: bodyData, options: []), let payload = json as? [String: Any] else {
+            return nil
+        }
+        return payload
+    }
 }

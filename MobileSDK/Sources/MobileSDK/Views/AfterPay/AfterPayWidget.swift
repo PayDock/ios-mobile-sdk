@@ -16,16 +16,19 @@ public struct AfterPayWidget: View {
     public init(configuration: AfterpaySdkConfig,
                 afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
                 buttonWidth: CGFloat,
-                completion: @escaping (Result<String, AfterPayError>) -> Void) {
-        _viewModel = StateObject(wrappedValue: AfterPayVM(afterPayToken: afterPayToken, completion: completion))
+                completion: @escaping (Result<ChargeResponse, AfterPayError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: AfterPayVM(configuration: configuration, afterPayToken: afterPayToken, completion: completion))
         self.buttonWidth = buttonWidth
     }
 
     public var body: some View {
         HStack {
             Spacer()
-            AfterpayPaymentButton(width: buttonWidth, action: {
-                viewModel.handleButtonTap()
+            AfterpayPaymentButton(
+                width: buttonWidth,
+                config: viewModel.configuration.buttonTheme,
+                action: {
+                    viewModel.handleButtonTap()
             })
             .frame(width: buttonWidth, height: buttonWidth * 0.15)
             Spacer()
@@ -39,6 +42,6 @@ public struct AfterPayWidget: View {
 
 struct AfterPayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        AfterPayWidget(afterPayToken: { _ in }, buttonWidth: 320, completion: { _ in })
+        AfterPayWidget(configuration: .init(buttonTheme: .init(), config: .init(maximumAmount: "100.0", currency: "AUD"), environment: .sandbox, options: .init()), afterPayToken: { _ in }, buttonWidth: 320, completion: { _ in })
     }
 }

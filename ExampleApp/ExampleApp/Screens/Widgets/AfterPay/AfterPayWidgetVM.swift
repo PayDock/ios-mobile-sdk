@@ -64,19 +64,22 @@ class AfterPayWidgetVM: ObservableObject {
         }
     }
 
+    func getAfterpayConfig() -> AfterpaySdkConfig {
+        let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
+        let config = AfterpaySdkConfig.AfterPayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
+        let options = AfterpaySdkConfig.CheckoutOptions()
+        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
+    }
+
     func handleError(error: Error) {
         alertTitle = "Error"
         alertMessage = "Transaction canceled"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.showAlert = true
-        }
+        self.showAlert = true
     }
 
-    func handleSuccess() {
+    func handleSuccess(_ chargeData: ChargeResponse) {
         alertTitle = "Success"
-        alertMessage = "Charge completed"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.showAlert = true
-        }
+        alertMessage = "Charged \(chargeData.amount) \(chargeData.currency)"
+        self.showAlert = true
     }
 }
