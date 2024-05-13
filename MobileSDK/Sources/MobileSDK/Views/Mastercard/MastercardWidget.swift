@@ -165,7 +165,7 @@ public struct MastercardWidget: UIViewRepresentable {
         </head>
         <body>
             <div id="checkoutIframe"></div>
-            <script src="https://widget.paydock.com/sdk/v1.99.9-beta/widget.umd.min.js"></script>
+            <script src="https://widget.paydock.com/sdk/v1.103.24-beta/widget.umd.min.js"></script>
             <script>
                 const serviceId = "\(serviceId)";
                 const publicKey = "\(publicKey)";
