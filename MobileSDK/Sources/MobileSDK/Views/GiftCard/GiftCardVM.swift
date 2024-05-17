@@ -18,7 +18,7 @@ class GiftCardVM: ObservableObject {
     
     // MARK: - Handlers
 
-    private let completion: (Result<String, Error>) -> Void
+    private let completion: (Result<String, GiftCardError>) -> Void
 
     // MARK: - Properties
 
@@ -31,7 +31,7 @@ class GiftCardVM: ObservableObject {
     init(giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
          cardService: CardService = CardServiceImpl(),
          storePin: Bool,
-         completion: @escaping (Result<String, Error>) -> Void) {
+         completion: @escaping (Result<String, GiftCardError>) -> Void) {
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
         self.storePin = storePin
@@ -56,7 +56,8 @@ class GiftCardVM: ObservableObject {
                 completion(.success(cardToken))
             } catch {
                 isLoading = false
-                completion(.failure(error))
+                print(error)
+                completion(.failure(.errorTokenisingCard(error: error)))
             }
         }
     }
