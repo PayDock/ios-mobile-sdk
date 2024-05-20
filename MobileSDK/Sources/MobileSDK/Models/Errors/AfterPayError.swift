@@ -10,15 +10,19 @@ import Foundation
 
 public enum AfterPayError: Error {
 
-    case requestFailed
-    case webViewFailed
+    case errorFetchingAfterpayUrl(error: ErrorRes)
+    case errorCapturingCharge(error: ErrorRes)
+    case errorCancelingTransaction(error: ErrorRes)
     case transactionCanceled
+    case unknownError
 
     public var customMessage: String {
         switch self {
-        case .requestFailed: return "Afterpay payment request has failed! There was an issue with your request."
-        case .webViewFailed: return "Afterpay WebView widget has failed."
+        case .errorFetchingAfterpayUrl: return "Unable to fetch Afterpay widget URL"
+        case .errorCapturingCharge: return "Unable to complete the charge"
+        case .errorCancelingTransaction: return "Unable to cancel transaction"
         case .transactionCanceled: return "Afterpay transaction was canceled."
+        case .unknownError: return "Unknown error"
         }
     }
 }

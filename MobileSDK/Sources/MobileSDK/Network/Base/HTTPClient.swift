@@ -81,13 +81,13 @@ extension HTTPClient {
                 }
                 return decodedResponse
 
+            case 401: throw RequestError.unauthorized
+
             case 400...599:
                 guard let decodedError = try? decoder.decode(ErrorRes.self, from: data) else {
                     throw RequestError.unexpectedErrorModel
                 }
-                throw RequestError.error(errorResponse: decodedError)
-//            case 401:
-//                throw RequestError.unauthorized
+                throw RequestError.requestError(decodedError)
 
             default:
                 throw RequestError.unexpectedStatusCode

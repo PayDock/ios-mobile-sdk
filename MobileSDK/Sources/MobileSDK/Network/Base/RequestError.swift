@@ -15,17 +15,19 @@ enum RequestError: Error {
     case unauthorized
     case unexpectedStatusCode
     case unexpectedErrorModel
+    case requestError(_ errorResponse: ErrorRes)
     case unknown
-    case error(errorResponse: ErrorRes)
 
     var customMessage: String {
         switch self {
-        case .decode:
-            return "Decode error"
-        case .unauthorized:
-            return "Session expired"
-        default:
-            return "Unknown error"
+        case .decode: return "Error while mapping a JSON response"
+        case .invalidURL: return "Invalid URL"
+        case .noResponse: return "Response timeout"
+        case .unauthorized: return "Unauthorized - missing or invalid access key"
+        case .unexpectedStatusCode: return "Unexpected status code received"
+        case .unexpectedErrorModel: return "Unexpected error model - unable to decode JSON"
+        case .requestError(let errorRes): return errorRes.error?.message ?? "Request error"
+        case .unknown: return "Unknown error"
         }
     }
 }

@@ -64,8 +64,11 @@ class CardDetailsVM: ObservableObject {
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
                 isLoading = false
                 completion(.success(cardToken))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.errorTokenisingCard(error: errorResponse)))
+                isLoading = false
             } catch {
-                completion(.failure(.errorTokenisingCard))
+                completion(.failure(.unknownError))
                 isLoading = false
             }
         }

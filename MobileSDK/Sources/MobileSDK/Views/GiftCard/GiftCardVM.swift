@@ -54,10 +54,11 @@ class GiftCardVM: ObservableObject {
                 let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq)
                 isLoading = false
                 completion(.success(cardToken))
-            } catch {
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
-                print(error)
-                completion(.failure(.errorTokenisingCard(error: error)))
+                completion(.failure(.errorTokenisingCard(error: errorResponse)))
+            } catch {
+                completion(.failure(.unknownError))
             }
         }
     }

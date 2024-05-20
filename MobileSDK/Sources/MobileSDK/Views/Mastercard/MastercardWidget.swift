@@ -70,7 +70,6 @@ public struct MastercardWidget: UIViewRepresentable {
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            print(message.body)
             guard let data = message.body as? [String: Any],
                   let eventRaw = data["event"] as? String,
                   let event = MastercardResult.EventType(rawValue: eventRaw) else {

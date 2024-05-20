@@ -11,11 +11,12 @@ import Foundation
 public enum GiftCardError: Error {
 
     case errorTokenisingCard(error: ErrorRes)
+    case unknownError
 
     public var customMessage: String {
         switch self {
-        case let .errorTokenisingCard(error):
-            return "Error tokenising card details!"
+        case let .errorTokenisingCard(error): return error.error?.message ?? "Error tokenising gift card"
+        case .unknownError: return "Unknown error occured"
         }
     }
 }

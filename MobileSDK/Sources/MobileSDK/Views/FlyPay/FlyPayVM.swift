@@ -48,11 +48,17 @@ class FlyPayVM: ObservableObject {
                     self.flyPayOrderId = flyPayOrderId
                     self.showWebView = true
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.showWebView = false
+                    self.completion(.failure(.errorFetchingFlyPayOrder(error: errorResponse)))
+                }
             } catch {
                 await MainActor.run {
                     self.isLoading = false
                     self.showWebView = false
-                    self.completion(.failure(.webViewFailed))
+                    self.completion(.failure(.unknownError))
                 }
             }
         }
