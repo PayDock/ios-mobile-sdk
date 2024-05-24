@@ -29,7 +29,7 @@ struct CheckoutPaymentSheet: View {
                 VStack {
                     CardDetailsWidget(gatewayId: "", completion: { result in
                         switch result {
-                        case .success(let token): viewModel.saveCardToken(token)
+                        case .success(let result): viewModel.saveCardToken(result.token)
                         case .failure: break
                         }
                     })
