@@ -63,7 +63,7 @@ class AfterPayVM: ObservableObject {
         } completion: { [weak self] result in
             switch result {
             case .success:
-                self?.captureWaletCharge()
+                self?.captureWalletCharge()
             case .cancelled:
                 self?.declineWalletTransaction()
             }
@@ -81,17 +81,23 @@ class AfterPayVM: ObservableObject {
                     self.presentAfterpay()
                     self.showWebView = true
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.showWebView = false
+                    self.completion(.failure(.errorFetchingAfterpayUrl(error: errorResponse)))
+                }
             } catch {
                 await MainActor.run {
                     self.isLoading = false
                     self.showWebView = false
-                    self.completion(.failure(.webViewFailed))
+                    self.completion(.failure(.unknownError))
                 }
             }
         }
     }
 
-    private func captureWaletCharge() {
+    private func captureWalletCharge() {
         isLoading = true
         Task {
             do {
@@ -102,10 +108,12 @@ class AfterPayVM: ObservableObject {
                     refToken: self.afterPayOrderId)
                 isLoading = false
                 completion(.success(chargeResponse))
-
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                completion(.failure(.errorCapturingCharge(error: errorResponse)))
             } catch {
                 isLoading = false
-                completion(.failure(.requestFailed))
+                completion(.failure(.unknownError))
             }
         }
     }
@@ -125,11 +133,13 @@ class AfterPayVM: ObservableObject {
                 guard let chargeId = decodeChargeId(jwtToken: token) else { return }
                 _ = try await walletService.declineWalletTransaction(token: self.token, chargeId: chargeId)
                 isLoading = false
-                completion(.failure(.webViewFailed))
-            } catch {
-                print("error")
+                completion(.failure(.transactionCanceled))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
-                completion(.failure(.webViewFailed))
+                completion(.failure(.errorCancelingTransaction(error: errorResponse)))
+            } catch {
+                isLoading = false
+                completion(.failure(.unknownError))
             }
         }
     }

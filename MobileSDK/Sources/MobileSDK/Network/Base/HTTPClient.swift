@@ -31,6 +31,19 @@ extension HTTPClient {
         return SSLPinningManager()
     }
 
+    var encoder: JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        return encoder
+    }
+
+    var decoder: JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }
+
+
     // MARK: - Default implementation
 
     func sendRequest<T: Decodable>(endpoint: Endpoint, responseModel: T.Type) async throws -> T {
@@ -63,20 +76,25 @@ extension HTTPClient {
 
             switch response.statusCode {
             case 200...299:
-                guard let decodedResponse = try? JSONDecoder().decode(responseModel, from: data) else {
+                guard let decodedResponse = try? decoder.decode(responseModel, from: data) else {
                     throw RequestError.decode
                 }
                 return decodedResponse
 
-            case 401:
-                throw RequestError.unauthorized
+            case 401: throw RequestError.unauthorized
+
+            case 400...599:
+                guard let decodedError = try? decoder.decode(ErrorRes.self, from: data) else {
+                    throw RequestError.unexpectedErrorModel
+                }
+                throw RequestError.requestError(decodedError)
 
             default:
                 throw RequestError.unexpectedStatusCode
             }
 
         } catch {
-            throw RequestError.unknown
+            throw error
         }
     }
 
