@@ -89,7 +89,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
                 completion(paymentStatus)
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 paymentStatus = .failure
-                self.error = .paymentFailed(error: errorResponse)
+                self.error = .errorCompletingPayment(error: errorResponse)
                 completion(paymentStatus)
             } catch {
                 paymentStatus = .failure
