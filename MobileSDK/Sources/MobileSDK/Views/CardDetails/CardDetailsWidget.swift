@@ -106,7 +106,7 @@ public struct CardDetailsWidget: View {
                     privacyView
                 }
             }
-            LargeButton(title: "Submit", disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            LargeButton(title: viewModel.actionText, disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
                 viewModel.tokeniseCardDetails()
             }
             .padding(.bottom, 16)
@@ -120,7 +120,7 @@ public struct CardDetailsWidget: View {
     private var privacyView: some View {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(viewModel.allowSaveCard?.consentText ?? "Remember this card for next time.")
+                    Text(viewModel.allowSaveCard?.consentText ?? "")
                         .customFont(.body3)
                         .foregroundColor(.textColor)
                     let text = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""

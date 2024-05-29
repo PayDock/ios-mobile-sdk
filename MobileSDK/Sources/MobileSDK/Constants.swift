@@ -14,7 +14,7 @@ struct Constants {
         guard let environment = MobileSDK.shared.config?.environment else {
             fatalError("Missing configuration!")
         }
-        
+
         switch environment {
         case .production: return "api.paydock.com"
         case .sandbox: return "api-sandbox.paydock.com"
@@ -22,5 +22,25 @@ struct Constants {
         }
     }
 
-    static var publicKey: String = ""
+    static var clientSdkUrlString: String {
+        guard let environment = MobileSDK.shared.config?.environment else {
+            fatalError("Missing configuration!")
+        }
+
+        switch environment {
+        case .production, .sandbox, .staging: return "https://widget.paydock.com/sdk/latest/widget.umd.min.js"
+        }
+    }
+
+    static var publicKey: String {
+        guard let config = MobileSDK.shared.config else {
+            fatalError("Missing configuration!")
+        }
+
+        return config.publicKey
+    }
+
+    static var payPalCallbackHost: String {
+        return "paydock-mobile.sdk"
+    }
 }

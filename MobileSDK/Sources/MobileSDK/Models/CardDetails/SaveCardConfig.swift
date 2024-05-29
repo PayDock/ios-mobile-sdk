@@ -12,7 +12,8 @@ public struct SaveCardConfig {
     public let consentText: String?
     public let privacyPolicyConfig: PrivacyPolicyConfig?
 
-    public init(consentText: String?, privacyPolicyConfig: PrivacyPolicyConfig?) {
+    public init(consentText: String? = "Remember this card for next time.",
+                privacyPolicyConfig: PrivacyPolicyConfig?) {
         self.consentText = consentText
         self.privacyPolicyConfig = privacyPolicyConfig
     }

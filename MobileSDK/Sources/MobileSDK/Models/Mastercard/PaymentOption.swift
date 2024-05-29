@@ -9,7 +9,11 @@
 import Foundation
 
 public struct PaymentOption: Codable {
-    public var dynamicDataType: String? = nil
+    public let dynamicDataType: String?
+
+    public init(dynamicDataType: String? = nil) {
+        self.dynamicDataType = dynamicDataType
+    }
 
     enum CodingKeys: String, CodingKey {
         case dynamicDataType = "dynamic_data_type"

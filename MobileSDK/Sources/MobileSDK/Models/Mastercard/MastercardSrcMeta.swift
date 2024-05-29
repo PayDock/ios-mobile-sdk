@@ -9,13 +9,29 @@
 import Foundation
 
 public struct MastercardSrcMeta: Codable {
-    public let dpaData: MastercardDpaData? = nil
-    public let disableSummaryScreen: Bool? = nil
-    public let cardBrands: [CardBrands]? = nil
-    public let coBrandNames: [String]? = nil
-    public let checkoutExperience: CheckoutExperience? = nil
-    public let services: Services? = nil
-    public let dpaTransactionOptions: MastercardDpaOptions? = nil
+    public let dpaData: MastercardDpaData?
+    public let disableSummaryScreen: Bool?
+    public let cardBrands: [CardBrands]?
+    public let coBrandNames: [String]?
+    public let checkoutExperience: CheckoutExperience?
+    public let services: Services?
+    public let dpaTransactionOptions: MastercardDpaOptions?
+
+    public init(dpaData: MastercardDpaData? = nil,
+                disableSummaryScreen: Bool? = nil,
+                cardBrands: [CardBrands]? = nil,
+                coBrandNames: [String]? = nil,
+                checkoutExperience: CheckoutExperience? = nil,
+                services: Services? = nil,
+                dpaTransactionOptions: MastercardDpaOptions? = nil) {
+        self.dpaData = dpaData
+        self.disableSummaryScreen = disableSummaryScreen
+        self.cardBrands = cardBrands
+        self.coBrandNames = coBrandNames
+        self.checkoutExperience = checkoutExperience
+        self.services = services
+        self.dpaTransactionOptions = dpaTransactionOptions
+    }
 
     enum CodingKeys: String, CodingKey {
         case dpaData = "dpa_data"

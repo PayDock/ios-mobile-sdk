@@ -9,8 +9,8 @@
 import Foundation
 
 public struct PhoneNumber: Codable {
-    public var countryCode: String
-    public var phoneNumber: String
+    public let countryCode: String
+    public let phoneNumber: String
 
     enum CodingKeys: String, CodingKey {
         case countryCode = "country_code"
