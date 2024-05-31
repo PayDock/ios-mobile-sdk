@@ -7,15 +7,15 @@
 //
 
 public struct MastercardDpaData: Codable {
-    public let dpaAddress: String? = nil
-    public let dpaEmailAddress: String? = nil
-    public let dpaPhoneNumber: PhoneNumber? = nil
-    public let dpaLogoUri: String? = nil
-    public let dpaSupportedEmailAddress: String? = nil
-    public let dpaSupportedPhoneNumber: PhoneNumber? = nil
-    public let dpaUri: String? = nil
-    public let dpaSupportUri: String? = nil
-    public let applicationType: ApplicationType? = nil
+    public var dpaAddress: String? = nil
+    public var dpaEmailAddress: String? = nil
+    public var dpaPhoneNumber: PhoneNumber? = nil
+    public var dpaLogoUri: String? = nil
+    public var dpaSupportedEmailAddress: String? = nil
+    public var dpaSupportedPhoneNumber: PhoneNumber? = nil
+    public var dpaUri: String? = nil
+    public var dpaSupportUri: String? = nil
+    public var applicationType: ApplicationType? = nil
 
     enum CodingKeys: String, CodingKey {
         case dpaAddress = "dpa_address"

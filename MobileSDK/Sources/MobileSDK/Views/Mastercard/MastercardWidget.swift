@@ -15,6 +15,7 @@ public struct MastercardWidget: UIViewRepresentable {
     private let serviceId: String
     private let publicKey = Constants.publicKey
     private let meta: MastercardSrcMeta?
+    private let clientSdkUrl = Constants.clientSdkUrlString
 
     public init(serviceId: String,
                 meta: MastercardSrcMeta?,
@@ -108,17 +109,21 @@ public struct MastercardWidget: UIViewRepresentable {
 
     func html(serviceId: String, publicKey: String, meta: MastercardSrcMeta?) -> String {
         let jsonString: String = {
-            do {
-                let jsonData = try JSONEncoder().encode(meta)
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    return jsonString
-                } else {
+            if meta == nil {
+                return "{}"
+            } else {
+                do {
+                    let jsonData = try JSONEncoder().encode(meta)
+                    if let jsonString = String(data: jsonData, encoding: .utf8) {
+                        return jsonString
+                    } else {
+                        print("Error converting SRC meta to JSON")
+                        return ""
+                    }
+                } catch {
                     print("Error converting SRC meta to JSON")
                     return ""
                 }
-            } catch {
-                print("Error converting SRC meta to JSON")
-                return ""
             }
         }()
 
@@ -164,18 +169,19 @@ public struct MastercardWidget: UIViewRepresentable {
         </head>
         <body>
             <div id="checkoutIframe"></div>
-            <script src="https://widget.paydock.com/sdk/v1.103.24-beta/widget.umd.min.js"></script>
+            <script src="https://widget.paydock.com/sdk/latest/widget.umd.min.js"></script>
             <script>
                 const serviceId = "\(serviceId)";
                 const publicKey = "\(publicKey)";
-                const meta = "\(jsonString)"
+                const meta = \(jsonString)
                 var src = new paydock.MastercardSRCClickToPay(
                         "#checkoutIframe",
                         serviceId,
                         publicKey,
+                        meta,
                         {}
                     );
-                src.setEnv('staging_10');
+                src.setEnv('sandbox');
                 const watchEvent = (event) => {
                     src.on(event, function (data) {
                         if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
