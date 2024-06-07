@@ -21,11 +21,6 @@ struct AfterPayCallbackRes: Codable {
             let refToken: String
             let charge: Charge
 
-            enum CodingKeys: String, CodingKey {
-                case refToken = "ref_token"
-                case charge
-            }
-
             struct Charge: Codable {
                 let status: String
             }
