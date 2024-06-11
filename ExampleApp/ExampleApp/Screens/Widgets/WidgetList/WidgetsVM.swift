@@ -22,9 +22,9 @@ class WidgetsVM: ObservableObject {
     private func initialiseMobileSDK() {
         var config: MobileSDKConfig
         switch ProjectEnvironment.shared.environment {
-        case .production: config = MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey())
+        case .production: config = MobileSDKConfig(environment: .production, publicKey: ProjectEnvironment.shared.getPublicKey())
         case .sandbox: config = MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey())
-        case .staging: config = MobileSDKConfig(environment: .sandbox, publicKey: ProjectEnvironment.shared.getPublicKey())
+        case .staging: config = MobileSDKConfig(environment: .staging, publicKey: ProjectEnvironment.shared.getPublicKey())
         }
 
         mobileSDK.configureMobileSDK(config: config)

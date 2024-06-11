@@ -16,12 +16,10 @@
 	<string>$(INTEGRATED_3DS_GATEWAY_ID)</string>
 	<key>PAY_PAL_GATEWAY_ID</key>
 	<string>$(PAY_PAL_GATEWAY_ID)</string>
-	<key>PUBLIC_KEY</key>
-	<string>$(PUBLIC_KEY)</string>
-	<key>SECRET_KEY</key>
-	<string>$(SECRET_KEY)</string>
 	<key>MASTERCARD_SERVICE_ID</key>
 	<string>$(MASTERCARD_SERVICE_ID)</string>
+	<key>CONFIGURATION</key>
+	<string>$(CONFIGURATION)</string>
 	<key>STANDALONE_3DS_GATEWAY_ID</key>
 	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
 </dict>
