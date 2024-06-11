@@ -108,6 +108,9 @@ public struct MastercardWidget: UIViewRepresentable {
     }
 
     func html(serviceId: String, publicKey: String, meta: MastercardSrcMeta?) -> String {
+        let clientSdkUrl = Constants.clientSdkUrlString
+        let clientSdkEnvironment = Constants.clientSdkEnvironment
+        let clientSdkType = Constants.clientSdkType
         let jsonString: String = {
             if meta == nil {
                 return "{}"
@@ -169,19 +172,19 @@ public struct MastercardWidget: UIViewRepresentable {
         </head>
         <body>
             <div id="checkoutIframe"></div>
-            <script src="https://widget.paydock.com/sdk/latest/widget.umd.min.js"></script>
+            <script src="\(clientSdkUrl)"></script>
             <script>
                 const serviceId = "\(serviceId)";
                 const publicKey = "\(publicKey)";
                 const meta = \(jsonString)
-                var src = new paydock.MastercardSRCClickToPay(
+                var src = new \(clientSdkType).ClickToPay(
                         "#checkoutIframe",
                         serviceId,
                         publicKey,
                         meta,
                         {}
                     );
-                src.setEnv('sandbox');
+                src.setEnv('\(clientSdkEnvironment)');
                 const watchEvent = (event) => {
                     src.on(event, function (data) {
                         if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {

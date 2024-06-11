@@ -90,6 +90,9 @@ public struct ThreeDSWidget: UIViewRepresentable {
     }
 
     static func html(_ token: String) -> String {
+        let clientSdkUrl = Constants.clientSdkUrlString
+        let clientSdkEnvironment = Constants.clientSdkEnvironment
+        let clientSdkType = Constants.clientSdkType
         return """
         <!DOCTYPE html>
         <html lang="en">
@@ -127,7 +130,7 @@ public struct ThreeDSWidget: UIViewRepresentable {
             </head>
             <body>
                 <div id="widget"></div>
-                <script src="https://widget.paydock.com/sdk/latest/widget.umd.min.js"></script>
+                <script src="\(clientSdkUrl)"></script>
                 <script>
                     var meta = document.createElement("meta");
                     meta.name = "viewport";
@@ -136,8 +139,8 @@ public struct ThreeDSWidget: UIViewRepresentable {
                     head.appendChild(meta);
 
                     const token = "\(token)";
-                    var canvas3ds = new paydock.Canvas3ds("#widget", token);
-                    canvas3ds.setEnv("sandbox");
+                    var canvas3ds = new \(clientSdkType).Canvas3ds("#widget", token);
+                    canvas3ds.setEnv('\(clientSdkEnvironment)');
 
                     const watchEvent = (event) => {
                         canvas3ds.on(event, function (data) {

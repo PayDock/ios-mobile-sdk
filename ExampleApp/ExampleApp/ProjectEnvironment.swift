@@ -13,6 +13,7 @@ struct ProjectEnvironment {
     static let shared = ProjectEnvironment()
 
     enum Keys {
+        static let configuration = "CONFIGURATION"
         static let secretKey = "SECRET_KEY"
         static let publicKey = "PUBLIC_KEY"
         static let applePayGatewayId = "APPLE_PAY_GATEWAY_ID"
@@ -37,6 +38,20 @@ struct ProjectEnvironment {
 
     enum Environment: String, CaseIterable {
         case production, sandbox, staging
+    }
+
+    init() {
+        guard let currentConfiguration = Self.infoDictionary[Keys.configuration] as? String else {
+            fatalError("Configuration key not found in .plist!")
+        }
+
+        if currentConfiguration == "Debug (Production)" || currentConfiguration == "Release (Production)" {
+            self.environment = .production
+        } else if currentConfiguration == "Debug (Sandbox)" || currentConfiguration == "Release (Sandbox)" {
+            self.environment = .sandbox
+        } else if currentConfiguration == "Debug (Staging)" || currentConfiguration == "Release (Staging)" {
+            self.environment = .staging
+        }
     }
 
     func getEnvironmentEndpoint() -> String {
@@ -115,5 +130,11 @@ struct ProjectEnvironment {
             return nil
         }
         return serviceId
+    }
+
+    func getSslPublicKeyHash() -> String {
+        switch environment {
+        case .production, .sandbox, .staging: return "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
+        }
     }
 }
