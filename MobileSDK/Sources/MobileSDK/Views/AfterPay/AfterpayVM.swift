@@ -1,5 +1,5 @@
 //
-//  AfterPayVM.swift
+//  AfterpayVM.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -10,7 +10,7 @@ import SwiftUI
 import Afterpay
 
 @MainActor
-class AfterPayVM: ObservableObject {
+class AfterpayVM: ObservableObject {
 
     // MARK: - Dependencies
 
@@ -27,19 +27,23 @@ class AfterPayVM: ObservableObject {
 
     // MARK: - Handlers
 
-    private var completion: (Result<ChargeResponse, AfterPayError>) -> Void
-    private var onAddressChange: ShippingAddressDidChangeClosure?
-    private var onShippingChange: ShippingOptionDidChangeClosure?
+    private let completion: (Result<ChargeResponse, AfterpayError>) -> Void
+    private let selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?
+    private let selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?
 
 
     // MARK: - Initialisation
 
     init(configuration: AfterpaySdkConfig,
          afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
+         selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
+         selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
          walletService: WalletService = WalletServiceImpl(),
-         completion: @escaping (Result<ChargeResponse, AfterPayError>) -> Void) {
+         completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
         self.configuration = configuration
         self.afterPayToken = afterPayToken
+        self.selectAddress = selectAddress
+        self.selectShippingOption = selectShippingOption
         self.walletService = walletService
         self.completion = completion
         self.setupConfig()
@@ -58,23 +62,50 @@ class AfterPayVM: ObservableObject {
     func presentAfterpay() {
         let vc = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.last?.rootViewController
         guard let vc = vc else { return }
-        Afterpay.presentCheckoutV2Modally(over: vc, animated: true, options: .init()) { completion in
-            completion(.success(self.afterPayOrderId))
-        } completion: { [weak self] result in
-            switch result {
-            case .success:
-                self?.captureWalletCharge()
-            case .cancelled:
-                self?.declineWalletTransaction()
-            }
-        }
+
+        Afterpay.presentCheckoutV2Modally(
+            over: vc,
+            animated: true,
+            options: .init(
+                pickup: configuration.options.pickup,
+                buyNow: configuration.options.buyNow,
+                shippingOptionRequired: configuration.options.shippingOptionRequired,
+                enableSingleShippingOptionUpdate: configuration.options.enableSingleShippingOptionUpdate),
+            didCommenceCheckout: { [weak self] completion in
+                guard let self = self else { return }
+                completion(.success(self.afterPayOrderId))
+            },
+
+            shippingAddressDidChange: { [weak self] address, completion in
+                guard let selectAddress = self?.selectAddress else { return }
+                selectAddress(address, { shippingOption in
+                    let result: ShippingOptionsResult = .success(shippingOption)
+                    completion(result)
+                })
+
+            }, shippingOptionDidChange: { [weak self] shippingOption, completion in
+                guard let selectShippingOption = self?.selectShippingOption else { return }
+                selectShippingOption(shippingOption, { shippingOptionUpdate in
+                    guard let shippingOptionUpdate = shippingOptionUpdate else { return }
+                    let result: ShippingOptionUpdateResult = .success(shippingOptionUpdate)
+                    completion(result)
+                })
+
+            }, completion: { [weak self] result in
+                switch result {
+                case .success:
+                    self?.captureWalletCharge()
+                case .cancelled:
+                    self?.declineWalletTransaction()
+                }
+            })
     }
 
-    func getAfterPayURL(token: String) {
+    func getAfterpayURL(token: String) {
         Task {
             do {
                 isLoading = true
-                let afterPayOrderId = try await walletService.getAfterPayCallback(token: token)
+                let afterPayOrderId = try await walletService.getAfterpayCallback(token: token)
                 await MainActor.run {
                     self.isLoading = false
                     self.afterPayOrderId = afterPayOrderId
@@ -122,7 +153,7 @@ class AfterPayVM: ObservableObject {
         isLoading = true
         afterPayToken { token in
             self.token = token
-            self.getAfterPayURL(token: token)
+            self.getAfterpayURL(token: token)
         }
     }
 
@@ -147,7 +178,7 @@ class AfterPayVM: ObservableObject {
 
 // MARK: - JWT Handling
 
-extension AfterPayVM {
+extension AfterpayVM {
     private func decodeChargeId(jwtToken jwt: String) -> String? {
         let segments = jwt.components(separatedBy: ".")
         let parts = decodeJWTPart(segments[1]) ?? [:]

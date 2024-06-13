@@ -13,7 +13,7 @@ protocol WalletService {
     func captureCharge(token: String, paymentMethodId: String?, payerId: String?, refToken: String?) async throws -> ChargeResponse
     func getCallback(token: String, shipping: Bool) async throws -> String
     func getFlyPayCallback(token: String) async throws -> String
-    func getAfterPayCallback(token: String) async throws -> String
+    func getAfterpayCallback(token: String) async throws -> String
     func declineWalletTransaction(token: String, chargeId: String) async throws -> String
 
 }
@@ -56,14 +56,14 @@ struct WalletServiceImpl: HTTPClient, WalletService {
         return response.resource.data.id
     }
 
-    func getAfterPayCallback(token: String) async throws -> String {
+    func getAfterpayCallback(token: String) async throws -> String {
         let walletCallbackReq = WalletCallbackReq(type: "CREATE_SESSION", shipping: nil, sessionId: nil, walletType: nil)
 
         let response = try await sendRequest(
             endpoint: WalletEndpoints.walletCallback(
                 token: token,
                 walletCallbackReq: walletCallbackReq),
-            responseModel: AfterPayCallbackRes.self)
+            responseModel: AfterpayCallbackRes.self)
 
         return response.resource.data.refToken
     }

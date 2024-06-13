@@ -1,5 +1,5 @@
 //
-//  AfterPayWidgetVM.swift
+//  AfterpayWidgetVM.swift
 //  ExampleApp
 //
 //  Created by Domagoj Grizelj on 19.02.2024..
@@ -8,8 +8,9 @@
 
 import Foundation
 import MobileSDK
+import Afterpay
 
-class AfterPayWidgetVM: ObservableObject {
+class AfterpayWidgetVM: ObservableObject {
 
     // MARK: - Dependencies
 
@@ -29,7 +30,7 @@ class AfterPayWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterPayGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "David",
@@ -50,7 +51,7 @@ class AfterPayWidgetVM: ObservableObject {
                 amount: 5,
                 currency: "AUD",
                 reference: UUID().uuidString,
-                description: "Test transaction for AfterPay",
+                description: "Test transaction for Afterpay",
                 meta: metaData)
 
             do {
@@ -66,9 +67,37 @@ class AfterPayWidgetVM: ObservableObject {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
         let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
-        let config = AfterpaySdkConfig.AfterPayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
+        let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
-        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
+        let environment: Environment = {
+            switch ProjectEnvironment.shared.environment {
+            case .production: return .production
+            case .sandbox, .staging: return .sandbox
+            }
+        }()
+        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: environment, options: options)
+    }
+
+    func getShippingOptions() -> [ShippingOption] {
+        let shippingOption1 = ShippingOption(
+            id: "Standard",
+            name: "Standard",
+            description: "",
+            shippingAmount: Money(amount: "5.0", currency: "AUD"),
+            orderAmount: Money(amount: "10.0", currency: "AUD"))
+
+        let shippingOption2 = ShippingOption(
+            id: "Standard",
+            name: "Standard",
+            description: "",
+            shippingAmount: Money(amount: "2.0", currency: "AUD"),
+            orderAmount: Money(amount: "10.0", currency: "AUD"))
+        
+        return [shippingOption1, shippingOption2]
+    }
+
+    func getShippingOptionUpdate() -> ShippingOptionUpdate {
+        return ShippingOptionUpdate(id: "Standard", shippingAmount: Money(amount: "5.0", currency: "AUD"), orderAmount: Money(amount: "10.0", currency: "AUD"))
     }
 
     func handleError(error: Error) {

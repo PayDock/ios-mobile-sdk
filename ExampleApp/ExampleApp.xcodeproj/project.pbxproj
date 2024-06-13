@@ -71,8 +71,8 @@
 		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
 		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
 		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
-		28F4E3242B83921500C73065 /* AfterPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3232B83921500C73065 /* AfterPayWidgetView.swift */; };
-		28F4E3262B83922100C73065 /* AfterPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3252B83922100C73065 /* AfterPayWidgetVM.swift */; };
+		28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */; };
+		28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3252B83922100C73065 /* AfterpayWidgetVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -164,8 +164,8 @@
 		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 		28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetView.swift; sourceTree = "<group>"; };
-		28F4E3232B83921500C73065 /* AfterPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterPayWidgetView.swift; sourceTree = "<group>"; };
-		28F4E3252B83922100C73065 /* AfterPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterPayWidgetVM.swift; sourceTree = "<group>"; };
+		28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayWidgetView.swift; sourceTree = "<group>"; };
+		28F4E3252B83922100C73065 /* AfterpayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayWidgetVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -532,8 +532,8 @@
 		28F4E3222B83920600C73065 /* AfterPay */ = {
 			isa = PBXGroup;
 			children = (
-				28F4E3232B83921500C73065 /* AfterPayWidgetView.swift */,
-				28F4E3252B83922100C73065 /* AfterPayWidgetVM.swift */,
+				28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */,
+				28F4E3252B83922100C73065 /* AfterpayWidgetVM.swift */,
 			);
 			path = AfterPay;
 			sourceTree = "<group>";
@@ -699,7 +699,7 @@
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
 				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
-				28F4E3242B83921500C73065 /* AfterPayWidgetView.swift in Sources */,
+				28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
@@ -726,7 +726,7 @@
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
-				28F4E3262B83922100C73065 /* AfterPayWidgetVM.swift in Sources */,
+				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* MastercardWidgetView.swift in Sources */,
 				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,

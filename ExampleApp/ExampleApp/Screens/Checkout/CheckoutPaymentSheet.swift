@@ -86,12 +86,22 @@ struct CheckoutPaymentSheet: View {
                 .padding()
 
             case .afterpay:
-                AfterPayWidget(
+                AfterpayWidget(
                     configuration: viewModel.getAfterpayConfig(),
-                    afterPayToken: { onAfterPayButtonTap in
-                        viewModel.initializeAfterpayWalletCharge(completion: onAfterPayButtonTap)
+                    afterPayToken: { onAfterpayButtonTap in
+                        viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
                         onCloseSheet()
-                    }, buttonWidth: 320) { result in
+                    }, 
+                    selectAddress: { address, provideShippingOptions in
+                        // Provide shipping options based on user selected address if needed
+                        // Check AfterpayWidget example for more details
+
+                    },
+                    selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
+                        // Provide shipping update if needed based on the selected shipping option
+                        // Check AfterpayWidget example for more details
+                    },
+                    buttonWidth: 320) { result in
                         switch result {
                         case .success:
                             viewModel.alertTitle = "Success"
