@@ -1,5 +1,5 @@
 //
-//  AfterPayError.swift
+//  AfterpayError.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum AfterPayError: Error {
+public enum AfterpayError: Error {
 
     case errorFetchingAfterpayUrl(error: ErrorRes)
     case errorCapturingCharge(error: ErrorRes)

@@ -1,5 +1,5 @@
 //
-//  AfterPayCallbackRes.swift
+//  AfterpayCallbackRes.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct AfterPayCallbackRes: Codable {
+struct AfterpayCallbackRes: Codable {
     let status: Int
     let error: ErrorRes?
     let resource: Resource

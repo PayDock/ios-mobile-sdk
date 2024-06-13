@@ -11,11 +11,11 @@ import Foundation
 
 public struct AfterpaySdkConfig {
     public var buttonTheme: ButtonTheme
-    public var config: AfterPayConfiguration
+    public var config: AfterpayConfiguration
     public var environment: Environment
     public var options: CheckoutOptions
 
-    public init(buttonTheme: ButtonTheme, config: AfterPayConfiguration, environment: Environment, options: CheckoutOptions) {
+    public init(buttonTheme: ButtonTheme, config: AfterpayConfiguration, environment: Environment, options: CheckoutOptions) {
         self.buttonTheme = buttonTheme
         self.config = config
         self.environment = environment
@@ -50,7 +50,7 @@ public struct AfterpaySdkConfig {
         }
     }
 
-    public struct AfterPayConfiguration {
+    public struct AfterpayConfiguration {
         public var minimumAmount: String? = nil
         public var maximumAmount: String
         public var currency: String

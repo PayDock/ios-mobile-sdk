@@ -116,9 +116,9 @@ struct ProjectEnvironment {
         return gatewayId
     }
 
-    func getAfterPayGatewayId() -> String? {
+    func getAfterpayGatewayId() -> String? {
         guard let gatewayId = Self.infoDictionary[Keys.afterpayGatewayId] as? String else {
-            print("AfterPay gateway ID not found in .plist!")
+            print("Afterpay gateway ID not found in .plist!")
             return nil
         }
         return gatewayId

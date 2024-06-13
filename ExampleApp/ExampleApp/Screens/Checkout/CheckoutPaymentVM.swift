@@ -73,7 +73,7 @@ extension CheckoutPaymentVM {
     /// Initializes wallet charge when paying through Afterpay
     func initializeAfterpayWalletCharge(completion: @escaping (String) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterPayGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
 
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "David",
@@ -94,7 +94,7 @@ extension CheckoutPaymentVM {
                 amount: 5,
                 currency: "AUD",
                 reference: UUID().uuidString,
-                description: "Test transaction for AfterPay",
+                description: "Test transaction for Afterpay",
                 meta: metaData)
 
             do {
@@ -244,7 +244,7 @@ extension CheckoutPaymentVM {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
         let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
-        let config = AfterpaySdkConfig.AfterPayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
+        let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
         return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
     }
@@ -261,10 +261,6 @@ extension CheckoutPaymentVM {
             showMastercardWebView = false
             saveCardToken(result.mastercardToken)
             payWithCard()
-//            alertTitle = "Checkout successful"
-//            alertMessage = "Mastercard token:\n\(result.mastercardToken)"
-//            showAlert = true
-
 
         case .checkoutReady:
             print("Checkout ready")
