@@ -8,12 +8,14 @@
 
 import SwiftUI
 import MobileSDK
+import NetworkingLib
 
 @main
 struct ExampleApp: App {
 
     init() {
         setupMobileSDK()
+        setupDependencies()
     }
 
     var body: some Scene {
@@ -31,5 +33,10 @@ struct ExampleApp: App {
         }
 
         MobileSDK.shared.configureMobileSDK(config: config)
+    }
+
+    private func setupDependencies() {
+        NetworkingLib.shared.publicKeyHash = ProjectEnvironment.shared.getPublicKey()
+        NetworkingLib.shared.host = ProjectEnvironment.shared.getEnvironmentEndpoint()
     }
 }
