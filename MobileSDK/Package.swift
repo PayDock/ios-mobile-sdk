@@ -16,7 +16,8 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.4.0")
+        .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.4.0"),
+        .package(path: "/Users/domagojgrizelj/XcodeProjects/Paydock/NetworkingLib")
         // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
@@ -24,7 +25,10 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "MobileSDK",
-            dependencies: [.product(name: "Afterpay", package: "sdk-ios")]),
+            dependencies: [
+                .product(name: "Afterpay", package: "sdk-ios"),
+                .product(name: "NetworkingLib", package: "NetworkingLib")]
+        ),
         .testTarget(
             name: "MobileSDKTests",
             dependencies: ["MobileSDK"],

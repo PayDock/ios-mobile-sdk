@@ -36,7 +36,7 @@ struct ExampleApp: App {
     }
 
     private func setupDependencies() {
-        NetworkingLib.shared.publicKeyHash = ProjectEnvironment.shared.getPublicKey()
+        NetworkingLib.shared.publicKeyHash = ProjectEnvironment.shared.getSslPublicKeyHash()
         NetworkingLib.shared.host = ProjectEnvironment.shared.getEnvironmentEndpoint()
     }
 }

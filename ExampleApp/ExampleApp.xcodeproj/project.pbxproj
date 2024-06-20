@@ -31,7 +31,7 @@
 		2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */; };
 		2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
-		287F9F482C2392FC00AFD914 /* NetworkingLib in Frameworks */ = {isa = PBXBuildFile; productRef = 287F9F472C2392FC00AFD914 /* NetworkingLib */; };
+		287F9F4B2C2397B300AFD914 /* NetworkingLib in Frameworks */ = {isa = PBXBuildFile; productRef = 287F9F4A2C2397B300AFD914 /* NetworkingLib */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
@@ -64,7 +64,6 @@
 		28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */; };
 		28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6D2ACC213F008E827E /* WalletService.swift */; };
 		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
-		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
 		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
 		28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */; };
 		28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3252B83922100C73065 /* AfterpayWidgetVM.swift */; };
@@ -150,7 +149,6 @@
 		28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeReq.swift; sourceTree = "<group>"; };
 		28E86F6D2ACC213F008E827E /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeRes.swift; sourceTree = "<group>"; };
-		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 		28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetView.swift; sourceTree = "<group>"; };
 		28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayWidgetView.swift; sourceTree = "<group>"; };
@@ -164,7 +162,7 @@
 			files = (
 				28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */,
 				280CD68C2C18AC2F004C8788 /* MobileSDK in Frameworks */,
-				287F9F482C2392FC00AFD914 /* NetworkingLib in Frameworks */,
+				287F9F4B2C2397B300AFD914 /* NetworkingLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -466,7 +464,6 @@
 			isa = PBXGroup;
 			children = (
 				28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */,
-				28E86F712ACC2480008E827E /* ErrorRes.swift */,
 				28A81F522B14E13E0068FE75 /* CardTokenRes.swift */,
 				28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */,
 				280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */,
@@ -533,7 +530,7 @@
 			packageProductDependencies = (
 				28E215FD2B63D28400A0877B /* MobileSDK */,
 				280CD68B2C18AC2F004C8788 /* MobileSDK */,
-				287F9F472C2392FC00AFD914 /* NetworkingLib */,
+				287F9F4A2C2397B300AFD914 /* NetworkingLib */,
 			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
@@ -610,7 +607,7 @@
 			mainGroup = 2889B7C82A558F1800D6C7BE;
 			packageReferences = (
 				280CD68A2C18AC2F004C8788 /* XCLocalSwiftPackageReference "../MobileSDK" */,
-				287F9F462C2392FC00AFD914 /* XCLocalSwiftPackageReference "../NetworkingLib" */,
+				287F9F492C2397B300AFD914 /* XCLocalSwiftPackageReference "../../NetworkingLib" */,
 			);
 			productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
 			projectDirPath = "";
@@ -685,7 +682,6 @@
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
-				28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
@@ -1768,9 +1764,9 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../MobileSDK;
 		};
-		287F9F462C2392FC00AFD914 /* XCLocalSwiftPackageReference "../NetworkingLib" */ = {
+		287F9F492C2397B300AFD914 /* XCLocalSwiftPackageReference "../../NetworkingLib" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../NetworkingLib;
+			relativePath = ../../NetworkingLib;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -1779,7 +1775,7 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = MobileSDK;
 		};
-		287F9F472C2392FC00AFD914 /* NetworkingLib */ = {
+		287F9F4A2C2397B300AFD914 /* NetworkingLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkingLib;
 		};

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import NetworkingLib
 
 public enum CardDetailsError: Error {
 
