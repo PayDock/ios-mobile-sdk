@@ -71,7 +71,7 @@ struct Constants {
         }
 
         switch environment {
-        case .production: return "produciton"
+        case .production: return "production"
         case .sandbox: return "sandbox"
         case .staging: return "staging"
         }
