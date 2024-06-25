@@ -19,9 +19,5 @@ struct WalletCallbackRes: Codable {
 
     struct CallbackData: Codable {
         let callbackUrl: String
-
-        enum CodingKeys: String, CodingKey {
-            case callbackUrl = "callback_url"
-        }
     }
 }

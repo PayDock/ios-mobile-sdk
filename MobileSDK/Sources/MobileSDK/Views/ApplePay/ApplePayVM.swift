@@ -51,7 +51,7 @@ class ApplePayVM: NSObject, ObservableObject {
 
     private func startPayment() {
         guard let applePayRequest = applePayRequest else {
-            completion(.failure(.paymentFailed))
+            completion(.failure(.invalidApplePayRequest))
             return
         }
 
@@ -70,7 +70,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
                                         didAuthorizePayment payment: PKPayment,
                                         completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
         guard let applePayRequest = applePayRequest else {
-            self.completion(.failure(.paymentFailed))
+            self.completion(.failure(.invalidApplePayRequest))
             return
         }
 
@@ -87,10 +87,13 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
                 self.completion(.success(chargeResponse))
                 isLoading = false
                 completion(paymentStatus)
-
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                paymentStatus = .failure
+                self.error = .errorCompletingPayment(error: errorResponse)
+                completion(paymentStatus)
             } catch {
                 paymentStatus = .failure
-                self.error = .paymentFailed
+                self.error = .unknownError
                 completion(paymentStatus)
             }
         }
@@ -102,7 +105,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
                 if self.paymentStatus == .success, let chargeData = self.chargeData {
                     self.completion(.success(chargeData))
                 } else {
-                    self.completion(.failure(self.error ?? .paymentFailed))
+                    self.completion(.failure(self.error ?? .unknownError))
                 }
             }
         }

@@ -10,15 +10,15 @@ import Foundation
 
 public enum FlyPayError: Error {
 
-    case requestFailed
+    case errorFetchingFlyPayOrder(error: ErrorRes)
     case webViewFailed
+    case unknownError
 
     public var customMessage: String {
         switch self {
-        case .requestFailed:
-            return "FlyPay payment request has failed! There was an issue with your request."
-        case .webViewFailed:
-            return "FlyPay WebView widget has failed"
+        case .errorFetchingFlyPayOrder: return "Unable to fetch FlyPay widget order ID"
+        case .webViewFailed: return "FlyPay WebView widget has failed"
+        case .unknownError: return "Unknown error"
         }
     }
 }

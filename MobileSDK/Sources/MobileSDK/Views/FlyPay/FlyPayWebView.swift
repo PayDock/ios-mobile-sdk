@@ -63,7 +63,6 @@ struct FlyPayWebView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-
         var onApprove: OnApprove
         var onFailure: OnFailure
         var isLoaded = false
@@ -75,16 +74,8 @@ struct FlyPayWebView: UIViewRepresentable {
             self.onFailure = onFailure
         }
 
-        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            print(message)
-        }
-
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
-        }
-
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print(error)
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -93,14 +84,10 @@ struct FlyPayWebView: UIViewRepresentable {
             }
         }
 
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        }
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) { }
 
         func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(true)
-        }
-
-        func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         }
 
         func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {

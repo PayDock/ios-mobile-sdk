@@ -26,7 +26,6 @@ public struct MobileSDKConfig {
 
     private func setup() {
         setupTheme()
-        setupKeys()
     }
 
     private func setupTheme() {
@@ -36,10 +35,6 @@ public struct MobileSDKConfig {
         Appearance.shared.darkThemeColors = theme.darkThemeColors
         Appearance.shared.dimensions = theme.dimensions
         Appearance.shared.fontName = theme.fontName
-    }
-
-    private func setupKeys() {
-        Constants.publicKey = publicKey
     }
 
 }

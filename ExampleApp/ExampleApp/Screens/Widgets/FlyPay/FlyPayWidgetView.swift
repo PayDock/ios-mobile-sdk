@@ -36,6 +36,6 @@ struct FlyPayWidgetView: View {
 
 struct FlyPayWidgetView_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayWidgetView()
+        FlyPayWidgetView()
     }
 }

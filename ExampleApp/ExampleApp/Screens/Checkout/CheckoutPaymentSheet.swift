@@ -12,9 +12,12 @@ import MobileSDK
 struct CheckoutPaymentSheet: View {
 
     @StateObject private var viewModel: CheckoutPaymentVM
+    private let onCloseSheet: () -> Void
 
-    init(viewModel: CheckoutPaymentVM = CheckoutPaymentVM()) {
+    init(viewModel: CheckoutPaymentVM = CheckoutPaymentVM(),
+         onCloseSheet: @escaping () -> Void) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onCloseSheet = onCloseSheet
     }
 
     var body: some View {
@@ -26,7 +29,7 @@ struct CheckoutPaymentSheet: View {
                 VStack {
                     CardDetailsWidget(gatewayId: "", completion: { result in
                         switch result {
-                        case .success(let token): viewModel.saveCardToken(token)
+                        case .success(let result): viewModel.saveCardToken(result.token)
                         case .failure: break
                         }
                     })
@@ -81,13 +84,69 @@ struct CheckoutPaymentSheet: View {
                     }
                 }
                 .padding()
+
+            case .afterpay:
+                AfterpayWidget(
+                    configuration: viewModel.getAfterpayConfig(),
+                    afterPayToken: { onAfterpayButtonTap in
+                        viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
+                        onCloseSheet()
+                    }, 
+                    selectAddress: { address, provideShippingOptions in
+                        // Provide shipping options based on user selected address if needed
+                        // Check AfterpayWidget example for more details
+
+                    },
+                    selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
+                        // Provide shipping update if needed based on the selected shipping option
+                        // Check AfterpayWidget example for more details
+                    },
+                    buttonWidth: 320) { result in
+                        switch result {
+                        case .success:
+                            viewModel.alertTitle = "Success"
+                            viewModel.alertMessage = "Charge successful"
+                            viewModel.showAlert = true
+                        case .failure:
+                            viewModel.alertTitle = "Error"
+                            viewModel.alertMessage = "Charge failed"
+                            viewModel.showAlert = true
+                        }
+                    }
+                    .padding()
+
+            case .mastercard:
+                Button("Checkout with Mastercard") {
+                    viewModel.showMastercardWebView = true
+                }
+                .foregroundStyle(.white)
+                .font(Font.system(size: 16, weight: .semibold))
+                .frame(height: 48)
+                .frame(maxWidth:.infinity)
+                .background(Color(hex: "6750A4"))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .padding()
+                .sheet(isPresented: $viewModel.showMastercardWebView, content: {
+                    NavigationStack {
+                        VStack {
+                            MastercardWidget(
+                                serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                meta: nil) { result in
+                                viewModel.handleMastercardResult(result)
+                            }
+                            .navigationTitle("Checkout with Mastercard")
+                            .navigationBarTitleDisplayMode(.inline)
+                        }
+                    }
+
+                })
             }
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
             Text(viewModel.alertMessage)
         })
-        .sheet(isPresented: $viewModel.showWebView, onDismiss: { }) {
+        .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }) {
             NavigationStack {
                 VStack {
                     ThreeDSWidget(
@@ -119,6 +178,8 @@ struct CheckoutPaymentSheet: View {
                 paymentMethodCell(type: .card, logo: Image("credit-card-fill"), title: "Card")
                 paymentMethodCell(type: .applePay, logo: Image("applePay"))
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
+                paymentMethodCell(type: .afterpay, logo: Image("afterpay"))
+                paymentMethodCell(type: .mastercard, logo: Image("mastercard"))
             }
             .padding()
         }
@@ -149,6 +210,6 @@ struct CheckoutPaymentSheet: View {
 
 struct PaymentMethodSelector_Previews: PreviewProvider {
     static var previews: some View {
-        CheckoutPaymentSheet()
+        CheckoutPaymentSheet(onCloseSheet: {})
     }
 }
