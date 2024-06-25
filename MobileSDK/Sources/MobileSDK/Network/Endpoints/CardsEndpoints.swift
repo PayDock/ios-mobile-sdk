@@ -42,9 +42,15 @@ extension CardsEndpoints: Endpoint {
 
     var body: Data? {
         switch self {
-        case .cardToken(let tokeniseCardDetailsReq): return try? JSONEncoder().encode(tokeniseCardDetailsReq)
-        case .giftCardToken(let tokeniseGiftCardReq): return try? JSONEncoder().encode(tokeniseGiftCardReq)
+        case .cardToken(let tokeniseCardDetailsReq): return try? encoder.encode(tokeniseCardDetailsReq)
+        case .giftCardToken(let tokeniseGiftCardReq): return try? encoder.encode(tokeniseGiftCardReq)
         }
     }
-    
+
+    var parameters: [URLQueryItem] {
+        switch self {
+        default: return []
+        }
+    }
+
 }

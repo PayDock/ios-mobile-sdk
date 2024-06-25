@@ -14,7 +14,7 @@ struct PayPalWebView: UIViewRepresentable {
     typealias OnApprove = (_ paymentId: String, _ payerId: String) -> Void
     typealias OnFailure = (_ payPalError: PayPalError) -> Void
 
-    static private let callbackHost = "paydock-mobile.sdk"
+    static private let callbackHost = Constants.payPalCallbackHost
     static private let callbackPath = "/paypal/success"
     static private let callbackUrl = "https://\(callbackHost)\(callbackPath)"
 

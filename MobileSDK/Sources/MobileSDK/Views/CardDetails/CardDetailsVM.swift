@@ -16,13 +16,18 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Dependencies
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
-    @Published var isLoading = false
     private let cardService: CardService
 
     // MARK: - Properties
 
     private let gatewayId: String?
-    private let completion: (Result<String, CardDetailsError>) -> Void
+    let actionText: String
+    let showCardTitle: Bool
+    let allowSaveCard: SaveCardConfig?
+    private let completion: (Result<CardResult, CardDetailsError>) -> Void
+
+    @Published var isLoading = false
+    @Published var policyAccepted = false
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
@@ -31,10 +36,16 @@ class CardDetailsVM: ObservableObject {
     init(cardService: CardService = CardServiceImpl(),
          cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager(),
          gatewayId: String?,
-         completion: @escaping (Result<String, CardDetailsError>) -> Void) {
+         actionText: String,
+         showCardTitle: Bool,
+         allowSaveCard: SaveCardConfig?,
+         completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
         self.cardDetailsFormManager = cardDetailsFormManager
         self.gatewayId = gatewayId
+        self.actionText = actionText
+        self.showCardTitle = showCardTitle
+        self.allowSaveCard = allowSaveCard
         self.completion = completion
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
@@ -63,12 +74,23 @@ class CardDetailsVM: ObservableObject {
                 isLoading = true
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
                 isLoading = false
-                completion(.success(cardToken))
+                completion(.success(createResult(token: cardToken)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.errorTokenisingCard(error: errorResponse)))
+                isLoading = false
             } catch {
-                completion(.failure(.errorTokenisingCard))
+                completion(.failure(.unknownError))
                 isLoading = false
             }
         }
     }
-    
+
+    private func createResult(token: String) -> CardResult {
+        if let allowSaveCard = allowSaveCard {
+            return CardResult(token: token, saveCard: policyAccepted)
+        } else {
+            return CardResult(token: token, saveCard: nil)
+        }
+    }
+
 }

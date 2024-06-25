@@ -47,6 +47,12 @@ class PayPalVM: ObservableObject {
                     self.payPalUrl = URL(string: payPalUrlString)
                     self.showWebView = true
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.showWebView = false
+                    self.completion(.failure(.errorFetchingPayPalUrl(error: errorResponse)))
+                }
             } catch {
                 await MainActor.run {
                     self.isLoading = false
@@ -59,7 +65,7 @@ class PayPalVM: ObservableObject {
 
     func capturePayPalPayment(paymentMethodId: String, payerId: String) {
         guard !token.isEmpty else {
-            completion(.failure(.requestFailed))
+            completion(.failure(.unknownError))
             return
         }
 
@@ -71,11 +77,16 @@ class PayPalVM: ObservableObject {
                     self.completion(.success(charge))
                     self.showWebView = false
                 }
-
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
+                    self.showWebView = false
+                }
             } catch {
                 await MainActor.run {
                     self.isLoading = false
-                    self.completion(.failure(.requestFailed))
+                    self.completion(.failure(.unknownError))
                     self.showWebView = false
                 }
             }

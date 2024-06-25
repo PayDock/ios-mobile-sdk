@@ -50,11 +50,15 @@ struct InitialiseWalletChargeReq: Codable {
         let storeName: String
         let merchantName: String
         let storeId: String
+        let successUrl: String?
+        let errorUrl: String?
 
         enum CodingKeys: String, CodingKey {
             case storeName = "store_name"
             case merchantName = "merchant_name"
             case storeId = "store_id"
+            case successUrl = "success_url"
+            case errorUrl = "error_url"
         }
     }
 }

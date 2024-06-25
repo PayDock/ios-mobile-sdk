@@ -19,9 +19,10 @@ struct CardDetailsWidgetView: View {
             ScrollView {
                 CardDetailsWidget(
                     gatewayId: nil,
+                    allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
                     completion: { result in
                         switch result {
-                        case .success(let token): alertMessage = token
+                        case .success(let result): alertMessage = result.token
                         case .failure(let error): alertMessage = error.localizedDescription
                         }
                         showAlert = true

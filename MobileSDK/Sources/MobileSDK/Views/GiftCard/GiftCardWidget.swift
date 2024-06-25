@@ -13,7 +13,7 @@ public struct GiftCardWidget: View {
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
 
     public init(storePin: Bool = true,
-                completion: @escaping (Result<String, Error>) -> Void) {
+                completion: @escaping (Result<String, GiftCardError>) -> Void) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(
             storePin: storePin,
             completion: completion))

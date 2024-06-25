@@ -16,6 +16,8 @@ protocol Endpoint {
     var method: RequestMethod { get }
     var header: [String: String]? { get }
     var body: Data? { get }
+    var parameters: [URLQueryItem] { get }
+    var encoder: JSONEncoder { get }
 
 }
 
@@ -29,4 +31,9 @@ extension Endpoint {
         return Constants.baseURL
     }
 
+    var encoder: JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        return encoder
+    }
 }

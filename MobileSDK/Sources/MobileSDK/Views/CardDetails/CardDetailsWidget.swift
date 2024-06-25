@@ -18,21 +18,31 @@ public struct CardDetailsWidget: View {
     // MARK: - Initialisation
 
     public init(gatewayId: String?,
-                completion: @escaping (Result<String, CardDetailsError>) -> Void) {
-        _viewModel = StateObject(wrappedValue: CardDetailsVM(gatewayId: gatewayId, completion: completion))
+                actionText: String = "Submit",
+                showCardTitle: Bool = true,
+                allowSaveCard: SaveCardConfig? = nil,
+                completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: CardDetailsVM(
+            gatewayId: gatewayId,
+            actionText: actionText,
+            showCardTitle: showCardTitle,
+            allowSaveCard: allowSaveCard,
+            completion: completion))
     }
 
     // MARK: - View protocol properties
 
     public var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Text("Card information")
-                    .customFont(.body)
-                    .foregroundColor(.placeholderColor)
-                Spacer()
+            if viewModel.showCardTitle {
+                HStack {
+                    Text("Card information")
+                        .customFont(.body)
+                        .foregroundColor(.placeholderColor)
+                    Spacer()
+                }
+                .padding(.bottom, 14)
             }
-            .padding(.bottom, 12)
 
             VStack(spacing: max(max(.spacing - 10, 0), 0)) {
                 OutlineTextField(
@@ -92,8 +102,11 @@ public struct CardDetailsWidget: View {
                         viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                     }
                 }
+                if viewModel.allowSaveCard != nil {
+                    privacyView
+                }
             }
-            LargeButton(title: "Submit", disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            LargeButton(title: viewModel.actionText, disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
                 viewModel.tokeniseCardDetails()
             }
             .padding(.bottom, 16)
@@ -102,6 +115,27 @@ public struct CardDetailsWidget: View {
         }
         .padding(.horizontal, max(16, .spacing))
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+    }
+
+    private var privacyView: some View {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(viewModel.allowSaveCard?.consentText ?? "")
+                        .customFont(.body3)
+                        .foregroundColor(.textColor)
+                    let text = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
+                    let url = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
+                    let link = "[\(text)](\(url))"
+                    Text(.init(link))
+                        .customFont(.body3)
+                        .foregroundColor(.textColor)
+                        .underline()
+                }
+                Spacer()
+                Toggle(isOn: $viewModel.policyAccepted) {}
+                    .tint(.primaryColor)
+                    .frame(width: 64, height: 44)
+        }
     }
 }
 

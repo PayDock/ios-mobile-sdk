@@ -23,10 +23,13 @@ class CheckoutPaymentVM: ObservableObject {
     private var vaultToken = ""
     private(set) var token3DS = ""
 
-    @Published var showWebView = false
+    @Published var show3dsWebView = false
     @Published var selectedMethod: PaymentMethod = .card
     @Published var showAlert = false
     @Published var isLoading = false
+
+    @Published var showMastercardWebView = false
+
     var alertTitle = ""
     var alertMessage = ""
 
@@ -67,6 +70,44 @@ extension CheckoutPaymentVM {
         }
     }
 
+    /// Initializes wallet charge when paying through Afterpay
+    func initializeAfterpayWalletCharge(completion: @escaping (String) -> Void) {
+        Task {
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
+
+            let customer = InitialiseWalletChargeReq.Customer(
+                firstName: "David",
+                lastName: "Cameron",
+                email: "david.cameron@paydock.com",
+                phone: "+1234567890",
+                paymentSource: paymentSource)
+
+            let metaData = InitialiseWalletChargeReq.MetaData(
+                storeName: "Tom Taylor Ltd.",
+                merchantName: "Tom's store",
+                storeId: "1234556",
+                successUrl: "https://paydock-integration.netlify.app/success",
+                errorUrl: "https://paydock-integration.netlify.app/error")
+
+            let initializeWalletChargeReq = InitialiseWalletChargeReq(
+                customer: customer,
+                amount: 5,
+                currency: "AUD",
+                reference: UUID().uuidString,
+                description: "Test transaction for Afterpay",
+                meta: metaData)
+
+            do {
+                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
+                DispatchQueue.main.async {
+                    completion(token)
+                }
+            } catch {
+                print("ERROR: Error fetching wallet token!")
+            }
+        }
+    }
+
     /// Helper method that creates ApplePay request
     private func getApplePayRequest(walletToken: String) -> ApplePayRequest {
         let paymentRequest = MobileSDK.createApplePayRequest(
@@ -92,7 +133,14 @@ extension CheckoutPaymentVM {
             email: "novaba9346@hondabbs.com",
             phone: "+11234567890",
             paymentSource: paymentSource)
-        let metaData = InitialiseWalletChargeReq.MetaData(storeName: "Tom Taylor Ltd.", merchantName: "Tom's store", storeId: "1234556")
+        
+        let metaData = InitialiseWalletChargeReq.MetaData(
+            storeName: "Tom Taylor Ltd.",
+            merchantName: "Tom's store",
+            storeId: "1234556",
+            successUrl: nil,
+            errorUrl: nil)
+
         let initializeWalletChargeReq = InitialiseWalletChargeReq(
             customer: customer,
             amount: 10,
@@ -150,7 +198,7 @@ extension CheckoutPaymentVM {
         case .pending:
             DispatchQueue.main.async {
                 self.token3DS = response.resource.data.threeDS.token ?? ""
-                self.showWebView = true
+                self.show3dsWebView = true
             }
         case .none:
             showAlert(title: .error, message: "Error getting 3DS auth status!")
@@ -165,11 +213,11 @@ extension CheckoutPaymentVM {
             case .chargeAuthDecoupled: break
             case .chargeAuthInfo: break
             case .chargeAuthSuccess:
-                self.showWebView = false
+                self.show3dsWebView = false
                 self.captureCharge()
             case .chargeAuthReject: break
             case .error:
-                self.showWebView = false
+                self.show3dsWebView = false
                 self.showAlert(title: .error, message: "3DS failed!")
             }
         }
@@ -188,6 +236,43 @@ extension CheckoutPaymentVM {
             }
         }
     }
+}
+
+// MARK: - Afterpay
+
+extension CheckoutPaymentVM {
+
+    func getAfterpayConfig() -> AfterpaySdkConfig {
+        let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
+        let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
+        let options = AfterpaySdkConfig.CheckoutOptions()
+        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
+    }
+    
+}
+
+// MARK: - Mastercard SRC
+
+extension CheckoutPaymentVM {
+
+    func handleMastercardResult(_ result: MastercardResult) {
+        switch result.event {
+        case .checkoutCompleted:
+            showMastercardWebView = false
+            saveCardToken(result.mastercardToken)
+            payWithCard()
+
+        case .checkoutReady:
+            print("Checkout ready")
+
+        case .checkoutError:
+            showMastercardWebView = false
+            alertTitle = "Checkout failure"
+            alertMessage = "Please try again."
+            showAlert = true
+        }
+    }
+
 }
 
 // MARK: - Helpers
@@ -216,5 +301,7 @@ extension CheckoutPaymentVM {
         case card
         case applePay
         case payPal
+        case afterpay
+        case mastercard
     }
 }
