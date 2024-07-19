@@ -27,7 +27,7 @@ let package = Package(
             name: "MobileSDK",
             dependencies: [
                 .product(name: "Afterpay", package: "sdk-ios"),
-                .product(name: "NetworkingLib", package: "mobile-lib-networking-ios")]
+                .product(name: "NetworkingLib", package: "mobile-lib-networking-ios")],
             path: "MobileSDK/Sources"),
         .testTarget(
             name: "MobileSDKTests",
