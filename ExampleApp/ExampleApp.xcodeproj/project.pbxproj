@@ -31,7 +31,6 @@
 		2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */; };
 		2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
-		287F9F4B2C2397B300AFD914 /* NetworkingLib in Frameworks */ = {isa = PBXBuildFile; productRef = 287F9F4A2C2397B300AFD914 /* NetworkingLib */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
@@ -162,7 +161,6 @@
 			files = (
 				28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */,
 				280CD68C2C18AC2F004C8788 /* MobileSDK in Frameworks */,
-				287F9F4B2C2397B300AFD914 /* NetworkingLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -530,7 +528,6 @@
 			packageProductDependencies = (
 				28E215FD2B63D28400A0877B /* MobileSDK */,
 				280CD68B2C18AC2F004C8788 /* MobileSDK */,
-				287F9F4A2C2397B300AFD914 /* NetworkingLib */,
 			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
@@ -607,7 +604,6 @@
 			mainGroup = 2889B7C82A558F1800D6C7BE;
 			packageReferences = (
 				280CD68A2C18AC2F004C8788 /* XCLocalSwiftPackageReference "../MobileSDK" */,
-				287F9F492C2397B300AFD914 /* XCLocalSwiftPackageReference "../../NetworkingLib" */,
 			);
 			productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
 			projectDirPath = "";
@@ -1764,20 +1760,12 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../MobileSDK;
 		};
-		287F9F492C2397B300AFD914 /* XCLocalSwiftPackageReference "../../NetworkingLib" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../NetworkingLib;
-		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		280CD68B2C18AC2F004C8788 /* MobileSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MobileSDK;
-		};
-		287F9F4A2C2397B300AFD914 /* NetworkingLib */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = NetworkingLib;
 		};
 		28E215FD2B63D28400A0877B /* MobileSDK */ = {
 			isa = XCSwiftPackageProductDependency;
