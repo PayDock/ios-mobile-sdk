@@ -8,6 +8,7 @@
 
 import Combine
 import SwiftUI
+import NetworkingLib
 
 class GiftCardVM: ObservableObject {
 

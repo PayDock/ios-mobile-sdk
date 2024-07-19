@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import NetworkingLib
 
 @MainActor
 class CardDetailsVM: ObservableObject {

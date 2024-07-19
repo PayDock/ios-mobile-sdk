@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import NetworkingLib
 
 protocol WalletService {
 

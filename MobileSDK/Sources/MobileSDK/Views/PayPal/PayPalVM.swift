@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import NetworkingLib
 
 @MainActor
 class PayPalVM: ObservableObject {
