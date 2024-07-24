@@ -70,6 +70,9 @@ struct ProjectEnvironment {
     }
 
     func getAccessToken() -> String {
+        if let accessToken = Self.accessToken {
+            return accessToken
+        }
         guard let accessToken = Self.infoDictionary[Keys.accessToken] as? String else {
             fatalError("Access token not found in .plist!")
         }
@@ -137,4 +140,6 @@ struct ProjectEnvironment {
         case .production, .sandbox, .staging: return "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
         }
     }
+
+    static var accessToken: String? = nil
 }
