@@ -27,7 +27,7 @@ struct CheckoutPaymentSheet: View {
             switch viewModel.selectedMethod {
             case .card:
                 VStack {
-                    CardDetailsWidget(gatewayId: "", completion: { result in
+                    CardDetailsWidget(gatewayId: "", accessToken: ProjectEnvironment.shared.getAccessToken(), completion: { result in
                         switch result {
                         case .success(let result): viewModel.saveCardToken(result.token)
                         case .failure: break
@@ -131,6 +131,7 @@ struct CheckoutPaymentSheet: View {
                         VStack {
                             MastercardWidget(
                                 serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                accessToken: ProjectEnvironment.shared.getAccessToken(),
                                 meta: nil) { result in
                                 viewModel.handleMastercardResult(result)
                             }
