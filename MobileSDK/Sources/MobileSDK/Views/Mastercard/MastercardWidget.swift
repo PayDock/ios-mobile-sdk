@@ -11,18 +11,28 @@ import WebKit
 import AuthenticationServices
 
 public struct MastercardWidget: UIViewRepresentable {
-    private let completion: (MastercardResult) -> Void
+
+    // MARK: - Dependencies
+
     private let serviceId: String
-    private let publicKey = Constants.publicKey
+    private let accessToken: String
     private let meta: MastercardSrcMeta?
     private let clientSdkUrl = Constants.clientSdkUrlString
 
+    // MARK: - Handlers
+
+    private let completion: (MastercardResult) -> Void
+
+    // MARK: - Initialization
+
     public init(serviceId: String,
+                accessToken: String,
                 meta: MastercardSrcMeta?,
                 completion: @escaping (MastercardResult) -> Void) {
         self.serviceId = serviceId
-        self.completion = completion
+        self.accessToken = accessToken
         self.meta = meta
+        self.completion = completion
     }
 
     public func makeUIView(context: Context) -> WKWebView {
@@ -52,7 +62,7 @@ public struct MastercardWidget: UIViewRepresentable {
     public func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
             if let url = URL(string: "https://sandbox.src.mastercard.com") {
-                let html = html(serviceId: serviceId, publicKey: Constants.publicKey, meta: meta)
+                let html = html(serviceId: serviceId, accessToken: accessToken, meta: meta)
                 webView.loadHTMLString(html, baseURL: url)
             }
         }
@@ -107,7 +117,7 @@ public struct MastercardWidget: UIViewRepresentable {
         }
     }
 
-    func html(serviceId: String, publicKey: String, meta: MastercardSrcMeta?) -> String {
+    func html(serviceId: String, accessToken: String, meta: MastercardSrcMeta?) -> String {
         let clientSdkUrl = Constants.clientSdkUrlString
         let clientSdkEnvironment = Constants.clientSdkEnvironment
         let clientSdkType = Constants.clientSdkType
@@ -175,12 +185,12 @@ public struct MastercardWidget: UIViewRepresentable {
             <script src="\(clientSdkUrl)"></script>
             <script>
                 const serviceId = "\(serviceId)";
-                const publicKey = "\(publicKey)";
+                const accessToken = "\(accessToken)";
                 const meta = \(jsonString)
                 var src = new \(clientSdkType).ClickToPay(
                         "#checkoutIframe",
                         serviceId,
-                        publicKey,
+                        accessToken,
                         meta,
                         {}
                     );

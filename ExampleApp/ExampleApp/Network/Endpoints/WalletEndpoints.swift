@@ -52,7 +52,7 @@ extension WalletEndpoints: Endpoint {
 
     var header: [String: String]? {
         let secretKey = ProjectEnvironment.shared.getSecretKey()
-        let publicKey =  ProjectEnvironment.shared.getPublicKey()
+        let accessToken =  ProjectEnvironment.shared.getAccessToken()
         switch self {
         case .initialiseWalletCharge, .initialiseFlyPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge:
             return [
@@ -61,7 +61,7 @@ extension WalletEndpoints: Endpoint {
             ]
         case .cardToken, .integrated3ds, .integrated3dsVault:
             return [
-                "x-user-public-key": "\(publicKey)",
+                "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }

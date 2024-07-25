@@ -28,8 +28,10 @@ struct SettingsView: View {
                     })
                     divider
 
-                    sectionTitle("Secret Key")
-                    secretKeyField(text: $viewModel.secretKey)
+                    sectionTitle("Access Token")
+                    textField(title: "Access Token", text: $viewModel.accessToken) {
+                        viewModel.copyAccessToken()
+                    }
                     divider
 
                     sectionTitle("Language")
@@ -38,6 +40,15 @@ struct SettingsView: View {
                     }
                     divider
 
+                    Button("Save") {
+                        viewModel.save()
+                    }
+                    .frame(height: 48)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.white)
+                    .background(Color.black)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
                 .navigationTitle("Settings")
             }
@@ -61,7 +72,7 @@ struct SettingsView: View {
         .padding(16)
     }
 
-    private func secretKeyField(text: Binding<String>) -> some View {
+    private func textField(title: String, text: Binding<String>, action: @escaping () -> Void) -> some View {
         VStack {
             ZStack {
                 Rectangle()
@@ -69,7 +80,7 @@ struct SettingsView: View {
                     .foregroundColor(Color.white)
                     .padding(.horizontal, 16)
 
-                TextField("Secret Key", text: text)
+                TextField(title, text: text)
                     .frame(height: 40)
                     .background(Color.white)
                     .padding(.leading, 32)
@@ -77,9 +88,7 @@ struct SettingsView: View {
 
                 HStack {
                     Spacer()
-                    Button(action: {
-                        viewModel.copySecretKey()
-                    }) {
+                    Button(action: action) {
                         Image("clone")
                             .padding(.horizontal, 32)
                     }

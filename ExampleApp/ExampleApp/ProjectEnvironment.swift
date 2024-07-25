@@ -15,7 +15,7 @@ struct ProjectEnvironment {
     enum Keys {
         static let configuration = "CONFIGURATION"
         static let secretKey = "SECRET_KEY"
-        static let publicKey = "PUBLIC_KEY"
+        static let accessToken = "ACCESS_TOKEN"
         static let applePayGatewayId = "APPLE_PAY_GATEWAY_ID"
         static let payPalGatewayId = "PAY_PAL_GATEWAY_ID"
         static let integrated3dsGatewayId = "INTEGRATED_3DS_GATEWAY_ID"
@@ -69,11 +69,14 @@ struct ProjectEnvironment {
         return secretKey
     }
 
-    func getPublicKey() -> String {
-        guard let publicKey = Self.infoDictionary[Keys.publicKey] as? String else {
-            fatalError("Public key not found in .plist!")
+    func getAccessToken() -> String {
+        if let accessToken = Self.accessToken {
+            return accessToken
         }
-        return publicKey
+        guard let accessToken = Self.infoDictionary[Keys.accessToken] as? String else {
+            fatalError("Access token not found in .plist!")
+        }
+        return accessToken
     }
 
     func getApplePayGatewayId() -> String? {
@@ -137,4 +140,6 @@ struct ProjectEnvironment {
         case .production, .sandbox, .staging: return "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
         }
     }
+
+    static var accessToken: String? = nil
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import MobileSDK
 
 class SettingsVM: ObservableObject {
 
@@ -20,7 +21,7 @@ class SettingsVM: ObservableObject {
     @Published var selectedEnvironment = ""
     var languages = ["English"]
     var selectedLanguage = "English"
-    var secretKey = ""
+    var accessToken = ""
 
     // MARK: - Initialization
 
@@ -36,8 +37,12 @@ class SettingsVM: ObservableObject {
         return projectEnvironment.getEnvironmentEndpoint()
     }
 
-    func copySecretKey() {
-        UIPasteboard.general.string = secretKey
+    func copyAccessToken() {
+        UIPasteboard.general.string = accessToken
+    }
+
+    func save() {
+        ProjectEnvironment.accessToken = accessToken
     }
 
 }

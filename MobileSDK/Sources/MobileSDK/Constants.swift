@@ -24,14 +24,6 @@ struct Constants {
         }
     }
 
-    static var publicKey: String {
-        guard let config = MobileSDK.shared.config else {
-            fatalError("Missing configuration!")
-        }
-
-        return config.publicKey
-    }
-
     static var sslPublicKeyHash: String {
         guard let environment = MobileSDK.shared.config?.environment else {
             fatalError("Missing configuration!")

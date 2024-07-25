@@ -20,7 +20,11 @@ struct MastercardWidgetView: View {
                         .sheet(isPresented: $viewModel.showWebView, content: {
                             NavigationStack {
                                 VStack {
-                                    MastercardWidget(serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "", meta: nil, completion: { result in
+                                    MastercardWidget(
+                                        serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                        accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                        meta: nil,
+                                        completion: { result in
                                         viewModel.handleMastercardResult(result)
                                     })
                                     .navigationTitle("Checkout with Mastercard")

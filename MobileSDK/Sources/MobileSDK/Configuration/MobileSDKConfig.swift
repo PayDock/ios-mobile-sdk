@@ -12,14 +12,11 @@ public struct MobileSDKConfig {
 
     var environment: SDKEnvironment
     let theme: Theme?
-    let publicKey: String
 
     public init(environment: SDKEnvironment,
-                publicKey: String,
                 theme: Theme? = nil) {
         self.environment = environment
         self.theme = theme
-        self.publicKey = publicKey
 
         setup()
     }
