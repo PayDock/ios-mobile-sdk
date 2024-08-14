@@ -28,7 +28,7 @@ struct WidgetsView: View {
                 stylizedNavigationLink(destination: Standalone3DSWidgetView(), title: "Standalone 3DS", subtitle: "Standalone 3DS widget")
                 stylizedNavigationLink(destination: FlyPayWidgetView(), title: "FlyPay", subtitle: "Standalone FlyPay widget")
                 stylizedNavigationLink(destination: AfterpayWidgetView(), title: "Afterpay", subtitle: "Standalone Afterpay widget")
-                stylizedNavigationLink(destination: MastercardWidgetView(), title: "Mastercard SRC", subtitle: "Standalone Mastercard widget")
+                stylizedNavigationLink(destination: MastercardWidgetView(), title: "Click to Pay", subtitle: " ClickToPay flow")
             }
             .navigationTitle("Widgets")
             .background(Color(hex: "#EAE0D7"))

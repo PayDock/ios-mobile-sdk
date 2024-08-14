@@ -6,7 +6,7 @@
 //  Copyright © 2024 Paydock Ltd.
 //
 
-public struct MastercardDpaData: Codable {
+public struct ClickToPayDPAData: Codable {
     public var dpaAddress: String? = nil
     public var dpaEmailAddress: String? = nil
     public var dpaPhoneNumber: PhoneNumber? = nil
