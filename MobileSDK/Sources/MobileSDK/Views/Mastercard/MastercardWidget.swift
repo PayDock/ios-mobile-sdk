@@ -18,7 +18,7 @@ public struct MastercardWidget: UIViewRepresentable {
     private let accessToken: String
     private let meta: MastercardSrcMeta?
     private let clientSdkUrl = Constants.clientSdkUrlString
-
+    
     // MARK: - Handlers
 
     private let completion: (MastercardResult) -> Void
@@ -35,7 +35,10 @@ public struct MastercardWidget: UIViewRepresentable {
         self.completion = completion
     }
 
-    public func makeUIView(context: Context) -> WKWebView {
+    public func makeUIView(context: Context) -> UIView {
+        // Create a container view to hold both the WKWebView and the UIActivityIndicatorView
+        let containerView = UIView(frame: UIScreen.main.bounds)
+        
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
         configuration.websiteDataStore = WKWebsiteDataStore.default()
@@ -56,10 +59,26 @@ public struct MastercardWidget: UIViewRepresentable {
         }
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
-        return webView
+        
+        // Create UIActivityIndicatorView
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.center = containerView.center
+        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()  // Start animating initially
+        context.coordinator.activityIndicator = activityIndicator  // Assign to the coordinator
+        
+        // Add WKWebView and UIActivityIndicatorView to the container view
+        containerView.addSubview(webView)
+        containerView.addSubview(activityIndicator)
+
+        return containerView
     }
 
-    public func updateUIView(_ webView: WKWebView, context: Context) {
+    public func updateUIView(_ view: UIView, context: Context) {
+        guard let webView = view.subviews.first(where: { $0 is WKWebView }) as? WKWebView else {
+            return
+        }
         if !context.coordinator.isLoaded {
             if let url = URL(string: "https://sandbox.src.mastercard.com") {
                 let html = html(serviceId: serviceId, accessToken: accessToken, meta: meta)
@@ -75,6 +94,7 @@ public struct MastercardWidget: UIViewRepresentable {
     public class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
         private let completion: (MastercardResult) -> Void
         var isLoaded = false
+        var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
 
         init(completion: @escaping (MastercardResult) -> Void) {
             self.completion = completion
@@ -110,6 +130,20 @@ public struct MastercardWidget: UIViewRepresentable {
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            activityIndicator?.stopAnimating()  // Stop animating when loading finishes
+        }
+        
+        public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print(error)
+            activityIndicator?.stopAnimating()  // Stop animating on failure
+        }
+
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            activityIndicator?.startAnimating()  // Start animating when loading starts
+        }
+        
+        public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            print(error)
         }
 
         public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {

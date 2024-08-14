@@ -21,16 +21,35 @@ public struct ThreeDSWidget: UIViewRepresentable {
         self.completion = completion
     }
 
-    public func makeUIView(context: Context) -> WKWebView {
+    public func makeUIView(context: Context) -> UIView {
+        // Create a container view to hold both the WKWebView and the UIActivityIndicatorView
+        let containerView = UIView(frame: UIScreen.main.bounds)
+        
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
-        return webView
+        
+        // Create UIActivityIndicatorView
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.center = containerView.center
+        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()  // Start animating initially
+        context.coordinator.activityIndicator = activityIndicator  // Assign to the coordinator
+        
+        // Add WKWebView and UIActivityIndicatorView to the container view
+        containerView.addSubview(webView)
+        containerView.addSubview(activityIndicator)
+
+        return containerView
     }
 
-    public func updateUIView(_ webView: WKWebView, context: Context) {
+    public func updateUIView(_ view: UIView, context: Context) {
+        guard let webView = view.subviews.first(where: { $0 is WKWebView }) as? WKWebView else {
+            return
+        }
         if !context.coordinator.isLoaded {
             let html = ThreeDSWidget.html(token)
             webView.loadHTMLString(html, baseURL: baseUrl)
@@ -44,6 +63,7 @@ public struct ThreeDSWidget: UIViewRepresentable {
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         private let completion: (ThreeDSResult) -> Void
         var isLoaded = false
+        var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
 
         init(completion: @escaping (ThreeDSResult) -> Void) {
             self.completion = completion
@@ -60,16 +80,20 @@ public struct ThreeDSWidget: UIViewRepresentable {
             }
             completion(ThreeDSResult(event: event, charge3dsId: token))
         }
-
+        
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            activityIndicator?.stopAnimating()  // Stop animating when loading finishes
         }
-
+        
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             print(error)
+            activityIndicator?.stopAnimating()  // Stop animating on failure
         }
 
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {}
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            activityIndicator?.startAnimating()  // Start animating when loading starts
+        }
 
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             print(error)
