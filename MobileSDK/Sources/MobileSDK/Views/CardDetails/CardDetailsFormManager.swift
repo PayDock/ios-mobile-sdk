@@ -194,7 +194,7 @@ class CardDetailsFormManager: ObservableObject {
     private func validateCardholderName() {
         if cardIssuerValidator.isValidCreditCardNumber(number: cardholderNameText) {
             cardHolderNameValid = false
-            cardholderNameError = "Card number is in wrong field!"
+            cardholderNameError = "Card number is in the wrong field!"
 
         } else if !cardholderNameText.isEmpty {
             cardHolderNameValid = true
