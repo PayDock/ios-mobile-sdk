@@ -10,13 +10,13 @@ import SwiftUI
 import WebKit
 import AuthenticationServices
 
-public struct MastercardWidget: UIViewRepresentable {
+public struct ClickToPayWidget: UIViewRepresentable {
 
     // MARK: - Dependencies
 
     private let serviceId: String
     private let accessToken: String
-    private let meta: MastercardSrcMeta?
+    private let meta: ClickToPayMeta?
     private let clientSdkUrl = Constants.clientSdkUrlString
     
     // MARK: - Handlers
@@ -27,7 +27,7 @@ public struct MastercardWidget: UIViewRepresentable {
 
     public init(serviceId: String,
                 accessToken: String,
-                meta: MastercardSrcMeta?,
+                meta: ClickToPayMeta?,
                 completion: @escaping (MastercardResult) -> Void) {
         self.serviceId = serviceId
         self.accessToken = accessToken
@@ -151,7 +151,7 @@ public struct MastercardWidget: UIViewRepresentable {
         }
     }
 
-    func html(serviceId: String, accessToken: String, meta: MastercardSrcMeta?) -> String {
+    func html(serviceId: String, accessToken: String, meta: ClickToPayMeta?) -> String {
         let clientSdkUrl = Constants.clientSdkUrlString
         let clientSdkEnvironment = Constants.clientSdkEnvironment
         let clientSdkType = Constants.clientSdkType
@@ -189,7 +189,7 @@ public struct MastercardWidget: UIViewRepresentable {
             <link rel="manifest" href="/site.webmanifest">
 
             <!-- Title for the HTML document -->
-            <title>Mastercard SRC</title>
+            <title>Click To Pay</title>
 
             <!-- Style block for custom styles -->
             <style>

@@ -116,7 +116,7 @@ struct CheckoutPaymentSheet: View {
                     .padding()
 
             case .mastercard:
-                Button("Checkout with Mastercard") {
+                Button("Checkout with Click to Pay") {
                     viewModel.showMastercardWebView = true
                 }
                 .foregroundStyle(.white)
@@ -129,13 +129,13 @@ struct CheckoutPaymentSheet: View {
                 .sheet(isPresented: $viewModel.showMastercardWebView, content: {
                     NavigationStack {
                         VStack {
-                            MastercardWidget(
+                            ClickToPayWidget(
                                 serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
                                 accessToken: ProjectEnvironment.shared.getAccessToken(),
                                 meta: nil) { result in
                                 viewModel.handleMastercardResult(result)
                             }
-                            .navigationTitle("Checkout with Mastercard")
+                            .navigationTitle("Checkout with Click to Pay")
                             .navigationBarTitleDisplayMode(.inline)
                         }
                     }
