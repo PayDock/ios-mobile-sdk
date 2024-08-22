@@ -9,9 +9,9 @@
 import SwiftUI
 import MobileSDK
 
-struct MastercardWidgetView: View {
+struct ClickToPayWidgetView: View {
 
-    @StateObject private var viewModel = MastercardWidgetVM()
+    @StateObject private var viewModel = ClickToPayWidgetVM()
 
     var body: some View {
         NavigationStack {
@@ -25,8 +25,15 @@ struct MastercardWidgetView: View {
                                         accessToken: ProjectEnvironment.shared.getAccessToken(),
                                         meta: nil,
                                         completion: { result in
-                                        viewModel.handleMastercardResult(result)
-                                    })
+                                            switch result {
+                                            case .success(let result):
+                                                viewModel.handleMastercardResult(result)
+                                                
+                                            case .failure(let error):
+                                                viewModel.alertMessage = error.localizedDescription
+                                                viewModel.showAlert = true
+                                            }
+                                        })
                                     .navigationTitle("Checkout with Click to Pay")
                                     .navigationBarTitleDisplayMode(.inline)
                                 }
@@ -43,6 +50,6 @@ struct MastercardWidgetView: View {
 
 struct MastercardWidgetView_Previews: PreviewProvider {
     static var previews: some View {
-        MastercardWidgetView()
+        ClickToPayWidgetView()
     }
 }

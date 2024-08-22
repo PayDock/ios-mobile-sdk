@@ -255,7 +255,7 @@ extension CheckoutPaymentVM {
 
 extension CheckoutPaymentVM {
 
-    func handleMastercardResult(_ result: MastercardResult) {
+    func handleMastercardResult(_ result: ClickToPayResult) {
         switch result.event {
         case .checkoutCompleted:
             showMastercardWebView = false

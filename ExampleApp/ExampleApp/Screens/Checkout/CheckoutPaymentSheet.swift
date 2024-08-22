@@ -133,13 +133,19 @@ struct CheckoutPaymentSheet: View {
                                 serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
                                 accessToken: ProjectEnvironment.shared.getAccessToken(),
                                 meta: nil) { result in
-                                viewModel.handleMastercardResult(result)
-                            }
-                            .navigationTitle("Checkout with Click to Pay")
-                            .navigationBarTitleDisplayMode(.inline)
+                                    switch result {
+                                    case .success(let result):
+                                        viewModel.handleMastercardResult(result)
+                                        
+                                    case .failure(let error):
+                                        viewModel.alertMessage = error.localizedDescription
+                                        viewModel.showAlert = true
+                                    }
+                                }
                         }
+                        .navigationTitle("Checkout with Click to Pay")
+                        .navigationBarTitleDisplayMode(.inline)
                     }
-
                 })
             }
         }
@@ -153,8 +159,15 @@ struct CheckoutPaymentSheet: View {
                     ThreeDSWidget(
                         token: viewModel.token3DS,
                         baseURL: viewModel.getBaseUrl(),
-                        completion: { event in
-                            viewModel.handle3dsEvent(event)
+                        completion: { result in
+                            switch result {
+                            case .success(let result):
+                                viewModel.handle3dsEvent(result)
+                                
+                            case .failure(let error):
+                                viewModel.alertMessage = error.localizedDescription
+                                viewModel.showAlert = true
+                            }
                         })
                     .navigationTitle("3DS Check")
                     .navigationBarTitleDisplayMode(.inline)
