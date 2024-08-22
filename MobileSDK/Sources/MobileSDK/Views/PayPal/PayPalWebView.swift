@@ -73,8 +73,22 @@ struct PayPalWebView: UIViewRepresentable {
             isLoaded = true
         }
 
+        /**
+         This method handles errors that are reported that happen while loading the resource.
+         These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
+         **/
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed)
+            onFailure(.webViewFailed(error: error as NSError))
+        }
+        
+        /**
+         This method handles errors that happen before the resource of the url can even be reached.
+         These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
+         
+         @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
+         */
+        public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            onFailure(.webViewFailed(error: error as NSError))
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {

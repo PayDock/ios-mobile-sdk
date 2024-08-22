@@ -9,7 +9,7 @@
 import Foundation
 import MobileSDK
 
-class MastercardWidgetVM: NSObject, ObservableObject {
+class ClickToPayWidgetVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
@@ -23,7 +23,7 @@ class MastercardWidgetVM: NSObject, ObservableObject {
         return URL(string: urlString)
     }
 
-    func handleMastercardResult(_ result: MastercardResult) {
+    func handleMastercardResult(_ result: ClickToPayResult) {
         switch result.event {
         case .checkoutCompleted:
             showWebView = false

@@ -21,14 +21,14 @@ public struct ClickToPayWidget: UIViewRepresentable {
     
     // MARK: - Handlers
 
-    private let completion: (MastercardResult) -> Void
+    private let completion: (Result<ClickToPayResult, ClickToPayError>) -> Void
 
     // MARK: - Initialization
 
     public init(serviceId: String,
                 accessToken: String,
                 meta: ClickToPayMeta?,
-                completion: @escaping (MastercardResult) -> Void) {
+                completion: @escaping (Result<ClickToPayResult, ClickToPayError>) -> Void) {
         self.serviceId = serviceId
         self.accessToken = accessToken
         self.meta = meta
@@ -36,13 +36,11 @@ public struct ClickToPayWidget: UIViewRepresentable {
     }
 
     public func makeUIView(context: Context) -> UIView {
-        // Create a container view to hold both the WKWebView and the UIActivityIndicatorView
         let containerView = UIView(frame: UIScreen.main.bounds)
         
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
         configuration.websiteDataStore = WKWebsiteDataStore.default()
-        // adds dummy cookie to webview to sync cookies
         let cookie = HTTPCookie(properties: [
             .domain: "sandbox.src.mastercard.com",
             .path: "/",
@@ -60,15 +58,13 @@ public struct ClickToPayWidget: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
         
-        // Create UIActivityIndicatorView
         let activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.center = containerView.center
         activityIndicator.color = UIColor(Color.primaryColor)
         activityIndicator.hidesWhenStopped = true
         activityIndicator.startAnimating()  // Start animating initially
-        context.coordinator.activityIndicator = activityIndicator  // Assign to the coordinator
+        context.coordinator.activityIndicator = activityIndicator
         
-        // Add WKWebView and UIActivityIndicatorView to the container view
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
 
@@ -92,19 +88,19 @@ public struct ClickToPayWidget: UIViewRepresentable {
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
-        private let completion: (MastercardResult) -> Void
+        private let completion: (Result<ClickToPayResult, ClickToPayError>) -> Void
         var isLoaded = false
         var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
 
-        init(completion: @escaping (MastercardResult) -> Void) {
+        init(completion: @escaping (Result<ClickToPayResult, ClickToPayError>) -> Void) {
             self.completion = completion
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard let data = message.body as? [String: Any],
                   let eventRaw = data["event"] as? String,
-                  let event = MastercardResult.EventType(rawValue: eventRaw) else {
-                completion(MastercardResult(event: .checkoutError, mastercardToken: ""))
+                  let event = ClickToPayResult.EventType(rawValue: eventRaw) else {
+                completion(.success(ClickToPayResult(event: .checkoutError, mastercardToken: "")))
                 return
             }
 
@@ -112,7 +108,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
                   let innerData = outerData["data"] as? [String: Any],
                   let token = innerData["token"] as? String else { return }
 
-            completion(MastercardResult(event: event, mastercardToken: token))
+            completion(.success(ClickToPayResult(event: event, mastercardToken: token)))
         }
 
         public func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
@@ -130,20 +126,31 @@ public struct ClickToPayWidget: UIViewRepresentable {
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
-            activityIndicator?.stopAnimating()  // Stop animating when loading finishes
+            activityIndicator?.stopAnimating()
         }
         
+        /**
+         This method handles errors that are reported that happen while loading the resource.
+         These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
+         **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print(error)
-            activityIndicator?.stopAnimating()  // Stop animating on failure
+            activityIndicator?.stopAnimating()
+            completion(.failure(.webViewFailed(error: error as NSError)))
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            activityIndicator?.startAnimating()  // Start animating when loading starts
+            activityIndicator?.startAnimating()
         }
         
+        /**
+         This method handles errors that happen before the resource of the url can even be reached.
+         These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
+         
+         @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
+         */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            print(error)
+            activityIndicator?.stopAnimating()
+            completion(.failure(.webViewFailed(error: error as NSError)))
         }
 
         public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
