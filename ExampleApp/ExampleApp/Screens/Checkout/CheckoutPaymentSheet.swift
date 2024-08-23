@@ -27,7 +27,7 @@ struct CheckoutPaymentSheet: View {
             switch viewModel.selectedMethod {
             case .card:
                 VStack {
-                    CardDetailsWidget(gatewayId: "", accessToken: ProjectEnvironment.shared.getAccessToken(), completion: { result in
+                    CardDetailsWidget(gatewayId: nil, accessToken: ProjectEnvironment.shared.getAccessToken(), completion: { result in
                         switch result {
                         case .success(let result): viewModel.saveCardToken(result.token)
                         case .failure: break
