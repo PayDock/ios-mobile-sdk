@@ -16,12 +16,8 @@ struct VaultTokenRes: Codable {
         let type: String
         let data: VaultData
     }
-
+    
     struct VaultData: Codable {
-        let token: String
-
-        enum CodingKeys: String, CodingKey {
-            case token = "vault_token"
-        }
+        let vaultToken: String
     }
 }

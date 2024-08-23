@@ -53,12 +53,12 @@ struct WalletServiceImpl: HTTPClient, WalletService {
 
     func createVaultToken(request: TokeniseCardDetailsReq) async throws -> String {
         let response = try await sendRequest(endpoint: WalletEndpoints.vaultToken(request: request), responseModel: VaultTokenRes.self)
-        return response.resource.data.token
+        return response.resource.data.vaultToken
     }
 
     func convertCardTokenToVaultToken(request: ConvertToVaultTokenReq) async throws -> String {
         let response = try await sendRequest(endpoint: WalletEndpoints.convertToVaultToken(request: request), responseModel: VaultTokenRes.self)
-        return response.resource.data.token
+        return response.resource.data.vaultToken
     }
 
     func createStandalone3DSToken(request: Standalone3DSReq) async throws -> String? {
