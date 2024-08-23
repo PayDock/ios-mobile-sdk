@@ -7,11 +7,12 @@
 //
 
 import Foundation
+import NetworkingLib
 
 enum CardsEndpoints {
 
-    case cardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq)
-    case giftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq)
+    case cardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String)
+    case giftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String)
 
 }
 
@@ -32,9 +33,9 @@ extension CardsEndpoints: Endpoint {
 
     var header: [String: String]? {
         switch self {
-        case .cardToken, .giftCardToken:
+        case let .cardToken(_, accessToken), let .giftCardToken(_, accessToken):
             return [
-                "x-user-public-key": "\(Constants.publicKey)",
+                "x-access-token": accessToken,
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }
@@ -42,8 +43,8 @@ extension CardsEndpoints: Endpoint {
 
     var body: Data? {
         switch self {
-        case .cardToken(let tokeniseCardDetailsReq): return try? encoder.encode(tokeniseCardDetailsReq)
-        case .giftCardToken(let tokeniseGiftCardReq): return try? encoder.encode(tokeniseGiftCardReq)
+        case .cardToken(let request, _): return try? encoder.encode(request)
+        case .giftCardToken(let request, _): return try? encoder.encode(request)
         }
     }
 

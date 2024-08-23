@@ -17,7 +17,7 @@ struct GiftCardWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                GiftCardWidget(storePin: false) { result in
+                GiftCardWidget(storePin: false, accessToken: ProjectEnvironment.shared.getAccessToken()) { result in
                     switch result {
                     case .success(let text): self.alertMessage = text
                     case .failure(let error): self.alertMessage = error.localizedDescription

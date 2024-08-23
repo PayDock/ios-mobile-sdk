@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import NetworkingLib
 
 @MainActor
 class PayPalVM: ObservableObject {
@@ -57,7 +58,7 @@ class PayPalVM: ObservableObject {
                 await MainActor.run {
                     self.isLoading = false
                     self.showWebView = false
-                    self.completion(.failure(.webViewFailed))
+                    self.completion(.failure(.unknownError))
                 }
             }
         }

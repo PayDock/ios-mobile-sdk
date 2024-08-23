@@ -8,6 +8,7 @@
 
 import SwiftUI
 import PassKit
+import NetworkingLib
 
 class ApplePayVM: NSObject, ObservableObject {
 

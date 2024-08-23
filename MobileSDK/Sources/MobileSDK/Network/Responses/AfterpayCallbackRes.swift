@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import NetworkingLib
 
 struct AfterpayCallbackRes: Codable {
     let status: Int

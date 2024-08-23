@@ -27,7 +27,7 @@ struct CheckoutPaymentSheet: View {
             switch viewModel.selectedMethod {
             case .card:
                 VStack {
-                    CardDetailsWidget(gatewayId: "", completion: { result in
+                    CardDetailsWidget(gatewayId: nil, accessToken: ProjectEnvironment.shared.getAccessToken(), completion: { result in
                         switch result {
                         case .success(let result): viewModel.saveCardToken(result.token)
                         case .failure: break
@@ -116,7 +116,7 @@ struct CheckoutPaymentSheet: View {
                     .padding()
 
             case .mastercard:
-                Button("Checkout with Mastercard") {
+                Button("Checkout with Click to Pay") {
                     viewModel.showMastercardWebView = true
                 }
                 .foregroundStyle(.white)
@@ -129,16 +129,23 @@ struct CheckoutPaymentSheet: View {
                 .sheet(isPresented: $viewModel.showMastercardWebView, content: {
                     NavigationStack {
                         VStack {
-                            MastercardWidget(
+                            ClickToPayWidget(
                                 serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                accessToken: ProjectEnvironment.shared.getAccessToken(),
                                 meta: nil) { result in
-                                viewModel.handleMastercardResult(result)
-                            }
-                            .navigationTitle("Checkout with Mastercard")
-                            .navigationBarTitleDisplayMode(.inline)
+                                    switch result {
+                                    case .success(let result):
+                                        viewModel.handleMastercardResult(result)
+                                        
+                                    case .failure(let error):
+                                        viewModel.alertMessage = error.localizedDescription
+                                        viewModel.showAlert = true
+                                    }
+                                }
                         }
+                        .navigationTitle("Checkout with Click to Pay")
+                        .navigationBarTitleDisplayMode(.inline)
                     }
-
                 })
             }
         }
@@ -152,8 +159,15 @@ struct CheckoutPaymentSheet: View {
                     ThreeDSWidget(
                         token: viewModel.token3DS,
                         baseURL: viewModel.getBaseUrl(),
-                        completion: { event in
-                            viewModel.handle3dsEvent(event)
+                        completion: { result in
+                            switch result {
+                            case .success(let result):
+                                viewModel.handle3dsEvent(result)
+                                
+                            case .failure(let error):
+                                viewModel.alertMessage = error.localizedDescription
+                                viewModel.showAlert = true
+                            }
                         })
                     .navigationTitle("3DS Check")
                     .navigationBarTitleDisplayMode(.inline)

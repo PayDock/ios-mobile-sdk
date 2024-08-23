@@ -13,24 +13,40 @@ import AuthenticationServices
 public struct ThreeDSWidget: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?
-    private let completion: (ThreeDSResult) -> Void
+    private let completion: (Result<ThreeDSResult, ThreeDSError>) -> Void
 
-    public init(token: String, baseURL: URL?, completion: @escaping (ThreeDSResult) -> Void) {
+    public init(token: String, baseURL: URL?, completion: @escaping (Result<ThreeDSResult, ThreeDSError>) -> Void) {
         self.token = token
         self.baseUrl = baseURL
         self.completion = completion
     }
 
-    public func makeUIView(context: Context) -> WKWebView {
+    public func makeUIView(context: Context) -> UIView {
+        let containerView = UIView(frame: UIScreen.main.bounds)
+        
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
-        return webView
+        
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.center = containerView.center
+        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.startAnimating()  // Start animating initially
+        context.coordinator.activityIndicator = activityIndicator
+        
+        containerView.addSubview(webView)
+        containerView.addSubview(activityIndicator)
+
+        return containerView
     }
 
-    public func updateUIView(_ webView: WKWebView, context: Context) {
+    public func updateUIView(_ view: UIView, context: Context) {
+        guard let webView = view.subviews.first(where: { $0 is WKWebView }) as? WKWebView else {
+            return
+        }
         if !context.coordinator.isLoaded {
             let html = ThreeDSWidget.html(token)
             webView.loadHTMLString(html, baseURL: baseUrl)
@@ -42,10 +58,11 @@ public struct ThreeDSWidget: UIViewRepresentable {
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        private let completion: (ThreeDSResult) -> Void
+        private let completion: (Result<ThreeDSResult, ThreeDSError>) -> Void
         var isLoaded = false
+        var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
 
-        init(completion: @escaping (ThreeDSResult) -> Void) {
+        init(completion: @escaping (Result<ThreeDSResult, ThreeDSError>) -> Void) {
             self.completion = completion
         }
 
@@ -55,24 +72,39 @@ public struct ThreeDSWidget: UIViewRepresentable {
                   let event = ThreeDSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completion(ThreeDSResult(event: .error, charge3dsId: ""))
+                completion(.success(ThreeDSResult(event: .error, charge3dsId: "")))
                 return
             }
-            completion(ThreeDSResult(event: event, charge3dsId: token))
+           completion(.success(ThreeDSResult(event: event, charge3dsId: token)))
         }
-
+        
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            activityIndicator?.stopAnimating()
         }
-
+        
+        /**
+         This method handles errors that are reported that happen while loading the resource.
+         These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
+         **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print(error)
+            activityIndicator?.stopAnimating()
+            completion(.failure(.webViewFailed(error: error as NSError)))
         }
 
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {}
-
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            activityIndicator?.startAnimating()
+        }
+        
+        /**
+         This method handles errors that happen before the resource of the url can even be reached.
+         These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
+         
+         @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
+         */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            print(error)
+            activityIndicator?.stopAnimating()
+            completion(.failure(.webViewFailed(error: error as NSError)))
         }
 
         public func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {

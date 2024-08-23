@@ -93,3 +93,4 @@ iOSInjectionProject/
 # Custom
 **/xcuserdata/*
 .DS_Store
+NetworkingLib/
