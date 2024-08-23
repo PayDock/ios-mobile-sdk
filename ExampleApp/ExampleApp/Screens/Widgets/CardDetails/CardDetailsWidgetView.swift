@@ -19,6 +19,7 @@ struct CardDetailsWidgetView: View {
             ScrollView {
                 CardDetailsWidget(
                     gatewayId: nil,
+                    accessToken: ProjectEnvironment.shared.getAccessToken(),
                     allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
                     completion: { result in
                         switch result {

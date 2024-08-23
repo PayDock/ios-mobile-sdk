@@ -18,12 +18,14 @@ public struct CardDetailsWidget: View {
     // MARK: - Initialisation
 
     public init(gatewayId: String?,
+                accessToken: String,
                 actionText: String = "Submit",
                 showCardTitle: Bool = true,
                 allowSaveCard: SaveCardConfig? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
             gatewayId: gatewayId,
+            accessToken: accessToken,
             actionText: actionText,
             showCardTitle: showCardTitle,
             allowSaveCard: allowSaveCard,
@@ -141,7 +143,7 @@ public struct CardDetailsWidget: View {
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsWidget(gatewayId: "", completion: { _ in })
+        CardDetailsWidget(gatewayId: "", accessToken: "", completion: { _ in })
             .previewLayout(.sizeThatFits)
     }
 }

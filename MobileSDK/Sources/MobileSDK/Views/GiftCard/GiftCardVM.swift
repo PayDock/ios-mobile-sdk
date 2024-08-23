@@ -8,6 +8,7 @@
 
 import Combine
 import SwiftUI
+import NetworkingLib
 
 class GiftCardVM: ObservableObject {
 
@@ -15,14 +16,15 @@ class GiftCardVM: ObservableObject {
 
     @Published var giftCardFormManager: GiftCardFormManager
     private let cardService: CardService
-    
+    private let accessToken: String
+    private let storePin: Bool
+
     // MARK: - Handlers
 
     private let completion: (Result<String, GiftCardError>) -> Void
 
     // MARK: - Properties
 
-    private let storePin: Bool
     @Published var isLoading = false
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
@@ -30,10 +32,12 @@ class GiftCardVM: ObservableObject {
 
     init(giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
          cardService: CardService = CardServiceImpl(),
+         accessToken: String,
          storePin: Bool,
          completion: @escaping (Result<String, GiftCardError>) -> Void) {
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
+        self.accessToken = accessToken
         self.storePin = storePin
         self.completion = completion
 
@@ -51,7 +55,7 @@ class GiftCardVM: ObservableObject {
                 storePin: storePin)
 
             do {
-                let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq)
+                let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: accessToken)
                 isLoading = false
                 completion(.success(cardToken))
             } catch let RequestError.requestError(errorResponse: errorResponse) {

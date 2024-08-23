@@ -13,8 +13,10 @@ public struct GiftCardWidget: View {
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
 
     public init(storePin: Bool = true,
+                accessToken: String,
                 completion: @escaping (Result<String, GiftCardError>) -> Void) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(
+            accessToken: accessToken,
             storePin: storePin,
             completion: completion))
     }
@@ -80,6 +82,6 @@ public struct GiftCardWidget: View {
 
 struct GiftCardView_Previews: PreviewProvider {
     static var previews: some View {
-        GiftCardWidget(completion: { _ in })
+        GiftCardWidget(accessToken: "", completion: { _ in })
     }
 }

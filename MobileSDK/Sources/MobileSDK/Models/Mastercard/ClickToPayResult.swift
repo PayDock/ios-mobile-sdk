@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct MastercardResult {
+public struct ClickToPayResult {
     public let event: EventType
     public let mastercardToken: String
     

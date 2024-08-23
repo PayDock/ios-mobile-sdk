@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import NetworkingLib
 
 @MainActor
 class CardDetailsVM: ObservableObject {
@@ -17,6 +18,7 @@ class CardDetailsVM: ObservableObject {
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
     private let cardService: CardService
+    private let accessToken: String
 
     // MARK: - Properties
 
@@ -36,6 +38,7 @@ class CardDetailsVM: ObservableObject {
     init(cardService: CardService = CardServiceImpl(),
          cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager(),
          gatewayId: String?,
+         accessToken: String,
          actionText: String,
          showCardTitle: Bool,
          allowSaveCard: SaveCardConfig?,
@@ -43,6 +46,7 @@ class CardDetailsVM: ObservableObject {
         self.cardService = cardService
         self.cardDetailsFormManager = cardDetailsFormManager
         self.gatewayId = gatewayId
+        self.accessToken = accessToken
         self.actionText = actionText
         self.showCardTitle = showCardTitle
         self.allowSaveCard = allowSaveCard
@@ -72,7 +76,7 @@ class CardDetailsVM: ObservableObject {
 
             do {
                 isLoading = true
-                let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq)
+                let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: accessToken)
                 isLoading = false
                 completion(.success(createResult(token: cardToken)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {

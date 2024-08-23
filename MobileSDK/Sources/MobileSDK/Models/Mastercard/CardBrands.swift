@@ -26,13 +26,13 @@ public enum Services: String, Codable {
     case inlineInstallments = "inline_nstallments"
 }
 
-public enum MastercardDPAShippingBillingPreference: String, Codable {
+public enum ClickToPayDPAShippingBillingPreference: String, Codable {
     case full = "full"
     case postalCountry = "postal_country"
     case none = "none"
 }
 
-public enum MastercardOrderType: String, Codable {
+public enum ClickToPayOrderType: String, Codable {
     case splitShipment = "split_shipment"
     case preferredCard = "preferred_card"
 }

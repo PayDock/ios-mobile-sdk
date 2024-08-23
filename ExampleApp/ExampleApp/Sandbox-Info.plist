@@ -6,8 +6,8 @@
 	<string>$(AFTERPAY_GATEWAY_ID)</string>
 	<key>SECRET_KEY</key>
 	<string>$(SECRET_KEY)</string>
-	<key>PUBLIC_KEY</key>
-	<string>$(PUBLIC_KEY)</string>
+	<key>ACCESS_TOKEN</key>
+	<string>$(ACCESS_TOKEN)</string>
 	<key>APPLE_PAY_GATEWAY_ID</key>
 	<string>$(APPLE_PAY_GATEWAY_ID)</string>
 	<key>FLYPAY_GATEWAY_ID</key>

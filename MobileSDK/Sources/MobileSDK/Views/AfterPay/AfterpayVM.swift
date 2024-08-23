@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Afterpay
+import NetworkingLib
 
 @MainActor
 class AfterpayVM: ObservableObject {

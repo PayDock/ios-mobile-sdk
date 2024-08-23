@@ -8,16 +8,16 @@
 
 import Foundation
 
-public struct MastercardDpaOptions: Codable {
-    public var dpaBillingPreference: MastercardDPAShippingBillingPreference?
+public struct ClickToPayDPAOptions: Codable {
+    public var dpaBillingPreference: ClickToPayDPAShippingBillingPreference?
     public var paymentOptions: [PaymentOption]?
-    public var orderType: MastercardOrderType?
+    public var orderType: ClickToPayOrderType?
     public var threeDSPreference: String?
     public var confirmPayment: Bool?
 
-    public init(dpaBillingPreference: MastercardDPAShippingBillingPreference? = nil,
+    public init(dpaBillingPreference: ClickToPayDPAShippingBillingPreference? = nil,
                 paymentOptions: [PaymentOption]? = nil,
-                orderType: MastercardOrderType? = nil,
+                orderType: ClickToPayOrderType? = nil,
                 threeDSPreference: String? = nil,
                 confirmPayment: Bool? = nil) {
         self.dpaBillingPreference = dpaBillingPreference

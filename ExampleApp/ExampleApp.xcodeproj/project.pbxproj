@@ -40,8 +40,8 @@
 		2889B7F12A558F1A00D6C7BE /* ExampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F02A558F1A00D6C7BE /* ExampleAppUITests.swift */; };
 		2889B7F32A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */; };
 		288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */; };
-		289B83842B9E382500CEA8B4 /* MastercardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83832B9E382500CEA8B4 /* MastercardWidgetView.swift */; };
-		289B83862B9E382F00CEA8B4 /* MastercardWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83852B9E382F00CEA8B4 /* MastercardWidgetVM.swift */; };
+		289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83832B9E382500CEA8B4 /* ClickToPayWidgetView.swift */; };
+		289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */; };
 		289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289D76C02B45FABA002601BB /* CaptureChargeReq.swift */; };
 		28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */; };
 		28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */; };
@@ -59,17 +59,10 @@
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
 		28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 28E215FD2B63D28400A0877B /* MobileSDK */; };
-		28E86F582ACC1189008E827E /* NetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F572ACC1189008E827E /* NetworkLogger.swift */; };
-		28E86F5B2ACC11C8008E827E /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F5A2ACC11C8008E827E /* Endpoint.swift */; };
-		28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F5C2ACC11E0008E827E /* HTTPClient.swift */; };
-		28E86F5F2ACC11F6008E827E /* RequestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F5E2ACC11F6008E827E /* RequestError.swift */; };
-		28E86F612ACC120B008E827E /* RequestMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F602ACC120B008E827E /* RequestMethod.swift */; };
-		28E86F632ACC1324008E827E /* SSLPinningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F622ACC1324008E827E /* SSLPinningManager.swift */; };
 		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
 		28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */; };
 		28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6D2ACC213F008E827E /* WalletService.swift */; };
 		28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */; };
-		28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F712ACC2480008E827E /* ErrorRes.swift */; };
 		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
 		28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */; };
 		28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3252B83922100C73065 /* AfterpayWidgetVM.swift */; };
@@ -132,8 +125,8 @@
 		2889B7F22A558F1A00D6C7BE /* ExampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		288E33A72A5C984000DB2A41 /* ProjectEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectEnvironment.swift; sourceTree = "<group>"; };
 		28962E762AA79C3E003272A3 /* Production-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Production-Info.plist"; sourceTree = "<group>"; };
-		289B83832B9E382500CEA8B4 /* MastercardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastercardWidgetView.swift; sourceTree = "<group>"; };
-		289B83852B9E382F00CEA8B4 /* MastercardWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastercardWidgetVM.swift; sourceTree = "<group>"; };
+		289B83832B9E382500CEA8B4 /* ClickToPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayWidgetView.swift; sourceTree = "<group>"; };
+		289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayWidgetVM.swift; sourceTree = "<group>"; };
 		289D76C02B45FABA002601BB /* CaptureChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq.swift; sourceTree = "<group>"; };
 		28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVaultTokenReq.swift; sourceTree = "<group>"; };
 		28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleVM.swift; sourceTree = "<group>"; };
@@ -151,17 +144,10 @@
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28D541F92A6FFC290041BAE0 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
-		28E86F572ACC1189008E827E /* NetworkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogger.swift; sourceTree = "<group>"; };
-		28E86F5A2ACC11C8008E827E /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
-		28E86F5C2ACC11E0008E827E /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
-		28E86F5E2ACC11F6008E827E /* RequestError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestError.swift; sourceTree = "<group>"; };
-		28E86F602ACC120B008E827E /* RequestMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestMethod.swift; sourceTree = "<group>"; };
-		28E86F622ACC1324008E827E /* SSLPinningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLPinningManager.swift; sourceTree = "<group>"; };
 		28E86F662ACC1361008E827E /* WalletEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEndpoints.swift; sourceTree = "<group>"; };
 		28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeReq.swift; sourceTree = "<group>"; };
 		28E86F6D2ACC213F008E827E /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
 		28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeRes.swift; sourceTree = "<group>"; };
-		28E86F712ACC2480008E827E /* ErrorRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorRes.swift; sourceTree = "<group>"; };
 		28EA57122A5B48C70003774F /* MobileSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MobileSDK; path = ../MobileSDK; sourceTree = "<group>"; };
 		28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetView.swift; sourceTree = "<group>"; };
 		28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayWidgetView.swift; sourceTree = "<group>"; };
@@ -394,8 +380,8 @@
 		289B83822B9E381300CEA8B4 /* Mastercard */ = {
 			isa = PBXGroup;
 			children = (
-				289B83832B9E382500CEA8B4 /* MastercardWidgetView.swift */,
-				289B83852B9E382F00CEA8B4 /* MastercardWidgetVM.swift */,
+				289B83832B9E382500CEA8B4 /* ClickToPayWidgetView.swift */,
+				289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */,
 			);
 			path = Mastercard;
 			sourceTree = "<group>";
@@ -442,26 +428,12 @@
 		28E86F592ACC11A2008E827E /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				28E86F642ACC1348008E827E /* Base */,
 				28E86F652ACC1350008E827E /* Endpoints */,
 				28E86F682ACC1399008E827E /* Requests */,
 				28E86F692ACC13A1008E827E /* Responses */,
 				28E86F6A2ACC13AD008E827E /* Services */,
 			);
 			path = Network;
-			sourceTree = "<group>";
-		};
-		28E86F642ACC1348008E827E /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				28E86F5A2ACC11C8008E827E /* Endpoint.swift */,
-				28E86F5C2ACC11E0008E827E /* HTTPClient.swift */,
-				28E86F572ACC1189008E827E /* NetworkLogger.swift */,
-				28E86F5E2ACC11F6008E827E /* RequestError.swift */,
-				28E86F602ACC120B008E827E /* RequestMethod.swift */,
-				28E86F622ACC1324008E827E /* SSLPinningManager.swift */,
-			);
-			path = Base;
 			sourceTree = "<group>";
 		};
 		28E86F652ACC1350008E827E /* Endpoints */ = {
@@ -490,7 +462,6 @@
 			isa = PBXGroup;
 			children = (
 				28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */,
-				28E86F712ACC2480008E827E /* ErrorRes.swift */,
 				28A81F522B14E13E0068FE75 /* CardTokenRes.swift */,
 				28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */,
 				280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */,
@@ -682,12 +653,10 @@
 				2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */,
-				289B83862B9E382F00CEA8B4 /* MastercardWidgetVM.swift in Sources */,
+				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
-				28E86F632ACC1324008E827E /* SSLPinningManager.swift in Sources */,
 				28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */,
-				28E86F612ACC120B008E827E /* RequestMethod.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				28A81F4D2B14DB040068FE75 /* Integrated3DSVM.swift in Sources */,
 				2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */,
@@ -706,19 +675,15 @@
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
-				28E86F5B2ACC11C8008E827E /* Endpoint.swift in Sources */,
 				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
-				28E86F722ACC2480008E827E /* ErrorRes.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
 				28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
-				28E86F5F2ACC11F6008E827E /* RequestError.swift in Sources */,
-				28E86F582ACC1189008E827E /* NetworkLogger.swift in Sources */,
 				2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
@@ -727,8 +692,7 @@
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
 				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
-				289B83842B9E382500CEA8B4 /* MastercardWidgetView.swift in Sources */,
-				28E86F5D2ACC11E0008E827E /* HTTPClient.swift in Sources */,
+				289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
 				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
 				282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */,

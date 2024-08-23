@@ -8,22 +8,22 @@
 
 import Foundation
 
-public struct MastercardSrcMeta: Codable {
-    public let dpaData: MastercardDpaData?
+public struct ClickToPayMeta: Codable {
+    public let dpaData: ClickToPayDPAData?
     public let disableSummaryScreen: Bool?
     public let cardBrands: [CardBrands]?
     public let coBrandNames: [String]?
     public let checkoutExperience: CheckoutExperience?
     public let services: Services?
-    public let dpaTransactionOptions: MastercardDpaOptions?
+    public let dpaTransactionOptions: ClickToPayDPAOptions?
 
-    public init(dpaData: MastercardDpaData? = nil,
+    public init(dpaData: ClickToPayDPAData? = nil,
                 disableSummaryScreen: Bool? = nil,
                 cardBrands: [CardBrands]? = nil,
                 coBrandNames: [String]? = nil,
                 checkoutExperience: CheckoutExperience? = nil,
                 services: Services? = nil,
-                dpaTransactionOptions: MastercardDpaOptions? = nil) {
+                dpaTransactionOptions: ClickToPayDPAOptions? = nil) {
         self.dpaData = dpaData
         self.disableSummaryScreen = disableSummaryScreen
         self.cardBrands = cardBrands

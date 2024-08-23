@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import NetworkingLib
 
 public enum PayPalError: Error {
 
     case errorFetchingPayPalUrl(error: ErrorRes)
     case errorCapturingCharge(error: ErrorRes)
-    case webViewFailed
+    case webViewFailed(error: NSError)
     case unknownError
 
     public var customMessage: String {
