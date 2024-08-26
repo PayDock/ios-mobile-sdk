@@ -18,7 +18,8 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.4.0"),
-        .package(url: "https://gitlab.com/paydock/bounded-contexts/mobile/mobile-lib-networking-ios", branch: "develop")
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.0.1")
+
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -27,7 +28,7 @@ let package = Package(
             name: "MobileSDK",
             dependencies: [
                 .product(name: "Afterpay", package: "sdk-ios"),
-                .product(name: "NetworkingLib", package: "mobile-lib-networking-ios")],
+                .product(name: "NetworkingLib", package: "ios-core-networking")]
             path: "MobileSDK/Sources"),
         .testTarget(
             name: "MobileSDKTests",
