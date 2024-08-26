@@ -10,7 +10,6 @@
 		2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808B3412A7056F100E86C7E /* CardDetailsWidgetView.swift */; };
 		280CD6772C189699004C8788 /* Sandbox-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 280CD6762C189699004C8788 /* Sandbox-Info.plist */; };
 		280CD6792C1896A9004C8788 /* Staging-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 280CD6782C1896A9004C8788 /* Staging-Info.plist */; };
-		280CD68C2C18AC2F004C8788 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 280CD68B2C18AC2F004C8788 /* MobileSDK */; };
 		280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96312B176ED000BE8C3E /* Standalone3DSWidgetView.swift */; };
 		280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96332B176FD600BE8C3E /* Standalone3DSVM.swift */; };
 		280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */; };
@@ -160,7 +159,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */,
-				280CD68C2C18AC2F004C8788 /* MobileSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,7 +525,6 @@
 			name = ExampleApp;
 			packageProductDependencies = (
 				28E215FD2B63D28400A0877B /* MobileSDK */,
-				280CD68B2C18AC2F004C8788 /* MobileSDK */,
 			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
@@ -1763,10 +1760,6 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		280CD68B2C18AC2F004C8788 /* MobileSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = MobileSDK;
-		};
 		28E215FD2B63D28400A0877B /* MobileSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MobileSDK;
