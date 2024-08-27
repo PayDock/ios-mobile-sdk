@@ -27,12 +27,12 @@ let package = Package(
             dependencies: [
                 .product(name: "Afterpay", package: "sdk-ios"),
                 .product(name: "NetworkingLib", package: "ios-core-networking")],
-            path: "Sources"
+            path: "MobileSDK/Sources"
         ),
         .testTarget(
             name: "MobileSDKTests",
             dependencies: ["MobileSDK"],
-            path: "Tests",
+            path: "MobileSDK/Tests",
             resources: [
                 .copy("MobileSDKTests/Resources/JSON/card_tokenisation_error_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/card_tokenisation_success_response.json")]
