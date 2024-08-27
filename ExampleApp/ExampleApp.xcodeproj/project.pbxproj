@@ -57,7 +57,6 @@
 		28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
-		28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 28E215FD2B63D28400A0877B /* MobileSDK */; };
 		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
 		28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */; };
 		28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6D2ACC213F008E827E /* WalletService.swift */; };
@@ -65,6 +64,7 @@
 		28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */; };
 		28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3232B83921500C73065 /* AfterpayWidgetView.swift */; };
 		28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F4E3252B83922100C73065 /* AfterpayWidgetVM.swift */; };
+		8CD7D5842C7DA8D2007FCB38 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8CD7D5832C7DA8D2007FCB38 /* MobileSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,7 +158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28E215FE2B63D28400A0877B /* MobileSDK in Frameworks */,
+				8CD7D5842C7DA8D2007FCB38 /* MobileSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -524,7 +524,7 @@
 			);
 			name = ExampleApp;
 			packageProductDependencies = (
-				28E215FD2B63D28400A0877B /* MobileSDK */,
+				8CD7D5832C7DA8D2007FCB38 /* MobileSDK */,
 			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
@@ -600,7 +600,7 @@
 			);
 			mainGroup = 2889B7C82A558F1800D6C7BE;
 			packageReferences = (
-				280CD68A2C18AC2F004C8788 /* XCLocalSwiftPackageReference "../MobileSDK" */,
+				8CD7D5822C7DA6E4007FCB38 /* XCLocalSwiftPackageReference "../MobileSDK" */,
 			);
 			productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
 			projectDirPath = "";
@@ -1753,15 +1753,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		280CD68A2C18AC2F004C8788 /* XCLocalSwiftPackageReference "../MobileSDK" */ = {
+		8CD7D5822C7DA6E4007FCB38 /* XCLocalSwiftPackageReference "../MobileSDK" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../MobileSDK;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		28E215FD2B63D28400A0877B /* MobileSDK */ = {
+		8CD7D5832C7DA8D2007FCB38 /* MobileSDK */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 8CD7D5822C7DA6E4007FCB38 /* XCLocalSwiftPackageReference "../MobileSDK" */;
 			productName = MobileSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
