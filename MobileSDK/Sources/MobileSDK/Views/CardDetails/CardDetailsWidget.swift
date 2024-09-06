@@ -75,7 +75,7 @@ public struct CardDetailsWidget: View {
                     viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                 }
 
-                HStack(spacing: .spacing * 0.75) {
+                HStack(alignment: .top, spacing: .spacing * 0.75) {
                     OutlineTextField(
                         text: viewModel.cardDetailsFormManager.expiryDateBinding,
                         title: viewModel.cardDetailsFormManager.expiryDateTitle,
