@@ -150,7 +150,11 @@ struct CheckoutPaymentSheet: View {
             }
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
-        .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+        .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {
+            Button("OK") {
+              onCloseSheet()
+           }
+        }, message: {
             Text(viewModel.alertMessage)
         })
         .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }) {

@@ -16,7 +16,8 @@ class CheckoutPaymentVM: ObservableObject {
     private let walletService: WalletService
 
     // MARK: - Properties
-    let gatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
+    let applePayGatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
+    let threeDSGatewayId = ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
     
     private var cardToken = ""
@@ -60,7 +61,7 @@ extension CheckoutPaymentVM {
     func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
         Task {
             do {
-                let request = createWalletChargeRequest(gatewayId: gatewayId, walletType: "apple")
+                let request = createWalletChargeRequest(gatewayId: applePayGatewayId, walletType: "apple")
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
                 let applePayRequest = self.getApplePayRequest(walletToken: token)
                 completion(applePayRequest)
@@ -180,7 +181,7 @@ extension CheckoutPaymentVM {
 
     /// Attempts to create 3DS token and receive 3DS auth status
     private func attempt3dsTokenCreation() {
-        let request = Integrated3DSVaultReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gayewayId: gatewayId)), _3ds: .init(browserDetails: .init()))
+        let request = Integrated3DSVaultReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)), _3ds: .init(browserDetails: .init()))
         Task {
             do {
                 let response = try await walletService.createIntegrated3DSVaultToken(request: request)
@@ -226,13 +227,19 @@ extension CheckoutPaymentVM {
     /// Captures the charge as the final step in the payment flow
     private func captureCharge() {
         Task {
-            let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken)))
+            let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
             do {
                 let result = try await walletService.captureCharge(request: request)
-                isLoading = false
-                showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
+                // Ensure UI updates are performed on the main thread
+                await MainActor.run {
+                    isLoading = false
+                    showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
+                }
             } catch {
-                isLoading = false
+                // Ensure UI updates are performed on the main thread
+                await MainActor.run {
+                    isLoading = false
+                }
             }
         }
     }
