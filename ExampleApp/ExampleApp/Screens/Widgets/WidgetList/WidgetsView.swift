@@ -15,20 +15,24 @@ struct WidgetsView: View {
     init() {
         styleNavigation()
     }
+    
+    let widgetItems: [WidgetItem] = [
+        WidgetItem(destination: AnyView(CardDetailsWidgetView()), title: "Card Details", subtitle: "Tokenise card details"),
+        WidgetItem(destination: AnyView(AddressWidgetView()), title: "Address", subtitle: "Capture customer address form"),
+        WidgetItem(destination: AnyView(ApplePayWidgetView()), title: "Apple Pay", subtitle: "Standalone Apple Pay flow"),
+        WidgetItem(destination: AnyView(PayPalWidgetView()), title: "PayPal", subtitle: "Standalone PayPal button"),
+        WidgetItem(destination: AnyView(GiftCardWidgetView()), title: "Gift Card", subtitle: "Standalone Gift Card form"),
+        WidgetItem(destination: AnyView(Integrated3DSWidgetView()), title: "Integrated 3DS", subtitle: "Integrated 3DS widget"),
+        WidgetItem(destination: AnyView(Standalone3DSWidgetView()), title: "Standalone 3DS", subtitle: "Standalone 3DS widget"),
+        WidgetItem(destination: AnyView(FlyPayWidgetView()), title: "FlyPay", subtitle: "Standalone FlyPay widget"),
+        WidgetItem(destination: AnyView(AfterpayWidgetView()), title: "Afterpay", subtitle: "Standalone Afterpay widget"),
+        WidgetItem(destination: AnyView(ClickToPayWidgetView()), title: "Click to Pay", subtitle: "ClickToPay flow")
+    ].sorted { $0.title < $1.title }
 
     var body: some View {
         NavigationStack {
-            List {
-                stylizedNavigationLink(destination: CardDetailsWidgetView(), title: "Card Details", subtitle: "Tokenise card details")
-                stylizedNavigationLink(destination: AddressWidgetView(), title: "Address", subtitle: "Capture customer address form")
-                stylizedNavigationLink(destination: ApplePayWidgetView(), title: "Apple Pay", subtitle: "Standalone Apple Pay flow")
-                stylizedNavigationLink(destination: PayPalWidgetView(), title: "PayPal", subtitle: "Standalone PayPal button")
-                stylizedNavigationLink(destination: GiftCardWidgetView(), title: "Gift Card", subtitle: "Standalone Gift Card form")
-                stylizedNavigationLink(destination: Integrated3DSWidgetView(), title: "Integrated 3DS", subtitle: "Integrated 3DS widget")
-                stylizedNavigationLink(destination: Standalone3DSWidgetView(), title: "Standalone 3DS", subtitle: "Standalone 3DS widget")
-                stylizedNavigationLink(destination: FlyPayWidgetView(), title: "FlyPay", subtitle: "Standalone FlyPay widget")
-                stylizedNavigationLink(destination: AfterpayWidgetView(), title: "Afterpay", subtitle: "Standalone Afterpay widget")
-                stylizedNavigationLink(destination: ClickToPayWidgetView(), title: "Click to Pay", subtitle: " ClickToPay flow")
+            List(widgetItems) { item in
+                stylizedNavigationLink(destination: item.destination, title: item.title, subtitle: item.subtitle)
             }
             .navigationTitle("Widgets")
             .background(Color(hex: "#EAE0D7"))
@@ -77,6 +81,13 @@ struct WidgetsView: View {
         UINavigationBar.appearance().barTintColor = .white
     }
 
+}
+
+struct WidgetItem: Identifiable {
+    let id = UUID()
+    let destination: AnyView
+    let title: String
+    let subtitle: String
 }
 
 struct ContentView_Previews: PreviewProvider {
