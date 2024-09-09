@@ -36,11 +36,12 @@ public struct ClickToPayWidget: UIViewRepresentable {
     }
 
     public func makeUIView(context: Context) -> UIView {
-        let containerView = UIView(frame: UIScreen.main.bounds)
+        let containerView = UIView()
         
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
         configuration.websiteDataStore = WKWebsiteDataStore.default()
+        
         let cookie = HTTPCookie(properties: [
             .domain: "sandbox.src.mastercard.com",
             .path: "/",
@@ -50,7 +51,8 @@ public struct ClickToPayWidget: UIViewRepresentable {
             .expires: NSDate(timeIntervalSinceNow: 31556926)
         ])!
         configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
-        let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
+        
+        let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.contentMode = .scaleToFill
         if #available(iOS 16.4, *) {
             webView.isInspectable = true
@@ -59,15 +61,30 @@ public struct ClickToPayWidget: UIViewRepresentable {
         webView.uiDelegate = context.coordinator
         
         let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.center = containerView.center
         activityIndicator.color = UIColor(Color.primaryColor)
         activityIndicator.hidesWhenStopped = true
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
         context.coordinator.activityIndicator = activityIndicator
         
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
-
+        
+        // Set up constraints for webView
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            webView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            webView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
+        
+        // Set up constraints for activityIndicator to be centered
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: containerView.centerYAnchor)
+        ])
+        
         return containerView
     }
 
