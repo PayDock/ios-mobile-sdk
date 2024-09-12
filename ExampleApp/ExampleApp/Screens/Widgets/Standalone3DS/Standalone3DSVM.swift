@@ -36,10 +36,10 @@ class Standalone3DSVM: NSObject, ObservableObject {
             let req = TokeniseCardDetailsReq(
                 gatewayId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
                 cardName: "Test Card",
-                cardNumber: "343434343434343",
-                expireMonth: "01",
-                expireYear: "39",
-                cardCcv: "100")
+                cardNumber: "4100000000005000",
+                expireMonth: "08",
+                expireYear: "25",
+                cardCcv: "123")
             do {
                 let token = try await walletService.createVaultToken(request: req)
                 create3dsToken(vaultToken: token)
