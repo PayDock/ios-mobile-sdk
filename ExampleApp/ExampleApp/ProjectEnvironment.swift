@@ -135,11 +135,5 @@ struct ProjectEnvironment {
         return serviceId
     }
 
-    func getSslPublicKeyHash() -> String {
-        switch environment {
-        case .production, .sandbox, .staging: return "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
-        }
-    }
-
     static var accessToken: String? = nil
 }
