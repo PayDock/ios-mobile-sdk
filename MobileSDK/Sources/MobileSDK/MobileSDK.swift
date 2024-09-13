@@ -8,6 +8,7 @@
 
 import Foundation
 import PassKit
+import NetworkingLib
 
 public class MobileSDK {
 
@@ -19,7 +20,6 @@ public class MobileSDK {
 
     private init(fontRegistration: FontRegistration = FontRegistration()) {
         self.fontRegistration = fontRegistration
-
         setup()
     }
 
@@ -29,8 +29,14 @@ public class MobileSDK {
 
     public func configureMobileSDK(config: MobileSDKConfig) {
         self.config = config
+        // Once we have setup our config, we are able to setup our networking based on the environment
+        setupNetworkLayer()
     }
-
+    
+    private func setupNetworkLayer() {
+        NetworkingLib.shared.publicKeyHash = Constants.sslPublicKeyHash
+        NetworkingLib.shared.host = Constants.baseURL
+    }
 }
 
 // MARK: - Apple Pay helpers
