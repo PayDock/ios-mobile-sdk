@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import Afterpay
 
 class CheckoutPaymentVM: ObservableObject {
 
@@ -254,6 +255,28 @@ extension CheckoutPaymentVM {
         let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
         return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
+    }
+    
+    func getShippingOptions() -> [ShippingOption] {
+        let shippingOption1 = ShippingOption(
+            id: "Standard",
+            name: "Standard",
+            description: "",
+            shippingAmount: Money(amount: "5.0", currency: "AUD"),
+            orderAmount: Money(amount: "10.0", currency: "AUD"))
+
+        let shippingOption2 = ShippingOption(
+            id: "Standard",
+            name: "Standard",
+            description: "",
+            shippingAmount: Money(amount: "2.0", currency: "AUD"),
+            orderAmount: Money(amount: "10.0", currency: "AUD"))
+
+        return [shippingOption1, shippingOption2]
+    }
+
+    func getShippingOptionUpdate() -> ShippingOptionUpdate {
+        return ShippingOptionUpdate(id: "Standard", shippingAmount: Money(amount: "5.0", currency: "AUD"), orderAmount: Money(amount: "10.0", currency: "AUD"))
     }
     
 }

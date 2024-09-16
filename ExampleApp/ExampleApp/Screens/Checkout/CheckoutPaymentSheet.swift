@@ -90,16 +90,16 @@ struct CheckoutPaymentSheet: View {
                     configuration: viewModel.getAfterpayConfig(),
                     afterPayToken: { onAfterpayButtonTap in
                         viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
-                        onCloseSheet()
                     }, 
                     selectAddress: { address, provideShippingOptions in
                         // Provide shipping options based on user selected address if needed
                         // Check AfterpayWidget example for more details
-
+                        provideShippingOptions(viewModel.getShippingOptions())
                     },
                     selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
                         // Provide shipping update if needed based on the selected shipping option
                         // Check AfterpayWidget example for more details
+                        provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
                     },
                     buttonWidth: 320) { result in
                         switch result {
