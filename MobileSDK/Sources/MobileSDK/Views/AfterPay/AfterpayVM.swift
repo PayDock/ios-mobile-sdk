@@ -61,8 +61,9 @@ class AfterpayVM: ObservableObject {
     }
 
     func presentAfterpay() {
-        let vc = UIApplication.shared.connectedScenes.compactMap { ($0 as? UIWindowScene)?.keyWindow }.last?.rootViewController
-        guard let vc = vc else { return }
+        guard let vc = UIApplication.shared.topMostViewController() else {
+            return
+        }
 
         Afterpay.presentCheckoutV2Modally(
             over: vc,
