@@ -17,6 +17,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
+    @Published var isLoading = false
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
@@ -55,13 +56,19 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
                 meta: metaData)
 
             do {
+                isLoading = true
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
                     let applePayRequest = self.getApplePayRequest(walletToken: token)
                     completion(applePayRequest)
                 }
             } catch {
-                print("ERROR: Error fetching wallet token!")
+                isLoading = false
+                alertTitle = "Error"
+                alertMessage = "Error fetching wallet token!"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.showAlert = true
+                }
             }
         }
     }

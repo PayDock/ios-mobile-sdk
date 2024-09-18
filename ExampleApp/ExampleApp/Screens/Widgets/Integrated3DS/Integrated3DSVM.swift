@@ -43,7 +43,10 @@ class Integrated3DSVM: NSObject, ObservableObject {
                 let token = try await walletService.createCardToken(tokeniseCardDetailsReq: req)
                 create3dsToken(cardToken: token)
             } catch {
-                print(error)
+                alertMessage = "Error tokenising card details!"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.showAlert = true
+                }
             }
         }
     }
@@ -58,7 +61,11 @@ class Integrated3DSVM: NSObject, ObservableObject {
                     self.showWebView = true
                 }
             } catch {
-                print(error)
+                DispatchQueue.main.async {
+                    self.showWebView = false
+                    self.alertMessage = "Error tokenising card details!"
+                    self.showAlert = true
+                }
             }
         }
     }
