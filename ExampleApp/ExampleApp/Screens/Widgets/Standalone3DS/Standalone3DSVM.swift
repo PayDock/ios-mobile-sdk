@@ -44,7 +44,11 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 let token = try await walletService.createVaultToken(request: req)
                 create3dsToken(vaultToken: token)
             } catch {
-                print(error)
+                DispatchQueue.main.async {
+                    self.showWebView = false
+                    self.alertMessage = "Error fetching vault token!"
+                    self.showAlert = true
+                }
             }
         }
     }
