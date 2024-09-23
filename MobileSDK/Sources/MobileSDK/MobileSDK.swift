@@ -34,7 +34,15 @@ public class MobileSDK {
     }
     
     private func setupNetworkLayer() {
-        NetworkingLib.shared.publicKeyHash = Constants.sslPublicKeyHash
+        // Check if test mode is not enabled, then set the public key hash
+        if config?.enableTestMode == false {
+            NetworkingLib.shared.publicKeyHash = Constants.sslPublicKeyHash
+        } else {
+            // Optionally, you can clear or reset the publicKeyHash when test mode is enabled
+            NetworkingLib.shared.publicKeyHash = nil
+        }
+        
+        // Set the host regardless of the test mode
         NetworkingLib.shared.host = Constants.baseURL
     }
 }
