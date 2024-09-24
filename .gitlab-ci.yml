@@ -9,6 +9,12 @@
 stages:
   - test
   - build
+  - security
+
+include:
+  - project: 'paydock/platform/gitlab-templates'
+    ref: main
+    file: '/security/gitlab-defectdojo.yaml'
 
 variables:
   LC_ALL: "en_US.UTF-8"
