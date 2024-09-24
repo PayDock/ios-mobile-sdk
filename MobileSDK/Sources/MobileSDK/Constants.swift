@@ -76,6 +76,6 @@ struct Constants {
     // MARK: - Widgets
 
     static var payPalCallbackHost: String {
-        return "paydock-mobile.sdk"
+        return "paydock.com"
     }
 }
