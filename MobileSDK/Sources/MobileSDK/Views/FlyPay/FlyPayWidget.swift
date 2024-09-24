@@ -12,9 +12,9 @@ public struct FlyPayWidget: View {
 
     @StateObject private var viewModel: FlyPayVM
 
-    public init(flyPayToken: @escaping (_ flyPayToken: @escaping (String) -> Void) -> Void,
+    public init(clientId: String, flyPayToken: @escaping (_ flyPayToken: @escaping (String) -> Void) -> Void,
                 completion: @escaping (Result<Void, FlyPayError>) -> Void) {
-        _viewModel = StateObject(wrappedValue: FlyPayVM(flyPayToken: flyPayToken, completion: completion))
+        _viewModel = StateObject(wrappedValue: FlyPayVM(clientId: clientId, flyPayToken: flyPayToken, completion: completion))
     }
 
     public var body: some View {
@@ -28,6 +28,7 @@ public struct FlyPayWidget: View {
             .sheet(isPresented: $viewModel.showWebView) {
                 NavigationStack {
                     FlyPayWebView(
+                        clientId: viewModel.clientId ?? "",
                         flyPayOrderId: viewModel.flyPayOrderId,
                         onApprove: {
                             viewModel.handleSuccess()
@@ -45,6 +46,6 @@ public struct FlyPayWidget: View {
 
 struct FlyPayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        FlyPayWidget(flyPayToken: { _ in }, completion: { _ in })
+        FlyPayWidget(clientId: "", flyPayToken: { _ in }, completion: { _ in })
     }
 }
