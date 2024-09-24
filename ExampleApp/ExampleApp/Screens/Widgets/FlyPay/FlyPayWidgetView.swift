@@ -16,7 +16,7 @@ struct FlyPayWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                FlyPayWidget { onFlyPayButtonTap in
+                FlyPayWidget(clientId: ProjectEnvironment.shared.getFlyPayClientId() ?? "") { onFlyPayButtonTap in
                     viewModel.initializeWalletCharge(completion: onFlyPayButtonTap)
                 } completion: { result in
                     switch result {
