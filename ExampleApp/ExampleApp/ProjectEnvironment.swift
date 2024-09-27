@@ -23,6 +23,7 @@ struct ProjectEnvironment {
         static let flypayGatewayId = "FLYPAY_GATEWAY_ID"
         static let afterpayGatewayId = "AFTERPAY_GATEWAY_ID"
         static let mastercardServiceId = "MASTERCARD_SERVICE_ID"
+        static let flypayClientId = "FLYPAY_CLIENT_ID"
     }
 
     private static let infoDictionary: [String: Any] = {
@@ -127,18 +128,20 @@ struct ProjectEnvironment {
         return gatewayId
     }
 
-        func getMastercardServiceId() -> String? {
+    func getMastercardServiceId() -> String? {
         guard let serviceId = Self.infoDictionary[Keys.mastercardServiceId] as? String else {
             print("Mastercard service ID not found in .plist!")
             return nil
         }
         return serviceId
     }
-
-    func getSslPublicKeyHash() -> String {
-        switch environment {
-        case .production, .sandbox, .staging: return "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
+    
+    func getFlyPayClientId() -> String? {
+        guard let clientId = Self.infoDictionary[Keys.flypayClientId] as? String else {
+            print("FlyPay client ID not found in .plist!")
+            return nil
         }
+        return clientId
     }
 
     static var accessToken: String? = nil

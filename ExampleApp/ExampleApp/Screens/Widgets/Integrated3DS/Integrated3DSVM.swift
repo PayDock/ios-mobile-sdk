@@ -21,6 +21,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
     @Published var showWebView = false
     @Published var showAlert = false
     @Published var alertMessage = ""
+    @Published var isLoading = false
 
     // MARK: - Initialisation
 
@@ -31,6 +32,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
 
     func tokeniseCardDetails() {
         Task {
+            isLoading = true
             let req = TokeniseCardDetailsReq(
                 gatewayId: ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? "",
                 cardName: "Carlie Kuvalis",
@@ -43,7 +45,11 @@ class Integrated3DSVM: NSObject, ObservableObject {
                 let token = try await walletService.createCardToken(tokeniseCardDetailsReq: req)
                 create3dsToken(cardToken: token)
             } catch {
-                print(error)
+                alertMessage = "Error tokenising card details!"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.isLoading = false
+                    self.showAlert = true
+                }
             }
         }
     }
@@ -54,11 +60,17 @@ class Integrated3DSVM: NSObject, ObservableObject {
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
                 DispatchQueue.main.async {
+                    self.isLoading = false
                     self.token3DS = token3DS ?? ""
                     self.showWebView = true
                 }
             } catch {
-                print(error)
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    self.showWebView = false
+                    self.alertMessage = "Error tokenising card details!"
+                    self.showAlert = true
+                }
             }
         }
     }

@@ -105,5 +105,9 @@ class PayPalVM: ObservableObject {
     func handleWebViewFailure(_ error: PayPalError) {
         completion(.failure(error))
     }
+    
+    func handleSheetCancellation() {
+        completion(.failure(.transactionCanceled))
+    }
 
 }

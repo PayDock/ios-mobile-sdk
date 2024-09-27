@@ -31,11 +31,11 @@ struct Integrated3DSVaultReq: Codable {
 
         struct PaymentSource: Codable {
             let vaultToken: String
-            let gayewayId: String
+            let gatewayId: String
 
             enum CodingKeys: String, CodingKey {
                 case vaultToken = "vault_token"
-                case gayewayId = "gateway_id"
+                case gatewayId = "gateway_id"
             }
         }
     }

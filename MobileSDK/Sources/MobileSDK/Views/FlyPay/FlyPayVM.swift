@@ -20,6 +20,7 @@ class FlyPayVM: ObservableObject {
 
     private let flyPayToken: (_ flyPayToken: @escaping (String) -> Void) -> Void
     var flyPayUrl: URL?
+    let clientId: String?
     @Published var showWebView = false
     @Published var isLoading = false
     private var token = ""
@@ -31,9 +32,10 @@ class FlyPayVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(flyPayToken: @escaping (_ flyPayToken: @escaping (String) -> Void) -> Void,
+    init(clientId: String, flyPayToken: @escaping (_ flyPayToken: @escaping (String) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<Void, FlyPayError>) -> Void) {
+        self.clientId = clientId
         self.flyPayToken = flyPayToken
         self.walletService = walletService
         self.completion = completion
@@ -83,6 +85,10 @@ class FlyPayVM: ObservableObject {
         isLoading = false
         showWebView = false
         completion(.failure(error))
+    }
+    
+    func handleSheetCancellation() {
+        completion(.failure(.transactionCanceled))
     }
 
 }
