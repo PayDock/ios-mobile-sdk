@@ -8,6 +8,7 @@
 
 import Foundation
 import PassKit
+import NetworkingLib
 
 public class MobileSDK {
 
@@ -19,7 +20,6 @@ public class MobileSDK {
 
     private init(fontRegistration: FontRegistration = FontRegistration()) {
         self.fontRegistration = fontRegistration
-
         setup()
     }
 
@@ -29,8 +29,22 @@ public class MobileSDK {
 
     public func configureMobileSDK(config: MobileSDKConfig) {
         self.config = config
+        // Once we have setup our config, we are able to setup our networking based on the environment
+        setupNetworkLayer()
     }
-
+    
+    private func setupNetworkLayer() {
+        // Check if test mode is not enabled, then set the public key hash
+        if config?.enableTestMode == false {
+            NetworkingLib.shared.publicKeyHash = Constants.sslPublicKeyHash
+        } else {
+            // Optionally, you can clear or reset the publicKeyHash when test mode is enabled
+            NetworkingLib.shared.publicKeyHash = nil
+        }
+        
+        // Set the host regardless of the test mode
+        NetworkingLib.shared.host = Constants.baseURL
+    }
 }
 
 // MARK: - Apple Pay helpers

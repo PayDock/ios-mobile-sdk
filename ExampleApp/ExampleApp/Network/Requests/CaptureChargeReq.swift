@@ -22,9 +22,11 @@ struct CaptureChargeReq: Codable {
 
         struct PaymentSource: Codable {
             let vaultToken: String
+            let gatewayId: String
 
             enum CodingKeys: String, CodingKey {
                 case vaultToken = "vault_token"
+                case gatewayId = "gateway_id"
             }
         }
     }

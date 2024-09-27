@@ -22,5 +22,7 @@
 	<string>$(CONFIGURATION)</string>
 	<key>STANDALONE_3DS_GATEWAY_ID</key>
 	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
+    <key>FLYPAY_CLIENT_ID</key>
+    <string>$(FLYPAY_CLIENT_ID)</string>
 </dict>
 </plist>

@@ -27,6 +27,7 @@ struct ApplePayWidgetView: View {
                 }
                 .padding()
             }
+            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
             .background(Color(hex: "#EAE0D7"))
             .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
                 Text(viewModel.alertMessage)

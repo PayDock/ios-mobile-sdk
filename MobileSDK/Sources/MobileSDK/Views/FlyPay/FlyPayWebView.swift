@@ -15,11 +15,13 @@ struct FlyPayWebView: UIViewRepresentable {
     typealias OnApprove = () -> Void
     typealias OnFailure = (FlyPayError) -> Void
 
+    private let clientId: String
     private let flyPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure
 
-    init(flyPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
+    init(clientId: String, flyPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
+        self.clientId = clientId
         self.flyPayOrderId = flyPayOrderId
         self.onApprove = onApprove
         self.onFailure = onFailure
@@ -27,6 +29,7 @@ struct FlyPayWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = WKWebsiteDataStore.default()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
@@ -47,8 +50,8 @@ struct FlyPayWebView: UIViewRepresentable {
     private func getFlyPayUrlRequest() -> URLRequest? {
         let urlString: String = {
             switch MobileSDK.shared.config?.environment {
-            case .production: return "http://checkout.cxbflypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.sdk"
-            case .staging, .sandbox: return "https://checkout.sandbox.cxbflypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.sdk"
+            case .production: return "https://checkout.flypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
+            case .staging, .sandbox: return "https://checkout.sandbox.cxbflypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
             case .none: return ""
             }
         }()
@@ -66,7 +69,7 @@ struct FlyPayWebView: UIViewRepresentable {
         var onApprove: OnApprove
         var onFailure: OnFailure
         var isLoaded = false
-        private let redirectUrlString = "https://paydock.sdk/"
+        private let redirectUrlString = "https://paydock.com/"
 
         init(onApprove: @escaping OnApprove,
              onFailure: @escaping OnFailure) {

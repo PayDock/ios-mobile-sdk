@@ -59,7 +59,11 @@ class FlyPayWidgetVM: ObservableObject {
                     completion(token)
                 }
             } catch {
-                print("ERROR: Error fetching wallet token!")
+                alertTitle = "Error"
+                alertMessage = "Error fetching wallet token!"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.showAlert = true
+                }
             }
         }
     }

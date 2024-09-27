@@ -48,7 +48,7 @@ struct ClickToPayWidgetView: View {
     }
 }
 
-struct MastercardWidgetView_Previews: PreviewProvider {
+struct ClickToPayWidgetView_Previews: PreviewProvider {
     static var previews: some View {
         ClickToPayWidgetView()
     }

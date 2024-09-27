@@ -23,6 +23,7 @@ struct Integrated3DSWidgetView: View {
                             if !viewModel.alertMessage.isEmpty {
                                 viewModel.showAlert = true
                             }
+                            viewModel.isLoading = false
                         }) {
                             NavigationStack {
                                 VStack {
@@ -44,7 +45,7 @@ struct Integrated3DSWidgetView: View {
                                 }
                             }
                         }
-                    if viewModel.alertMessage.isEmpty {
+                    if viewModel.isLoading {
                         ProgressView()
                     }
                     Spacer()

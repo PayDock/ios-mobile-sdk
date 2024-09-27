@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.4.0"),
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.0.1")
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.1.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

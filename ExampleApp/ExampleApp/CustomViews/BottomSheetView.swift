@@ -34,7 +34,7 @@ struct BottomSheetView<Content: View>: View {
                         .onPreferenceChange(InnerHeightPreferenceKey.self) { newHeight in
                             sheetHeight = newHeight + 80
                         }
-                        .presentationDetents([.height(sheetHeight)])
+                        .presentationDetents([.large])
                         .interactiveDismissDisabled(false)
                         .scrollDisabled(false)
                     Spacer()
