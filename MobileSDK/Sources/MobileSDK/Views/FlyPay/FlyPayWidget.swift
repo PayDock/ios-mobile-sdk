@@ -25,7 +25,9 @@ public struct FlyPayWidget: View {
             backgroundColor:  Color(red: 0.00, green: 0.48, blue: 0.75)) {
                 viewModel.handleButtonTap()
             }
-            .sheet(isPresented: $viewModel.showWebView) {
+            .sheet(isPresented: $viewModel.showWebView, onDismiss: {
+                viewModel.handleSheetCancellation()
+            }) {
                 NavigationStack {
                     FlyPayWebView(
                         clientId: viewModel.clientId ?? "",

@@ -86,5 +86,9 @@ class FlyPayVM: ObservableObject {
         showWebView = false
         completion(.failure(error))
     }
+    
+    func handleSheetCancellation() {
+        completion(.failure(.transactionCanceled))
+    }
 
 }

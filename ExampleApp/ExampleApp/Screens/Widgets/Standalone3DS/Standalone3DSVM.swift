@@ -22,6 +22,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
     @Published var showWebView = false
     @Published var showAlert = false
     @Published var alertMessage = ""
+    @Published var isLoading = false
 
 
     // MARK: - Initialisation
@@ -33,6 +34,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
 
     func getValutToken() {
         Task {
+            isLoading = true
             let req = TokeniseCardDetailsReq(
                 gatewayId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
                 cardName: "Test Card",
@@ -45,6 +47,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 create3dsToken(vaultToken: token)
             } catch {
                 DispatchQueue.main.async {
+                    self.isLoading = false
                     self.showWebView = false
                     self.alertMessage = "Error fetching vault token!"
                     self.showAlert = true
@@ -83,11 +86,13 @@ class Standalone3DSVM: NSObject, ObservableObject {
             do {
                 let token3DS = try await walletService.createStandalone3DSToken(request: request)
                 DispatchQueue.main.async {
+                    self.isLoading = false
                     self.token3DS = token3DS ?? ""
                     self.showWebView = true
                 }
             } catch {
                 DispatchQueue.main.async {
+                    self.isLoading = false
                     self.showWebView = false
                     self.alertMessage = "3DS failed!"
                     self.showAlert = true

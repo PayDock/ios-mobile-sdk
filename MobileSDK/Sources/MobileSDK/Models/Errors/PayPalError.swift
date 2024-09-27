@@ -14,6 +14,7 @@ public enum PayPalError: Error {
     case errorFetchingPayPalUrl(error: ErrorRes)
     case errorCapturingCharge(error: ErrorRes)
     case webViewFailed(error: NSError)
+    case transactionCanceled
     case unknownError
 
     public var customMessage: String {
@@ -21,6 +22,7 @@ public enum PayPalError: Error {
         case .errorFetchingPayPalUrl: return "Unable to fetch PayPal widget URL"
         case .errorCapturingCharge: return "Unable to complete the charge"
         case .webViewFailed: return "PayPal WebView widget has failed"
+        case .transactionCanceled: return "PayPal transaction was canceled."
         case .unknownError: return "Unknown error"
         }
     }
