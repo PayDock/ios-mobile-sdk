@@ -1,10 +1,11 @@
 # Changelog
 
-## [1.3.0] - 2024-09-25
+## [1.3.0] - 2024-09-27
 
 ### Added
 
 - `enableTestMode` flag to `MobileSDKConfig` initialisation 
+- `transactionCanceled` to FlyPay and PayPal
 
 ### Changed
 
@@ -18,6 +19,11 @@
 - Presenting Afterpay SDK with top VC
 - FlyPay Url and redirect Url
 - PayPal redirect Url
+- iOS 18: Fixed checkout sheet
+
+### Compatibility
+- Tested support against iOS 18
+- Removed support for iOS 16
 
 ## [1.2.5] - 2024-08-28
 
