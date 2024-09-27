@@ -23,7 +23,9 @@ public struct PayPalWidget: View {
             backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)) {
                 viewModel.handleButtonTap()
             }
-            .sheet(isPresented: $viewModel.showWebView) {
+            .sheet(isPresented: $viewModel.showWebView, onDismiss: {
+                viewModel.handleSheetCancellation()
+            }) {
                 NavigationStack {
                     if let url = viewModel.payPalUrl {
                         PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
