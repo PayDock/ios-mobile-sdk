@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.1] - 2024-10-01
+
+### Fixed
+
+ - Outer Package mismatch with SDK Package
+
 ## [1.3.0] - 2024-09-27
 
 ### Added
