@@ -33,7 +33,8 @@ let package = Package(
                 .product(name: "NetworkingLib", package: "mobile-lib-networking-ios")],
             path: "Sources",
             resources: [
-                .copy("MobileSDK/Resources/JSON/paypal_vault_session_auth_success_response.json")
+                .copy("MobileSDK/Resources/JSON/paypal_vault_session_auth_success_response.json"),
+                .copy("MobileSDK/Resources/JSON/paypal_vault_setup_token_success_response.json")
             ]
         ),
         .testTarget(
@@ -44,7 +45,8 @@ let package = Package(
                 .copy("MobileSDKTests/Resources/JSON/card_tokenisation_error_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/card_tokenisation_success_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_success_response.json"),
-                .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_error_response.json")]
+                .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_error_response.json"),
+                .copy("MobileSDKTests/Resources/JSON/paypal_vault_setup_token_success_response.json")]
         ),
     ]
 )

@@ -1,0 +1,10 @@
+{
+  "status": 201,
+  "error": null,
+  "resource": {
+    "type": "setup-token",
+    "data" {
+      "setup_token": "XObCsxdHXe"
+    }
+  }
+}
