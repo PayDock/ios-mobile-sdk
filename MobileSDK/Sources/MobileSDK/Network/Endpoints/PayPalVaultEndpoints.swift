@@ -51,5 +51,15 @@ extension PayPalVaultEndpoints: Endpoint {
         case .authToken: return []
         }
     }
+    
+    var mockFile: String? {
+        switch self {
+        case .authToken: return "paypal_vault_session_auth_success_response"
+        }
+    }
+    
+    var bundle: Bundle? {
+        return Bundle.module
+    }
 
 }

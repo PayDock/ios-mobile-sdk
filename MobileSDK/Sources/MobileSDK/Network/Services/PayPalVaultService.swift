@@ -23,3 +23,12 @@ struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
     }
     
 }
+
+struct PayPalVaultMockServiceImpl: MockHTTPClient, PayPalVaultService {
+    
+    func createToken(gatewayId: String, accessToken: String) async throws -> String {
+        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.authToken(gatewayId: gatewayId, accessToken: accessToken), responseModel: PayPalVaultAuthRes.self)
+        return response.resource.data.accessToken
+    }
+    
+}

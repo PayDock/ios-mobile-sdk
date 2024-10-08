@@ -4,8 +4,8 @@
     "resource": {
         "type": "oauth-token",
         "data": {
-            "access_token": "xyz",
-            "id_token": "xyz"
+            "access_token": "some_access_token",
+            "id_token": "some_token_id"
         }
     }
 }

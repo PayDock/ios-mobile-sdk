@@ -1,5 +1,5 @@
 //
-//  CardServiceTest.swift
+//  CardServiceTests.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -9,7 +9,7 @@
 import XCTest
 @testable import MobileSDK
 
-final class CardServiceTest: XCTestCase {
+final class CardServiceTests: XCTestCase {
 
     private var sut: CardServiceMock!
 
@@ -29,7 +29,7 @@ final class CardServiceTest: XCTestCase {
                 expireMonth: "09",
                 expireYear: "21",
                 cardCcv: "123")
-            let cardToken = try await sut.createToken(tokeniseCardDetailsReq: req)
+            let cardToken = try await sut.createToken(tokeniseCardDetailsReq: req, accessToken: "access-token")
 
             XCTAssertEqual(cardToken, "bc8cb1a5-0c7b-454a-ab33-62a6d874ce3e")
         } catch {
