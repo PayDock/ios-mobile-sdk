@@ -35,7 +35,8 @@ let package = Package(
             path: "Tests",
             resources: [
                 .copy("MobileSDKTests/Resources/JSON/card_tokenisation_error_response.json"),
-                .copy("MobileSDKTests/Resources/JSON/card_tokenisation_success_response.json")]
+                .copy("MobileSDKTests/Resources/JSON/card_tokenisation_success_response.json"),
+                .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_success_response.json")]
         ),
     ]
 )
