@@ -12,6 +12,7 @@ import NetworkingLib
 enum PayPalVaultEndpoints {
 
     case authToken(request: PayPalVaultAuthReq, accessToken: String)
+    case setupToken(request: PayPalVaultSetupTokenReq, accessToken: String)
 
 }
 
@@ -20,18 +21,20 @@ extension PayPalVaultEndpoints: Endpoint {
     var path: String {
         switch self {
         case .authToken: return "/v1/payment_sources/oauth-tokens"
+        case .setupToken: return "/v1/payment_sources/setup-tokens"
         }
     }
 
     var method: RequestMethod {
         switch self {
         case .authToken: return .post
+        case .setupToken: return .post
         }
     }
 
     var header: [String: String]? {
         switch self {
-        case let .authToken(_ , accessToken):
+        case let .authToken(_ , accessToken), let .setupToken(_ , accessToken):
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json"
@@ -42,6 +45,7 @@ extension PayPalVaultEndpoints: Endpoint {
     var body: Data? {
         switch self {
         case .authToken(let request, _): return try? encoder.encode(request)
+        case .setupToken(let request, _): return try? encoder.encode(request)
         }
     }
 
@@ -49,12 +53,14 @@ extension PayPalVaultEndpoints: Endpoint {
     var parameters: [URLQueryItem] {
         switch self {
         case .authToken: return []
+        case .setupToken: return []
         }
     }
     
     var mockFile: String? {
         switch self {
         case .authToken: return "paypal_vault_session_auth_success_response"
+        case .setupToken: return "paypal_vault_setup_token_success_response"
         }
     }
     

@@ -35,7 +35,7 @@ extension Mockable {
             return decodedObject
 
         } catch {
-            fatalError("Failed to decode loaded JSON")
+            fatalError("Failed to decode loaded JSON as \(T.self)")
         }
     }
 
