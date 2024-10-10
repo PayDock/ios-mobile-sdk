@@ -15,7 +15,7 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
     var responseFilename: PayPalFilenames = .authSuccess
     var sendError = false
     
-    func createToken(gatewayId: String, accessToken: String) async throws -> String {
+    func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String {
         if sendError {
             let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
             throw RequestError.requestError(errorResponse)

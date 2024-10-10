@@ -23,7 +23,8 @@ final class PayPalVaultServiceNegativeTests: XCTestCase {
     func testCreateTokenFailure() async {
         sut.responseFilename = .authFail
         do {
-            _ = try await sut.createToken(gatewayId: "some_gateway_id", accessToken: "some_access_token")
+            let request = PayPalVaultAuthReq(gatewayId: "some_gateway_id")
+            _ = try await sut.createToken(request: request, accessToken: "some_access_token")
             XCTFail("Expected to throw an error, but no error was thrown.")
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             XCTAssertEqual(errorResponse.error?.code, "ValidationError")
