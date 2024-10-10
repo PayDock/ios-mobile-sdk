@@ -13,11 +13,14 @@ protocol PayPalVaultService {
 
     func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String
     func createSetupToken(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> String
+    func getClientId(gatewayId: String, accessToken: String) async throws -> String
 
 }
 
+// MARK: - PayPalVaultServiceImpl
+
 struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
-    
+
     func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.authToken(request: request, accessToken: accessToken), responseModel: PayPalVaultAuthRes.self)
         return response.resource.data.accessToken
@@ -28,7 +31,14 @@ struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
         return response.resource.data.setupToken
     }
     
+    func getClientId(gatewayId: String, accessToken: String) async throws -> String {
+        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.clientId(gatewayId: gatewayId, accessToken: accessToken), responseModel: PayPalVaultConfigRes.self)
+        return response.resource.data.credentials.clientAuth
+    }
+    
 }
+
+// MARK: - PayPalVaultMockServiceImpl
 
 struct PayPalVaultMockServiceImpl: MockHTTPClient, PayPalVaultService {
     
@@ -40,6 +50,11 @@ struct PayPalVaultMockServiceImpl: MockHTTPClient, PayPalVaultService {
     func createSetupToken(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> String {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.setupToken(request: req, accessToken: accessToken), responseModel: PayPalVaultSetupTokenRes.self)
         return response.resource.data.setupToken
+    }
+    
+    func getClientId(gatewayId: String, accessToken: String) async throws -> String {
+        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.clientId(gatewayId: gatewayId, accessToken: accessToken), responseModel: PayPalVaultConfigRes.self)
+        return response.resource.data.credentials.clientAuth
     }
     
 }
