@@ -11,7 +11,7 @@ import NetworkingLib
 
 enum PayPalVaultEndpoints {
 
-    case authToken(gatewayId: String, accessToken: String)
+    case authToken(request: PayPalVaultAuthReq, accessToken: String)
 
 }
 
@@ -41,7 +41,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var body: Data? {
         switch self {
-        case .authToken: return nil
+        case .authToken(let request, _): return try? encoder.encode(request)
         }
     }
 

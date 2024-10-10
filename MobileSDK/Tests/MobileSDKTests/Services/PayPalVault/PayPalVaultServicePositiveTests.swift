@@ -22,7 +22,8 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
     func testCreateTokenSuccess() async {
         sut.responseFilename = .authSuccess
         do {
-            let token = try await sut.createToken(gatewayId: "some_gateway_id", accessToken: "some_access_token")
+            let request = PayPalVaultAuthReq(gatewayId: "some_gateway_id")
+            let token = try await sut.createToken(request: request, accessToken: "some_access_token")
             XCTAssertEqual(token, "some_access_token")
         } catch {
             XCTFail("Getting PayPal auth token FAILED!")
