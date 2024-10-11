@@ -1,12 +1,12 @@
 //
-//  PayPalVaultSetupTokenRes.swift
+//  PayPalVaultPaymentTokenRes.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 08.10.2024..
+//  Created by Domagoj Grizelj on 11.10.2024..
 //
 
-struct PayPalVaultSetupTokenRes: Codable {
+struct PayPalVaultPaymentTokenRes: Codable {
     let status: Int
     let resource: Resource
 
@@ -16,6 +16,6 @@ struct PayPalVaultSetupTokenRes: Codable {
     }
 
     struct CallbackData: Codable {
-        let setupToken: String
+        let paymentToken: String
     }
 }

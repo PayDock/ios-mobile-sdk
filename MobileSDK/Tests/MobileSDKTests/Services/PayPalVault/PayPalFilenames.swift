@@ -13,4 +13,5 @@ enum PayPalFilenames: String {
     case authFail = "paypal_vault_session_auth_error_response"
     case setupTokenSuccess = "paypal_vault_setup_token_success_response"
     case getClientId = "paypal_vault_get_client_id_success_response"
+    case createPaymentToken = "paypal_vault_payment_token_success_response"
 }
