@@ -2,6 +2,7 @@
 //  PayPalVaultAuthRes.swift
 //  MobileSDK
 //
+//  Copyright © 2024 Paydock Ltd.
 //  Created by Domagoj Grizelj on 04.10.2024..
 //
 

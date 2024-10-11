@@ -50,6 +50,17 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
             XCTFail("Getting PayPal client ID FAILED!")
         }
     }
+    
+    func testCreatePaymentTokenSuccess() async {
+        sut.responseFilename = .createPaymentToken
+        do {
+            let req = PayPalVaultPaymentTokenReq(gatewayId: "some_gateway_id", setupToken: "some_access_Token")
+            let token = try await sut.createPaymentToken(request: req, accessToken: "some_access_token")
+            XCTAssertEqual(token, "8kk8451t")
+        } catch {
+            XCTFail("Getting PayPal payment token FAILED!")
+        }
+    }
 
     override func tearDown() {
         sut = nil

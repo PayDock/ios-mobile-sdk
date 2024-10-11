@@ -14,6 +14,7 @@ protocol PayPalVaultService {
     func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String
     func createSetupToken(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> String
     func getClientId(gatewayId: String, accessToken: String) async throws -> String
+    func createPaymentToken(request: PayPalVaultPaymentTokenReq, accessToken: String) async throws -> String
 
 }
 
@@ -36,6 +37,11 @@ struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
         return response.resource.data.credentials.clientAuth
     }
     
+    func createPaymentToken(request: PayPalVaultPaymentTokenReq, accessToken: String) async throws -> String {
+        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.paymentToken(request: request, accessToken: accessToken), responseModel: PayPalVaultPaymentTokenRes.self)
+        return response.resource.data.paymentToken
+    }
+    
 }
 
 // MARK: - PayPalVaultMockServiceImpl
@@ -55,6 +61,11 @@ struct PayPalVaultMockServiceImpl: MockHTTPClient, PayPalVaultService {
     func getClientId(gatewayId: String, accessToken: String) async throws -> String {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.clientId(gatewayId: gatewayId, accessToken: accessToken), responseModel: PayPalVaultConfigRes.self)
         return response.resource.data.credentials.clientAuth
+    }
+    
+    func createPaymentToken(request: PayPalVaultPaymentTokenReq, accessToken: String) async throws -> String {
+        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.paymentToken(request: request, accessToken: accessToken), responseModel: PayPalVaultPaymentTokenRes.self)
+        return response.resource.data.paymentToken
     }
     
 }

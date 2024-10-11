@@ -36,6 +36,7 @@ let package = Package(
                 .copy("MobileSDK/Resources/JSON/paypal_vault_session_auth_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_setup_token_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
+                .copy("MobileSDK/Resources/JSON/paypal_vault_payment_token_success_response.json"),
             ]
         ),
         .testTarget(
@@ -48,7 +49,8 @@ let package = Package(
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_success_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_error_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_setup_token_success_response.json"),
-                .copy("MobileSDKTests/Resources/JSON/paypal_vault_get_client_id_success_response.json")
+                .copy("MobileSDKTests/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
+                .copy("MobileSDKTests/Resources/JSON/paypal_vault_payment_token_success_response.json"),
             ]
         ),
     ]
