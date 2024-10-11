@@ -13,6 +13,7 @@ enum PayPalVaultEndpoints {
 
     case authToken(request: PayPalVaultAuthReq, accessToken: String)
     case setupToken(request: PayPalVaultSetupTokenReq, accessToken: String)
+    case clientId(gatewayId: String, accessToken: String)
 
 }
 
@@ -22,6 +23,7 @@ extension PayPalVaultEndpoints: Endpoint {
         switch self {
         case .authToken: return "/v1/payment_sources/oauth-tokens"
         case .setupToken: return "/v1/payment_sources/setup-tokens"
+        case .clientId(let gatewayId, _): return "/v1/gateways/\(gatewayId)/wallet-config"
         }
     }
 
@@ -29,12 +31,13 @@ extension PayPalVaultEndpoints: Endpoint {
         switch self {
         case .authToken: return .post
         case .setupToken: return .post
+        case .clientId: return .get
         }
     }
 
     var header: [String: String]? {
         switch self {
-        case let .authToken(_ , accessToken), let .setupToken(_ , accessToken):
+        case let .authToken(_ , accessToken), let .setupToken(_ , accessToken), let .clientId(_, accessToken):
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json"
@@ -46,14 +49,15 @@ extension PayPalVaultEndpoints: Endpoint {
         switch self {
         case .authToken(let request, _): return try? encoder.encode(request)
         case .setupToken(let request, _): return try? encoder.encode(request)
+        case .clientId: return nil
         }
     }
-
 
     var parameters: [URLQueryItem] {
         switch self {
         case .authToken: return []
         case .setupToken: return []
+        case .clientId: return []
         }
     }
     
@@ -61,6 +65,7 @@ extension PayPalVaultEndpoints: Endpoint {
         switch self {
         case .authToken: return "paypal_vault_session_auth_success_response"
         case .setupToken: return "paypal_vault_setup_token_success_response"
+        case .clientId: return "paypal_vault_get_client_id_success_response"
         }
     }
     

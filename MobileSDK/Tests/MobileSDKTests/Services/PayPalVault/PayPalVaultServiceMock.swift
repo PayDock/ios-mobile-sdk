@@ -11,7 +11,7 @@ import XCTest
 @testable import NetworkingLib
 
 class PayPalVaultServiceMock: Mockable, PayPalVaultService {
-    
+
     var responseFilename: PayPalFilenames = .authSuccess
     var sendError = false
     
@@ -32,6 +32,16 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
         } else {
             let response = loadJSON(filename: responseFilename.rawValue, type: PayPalVaultSetupTokenRes.self)
             return response.resource.data.setupToken
+        }
+    }
+    
+    func getClientId(gatewayId: String, accessToken: String) async throws -> String {
+        if sendError {
+            let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
+            throw RequestError.requestError(errorResponse)
+        } else {
+            let response = loadJSON(filename: responseFilename.rawValue, type: PayPalVaultConfigRes.self)
+            return response.resource.data.credentials.clientAuth
         }
     }
 
