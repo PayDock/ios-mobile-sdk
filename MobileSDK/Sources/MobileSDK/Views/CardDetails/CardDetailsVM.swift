@@ -25,6 +25,7 @@ class CardDetailsVM: ObservableObject {
     private let gatewayId: String?
     let actionText: String
     let showCardTitle: Bool
+    let collectCardholderName: Bool
     let allowSaveCard: SaveCardConfig?
     private let completion: (Result<CardResult, CardDetailsError>) -> Void
 
@@ -36,21 +37,23 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
-         cardDetailsFormManager: CardDetailsFormManager = CardDetailsFormManager(),
          gatewayId: String?,
          accessToken: String,
          actionText: String,
          showCardTitle: Bool,
+         collectCardholderName: Bool,
          allowSaveCard: SaveCardConfig?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
-        self.cardDetailsFormManager = cardDetailsFormManager
         self.gatewayId = gatewayId
         self.accessToken = accessToken
         self.actionText = actionText
         self.showCardTitle = showCardTitle
+        self.collectCardholderName = collectCardholderName
         self.allowSaveCard = allowSaveCard
         self.completion = completion
+        
+        self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: collectCardholderName)
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
@@ -65,10 +68,12 @@ class CardDetailsVM: ObservableObject {
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
                 return
             }
+            
+            let cardName = cardDetailsFormManager.cardholderNameText.isEmpty ? nil : cardDetailsFormManager.cardholderNameText
 
             let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
                 gatewayId: gatewayId,
-                cardName: cardDetailsFormManager.cardholderNameText,
+                cardName: cardName,
                 cardNumber: cardDetailsFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 expireMonth: String(expireMonth),
                 expireYear: String(expireYear),

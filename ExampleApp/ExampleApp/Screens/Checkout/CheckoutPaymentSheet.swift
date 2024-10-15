@@ -27,23 +27,19 @@ struct CheckoutPaymentSheet: View {
             switch viewModel.selectedMethod {
             case .card:
                 VStack {
-                    CardDetailsWidget(gatewayId: nil, accessToken: ProjectEnvironment.shared.getAccessToken(), completion: { result in
+                    CardDetailsWidget(gatewayId: nil,
+                                      accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                      actionText: "Pay",
+                                      showCardTitle: false,
+                                      collectCardholderName: false,
+                                      allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                                      completion: { result in
                         switch result {
-                        case .success(let result): viewModel.saveCardToken(result.token)
+                        case .success(let result): viewModel.payWithCard(result.token)
                         case .failure: break
                         }
                     })
-                    .frame(height: 320)
-                    Button("Pay") {
-                        viewModel.payWithCard()
-                    }
-                    .foregroundStyle(.white)
-                    .font(Font.system(size: 16, weight: .semibold))
-                    .frame(height: 48)
-                    .frame(maxWidth:.infinity)
-                    .background(Color(hex: "6750A4"))
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                    .padding()
+                    .frame(height: 240)
                 }
 
             case .applePay:

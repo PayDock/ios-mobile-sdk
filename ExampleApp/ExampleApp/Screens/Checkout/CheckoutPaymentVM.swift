@@ -158,13 +158,10 @@ extension CheckoutPaymentVM {
 // MARK: - Card Payment
 
 extension CheckoutPaymentVM {
-
-    func saveCardToken(_ token: String) {
-        self.cardToken = token
-    }
-
+    
     /// Initialized card payment using the tokenised card details
-    func payWithCard() {
+    func payWithCard(_ token: String) {
+        self.cardToken = token
         guard !cardToken.isEmpty else { return }
         isLoading = true
 
@@ -289,8 +286,7 @@ extension CheckoutPaymentVM {
         switch result.event {
         case .checkoutCompleted:
             showMastercardWebView = false
-            saveCardToken(result.mastercardToken)
-            payWithCard()
+            payWithCard(result.mastercardToken)
 
         case .checkoutReady:
             print("Checkout ready")
