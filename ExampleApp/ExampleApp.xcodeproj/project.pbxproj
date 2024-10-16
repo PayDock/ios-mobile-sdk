@@ -25,6 +25,7 @@
 		282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */; };
 		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
 		282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */; };
+		283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */; };
 		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
 		284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */; };
 		2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */; };
@@ -105,6 +106,7 @@
 		282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
 		282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentVM.swift; sourceTree = "<group>"; };
+		283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultWidgetView.swift; sourceTree = "<group>"; };
 		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
 		2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultReq.swift; sourceTree = "<group>"; };
 		2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyPayWidgetView.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				28A65CA12A94CE4E002A04CA /* Address */,
 				2867ADD72ACEE53400DB5319 /* ApplePay */,
 				280EB39B2AFE42920036E575 /* PayPal */,
+				283825872CBEB52B005BE050 /* PayPalVault */,
 				28F19D2B2B029F2E002F5526 /* GiftCard */,
 				28A81F492B14DAD60068FE75 /* Integrated3DS */,
 				280E96302B176EB600BE8C3E /* Standalone3DS */,
@@ -269,6 +272,14 @@
 				28D541F92A6FFC290041BAE0 /* SettingsVM.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		283825872CBEB52B005BE050 /* PayPalVault */ = {
+			isa = PBXGroup;
+			children = (
+				283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */,
+			);
+			path = PayPalVault;
 			sourceTree = "<group>";
 		};
 		2865B22B2B56E4C700EBE2DD /* FlyPay */ = {
@@ -689,6 +700,7 @@
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
 				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
+				283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
 				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
