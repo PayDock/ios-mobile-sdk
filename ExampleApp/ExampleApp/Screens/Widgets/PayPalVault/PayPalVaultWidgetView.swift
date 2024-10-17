@@ -14,9 +14,16 @@ struct PayPalVaultWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                
+                PayPalSavePaymentSourceWidget(config: PayPalVaultConfig(accessToken: "", gatewayId: "")) { result in
+                    switch result {
+                    case let .success(payPalVaultResult):
+                        print(payPalVaultResult.token)
+                    case let .failure(error):
+                        print(error)
+                    }
+                }
             }
-            .background(Color(hex: "#EAE0D7"))
+            .background(.white)
         }
     }
 }

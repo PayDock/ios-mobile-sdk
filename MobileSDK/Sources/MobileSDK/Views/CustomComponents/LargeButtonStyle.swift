@@ -12,10 +12,13 @@ struct LargeButtonStyle: ButtonStyle {
 
     let backgroundColor: Color
     let foregroundColor: Color
+    let borderColor: Color
     let isDisabled: Bool
 
     func makeBody(configuration: Self.Configuration) -> some View {
         let currentForegroundColor = isDisabled || configuration.isPressed ? foregroundColor.opacity(0.3) : foregroundColor
+        let currentBorderColor = isDisabled || configuration.isPressed ? borderColor.opacity(0.3) : borderColor
+        
         return configuration.label
             .customFont(.body)
             .imageScale(.small)
@@ -25,7 +28,7 @@ struct LargeButtonStyle: ButtonStyle {
             .cornerRadius(.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: .cornerRadius)
-                    .stroke(.clear)
+                    .stroke(currentBorderColor)
             )
             .font(Font.system(size: 19, weight: .semibold))
     }

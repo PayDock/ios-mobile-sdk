@@ -16,21 +16,24 @@ struct LargeButton: View {
     private let disabled: Bool
     private var backgroundColor: Color
     private var foregroundColor: Color
+    private var borderColor: Color
     private let action: () -> Void
 
     init(title: String,
-                image: Image? = nil,
-                imageLocation: ImageLocation = .left,
-                disabled: Bool = false,
-                backgroundColor: Color = .primaryColor,
-                foregroundColor: Color = .white,
-                action: @escaping () -> Void) {
+         image: Image? = nil,
+         imageLocation: ImageLocation = .left,
+         disabled: Bool = false,
+         backgroundColor: Color = .primaryColor,
+         foregroundColor: Color = .white,
+         borderColor: Color = .clear,
+         action: @escaping () -> Void) {
         self.title = title
         self.image = image
         self.imageLocation = imageLocation
         self.disabled = disabled
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
+        self.borderColor = borderColor
         self.action = action
     }
 
@@ -48,6 +51,7 @@ struct LargeButton: View {
             .buttonStyle(LargeButtonStyle(
                 backgroundColor: backgroundColor,
                 foregroundColor: foregroundColor,
+                borderColor: borderColor,
                 isDisabled: disabled))
             .disabled(self.disabled)
         }
