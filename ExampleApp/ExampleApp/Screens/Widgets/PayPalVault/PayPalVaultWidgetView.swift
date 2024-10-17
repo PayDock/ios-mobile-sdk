@@ -14,7 +14,7 @@ struct PayPalVaultWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                PayPalSavePaymentSourceWidget(config: PayPalVaultConfig(accessToken: "", gatewayId: "")) { result in
+                PayPalSavePaymentSourceWidget(config: getConfig()) { result in
                     switch result {
                     case let .success(payPalVaultResult):
                         print(payPalVaultResult.token)
@@ -25,6 +25,13 @@ struct PayPalVaultWidgetView: View {
             }
             .background(.white)
         }
+    }
+    
+    private func getConfig() -> PayPalVaultConfig {
+        let accessToken = ProjectEnvironment.shared.getAccessToken()
+        let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+        let config = PayPalVaultConfig(accessToken: accessToken, gatewayId: gatewayId)
+        return config
     }
 }
 
