@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0] - 2024-10-18
+
+### Added
+
+- `collectCardholderName` flag added to `CardDetailsWidget`
+
 ## [1.3.1] - 2024-10-01
 
 ### Fixed
