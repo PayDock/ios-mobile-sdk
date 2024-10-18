@@ -13,6 +13,7 @@ class CardDetailsFormManager: ObservableObject {
     
     // MARK: - Dependencies
     
+    private let shouldValidateCardholderName: Bool
     private let cardIssuerValidator: CardIssuerValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
@@ -113,10 +114,12 @@ class CardDetailsFormManager: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
+    init(shouldValidateCardholderName: Bool = true,
+         cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
          cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
+        self.shouldValidateCardholderName = shouldValidateCardholderName
         self.cardIssuerValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
@@ -184,10 +187,10 @@ class CardDetailsFormManager: ObservableObject {
         guard let textField = textField else { return }
 
         switch textField {
-        case .cardholderName: validateCardholderName()
-        case .cardNumber: validateCardNumber()
-        case .expiryDate: validateExpiryDate()
-        case .securityCode: validateSecurityCode()
+            case .cardholderName: if shouldValidateCardholderName { validateCardholderName() }
+            case .cardNumber: validateCardNumber()
+            case .expiryDate: validateExpiryDate()
+            case .securityCode: validateSecurityCode()
         }
     }
 
@@ -247,7 +250,9 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func isFormValid() -> Bool {
-        let isFormFilled = !cardholderNameText.isEmpty && !cardNumberText.isEmpty && !expiryDateText.isEmpty && !securityCodeText.isEmpty
+        let isCardholderNameValid = shouldValidateCardholderName ? !cardholderNameText.isEmpty : true
+        
+        let isFormFilled = isCardholderNameValid && !cardNumberText.isEmpty && !expiryDateText.isEmpty && !securityCodeText.isEmpty
         let isFormValid = cardHolderNameValid && cardNumberValid && expiryDateValid && securityCodeValid
         return isFormFilled && isFormValid
     }

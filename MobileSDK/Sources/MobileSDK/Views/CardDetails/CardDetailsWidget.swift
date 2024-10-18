@@ -21,6 +21,7 @@ public struct CardDetailsWidget: View {
                 accessToken: String,
                 actionText: String = "Submit",
                 showCardTitle: Bool = true,
+                collectCardholderName: Bool = true,
                 allowSaveCard: SaveCardConfig? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
@@ -28,6 +29,7 @@ public struct CardDetailsWidget: View {
             accessToken: accessToken,
             actionText: actionText,
             showCardTitle: showCardTitle,
+            collectCardholderName: collectCardholderName,
             allowSaveCard: allowSaveCard,
             completion: completion))
     }
@@ -47,17 +49,19 @@ public struct CardDetailsWidget: View {
             }
 
             VStack(spacing: max(max(.spacing - 10, 0), 0)) {
-                OutlineTextField(
-                    text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
-                    title: viewModel.cardDetailsFormManager.cardholderNameTitle,
-                    placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
-                    errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
-                    editing: $viewModel.cardDetailsFormManager.editingCardholderName,
-                    valid: $viewModel.cardDetailsFormManager.cardHolderNameValid)
-                .focused($textFieldInFocus, equals: .cardholderName)
-                .onTapGesture {
-                    self.textFieldInFocus = .cardholderName
-                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                if viewModel.collectCardholderName {
+                    OutlineTextField(
+                        text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
+                        title: viewModel.cardDetailsFormManager.cardholderNameTitle,
+                        placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
+                        errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
+                        editing: $viewModel.cardDetailsFormManager.editingCardholderName,
+                        valid: $viewModel.cardDetailsFormManager.cardHolderNameValid)
+                    .focused($textFieldInFocus, equals: .cardholderName)
+                    .onTapGesture {
+                        self.textFieldInFocus = .cardholderName
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                    }
                 }
 
                 OutlineTextField(

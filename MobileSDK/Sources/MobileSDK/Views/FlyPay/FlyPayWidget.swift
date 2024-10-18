@@ -26,7 +26,9 @@ public struct FlyPayWidget: View {
                 viewModel.handleButtonTap()
             }
             .sheet(isPresented: $viewModel.showWebView, onDismiss: {
-                viewModel.handleSheetCancellation()
+                if viewModel.sheetAction == .nothing {
+                    viewModel.handleSheetCancellation()
+                }
             }) {
                 NavigationStack {
                     FlyPayWebView(
