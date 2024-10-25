@@ -18,12 +18,12 @@ public struct PayPalSavePaymentSourceWidget: View {
 
     public var body: some View {
         LargeButton(
-            title: "Link PayPal account",
+            title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
             backgroundColor: .clear,
             foregroundColor: .primaryColor,
             borderColor: .primaryColor) {
-                // TODO: - Add handle on tap
+                viewModel.initializePayPalSDK()
             }
             .padding()
             .customFont(.body)

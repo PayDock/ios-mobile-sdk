@@ -10,6 +10,8 @@ import SwiftUI
 import MobileSDK
 
 struct PayPalVaultWidgetView: View {
+    
+    @StateObject private var viewModel = PayPalVaultWidgetVM()
 
     var body: some View {
         NavigationStack {
@@ -17,13 +19,16 @@ struct PayPalVaultWidgetView: View {
                 PayPalSavePaymentSourceWidget(config: getConfig()) { result in
                     switch result {
                     case let .success(payPalVaultResult):
-                        print(payPalVaultResult.token)
+                        viewModel.handleSuccess(result: payPalVaultResult)
                     case let .failure(error):
-                        print(error)
+                        viewModel.handleError(error: error)
                     }
                 }
             }
             .background(.white)
+            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+                Text(viewModel.alertMessage)
+            })
         }
     }
     

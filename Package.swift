@@ -17,7 +17,8 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.4.0"),
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.1.0")
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.1.0"),
+        .package(url: "https://github.com/paypal/paypal-ios/", exact: "1.4.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -26,7 +27,8 @@ let package = Package(
             name: "MobileSDK",
             dependencies: [
                 .product(name: "Afterpay", package: "sdk-ios"),
-                .product(name: "NetworkingLib", package: "ios-core-networking")],
+                .product(name: "NetworkingLib", package: "ios-core-networking"),
+                .product(name: "PayPalWebPayments", package: "paypal-ios")],
             path: "MobileSDK/Sources"
         ),
         .testTarget(
