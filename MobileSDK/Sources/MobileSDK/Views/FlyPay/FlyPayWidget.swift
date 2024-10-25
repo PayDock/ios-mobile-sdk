@@ -18,7 +18,7 @@ public struct FlyPayWidget: View {
     }
 
     public var body: some View {
-        LargeButton(
+        SDKButton(
             title: "Pay with",
             image: Image("flypay", bundle: Bundle.module),
             imageLocation: .right,

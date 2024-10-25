@@ -1,5 +1,5 @@
 //
-//  LargeButton.swift
+//  SDKButton.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct LargeButton: View {
+struct SDKButton: View {
 
     private let title: String
     private let image: Image?

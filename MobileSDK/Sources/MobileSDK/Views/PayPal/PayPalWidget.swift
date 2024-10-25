@@ -17,7 +17,7 @@ public struct PayPalWidget: View {
     }
 
     public var body: some View {
-        LargeButton(
+        SDKButton(
             title: "",
             image: Image("pay-pal", bundle: Bundle.module),
             style: .fill(FillButtonStyle(backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)))) {

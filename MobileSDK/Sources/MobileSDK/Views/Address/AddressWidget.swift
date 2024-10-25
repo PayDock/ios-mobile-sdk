@@ -243,7 +243,7 @@ public struct AddressWidget: View {
     }
 
     private var saveButton: some View {
-        LargeButton(title: "Save", style: .fill(FillButtonStyle())) {
+        SDKButton(title: "Save", style: .fill(FillButtonStyle())) {
             viewModel.saveAddress()
         }
         .padding(.vertical, 16)
