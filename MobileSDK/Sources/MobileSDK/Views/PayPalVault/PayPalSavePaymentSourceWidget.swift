@@ -20,9 +20,7 @@ public struct PayPalSavePaymentSourceWidget: View {
         LargeButton(
             title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
-            backgroundColor: .clear,
-            foregroundColor: .primaryColor,
-            borderColor: .primaryColor) {
+            style: .outline(OutlineButtonStyle())) {
                 viewModel.initializePayPalSDK()
             }
             .padding()
