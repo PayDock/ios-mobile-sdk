@@ -11,7 +11,7 @@ import Foundation
 struct TokeniseCardDetailsReq: Codable {
 
     let gatewayId: String?
-    let cardName: String
+    let cardName: String?
     let cardNumber: String
     let expireMonth: String
     let expireYear: String
