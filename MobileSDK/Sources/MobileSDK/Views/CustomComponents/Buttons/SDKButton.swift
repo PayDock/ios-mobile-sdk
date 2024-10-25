@@ -67,11 +67,11 @@ struct SDKButton: View {
 
 // MARK: - OutlineTextField_Previews
 
-//struct LargeButton_Previews: PreviewProvider {
-//
-//    static var previews: some View {
-//        LargeButton(title: "asdf", style: .outline(OutlineButtonStyle(backgroundColor: .red, foregroundColor: .green, borderColor: .blue, isDisabled: false))) { }
-//    }
-//
-//}
-//
+struct LargeButton_Previews: PreviewProvider {
+
+    static var previews: some View {
+        SDKButton(title: "asdf", style: .outline(OutlineButtonStyle())) { }
+    }
+
+}
+
