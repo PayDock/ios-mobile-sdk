@@ -1,5 +1,5 @@
 //
-//  LargeButton.swift
+//  SDKButton.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,29 +8,23 @@
 
 import SwiftUI
 
-struct LargeButton: View {
+struct SDKButton: View {
 
     private let title: String
     private let image: Image?
     private let imageLocation: ImageLocation
-    private let disabled: Bool
-    private var backgroundColor: Color
-    private var foregroundColor: Color
+    private let style: SDKButtonStyle
     private let action: () -> Void
 
     init(title: String,
-                image: Image? = nil,
-                imageLocation: ImageLocation = .left,
-                disabled: Bool = false,
-                backgroundColor: Color = .primaryColor,
-                foregroundColor: Color = .white,
-                action: @escaping () -> Void) {
+         image: Image? = nil,
+         imageLocation: ImageLocation = .left,
+         style: SDKButtonStyle,
+         action: @escaping () -> Void) {
         self.title = title
         self.image = image
         self.imageLocation = imageLocation
-        self.disabled = disabled
-        self.backgroundColor = backgroundColor
-        self.foregroundColor = foregroundColor
+        self.style = style
         self.action = action
     }
 
@@ -45,11 +39,8 @@ struct LargeButton: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .buttonStyle(LargeButtonStyle(
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor,
-                isDisabled: disabled))
-            .disabled(self.disabled)
+            .myStyle(style)
+            .disabled(style.isDisabled)
         }
         .frame(maxWidth:.infinity, minHeight: 50)
     }
@@ -79,7 +70,7 @@ struct LargeButton: View {
 struct LargeButton_Previews: PreviewProvider {
 
     static var previews: some View {
-        LargeButton(title: "asdf") { }
+        SDKButton(title: "asdf", style: .outline(OutlineButtonStyle())) { }
     }
 
 }
