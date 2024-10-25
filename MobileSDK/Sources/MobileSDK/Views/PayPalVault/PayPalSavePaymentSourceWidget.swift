@@ -17,7 +17,7 @@ public struct PayPalSavePaymentSourceWidget: View {
     }
 
     public var body: some View {
-        LargeButton(
+        SDKButton(
             title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
             style: .outline(OutlineButtonStyle())) {
