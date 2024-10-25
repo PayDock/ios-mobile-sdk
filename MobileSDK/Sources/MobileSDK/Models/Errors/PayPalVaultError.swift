@@ -11,11 +11,14 @@ import NetworkingLib
 
 public enum PayPalVaultError: Error {
 
-    // TODO: - Add cases once we know possible error states for the vault
+    case sdkException(description: String)
+    case userCancelled
     case unknownError
 
     public var customMessage: String {
         switch self {
+        case .sdkException(let description): return description
+        case .userCancelled: return "User canceled the operation."
         case .unknownError: return "Unknown error"
         }
     }

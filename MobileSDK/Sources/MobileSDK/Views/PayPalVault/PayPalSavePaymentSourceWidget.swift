@@ -18,10 +18,10 @@ public struct PayPalSavePaymentSourceWidget: View {
 
     public var body: some View {
         SDKButton(
-            title: "Link PayPal account",
+            title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
             style: .outline(OutlineButtonStyle())) {
-                // TODO: - Add handle on tap
+                viewModel.initializePayPalSDK()
             }
             .padding()
             .customFont(.body)
