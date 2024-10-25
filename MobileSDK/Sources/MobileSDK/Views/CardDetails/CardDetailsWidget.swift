@@ -108,7 +108,7 @@ public struct CardDetailsWidget: View {
                     privacyView
                 }
             }
-            LargeButton(title: viewModel.actionText, disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            LargeButton(title: viewModel.actionText, style: .fill(FillButtonStyle(isDisabled: !viewModel.cardDetailsFormManager.isFormValid()))) {
                 viewModel.tokeniseCardDetails()
             }
             .padding(.bottom, 16)

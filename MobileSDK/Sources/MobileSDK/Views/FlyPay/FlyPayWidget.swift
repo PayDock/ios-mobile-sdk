@@ -22,7 +22,7 @@ public struct FlyPayWidget: View {
             title: "Pay with",
             image: Image("flypay", bundle: Bundle.module),
             imageLocation: .right,
-            backgroundColor:  Color(red: 0.00, green: 0.48, blue: 0.75)) {
+            style: .fill(FillButtonStyle(backgroundColor: Color(red: 0.00, green: 0.48, blue: 0.75)))) {
                 viewModel.handleButtonTap()
             }
             .sheet(isPresented: $viewModel.showWebView, onDismiss: {

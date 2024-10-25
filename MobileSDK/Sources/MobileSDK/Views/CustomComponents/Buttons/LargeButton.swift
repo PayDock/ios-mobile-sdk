@@ -13,27 +13,18 @@ struct LargeButton: View {
     private let title: String
     private let image: Image?
     private let imageLocation: ImageLocation
-    private let disabled: Bool
-    private var backgroundColor: Color
-    private var foregroundColor: Color
-    private var borderColor: Color
+    private let style: SDKButtonStyle
     private let action: () -> Void
 
     init(title: String,
          image: Image? = nil,
          imageLocation: ImageLocation = .left,
-         disabled: Bool = false,
-         backgroundColor: Color = .primaryColor,
-         foregroundColor: Color = .white,
-         borderColor: Color = .clear,
+         style: SDKButtonStyle,
          action: @escaping () -> Void) {
         self.title = title
         self.image = image
         self.imageLocation = imageLocation
-        self.disabled = disabled
-        self.backgroundColor = backgroundColor
-        self.foregroundColor = foregroundColor
-        self.borderColor = borderColor
+        self.style = style
         self.action = action
     }
 
@@ -48,12 +39,8 @@ struct LargeButton: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .buttonStyle(LargeButtonStyle(
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor,
-                borderColor: borderColor,
-                isDisabled: disabled))
-            .disabled(self.disabled)
+            .myStyle(style)
+            .disabled(style.isDisabled)
         }
         .frame(maxWidth:.infinity, minHeight: 50)
     }
@@ -80,11 +67,11 @@ struct LargeButton: View {
 
 // MARK: - OutlineTextField_Previews
 
-struct LargeButton_Previews: PreviewProvider {
-
-    static var previews: some View {
-        LargeButton(title: "asdf") { }
-    }
-
-}
-
+//struct LargeButton_Previews: PreviewProvider {
+//
+//    static var previews: some View {
+//        LargeButton(title: "asdf", style: .outline(OutlineButtonStyle(backgroundColor: .red, foregroundColor: .green, borderColor: .blue, isDisabled: false))) { }
+//    }
+//
+//}
+//

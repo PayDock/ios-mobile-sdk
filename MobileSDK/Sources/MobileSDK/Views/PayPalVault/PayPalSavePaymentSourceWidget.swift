@@ -20,9 +20,7 @@ public struct PayPalSavePaymentSourceWidget: View {
         LargeButton(
             title: "Link PayPal account",
             image: Image("link", bundle: Bundle.module),
-            backgroundColor: .clear,
-            foregroundColor: .primaryColor,
-            borderColor: .primaryColor) {
+            style: .outline(OutlineButtonStyle())) {
                 // TODO: - Add handle on tap
             }
             .padding()
