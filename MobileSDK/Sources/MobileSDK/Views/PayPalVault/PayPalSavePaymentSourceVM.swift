@@ -42,7 +42,57 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         actionText = config.actionText ?? "Link PayPal account"
     }
     
+    private func getClientId() async -> String {
+        do {
+            return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            completion(.failure(.getPayPalClientId(error: errorResponse)))
+        } catch {
+            completion(.failure(.unknownError(error as? RequestError)))
+        }
+    }
+    
+    private func getAuthToken() async -> String {
+        do {
+            let request = PayPalVaultAuthReq(gatewayId: config.gatewayId)
+            return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            completion(.failure(.createSessionAuthToken(error: errorResponse)))
+        } catch {
+            completion(.failure(.unknownError(error as? RequestError)))
+        }
+    }
+    
+    private func getSetupTokenId(authToken: String) async -> String {
+        do {
+            let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId, oauthToken: authToken)
+            return try await payPalVaultService.createSetupToken(req: request, accessToken: config.accessToken)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            completion(.failure(.createSetupToken(error: errorResponse)))
+        } catch {
+            completion(.failure(.unknownError(error as? RequestError)))
+        }
+    }
+    
     func initializePayPalSDK() {
+        Task {
+            let clientId = await getClientId()
+            let authToken = await getAuthToken()
+            let setupToken = await getSetupTokenId(authToken: authToken)
+            
+            // TODO: - Use the URL from the response once it's live on BE
+            let vaultRequest = PayPalVaultRequest(url: URL(string: "https://www.sandbox.paypal.com/agreements/approve?approval_session_id=\(setupTokenID)")!, setupTokenID: setupToken)
+            let environment = Constants.payPalVaultEnvironment
+            let payPalConfig = CoreConfig(clientID: clientID, environment: environment)
+            let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
+            
+            payPalClient.vaultDelegate = self
+            payPalClient.vault(vaultReq)
+        }
+            
+            
+        
+        
         // TODO: - Testing data - use postman to obtain
         let clientID = "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0"
         let setupTokenID = "1B309495S0244553F"
