@@ -20,7 +20,7 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
             let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
             throw RequestError.requestError(errorResponse)
         } else {
-            let response = loadJSON(filename: responseFilename.rawValue, type: PayPalVaultAuthRes.self)
+            let response = loadJSON(filename: PayPalFilenames.authSuccess.rawValue, type: PayPalVaultAuthRes.self)
             return response.resource.data.accessToken
         }
     }
@@ -30,7 +30,7 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
             let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
             throw RequestError.requestError(errorResponse)
         } else {
-            let response = loadJSON(filename: responseFilename.rawValue, type: PayPalVaultSetupTokenRes.self)
+            let response = loadJSON(filename: PayPalFilenames.setupTokenSuccess.rawValue, type: PayPalVaultSetupTokenRes.self)
             return response.resource.data.setupToken
         }
     }
@@ -40,7 +40,7 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
             let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
             throw RequestError.requestError(errorResponse)
         } else {
-            let response = loadJSON(filename: responseFilename.rawValue, type: PayPalVaultConfigRes.self)
+            let response = loadJSON(filename: PayPalFilenames.getClientId.rawValue, type: PayPalVaultConfigRes.self)
             return response.resource.data.credentials.clientAuth
         }
     }
@@ -50,7 +50,7 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
             let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
             throw RequestError.requestError(errorResponse)
         } else {
-            let response = loadJSON(filename: responseFilename.rawValue, type: PayPalVaultPaymentTokenRes.self)
+            let response = loadJSON(filename: PayPalFilenames.createPaymentToken.rawValue, type: PayPalVaultPaymentTokenRes.self)
             return response.resource.data.paymentToken
         }
     }

@@ -63,7 +63,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
     }
     
-    private func getClientId() async -> String? {
+    func getClientId() async -> String? {
         do {
             return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
@@ -74,7 +74,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-    private func getAuthToken() async -> String? {
+    func getAuthToken() async -> String? {
         do {
             let request = PayPalVaultAuthReq(gatewayId: config.gatewayId)
             return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
@@ -86,7 +86,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-    private func getSetupTokenId(authToken: String) async -> String? {
+    func getSetupTokenId(authToken: String) async -> String? {
         do {
             let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId, oauthToken: authToken)
             return try await payPalVaultService.createSetupToken(req: request, accessToken: config.accessToken)
