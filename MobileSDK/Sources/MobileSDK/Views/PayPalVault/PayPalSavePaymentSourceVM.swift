@@ -42,18 +42,60 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         actionText = config.actionText ?? "Link PayPal account"
     }
     
+    // MARK: - PayPal Initialization
+    
     func initializePayPalSDK() {
-        // TODO: - Testing data - use postman to obtain
-        let clientID = "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0"
-        let setupTokenID = "1B309495S0244553F"
-        let vaultReq = PayPalVaultRequest(url: URL(string: "https://www.sandbox.paypal.com/agreements/approve?approval_session_id=\(setupTokenID)")!, setupTokenID: setupTokenID)
-        let environment = Constants.payPalVaultEnvironment
-        
-        let payPalConfig = CoreConfig(clientID: clientID, environment: environment)
-        let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
-        
-        payPalClient.vaultDelegate = self
-        payPalClient.vault(vaultReq)
+        Task {
+            guard let clientId = await getClientId(),
+                  let authToken = await getAuthToken(),
+                  let setupToken = await getSetupTokenId(authToken: authToken) else {
+                return
+            }
+            
+            // TODO: - Use the URL from the response once it's live on BE
+            let vaultRequest = PayPalVaultRequest(url: URL(string: "https://www.sandbox.paypal.com/agreements/approve?approval_session_id=\(setupToken)")!, setupTokenID: setupToken)
+            let environment = Constants.payPalVaultEnvironment
+            let payPalConfig = CoreConfig(clientID: clientId, environment: environment)
+            let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
+            
+            payPalClient.vaultDelegate = self
+            payPalClient.vault(vaultRequest)
+        }
+    }
+    
+    func getClientId() async -> String? {
+        do {
+            return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            completion(.failure(.getPayPalClientId(error: errorResponse)))
+        } catch {
+            completion(.failure(.unknownError(error as? RequestError)))
+        }
+        return nil
+    }
+    
+    func getAuthToken() async -> String? {
+        do {
+            let request = PayPalVaultAuthReq(gatewayId: config.gatewayId)
+            return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            completion(.failure(.createSessionAuthToken(error: errorResponse)))
+        } catch {
+            completion(.failure(.unknownError(error as? RequestError)))
+        }
+        return nil
+    }
+    
+    func getSetupTokenId(authToken: String) async -> String? {
+        do {
+            let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId, oauthToken: authToken)
+            return try await payPalVaultService.createSetupToken(req: request, accessToken: config.accessToken)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            completion(.failure(.createSetupToken(error: errorResponse)))
+        } catch {
+            completion(.failure(.unknownError(error as? RequestError)))
+        }
+        return nil
     }
 }
 

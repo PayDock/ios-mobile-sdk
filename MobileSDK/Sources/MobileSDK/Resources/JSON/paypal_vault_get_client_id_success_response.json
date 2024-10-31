@@ -7,7 +7,7 @@
             "type": "Paypal",
             "mode": "test",
             "credentials": {
-                "client_auth": "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0"
+                "client_auth": "A21AAImMSJ1pEQNd5g7FF17147v4ojjGcf0Gg6yiTPbMHpbW354srIl2fz8JuFfntMeEgt6urLX8eFcK2LorAKm4XkOvkYwYw"
             }
         }
     }
