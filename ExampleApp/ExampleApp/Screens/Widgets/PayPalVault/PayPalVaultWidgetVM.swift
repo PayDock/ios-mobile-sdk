@@ -17,6 +17,15 @@ class PayPalVaultWidgetVM: ObservableObject {
     @Published var alertTitle = ""
     @Published var alertMessage = ""
     
+    // MARK: - Config
+    
+    func getConfig() -> PayPalVaultConfig {
+        let accessToken = ProjectEnvironment.shared.getAccessToken()
+        let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+        let config = PayPalVaultConfig(accessToken: accessToken, gatewayId: gatewayId)
+        return config
+    }
+    
     // MARK: - Completion handling
 
     func handleError(error: PayPalVaultError) {

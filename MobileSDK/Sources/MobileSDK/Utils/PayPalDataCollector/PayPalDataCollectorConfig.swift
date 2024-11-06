@@ -10,4 +10,9 @@ public struct PayPalDataCollectorConfig {
     
     public let accessToken: String
     public let gatewayId: String
+    
+    public init(accessToken: String, gatewayId: String) {
+        self.accessToken = accessToken
+        self.gatewayId = gatewayId
+    }
 }
