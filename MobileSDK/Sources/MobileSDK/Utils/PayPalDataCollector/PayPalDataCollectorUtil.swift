@@ -30,7 +30,7 @@ public class PayPalDataCollectorUtil {
                 let clientId = try await PayPalVaultMockServiceImpl().getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
                 return PayPalDataCollectorUtil(config: config, clientId: clientId)
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                throw PayPalDataCollectorError.getPayPalClientId(error: errorResponse)
+                throw PayPalDataCollectorError.initialisationClientId(error: errorResponse)
             } catch {
                 throw PayPalDataCollectorError.unknownError(error as? RequestError)
             }

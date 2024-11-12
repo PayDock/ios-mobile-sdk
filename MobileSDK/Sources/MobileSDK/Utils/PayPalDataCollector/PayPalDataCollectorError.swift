@@ -11,12 +11,12 @@ import NetworkingLib
 
 public enum PayPalDataCollectorError: Error {
 
-    case getPayPalClientId(error: ErrorRes)
+    case initialisationClientId(error: ErrorRes)
     case unknownError(RequestError?)
 
     public var customMessage: String {
         switch self {
-        case .getPayPalClientId: return "Error getting PayPal client ID."
+        case .initialisationClientId: return "Error getting PayPal client ID."
         case .unknownError: return "Unknown error"
         }
     }

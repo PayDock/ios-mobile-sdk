@@ -33,9 +33,9 @@ class PayPalDataCollectorUtilTests: XCTestCase {
         
         do {
             _ = try await PayPalDataCollectorUtil.initialise(config: mockConfig)
-            XCTFail("Expected to throw PayPalDataCollectorError.getPayPalClientId, but succeeded.")
+            XCTFail("Expected to throw PayPalDataCollectorError.initialisationClientId, but succeeded.")
         } catch let error as PayPalDataCollectorError {
-            if case .getPayPalClientId = error {
+            if case .initialisationClientId = error {
                 XCTAssertTrue(true)
             } else {
                 XCTFail("Unexpected error type: \(error)")
