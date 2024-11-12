@@ -59,10 +59,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         if case .failure(let error) = completionResult {
             switch error {
             case .getPayPalClientId: XCTAssert(true)
-            default: XCTFail("Error message should always be getPayPalClientId.")
+            default: XCTFail("Error message should always be initialisationClientId.")
             }
         } else {
-            XCTFail("Expected completion to be called with a getPayPalClientId failure.")
+            XCTFail("Expected completion to be called with a initialisationClientId failure.")
         }
     }
     

@@ -28,6 +28,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Afterpay", package: "sdk-ios"),
                 .product(name: "NetworkingLib", package: "ios-core-networking"),
+                .product(name: "FraudProtection", package: "paypal-ios"),
                 .product(name: "PayPalWebPayments", package: "paypal-ios")],
             path: "MobileSDK/Sources"
         ),

@@ -32,6 +32,7 @@ let package = Package(
                 // TODO: - Replace once development is finished
 //                .product(name: "NetworkingLib", package: "ios-core-networking")],
                 .product(name: "NetworkingLib", package: "mobile-lib-networking-ios"),
+                .product(name: "FraudProtection", package: "paypal-ios"),
                 .product(name: "PayPalWebPayments", package: "paypal-ios")],
             path: "Sources",
             resources: [
