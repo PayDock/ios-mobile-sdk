@@ -24,7 +24,7 @@ public class PayPalDataCollectorUtil {
         self.clientId = clientId
     }
     
-    public static func initializeDataCollector(config: PayPalDataCollectorConfig) async throws -> PayPalDataCollectorUtil {
+    public static func initialise(config: PayPalDataCollectorConfig) async throws -> PayPalDataCollectorUtil {
             do {
                 // TODO: - Replace with real service once we start hooking up to BE
                 let clientId = try await PayPalVaultMockServiceImpl().getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
