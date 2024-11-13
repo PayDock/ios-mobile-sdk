@@ -25,15 +25,18 @@ public class PayPalDataCollectorUtil {
     }
     
     public static func initialise(config: PayPalDataCollectorConfig) async throws -> PayPalDataCollectorUtil {
-            do {
-                // TODO: - Replace with real service once we start hooking up to BE
-                let clientId = try await PayPalVaultMockServiceImpl().getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
-                return PayPalDataCollectorUtil(config: config, clientId: clientId)
-            } catch let RequestError.requestError(errorResponse: errorResponse) {
-                throw PayPalDataCollectorError.initialisationClientId(error: errorResponse)
-            } catch {
-                throw PayPalDataCollectorError.unknownError(error as? RequestError)
-            }
+        return try await initialise(config: config, service: PayPalVaultServiceImpl())
+    }
+    
+    static func initialise(config: PayPalDataCollectorConfig, service: PayPalVaultService = PayPalVaultServiceImpl()) async throws -> PayPalDataCollectorUtil {
+        do {
+            let clientId = try await service.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+            return PayPalDataCollectorUtil(config: config, clientId: clientId)
+        } catch let RequestError.requestError(errorResponse: errorResponse) {
+            throw PayPalDataCollectorError.initialisationClientId(error: errorResponse)
+        } catch {
+            throw PayPalDataCollectorError.unknownError(error as? RequestError)
+        }
     }
     
     public func collectDeviceData(additionalData: [String: String] = [:]) -> String {

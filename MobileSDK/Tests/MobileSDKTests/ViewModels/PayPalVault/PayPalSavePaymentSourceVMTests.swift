@@ -87,7 +87,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         mockService.sendError = true
         mockService.responseFilename = .authFail
         
-        let setupToken = await viewModel.getSetupTokenId(authToken: "auth_token")
+        let setupToken = await viewModel.getSetupTokenData(authToken: "auth_token")
         
         XCTAssertNil(setupToken, "Setup token should be nil on error.")
         if case .failure(let error) = completionResult {

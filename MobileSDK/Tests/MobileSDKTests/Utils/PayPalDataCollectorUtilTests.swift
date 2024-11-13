@@ -22,17 +22,17 @@ class PayPalDataCollectorUtilTests: XCTestCase {
     }
     
     func testInitializeDataCollector_Success() async throws {
-        let util = try await PayPalDataCollectorUtil.initialise(config: mockConfig)
+        let util = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: mockService)
         
         XCTAssertNotNil(util)
-        XCTAssertEqual(util.clientId, "A21AAImMSJ1pEQNd5g7FF17147v4ojjGcf0Gg6yiTPbMHpbW354srIl2fz8JuFfntMeEgt6urLX8eFcK2LorAKm4XkOvkYwYw", "Client ID should match the expected mock client ID.")
+        XCTAssertEqual(util.clientId, "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0", "Client ID should match the expected mock client ID.")
     }
     
     func testInitializeDataCollectorFail() async throws {
         mockService.sendError = true
         
         do {
-            _ = try await PayPalDataCollectorUtil.initialise(config: mockConfig)
+            _ = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: mockService)
             XCTFail("Expected to throw PayPalDataCollectorError.initialisationClientId, but succeeded.")
         } catch let error as PayPalDataCollectorError {
             if case .initialisationClientId = error {
