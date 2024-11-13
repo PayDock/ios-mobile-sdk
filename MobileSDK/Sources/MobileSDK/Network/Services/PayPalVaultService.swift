@@ -12,7 +12,7 @@ import NetworkingLib
 protocol PayPalVaultService {
 
     func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String
-    func createSetupToken(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> String
+    func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData
     func getClientId(gatewayId: String, accessToken: String) async throws -> String
     func createPaymentToken(request: PayPalVaultPaymentTokenReq, accessToken: String) async throws -> String
 
@@ -27,9 +27,9 @@ struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
         return response.resource.data.accessToken
     }
     
-    func createSetupToken(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> String {
+    func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.setupToken(request: req, accessToken: accessToken), responseModel: PayPalVaultSetupTokenRes.self)
-        return response.resource.data.setupToken
+        return response.resource.data
     }
     
     func getClientId(gatewayId: String, accessToken: String) async throws -> String {
@@ -53,9 +53,9 @@ struct PayPalVaultMockServiceImpl: MockHTTPClient, PayPalVaultService {
         return response.resource.data.accessToken
     }
     
-    func createSetupToken(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> String {
+    func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.setupToken(request: req, accessToken: accessToken), responseModel: PayPalVaultSetupTokenRes.self)
-        return response.resource.data.setupToken
+        return response.resource.data
     }
     
     func getClientId(gatewayId: String, accessToken: String) async throws -> String {
