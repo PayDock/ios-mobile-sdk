@@ -4,7 +4,8 @@
   "resource": {
     "type": "setup-token",
     "data": {
-      "setup_token": "XObCsxdHXe"
+      "setup_token": "XObCsxdHXe",
+      "approve_link": "www.something.com"
     }
   }
 }

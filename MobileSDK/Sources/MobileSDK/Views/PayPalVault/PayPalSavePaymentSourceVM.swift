@@ -29,7 +29,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     // MARK: - Initialisation
 
     init(config: PayPalVaultConfig,
-         payPalVaultService: PayPalVaultService = PayPalVaultMockServiceImpl(),
+         payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
          completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         self.config = config
         self.payPalVaultService = payPalVaultService
@@ -48,12 +48,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         Task {
             guard let clientId = await getClientId(),
                   let authToken = await getAuthToken(),
-                  let setupToken = await getSetupTokenId(authToken: authToken) else {
+                  let setupTokenData = await getSetupTokenData(authToken: authToken) else {
                 return
             }
             
             // TODO: - Use the URL from the response once it's live on BE
-            let vaultRequest = PayPalVaultRequest(url: URL(string: "https://www.sandbox.paypal.com/agreements/approve?approval_session_id=\(setupToken)")!, setupTokenID: setupToken)
+            let vaultRequest = PayPalVaultRequest(url: setupTokenData.approveLink, setupTokenID: setupTokenData.setupToken)
             let environment = Constants.payPalVaultEnvironment
             let payPalConfig = CoreConfig(clientID: clientId, environment: environment)
             let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
@@ -86,10 +86,10 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-    func getSetupTokenId(authToken: String) async -> String? {
+    func getSetupTokenData(authToken: String) async -> PayPalVaultSetupTokenRes.SetupTokenData? {
         do {
-            let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId, oauthToken: authToken)
-            return try await payPalVaultService.createSetupToken(req: request, accessToken: config.accessToken)
+            let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId, token: authToken)
+            return try await payPalVaultService.createSetupTokenData(req: request, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createSetupToken(error: errorResponse)))
         } catch {
