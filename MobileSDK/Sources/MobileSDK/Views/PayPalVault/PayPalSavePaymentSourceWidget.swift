@@ -25,6 +25,7 @@ public struct PayPalSavePaymentSourceWidget: View {
             }
             .padding()
             .customFont(.body)
+            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
 

@@ -21,6 +21,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     // MARK: - Properties
     
     @Published var actionText: String = ""
+    @Published var isLoading = false
 
     // MARK: - Handlers
 
@@ -46,9 +47,11 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     
     func initializePayPalSDK() {
         Task {
+            isLoading = true
             guard let clientId = await getClientId(),
                   let authToken = await getAuthToken(),
                   let setupTokenData = await getSetupTokenData(authToken: authToken) else {
+                isLoading = false
                 return
             }
             
@@ -68,8 +71,10 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.getPayPalClientId(error: errorResponse)))
+            isLoading = false
         } catch {
             completion(.failure(.unknownError(error as? RequestError)))
+            isLoading = false
         }
         return nil
     }
@@ -80,8 +85,10 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createSessionAuthToken(error: errorResponse)))
+            isLoading = false
         } catch {
             completion(.failure(.unknownError(error as? RequestError)))
+            isLoading = false
         }
         return nil
     }
@@ -92,10 +99,29 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             return try await payPalVaultService.createSetupTokenData(req: request, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createSetupToken(error: errorResponse)))
+            isLoading = false
         } catch {
             completion(.failure(.unknownError(error as? RequestError)))
+            isLoading = false
         }
         return nil
+    }
+    
+    private func createPaymentToken(setupToken: String) {
+        Task {
+            do {
+                let request = PayPalVaultPaymentTokenReq(gatewayId: config.gatewayId)
+                let tokenData = try await payPalVaultService.createPaymentToken(request: request, setupToken: setupToken, accessToken: config.accessToken)
+                isLoading = false
+                completion(.success(PayPalVaultResult(token: tokenData.token, email: tokenData.email)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.createPaymentToken(error: errorResponse)))
+                isLoading = false
+            } catch {
+                completion(.failure(.unknownError(error as? RequestError)))
+                isLoading = false
+            }
+        }
     }
 }
 
@@ -104,17 +130,18 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 extension PayPalSavePaymentSourceVM: PayPalVaultDelegate {
     
     func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultResult paypalVaultResult: PayPalWebPayments.PayPalVaultResult) {
-        let result = PayPalVaultResult(token: paypalVaultResult.approvalSessionID)
-        completion(.success(result))
+        createPaymentToken(setupToken: paypalVaultResult.tokenID)
     }
     
     func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultError vaultError: CorePayments.CoreSDKError) {
         let errorDescription = vaultError.errorDescription ?? ""
         completion(.failure(.sdkException(description: errorDescription)))
+        isLoading = false
     }
     
     func paypalDidCancel(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient) {
         completion(.failure(.userCancelled))
+        isLoading = false
     }
     
 }

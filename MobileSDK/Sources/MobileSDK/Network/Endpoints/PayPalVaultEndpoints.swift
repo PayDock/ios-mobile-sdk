@@ -14,7 +14,7 @@ enum PayPalVaultEndpoints {
     case authToken(request: PayPalVaultAuthReq, accessToken: String)
     case setupToken(request: PayPalVaultSetupTokenReq, accessToken: String)
     case clientId(gatewayId: String, accessToken: String)
-    case paymentToken(request: PayPalVaultPaymentTokenReq, accessToken: String)
+    case paymentToken(setupToken: String, request: PayPalVaultPaymentTokenReq, accessToken: String)
 
 }
 
@@ -25,7 +25,7 @@ extension PayPalVaultEndpoints: Endpoint {
         case .authToken: return "/v1/payment_sources/oauth-tokens"
         case .setupToken: return "/v1/payment_sources/setup-tokens"
         case .clientId(let gatewayId, _): return "/v1/gateways/\(gatewayId)/wallet-config"
-        case .paymentToken: return "/v1/payment_sources/tokens"
+        case .paymentToken(let setupToken, _, _): return "/v1/payment_sources/setup-tokens/\(setupToken)/tokens"
         }
     }
 
@@ -43,7 +43,7 @@ extension PayPalVaultEndpoints: Endpoint {
         case let .authToken(_ , accessToken),
             let .setupToken(_ , accessToken),
             let .clientId(_, accessToken),
-            let .paymentToken(_, accessToken):
+            let .paymentToken(_, _, accessToken):
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json"
@@ -56,7 +56,7 @@ extension PayPalVaultEndpoints: Endpoint {
         case .authToken(let request, _): return try? encoder.encode(request)
         case .setupToken(let request, _): return try? encoder.encode(request)
         case .clientId: return nil
-        case .paymentToken(let request, _): return try? encoder.encode(request)
+        case .paymentToken(_, let request, _): return try? encoder.encode(request)
         }
     }
 

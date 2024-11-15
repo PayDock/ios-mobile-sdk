@@ -12,10 +12,11 @@ struct PayPalVaultPaymentTokenRes: Codable {
 
     struct Resource: Codable {
         let type: String
-        let data: CallbackData
+        let data: PaymentTokenData
     }
 
-    struct CallbackData: Codable {
-        let paymentToken: String
+    struct PaymentTokenData: Codable {
+        let token: String
+        let email: String
     }
 }

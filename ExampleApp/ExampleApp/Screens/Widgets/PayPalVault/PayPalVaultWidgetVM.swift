@@ -38,7 +38,7 @@ class PayPalVaultWidgetVM: ObservableObject {
 
     func handleSuccess(result: PayPalVaultResult) {
         alertTitle = "Success"
-        alertMessage = "Approval session ID:\n \(result.token)"
+        alertMessage = "Token:\n \(result.token)\n\n Email:\n \(result.email)"
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showAlert = true
         }

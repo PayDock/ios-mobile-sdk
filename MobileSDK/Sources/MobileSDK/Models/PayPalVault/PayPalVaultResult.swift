@@ -9,5 +9,5 @@
 public struct PayPalVaultResult {
 
     public let token: String
-
+    public let email: String
 }
