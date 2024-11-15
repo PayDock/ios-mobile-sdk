@@ -8,7 +8,5 @@
 
 struct PayPalVaultPaymentTokenReq: Codable {
     
-    let gatewayId: String
-    let setupToken: String
-    
+    let gatewayId: String    
 }

@@ -47,14 +47,62 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         XCTAssertEqual(viewModel.actionText, "Link PayPal account", "The actionText should default to 'Link PayPal account' when nil.")
     }
     
+    // MARK: - Positive service interaction
+    
+    func testGetClientIdSuccess() async {
+        mockService.sendError = false
+        mockService.responseFilename = .getClientId
+        
+        let clientId = await viewModel.getClientId()
+        
+        XCTAssertEqual(clientId, "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0")
+        XCTAssertEqual(viewModel.isLoading, true)
+    }
+    
+    func testGetAuthTokenSuccess() async {
+        mockService.sendError = false
+        mockService.responseFilename = .authSuccess
+        
+        let authToken = await viewModel.getAuthToken()
+        
+        XCTAssertEqual(authToken, "some_access_token")
+        XCTAssertEqual(viewModel.isLoading, true)
+    }
+    
+    func testGetSetupTokenSuccess() async {
+        mockService.sendError = false
+        mockService.responseFilename = .setupTokenSuccess
+        
+        let setupTokenData = await viewModel.getSetupTokenData(authToken: "some_auth_token")
+        
+        XCTAssertEqual(setupTokenData?.setupToken, "XObCsxdHXe")
+        XCTAssertEqual(setupTokenData?.approveLink, URL(string: "www.something.com")!)
+        XCTAssertEqual(viewModel.isLoading, true)
+    }
+    
+    func testGetPaymentTokenSuccess() async {
+        mockService.sendError = false
+        mockService.responseFilename = .createPaymentToken
+        
+        await viewModel.createPaymentToken(setupToken: "some_setup_token")
+        
+        if case .success(let result) = completionResult {
+            XCTAssertEqual(result.token, "8kk8451t")
+            XCTAssertEqual(result.email, "someone@something.com")
+        } else {
+            XCTFail("Completion should return success.")
+        }
+        XCTAssertEqual(viewModel.isLoading, false)
+    }
+    
+    // MARK: - Negative service interaction
+    
     func testGetClientIdSetsCompletionOnFailure() async {
         mockService.sendError = true
         mockService.responseFilename = .authFail
         
-        // Act
         let clientId = await viewModel.getClientId()
         
-        // Assert
         XCTAssertNil(clientId, "Client ID should be nil on error.")
         if case .failure(let error) = completionResult {
             switch error {
@@ -81,6 +129,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         } else {
             XCTFail("Expected completion to be called with a createSessionAuthToken failure.")
         }
+        XCTAssertEqual(viewModel.isLoading, false)
     }
     
     func testGetSetupTokenIdSetsCompletionOnFailure() async {
@@ -98,5 +147,23 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         } else {
             XCTFail("Expected completion to be called with a createSetupToken failure.")
         }
+        XCTAssertEqual(viewModel.isLoading, false)
+    }
+    
+    func testCreatePaymentTokenSetsCompletionOnFailure() async {
+        mockService.sendError = true
+        mockService.responseFilename = .authFail
+        
+        await viewModel.createPaymentToken(setupToken: "some_setup_token")
+        
+        if case .failure(let error) = completionResult {
+            switch error {
+            case .createPaymentToken: XCTAssert(true)
+            default: XCTFail("Error message should always be createPaymentToken.")
+            }
+        } else {
+            XCTFail("Expected completion to be called with a createPaymentToken failure.")
+        }
+        XCTAssertEqual(viewModel.isLoading, false)
     }
 }
