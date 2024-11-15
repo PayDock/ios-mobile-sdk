@@ -45,13 +45,13 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
         }
     }
     
-    func createPaymentToken(request: PayPalVaultPaymentTokenReq, accessToken: String) async throws -> String {
+    func createPaymentToken(request: PayPalVaultPaymentTokenReq, setupToken: String, accessToken: String) async throws -> PayPalVaultPaymentTokenRes.PaymentTokenData {
         if sendError {
             let errorResponse = loadJSON(filename: responseFilename.rawValue, type: ErrorRes.self)
             throw RequestError.requestError(errorResponse)
         } else {
             let response = loadJSON(filename: PayPalFilenames.createPaymentToken.rawValue, type: PayPalVaultPaymentTokenRes.self)
-            return response.resource.data.paymentToken
+            return response.resource.data
         }
     }
 
