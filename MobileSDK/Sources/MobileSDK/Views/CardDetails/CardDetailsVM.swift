@@ -95,7 +95,7 @@ class CardDetailsVM: ObservableObject {
     }
 
     private func createResult(token: String) -> CardResult {
-        if let allowSaveCard = allowSaveCard {
+        if let _ = allowSaveCard {
             return CardResult(token: token, saveCard: policyAccepted)
         } else {
             return CardResult(token: token, saveCard: nil)

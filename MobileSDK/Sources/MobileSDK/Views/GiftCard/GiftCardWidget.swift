@@ -41,14 +41,14 @@ public struct GiftCardWidget: View {
                             errorMessage: $viewModel.giftCardFormManager.cardNumberError,
                             leftImage: .constant(Image("credit-card", bundle: Bundle.module)),
                             editing: $viewModel.giftCardFormManager.editingCardNumber,
-                            valid: $viewModel.giftCardFormManager.cardNumberValid)
+                            valid: $viewModel.giftCardFormManager.cardNumberValid,
+                            onTapGesture: {
+                                self.textFieldInFocus = .cardNumber
+                                viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
+                            })
                         .keyboardType(.numberPad)
                         .focused($textFieldInFocus, equals: .cardNumber)
                         .frame(width: UIScreen.main.bounds.width * 0.65)
-                        .onTapGesture {
-                            self.textFieldInFocus = .cardNumber
-                            viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
-                        }
                         
                         OutlineTextField(
                             text: viewModel.giftCardFormManager.pinBinding,
@@ -56,13 +56,13 @@ public struct GiftCardWidget: View {
                             placeholder: viewModel.giftCardFormManager.pinPlaceholder,
                             errorMessage: $viewModel.giftCardFormManager.pinError,
                             editing: $viewModel.giftCardFormManager.editingPin,
-                            valid: $viewModel.giftCardFormManager.pinValid)
+                            valid: $viewModel.giftCardFormManager.pinValid,
+                            onTapGesture: {
+                                self.textFieldInFocus = .pin
+                                viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
+                            })
                         .keyboardType(.numberPad)
                         .focused($textFieldInFocus, equals: .pin)
-                        .onTapGesture {
-                            self.textFieldInFocus = .pin
-                            viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
-                        }
                     }
                 }
                 let plusIcon = Image(systemName: "plus.circle")
