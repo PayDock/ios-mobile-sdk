@@ -24,6 +24,8 @@ struct PayPalVaultWidgetView: View {
                         viewModel.handleError(error: error)
                     }
                 }
+                .frame(height: 48)
+                .padding()
             }
             .background(.white)
             .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {

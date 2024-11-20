@@ -45,6 +45,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     
     // MARK: - PayPal Initialization
     
+    @MainActor
     func initializePayPalSDK() {
         Task {
             guard let clientId = await getClientId(),
@@ -65,6 +66,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
     }
     
+    @MainActor
     func getClientId() async -> String? {
         isLoading = true
         do {
@@ -79,6 +81,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
+    @MainActor
     func getAuthToken() async -> String? {
         isLoading = true
         do {
@@ -94,6 +97,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
+    @MainActor
     func getSetupTokenData(authToken: String) async -> PayPalVaultSetupTokenRes.SetupTokenData? {
         isLoading = true
         do {
@@ -109,6 +113,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
+    @MainActor
     func createPaymentToken(setupToken: String) async {
         isLoading = true
         do {

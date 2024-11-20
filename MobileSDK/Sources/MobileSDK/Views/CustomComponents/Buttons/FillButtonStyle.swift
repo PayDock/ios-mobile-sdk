@@ -20,7 +20,6 @@ struct FillButtonStyle: ButtonStyle {
         return configuration.label
             .customFont(.body)
             .imageScale(.small)
-            .frame(height: 48)
             .foregroundColor(currentForegroundColor)
             .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.8) : backgroundColor)
             .cornerRadius(.cornerRadius)

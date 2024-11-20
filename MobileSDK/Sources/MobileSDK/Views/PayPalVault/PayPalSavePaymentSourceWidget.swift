@@ -23,7 +23,6 @@ public struct PayPalSavePaymentSourceWidget: View {
             style: .outline(OutlineButtonStyle())) {
                 viewModel.initializePayPalSDK()
             }
-            .padding()
             .customFont(.body)
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
