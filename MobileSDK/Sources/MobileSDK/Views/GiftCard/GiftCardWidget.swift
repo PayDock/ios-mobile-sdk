@@ -69,6 +69,7 @@ public struct GiftCardWidget: View {
                 SDKButton(title: "Add", image: plusIcon, style: .fill(FillButtonStyle())) {
                     viewModel.tokeniseGiftCard()
                 }
+                .frame(height: 48)
                 .padding(.bottom, 16)
                 .padding(.top, .spacing)
                 .customFont(.body)

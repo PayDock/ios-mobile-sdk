@@ -115,6 +115,7 @@ public struct CardDetailsWidget: View {
             SDKButton(title: viewModel.actionText, style: .fill(FillButtonStyle(isDisabled: !viewModel.cardDetailsFormManager.isFormValid()))) {
                 viewModel.tokeniseCardDetails()
             }
+            .frame(height: 48)
             .padding(.bottom, 16)
             .padding(.top, .spacing)
             .customFont(.body)

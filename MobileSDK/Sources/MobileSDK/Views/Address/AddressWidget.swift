@@ -244,6 +244,7 @@ public struct AddressWidget: View {
         SDKButton(title: "Save", style: .fill(FillButtonStyle())) {
             viewModel.saveAddress()
         }
+        .frame(height: 48)
         .padding(.vertical, 16)
         .customFont(.body)
     }

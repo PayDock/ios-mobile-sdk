@@ -29,20 +29,17 @@ struct SDKButton: View {
     }
 
     var body: some View {
-        HStack {
-            Button(action: self.action) {
-                if image != nil {
-                    getImageAndTitle()
-                        .frame(maxWidth: .infinity)
-                } else {
-                    Text(self.title)
-                        .frame(maxWidth: .infinity)
-                }
+        Button(action: self.action) {
+            if image != nil {
+                getImageAndTitle()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Text(self.title)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .myStyle(style)
-            .disabled(style.isDisabled)
         }
-        .frame(maxWidth:.infinity, minHeight: 50)
+        .myStyle(style)
+        .disabled(style.isDisabled)
     }
 
     private func getImageAndTitle() -> some View {
