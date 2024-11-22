@@ -79,6 +79,7 @@ struct CheckoutPaymentSheet: View {
                         }
                     }
                 }
+                .frame(height: 48.0)
                 .padding()
 
             case .afterpay:
