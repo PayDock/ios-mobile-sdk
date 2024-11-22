@@ -1,0 +1,11 @@
+{
+  "status": 201,
+  "error": null,
+  "resource": {
+    "type": "setup-token",
+    "data": {
+      "setup_token": "XObCsxdHXe",
+      "approve_link": "www.something.com"
+    }
+  }
+}

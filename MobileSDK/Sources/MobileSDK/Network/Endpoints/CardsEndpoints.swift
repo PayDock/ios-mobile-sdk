@@ -53,5 +53,13 @@ extension CardsEndpoints: Endpoint {
         default: return []
         }
     }
+    
+    var mockFile: String? {
+        return nil
+    }
+    
+    var bundle: Bundle? {
+        return nil
+    }
 
 }

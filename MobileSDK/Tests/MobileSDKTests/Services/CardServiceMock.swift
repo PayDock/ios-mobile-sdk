@@ -10,13 +10,13 @@ import XCTest
 @testable import MobileSDK
 
 class CardServiceMock: Mockable, CardService {
-
-    func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq) async throws -> String {
+    
+    func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String) async throws -> String {
         let cardTokenRes = loadJSON(filename: "card_tokenisation_success_response", type: CardTokenRes.self)
         return cardTokenRes.resource.data
     }
     
-    func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq) async throws -> String {
+    func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
         let cardTokenRes = loadJSON(filename: "card_tokenisation_success_response", type: CardTokenRes.self)
         return cardTokenRes.resource.data
     }

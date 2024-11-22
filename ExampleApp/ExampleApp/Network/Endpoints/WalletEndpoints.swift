@@ -88,5 +88,13 @@ extension WalletEndpoints: Endpoint {
         case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
         }
     }
+    
+    var mockFile: String? {
+        return nil
+    }
+    
+    var bundle: Bundle? {
+        return nil
+    }
 
 }

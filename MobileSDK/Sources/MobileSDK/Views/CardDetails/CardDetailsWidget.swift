@@ -56,12 +56,12 @@ public struct CardDetailsWidget: View {
                         placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
                         editing: $viewModel.cardDetailsFormManager.editingCardholderName,
-                        valid: $viewModel.cardDetailsFormManager.cardHolderNameValid)
+                        valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
+                        onTapGesture: {
+                            self.textFieldInFocus = .cardholderName
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                        })
                     .focused($textFieldInFocus, equals: .cardholderName)
-                    .onTapGesture {
-                        self.textFieldInFocus = .cardholderName
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
-                    }
                 }
 
                 OutlineTextField(
@@ -71,13 +71,13 @@ public struct CardDetailsWidget: View {
                     errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
                     leftImage: $viewModel.cardDetailsFormManager.cardImage,
                     editing: $viewModel.cardDetailsFormManager.editingCardNumber,
-                    valid: $viewModel.cardDetailsFormManager.cardNumberValid)
+                    valid: $viewModel.cardDetailsFormManager.cardNumberValid,
+                    onTapGesture: {
+                        self.textFieldInFocus = .cardNumber
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+                    })
                 .keyboardType(.numberPad)
                 .focused($textFieldInFocus, equals: .cardNumber)
-                .onTapGesture {
-                    self.textFieldInFocus = .cardNumber
-                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-                }
 
                 HStack(alignment: .top, spacing: .spacing * 0.75) {
                     OutlineTextField(
@@ -86,13 +86,13 @@ public struct CardDetailsWidget: View {
                         placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
                         editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
-                        valid: $viewModel.cardDetailsFormManager.expiryDateValid)
+                        valid: $viewModel.cardDetailsFormManager.expiryDateValid,
+                        onTapGesture: {
+                            self.textFieldInFocus = .expiryDate
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+                        })
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .expiryDate)
-                    .onTapGesture {
-                        self.textFieldInFocus = .expiryDate
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-                    }
 
                     OutlineTextField(
                         text: viewModel.cardDetailsFormManager.securityCodeBinding,
@@ -100,21 +100,22 @@ public struct CardDetailsWidget: View {
                         placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
                         editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
-                        valid: $viewModel.cardDetailsFormManager.securityCodeValid)
+                        valid: $viewModel.cardDetailsFormManager.securityCodeValid,
+                        onTapGesture: {
+                            self.textFieldInFocus = .securityCode
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+                        })
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .securityCode)
-                    .onTapGesture {
-                        self.textFieldInFocus = .securityCode
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-                    }
                 }
                 if viewModel.allowSaveCard != nil {
                     privacyView
                 }
             }
-            LargeButton(title: viewModel.actionText, disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            SDKButton(title: viewModel.actionText, style: .fill(FillButtonStyle(isDisabled: !viewModel.cardDetailsFormManager.isFormValid()))) {
                 viewModel.tokeniseCardDetails()
             }
+            .frame(height: 48)
             .padding(.bottom, 16)
             .padding(.top, .spacing)
             .customFont(.body)

@@ -1,0 +1,11 @@
+{
+    "status": 201,
+    "error": null,
+    "resource": {
+        "type": "oauth-token",
+        "data": {
+            "access_token": "some_access_token",
+            "id_token": "some_token_id"
+        }
+    }
+}

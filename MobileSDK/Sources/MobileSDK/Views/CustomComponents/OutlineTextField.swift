@@ -39,6 +39,7 @@ struct OutlineTextField: View {
     private let title: String
     private let placeholder: String
     private let validationIconEnabled: Bool
+    private let onTapGesture: () -> Void
 
 
     // MARK: - Initialization
@@ -58,7 +59,8 @@ struct OutlineTextField: View {
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
-                validationIconEnabled: Bool = true) {
+                validationIconEnabled: Bool = true,
+                onTapGesture: @escaping (() -> Void)) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -67,6 +69,7 @@ struct OutlineTextField: View {
         self._editing = editing
         self._valid = valid
         self.validationIconEnabled = validationIconEnabled
+        self.onTapGesture = onTapGesture
 
         titleLeadingPadding = (leftImage != nil) ? 52 : 12
     }
@@ -76,7 +79,7 @@ struct OutlineTextField: View {
     public var body: some View {
         VStack {
             ZStack {
-                textFieldView()
+                textFieldView
                 placeholderView()
             }
             if showErrorView {
@@ -85,6 +88,7 @@ struct OutlineTextField: View {
                 Spacer()
             }
         }
+        .contentShape(Rectangle())
         .padding(.top, 0)
         .padding(.bottom, 0)
         .onChange(of: editing) { _ in
@@ -110,20 +114,29 @@ struct OutlineTextField: View {
         }
     }
 
-    private func textFieldView() -> some View {
+    private var textFieldView: some View {
         HStack {
             leftImage?
                 .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
-            TextField(editing ? placeholder : "", text: $text)
-                .customFont(.body)
-                .foregroundColor(.textColor)
-                .tint(.primaryColor)
-                .frame(height: 48)
+            TextField(editing ? placeholder : "", text: $text, onEditingChanged: { editingChanged in
+                if editingChanged {
+                    onTapGesture()
+                }
+            })
+            .frame(height: 48)
+            .customFont(.body)
+            .contentShape(Rectangle())
+            .foregroundColor(.textColor)
+            .tint(.primaryColor)
+            .onTapGesture {
+                onTapGesture()
+            }
             if validationIconEnabled {
                 validationIconView
             }
         }
+        .contentShape(Rectangle())
         .padding([.leading, .trailing], 16.0)
         .background(RoundedRectangle(cornerRadius: .cornerRadius, style: .continuous)
             .stroke(borderColor, lineWidth: borderWidth))
@@ -284,7 +297,7 @@ struct OutlineTextField_Previews: PreviewProvider {
             placeholder: "Placeholder",
             errorMessage: .constant("Error message"),
             editing: .constant(false),
-            valid: .constant(false))
+            valid: .constant(false), onTapGesture: {})
     }
 
 }
