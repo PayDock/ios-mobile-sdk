@@ -55,7 +55,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
                 return
             }
             
-            // TODO: - Use the URL from the response once it's live on BE
             let vaultRequest = PayPalVaultRequest(url: setupTokenData.approveLink, setupTokenID: setupTokenData.setupToken)
             let environment = Constants.payPalVaultEnvironment
             let payPalConfig = CoreConfig(clientID: clientId, environment: environment)
