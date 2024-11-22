@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.5.0] - 2024-11-22
+
+### Added
+
+- `PayPalSavePaymentSourceWidget` added to the SDK
+- `PayPalDataCollectorUtil` added to the SDK
+
+### Changed
+
+- Updated NetworkingLib to `1.2.0`
+- Button based Widgets now have flexible height
+
+### Fixed
+
+ - TextField validations not triggering on iOS 18
+
 ## [1.4.0] - 2024-10-18
 
 ### Added
