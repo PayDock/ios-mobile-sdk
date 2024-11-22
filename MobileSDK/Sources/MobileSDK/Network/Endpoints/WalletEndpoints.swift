@@ -62,5 +62,13 @@ extension WalletEndpoints: Endpoint {
         case .declineWalletTransaction: return []
         }
     }
+    
+    var mockFile: String? {
+        return nil
+    }
+    
+    var bundle: Bundle? {
+        return nil
+    }
 
 }

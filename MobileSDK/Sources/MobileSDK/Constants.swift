@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CorePayments
 
 struct Constants {
 
@@ -66,6 +67,17 @@ struct Constants {
         case .production: return "production"
         case .sandbox: return "sandbox"
         case .staging: return "staging"
+        }
+    }
+    
+    static var payPalVaultEnvironment: CorePayments.Environment {
+        guard let environment = MobileSDK.shared.config?.environment else {
+            fatalError("Missing configuration!")
+        }
+
+        switch environment {
+        case .production: return CorePayments.Environment.live
+        case .sandbox, .staging: return CorePayments.Environment.sandbox
         }
     }
 

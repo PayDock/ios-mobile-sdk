@@ -112,9 +112,10 @@ public struct CardDetailsWidget: View {
                     privacyView
                 }
             }
-            LargeButton(title: viewModel.actionText, disabled: !viewModel.cardDetailsFormManager.isFormValid()) {
+            SDKButton(title: viewModel.actionText, style: .fill(FillButtonStyle(isDisabled: !viewModel.cardDetailsFormManager.isFormValid()))) {
                 viewModel.tokeniseCardDetails()
             }
+            .frame(height: 48)
             .padding(.bottom, 16)
             .padding(.top, .spacing)
             .customFont(.body)

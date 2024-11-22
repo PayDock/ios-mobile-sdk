@@ -66,9 +66,10 @@ public struct GiftCardWidget: View {
                     }
                 }
                 let plusIcon = Image(systemName: "plus.circle")
-                LargeButton(title: "Add", image: plusIcon) {
+                SDKButton(title: "Add", image: plusIcon, style: .fill(FillButtonStyle())) {
                     viewModel.tokeniseGiftCard()
                 }
+                .frame(height: 48)
                 .padding(.bottom, 16)
                 .padding(.top, .spacing)
                 .customFont(.body)
