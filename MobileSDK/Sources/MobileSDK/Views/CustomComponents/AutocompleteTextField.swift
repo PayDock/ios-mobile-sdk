@@ -19,6 +19,7 @@ struct AutocompleteTextField: View {
     @Binding private var errorMessage: String
     private let title: String
     private let placeholder: String
+    private let onTapGesture: () -> Void
 
     // MARK: - AutocompleteTextField Properties
 
@@ -52,7 +53,8 @@ struct AutocompleteTextField: View {
                 valid: Binding<Bool>,
                 showPopup: Binding<Bool>,
                 options: Binding<Array<String>>,
-                onSelection: @escaping (Int?) -> ()) {
+                onSelection: @escaping (Int?) -> (),
+                onTapGesture: @escaping () -> Void) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -63,6 +65,7 @@ struct AutocompleteTextField: View {
         self._showPopup = showPopup
         self._options = options
         self.onSelection = onSelection
+        self.onTapGesture = onTapGesture
     }
 
     var body: some View {
@@ -74,7 +77,8 @@ struct AutocompleteTextField: View {
                 errorMessage: $errorMessage,
                 editing: $editing,
                 valid: $valid,
-                validationIconEnabled: false)
+                validationIconEnabled: false,
+                onTapGesture: onTapGesture)
             .overlay(
                 autocompletePopup
                     .offset(x: -1, y: 52), alignment: .topLeading
@@ -161,6 +165,6 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             editing: .constant(true),
             valid: .constant(true),
             showPopup: .constant(true),
-            options: .constant(options), onSelection: {_ in })
+            options: .constant(options), onSelection: {_ in }, onTapGesture: {})
     }
 }

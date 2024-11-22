@@ -1,0 +1,11 @@
+{
+    "status": 201,
+    "error": null,
+    "resource": {
+        "type": "oauth-token",
+        "data": {
+            "access_token": "A21AAIzaP6XjWLlzu0wbGu4oifnHyCzn0j9k_lReSbNQbzF8WvoSz0xkL_SwR5YqY5GoPOsI5Zj-_nk1cBsDgx86hSX_gRguA",
+            "id_token": "eyJraWQiOiJhMDRiMjEwZDYzYjU0NWQzODEwOWUxNDM3ZjQ3ZWYxMiIsInR5cCI6IkpXVCIsImFsZyI6IkVTMjU2In0.eyJpc3MiOiJodHRwczovL2FwaS5zYW5kYm94LnBheXBhbC5jb20iLCJzdWIiOiJGRkREU0VYR0U3SEdVIiwiYWNyIjpbImNsaWVudCJdLCJzY29wZSI6WyJCcmFpbnRyZWU6VmF1bHQiXSwib3B0aW9ucyI6e30sImF6IjoiY2NnMTguc2xjIiwiZXh0ZXJuYWxfaWQiOlsiUGF5UGFsOkZGRERTRVhHRTdIR1UiLCJCcmFpbnRyZWU6OW1mcWhiaGRzY2pkajZ4dCJdLCJleHAiOjE3Mjc3OTAwOTYsImlhdCI6MTcyNzc4OTE5NiwianRpIjoiVTJBQUtyODlQenMtTmcwc2lpUk5sNlNWZlplSjhaanJJUzc0MnVrekRlM2lxNUhKb3BRM2lCR1J2dDFfQTlwbktmTV9QS09mMTA2MV9kaUotdTM3TGpQcnhyMmlEVHhyV0IyOVFicWR3ZWxtWFpka0pxelhOUFoyZXQ0c3N6REEifQ.xlq8HPsjM4hviIL7VKEZiQ3XvXR_PL2ITq6jiA-QuVaVN4lvv_lolBQzuSx18eV9UaZkzSktqo3Fne05WwylKQ"
+        }
+    }
+}

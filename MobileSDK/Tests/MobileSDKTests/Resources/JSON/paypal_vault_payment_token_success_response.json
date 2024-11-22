@@ -1,0 +1,11 @@
+{
+    "status": 201,
+    "error": null,
+    "resource": {
+        "type": "payment-token",
+        "data": {
+            "token": "8kk8451t",
+            "email": "someone@something.com"
+        }
+    }
+}

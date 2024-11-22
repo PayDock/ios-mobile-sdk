@@ -74,12 +74,12 @@ public struct AddressWidget: View {
                     placeholder: viewModel.addressFormManager.firstNamePlaceholder,
                     errorMessage: $viewModel.addressFormManager.firstNameError,
                     editing: $viewModel.addressFormManager.editingFirstName,
-                    valid: $viewModel.addressFormManager.firstNameValid)
+                    valid: $viewModel.addressFormManager.firstNameValid,
+                    onTapGesture: {
+                        self.textFieldInFocus = .firstName
+                        viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
+                    })
                 .focused($textFieldInFocus, equals: .firstName)
-                .onTapGesture {
-                    self.textFieldInFocus = .firstName
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
-                }
 
                 OutlineTextField(
                     text: $viewModel.addressFormManager.lastNameText,
@@ -87,12 +87,12 @@ public struct AddressWidget: View {
                     placeholder: viewModel.addressFormManager.lastNamePlaceholder,
                     errorMessage: $viewModel.addressFormManager.lastNameError,
                     editing: $viewModel.addressFormManager.editingLastName,
-                    valid: $viewModel.addressFormManager.lastNameValid)
+                    valid: $viewModel.addressFormManager.lastNameValid,
+                    onTapGesture: {
+                        self.textFieldInFocus = .lastName
+                        viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
+                    })
                 .focused($textFieldInFocus, equals: .lastName)
-                .onTapGesture {
-                    self.textFieldInFocus = .lastName
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
-                }
             }
             .padding(.bottom, 20)
         }
@@ -122,14 +122,14 @@ public struct AddressWidget: View {
                 editing: $viewModel.addressFormManager.editingAddressSearch,
                 valid: $viewModel.addressFormManager.addressSearchValid,
                 showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
-                options: $viewModel.addressSearchSuggestions, onSelection: {
+                options: $viewModel.addressSearchSuggestions,
+                onSelection: {
                     viewModel.handleTapOnOptionAt(index: $0)
+                }, onTapGesture: {
+                    self.textFieldInFocus = .searchAddress
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
                 })
             .focused($textFieldInFocus, equals: .searchAddress)
-            .onTapGesture {
-                self.textFieldInFocus = .searchAddress
-                viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
-            }
             .padding(.bottom, 6)
         }
         .zIndex(1)
@@ -158,12 +158,12 @@ public struct AddressWidget: View {
             placeholder: viewModel.addressFormManager.addressLine1Placeholder,
             errorMessage: $viewModel.addressFormManager.addressLine1Error,
             editing: $viewModel.addressFormManager.editingAddressLine1,
-            valid: $viewModel.addressFormManager.addressLine1Valid)
+            valid: $viewModel.addressFormManager.addressLine1Valid,
+            onTapGesture: {
+                self.textFieldInFocus = .addressLine1
+                viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
+            })
         .focused($textFieldInFocus, equals: .addressLine1)
-        .onTapGesture {
-            self.textFieldInFocus = .addressLine1
-            viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
-        }
     }
 
     private var addressLine2View: some View {
@@ -173,12 +173,12 @@ public struct AddressWidget: View {
             placeholder: viewModel.addressFormManager.addressLine2Placeholder,
             errorMessage: $viewModel.addressFormManager.addressLine2Error,
             editing: $viewModel.addressFormManager.editingAddressLine2,
-            valid: $viewModel.addressFormManager.addressLine2Valid)
+            valid: $viewModel.addressFormManager.addressLine2Valid,
+            onTapGesture: {
+                self.textFieldInFocus = .addressLine2
+                viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
+            })
         .focused($textFieldInFocus, equals: .addressLine2)
-        .onTapGesture {
-            self.textFieldInFocus = .addressLine2
-            viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
-        }
     }
 
     private var cityView: some View {
@@ -188,12 +188,12 @@ public struct AddressWidget: View {
             placeholder: viewModel.addressFormManager.cityPlaceholder,
             errorMessage: $viewModel.addressFormManager.cityError,
             editing: $viewModel.addressFormManager.editingCity,
-            valid: $viewModel.addressFormManager.cityValid)
+            valid: $viewModel.addressFormManager.cityValid,
+            onTapGesture: {
+                self.textFieldInFocus = .city
+                viewModel.addressFormManager.setEditingTextField(focusedField: .city)
+            })
         .focused($textFieldInFocus, equals: .city)
-        .onTapGesture {
-            self.textFieldInFocus = .city
-            viewModel.addressFormManager.setEditingTextField(focusedField: .city)
-        }
     }
 
     private var stateView: some View {
@@ -203,12 +203,12 @@ public struct AddressWidget: View {
             placeholder: viewModel.addressFormManager.statePlaceholder,
             errorMessage: $viewModel.addressFormManager.stateError,
             editing: $viewModel.addressFormManager.editingState,
-            valid: $viewModel.addressFormManager.stateValid)
+            valid: $viewModel.addressFormManager.stateValid,
+            onTapGesture: {
+                self.textFieldInFocus = .state
+                viewModel.addressFormManager.setEditingTextField(focusedField: .state)
+            })
         .focused($textFieldInFocus, equals: .state)
-        .onTapGesture {
-            self.textFieldInFocus = .state
-            viewModel.addressFormManager.setEditingTextField(focusedField: .state)
-        }
     }
 
     private var postcodeView: some View {
@@ -218,12 +218,12 @@ public struct AddressWidget: View {
             placeholder: viewModel.addressFormManager.postcodePlaceholder,
             errorMessage: $viewModel.addressFormManager.postcodeError,
             editing: $viewModel.addressFormManager.editingPostcode,
-            valid: $viewModel.addressFormManager.postcodeValid)
+            valid: $viewModel.addressFormManager.postcodeValid,
+            onTapGesture: {
+                self.textFieldInFocus = .postcode
+                viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
+            })
         .focused($textFieldInFocus, equals: .postcode)
-        .onTapGesture {
-            self.textFieldInFocus = .postcode
-            viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
-        }
     }
 
     private var countryView: some View {
@@ -233,19 +233,18 @@ public struct AddressWidget: View {
             placeholder: viewModel.addressFormManager.countryPlaceholder,
             errorMessage: $viewModel.addressFormManager.countryError,
             editing: $viewModel.addressFormManager.editingCountry,
-            valid: $viewModel.addressFormManager.countryValid)
+            valid: $viewModel.addressFormManager.countryValid, onTapGesture: {
+                self.textFieldInFocus = .country
+                viewModel.addressFormManager.setEditingTextField(focusedField: .country)
+            })
         .focused($textFieldInFocus, equals: .country)
-        .onTapGesture {
-            self.textFieldInFocus = .country
-            viewModel.addressFormManager.setEditingTextField(focusedField: .country
-            )
-        }
     }
 
     private var saveButton: some View {
-        LargeButton(title: "Save") {
+        SDKButton(title: "Save", style: .fill(FillButtonStyle())) {
             viewModel.saveAddress()
         }
+        .frame(height: 48)
         .padding(.vertical, 16)
         .customFont(.body)
     }
