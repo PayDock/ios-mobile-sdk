@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum SDKButtonStyle {
     
@@ -19,6 +20,15 @@ enum SDKButtonStyle {
             return style.isDisabled
         case .outline(let style):
             return style.isDisabled
+        }
+    }
+    
+    var textColour: Color {
+        switch self {
+        case .fill(let style):
+            return style.foregroundColor
+        case .outline(let style):
+            return style.foregroundColor
         }
     }
 }

@@ -20,6 +20,7 @@ class PayPalWidgetVM: ObservableObject {
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
+    @Published var isLoading = false
 
     // MARK: - Initialisation
 
@@ -48,7 +49,7 @@ class PayPalWidgetVM: ObservableObject {
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 10,
-                currency: "USD",
+                currency: "AUD",
                 reference: UUID().uuidString,
                 description: "Test transaction for PayPal",
                 meta: metaData)
@@ -82,5 +83,15 @@ class PayPalWidgetVM: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showAlert = true
         }
+    }
+}
+
+extension PayPalWidgetVM: WidgetLoadingDelegate {
+    func loadingDidStart() {
+        isLoading = true
+    }
+    
+    func loadingDidFinish() {
+        isLoading = false
     }
 }

@@ -14,10 +14,12 @@ public struct GiftCardWidget: View {
 
     public init(storePin: Bool = true,
                 accessToken: String,
+                loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<String, GiftCardError>) -> Void) {
         _viewModel = StateObject(wrappedValue: GiftCardVM(
             accessToken: accessToken,
             storePin: storePin,
+            loadingDelegate: loadingDelegate,
             completion: completion))
     }
 
@@ -42,6 +44,7 @@ public struct GiftCardWidget: View {
                             leftImage: .constant(Image("credit-card", bundle: Bundle.module)),
                             editing: $viewModel.giftCardFormManager.editingCardNumber,
                             valid: $viewModel.giftCardFormManager.cardNumberValid,
+                            disabled: $viewModel.isDisabled,
                             onTapGesture: {
                                 self.textFieldInFocus = .cardNumber
                                 viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
@@ -57,6 +60,7 @@ public struct GiftCardWidget: View {
                             errorMessage: $viewModel.giftCardFormManager.pinError,
                             editing: $viewModel.giftCardFormManager.editingPin,
                             valid: $viewModel.giftCardFormManager.pinValid,
+                            disabled: $viewModel.isDisabled,
                             onTapGesture: {
                                 self.textFieldInFocus = .pin
                                 viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
@@ -66,7 +70,7 @@ public struct GiftCardWidget: View {
                     }
                 }
                 let plusIcon = Image(systemName: "plus.circle")
-                SDKButton(title: "Add", image: plusIcon, style: .fill(FillButtonStyle())) {
+                SDKButton(title: "Add", image: plusIcon, style: .fill(FillButtonStyle(isDisabled: viewModel.isDisabled))) {
                     viewModel.tokeniseGiftCard()
                 }
                 .frame(height: 48)
