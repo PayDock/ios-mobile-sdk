@@ -21,6 +21,7 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Properties
 
     @Published var addressSearchSuggestions: Array<String> = [""]
+    @Published var isDisabled = false
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
     let completion: (Result<Address, Error>) -> Void

@@ -146,7 +146,7 @@ extension CheckoutPaymentVM {
         let initializeWalletChargeReq = InitialiseWalletChargeReq(
             customer: customer,
             amount: 10,
-            currency: "USD",
+            currency: "AUD",
             reference: UUID().uuidString,
             description: "Test purchase",
             meta: metaData)
@@ -329,5 +329,16 @@ extension CheckoutPaymentVM {
         case payPal
         case afterpay
         case mastercard
+    }
+}
+
+extension CheckoutPaymentVM: WidgetLoadingDelegate {
+    
+    func loadingDidStart() {
+        isLoading = true
+    }
+    
+    func loadingDidFinish() {
+        isLoading = false
     }
 }

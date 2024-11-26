@@ -11,41 +11,53 @@ import SwiftUI
 public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
-    public init(payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
+    public init(loadingDelegate: WidgetLoadingDelegate? = nil,
+                payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
-        _viewModel = StateObject(wrappedValue: PayPalVM(payPalToken: payPalToken, completion: completion))
+        _viewModel = StateObject(wrappedValue: PayPalVM(
+            payPalToken: payPalToken,
+            loadingDelegate: loadingDelegate,
+            completion: completion)
+        )
     }
 
     public var body: some View {
-        SDKButton(
-            title: "",
-            image: Image("pay-pal", bundle: Bundle.module),
-            style: .fill(FillButtonStyle(backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)))) {
-                viewModel.handleButtonTap()
-            }
-            .sheet(isPresented: $viewModel.showWebView, onDismiss: {
-                if viewModel.sheetAction == .nothing {
-                    viewModel.handleSheetCancellation()
+        if (!viewModel.isLoading) {
+            SDKButton(
+                title: "",
+                image: Image("pay-pal", bundle: Bundle.module),
+                style: .fill(FillButtonStyle(backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)))) {
+                    viewModel.handleButtonTap()
                 }
-            }) {
-                NavigationStack {
-                    if let url = viewModel.payPalUrl {
-                        PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
-                            viewModel.capturePayPalPayment(paymentMethodId: paymentMethodId, payerId: payerId)
-                        }, onFailure: { error in
-                            viewModel.handleWebViewFailure(error)
-                        })
-                        .navigationTitle("Checkout with PayPal")
-                        .navigationBarTitleDisplayMode(.inline)
+                .sheet(isPresented: $viewModel.showWebView, onDismiss: {
+                    if viewModel.sheetAction == .nothing {
+                        viewModel.handleSheetCancellation()
+                    }
+                }) {
+                    NavigationStack {
+                        if let url = viewModel.payPalUrl {
+                            PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
+                                viewModel.capturePayPalPayment(paymentMethodId: paymentMethodId, payerId: payerId)
+                            }, onFailure: { error in
+                                viewModel.handleWebViewFailure(error)
+                            })
+                            .navigationTitle("Checkout with PayPal")
+                            .navigationBarTitleDisplayMode(.inline)
+                        }
                     }
                 }
-            }
-            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        } else {
+            SDKButton(
+                title: "",
+                isLoading: viewModel.isLoading,
+                style: .fill(FillButtonStyle(backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30), foregroundColor: .black))
+            ) {}
+        }
     }
 }
 
 struct PayPalWidget_Previews: PreviewProvider {
     static var previews: some View {
-        PayPalWidget(payPalToken: { _ in }, completion: { _ in })
+        PayPalWidget(loadingDelegate: nil, payPalToken: { _ in }, completion: { _ in })
     }
 }

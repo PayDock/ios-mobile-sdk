@@ -30,7 +30,9 @@ class CardDetailsVM: ObservableObject {
     private let completion: (Result<CardResult, CardDetailsError>) -> Void
 
     @Published var isLoading = false
+    @Published var isDisabled = false
     @Published var policyAccepted = false
+    private weak var loadingDelegate: WidgetLoadingDelegate?
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
@@ -43,6 +45,7 @@ class CardDetailsVM: ObservableObject {
          showCardTitle: Bool,
          collectCardholderName: Bool,
          allowSaveCard: SaveCardConfig?,
+         loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
         self.gatewayId = gatewayId
@@ -51,6 +54,7 @@ class CardDetailsVM: ObservableObject {
         self.showCardTitle = showCardTitle
         self.collectCardholderName = collectCardholderName
         self.allowSaveCard = allowSaveCard
+        self.loadingDelegate = loadingDelegate
         self.completion = completion
         
         self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: collectCardholderName)
@@ -80,18 +84,39 @@ class CardDetailsVM: ObservableObject {
                 cardCcv: cardDetailsFormManager.securityCodeText)
 
             do {
-                isLoading = true
+                updateLoadingState(isLoading: true)
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: accessToken)
-                isLoading = false
+                updateLoadingState(isLoading: false)
                 completion(.success(createResult(token: cardToken)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
+                updateLoadingState(isLoading: false)
                 completion(.failure(.errorTokenisingCard(error: errorResponse)))
-                isLoading = false
             } catch {
+                updateLoadingState(isLoading: false)
                 completion(.failure(.unknownError))
-                isLoading = false
             }
         }
+    }
+    
+    // MARK: - Validation
+    
+    func isActionButtonDisabled() -> Bool {
+        return isDisabled || !cardDetailsFormManager.isFormValid()
+    }
+    
+    // MARK: - State Management
+    
+    func updateLoadingState(isLoading: Bool) {
+        if (loadingDelegate != nil) {
+            if (isLoading) {
+                loadingDelegate?.loadingDidStart()
+            } else {
+                loadingDelegate?.loadingDidFinish()
+            }
+        } else {
+            self.isLoading = isLoading
+        }
+        self.isDisabled = isLoading
     }
 
     private func createResult(token: String) -> CardResult {
@@ -101,5 +126,4 @@ class CardDetailsVM: ObservableObject {
             return CardResult(token: token, saveCard: nil)
         }
     }
-
 }

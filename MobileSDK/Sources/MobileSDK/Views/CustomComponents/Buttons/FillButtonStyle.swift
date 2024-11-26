@@ -16,7 +16,7 @@ struct FillButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         let currentForegroundColor = isDisabled || configuration.isPressed ? foregroundColor.opacity(0.3) : foregroundColor
-        
+    
         return configuration.label
             .customFont(.body)
             .imageScale(.small)

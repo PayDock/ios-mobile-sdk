@@ -31,6 +31,7 @@ struct PayPalVaultWidgetView: View {
             .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
                 Text(viewModel.alertMessage)
             })
+            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         }
     }
 }

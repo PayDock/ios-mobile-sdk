@@ -33,6 +33,7 @@ struct CheckoutPaymentSheet: View {
                                       showCardTitle: false,
                                       collectCardholderName: false,
                                       allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                                      loadingDelegate: viewModel,
                                       completion: { result in
                         switch result {
                         case .success(let result): viewModel.payWithCard(result.token)
@@ -60,7 +61,7 @@ struct CheckoutPaymentSheet: View {
                 }
                 .padding()
             case .payPal:
-                PayPalWidget { onPayPalButtonTap in
+                PayPalWidget(loadingDelegate: viewModel) { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
                     switch result {

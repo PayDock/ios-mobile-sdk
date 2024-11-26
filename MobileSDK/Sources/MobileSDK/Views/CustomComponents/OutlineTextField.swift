@@ -33,6 +33,7 @@ struct OutlineTextField: View {
     @Binding private var leftImage: Image?
     @Binding private var editing: Bool
     @Binding private var errorMessage: String
+    @Binding private var disabled: Bool
 
     @FocusState private var focusField: Field?
 
@@ -52,6 +53,9 @@ struct OutlineTextField: View {
     ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
+    ///   - disabled: Whether the field is in a disabled state.
+    ///   - validationIconEnabled: Whether to enabled the validation icon.
+    ///   - onTapGesture: Action to take on tap gesture activaction.
     public init(text: Binding<String>,
                 title: String,
                 placeholder: String,
@@ -59,8 +63,10 @@ struct OutlineTextField: View {
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
+                disabled: Binding<Bool>,
                 validationIconEnabled: Bool = true,
-                onTapGesture: @escaping (() -> Void)) {
+                onTapGesture: @escaping (() -> Void)
+    ) {
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -68,6 +74,7 @@ struct OutlineTextField: View {
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
         self._valid = valid
+        self._disabled = disabled
         self.validationIconEnabled = validationIconEnabled
         self.onTapGesture = onTapGesture
 
@@ -112,6 +119,9 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
+        .onChange(of: disabled) { _ in
+            
+        }
     }
 
     private var textFieldView: some View {
@@ -119,11 +129,13 @@ struct OutlineTextField: View {
             leftImage?
                 .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
+
             TextField(editing ? placeholder : "", text: $text, onEditingChanged: { editingChanged in
                 if editingChanged {
                     onTapGesture()
                 }
             })
+            .disabled(disabled)
             .frame(height: 48)
             .customFont(.body)
             .contentShape(Rectangle())
@@ -132,6 +144,7 @@ struct OutlineTextField: View {
             .onTapGesture {
                 onTapGesture()
             }
+            
             if validationIconEnabled {
                 validationIconView
             }
@@ -297,7 +310,9 @@ struct OutlineTextField_Previews: PreviewProvider {
             placeholder: "Placeholder",
             errorMessage: .constant("Error message"),
             editing: .constant(false),
-            valid: .constant(false), onTapGesture: {})
+            valid: .constant(false),
+            disabled: .constant(false),
+            onTapGesture: {}
+        )
     }
-
 }

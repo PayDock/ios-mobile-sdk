@@ -16,6 +16,7 @@ class PayPalVaultWidgetVM: ObservableObject {
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
+    @Published var isLoading = false
     
     // MARK: - Config
     
@@ -42,5 +43,15 @@ class PayPalVaultWidgetVM: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showAlert = true
         }
+    }
+}
+
+extension PayPalVaultWidgetVM: WidgetLoadingDelegate {
+    func loadingDidStart() {
+        isLoading = true
+    }
+    
+    func loadingDidFinish() {
+        isLoading = false
     }
 }
