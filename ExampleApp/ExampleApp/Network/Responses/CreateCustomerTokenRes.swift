@@ -66,11 +66,3 @@ struct CreateCustomerTokenRes: Codable {
         }
     }
 }
-
-
-
-
-
-
-
-

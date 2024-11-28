@@ -28,7 +28,6 @@ struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
     
     func getClientId(gatewayId: String, accessToken: String) async throws -> String {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.clientId(gatewayId: gatewayId, accessToken: accessToken), responseModel: PayPalVaultConfigRes.self)
-        print(response)
         return response.resource.data.credentials.clientAuth
     }
     
