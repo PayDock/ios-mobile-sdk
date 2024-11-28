@@ -15,13 +15,15 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
     // MARK: - Dependencies
 
+    let config: PayPalVaultConfig
     private let payPalVaultService: PayPalVaultService
-    private let config: PayPalVaultConfig
     
     // MARK: - Properties
     
     @Published var actionText: String = ""
     @Published var isLoading = false
+    @Published var showLoaders = true
+    private weak var loadingDelegate: WidgetLoadingDelegate?
 
     // MARK: - Handlers
 
@@ -31,10 +33,16 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
     init(config: PayPalVaultConfig,
          payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
+         loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         self.config = config
         self.payPalVaultService = payPalVaultService
+        self.loadingDelegate = loadingDelegate
         self.completion = completion
+        
+        if (loadingDelegate != nil) {
+            showLoaders = false
+        }
         
         setUp()
     }
@@ -50,7 +58,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         Task {
             guard let clientId = await getClientId(),
                   let setupTokenData = await getSetupTokenData() else {
-                isLoading = false
+                updateLoadingState(isLoading: false)
                 return
             }
             
@@ -66,50 +74,65 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     
     @MainActor
     func getClientId() async -> String? {
-        isLoading = true
+        updateLoadingState(isLoading: true)
         do {
             return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.getPayPalClientId(error: errorResponse)))
-            isLoading = false
+            updateLoadingState(isLoading: false)
         } catch {
             completion(.failure(.unknownError(error as? RequestError)))
-            isLoading = false
+            updateLoadingState(isLoading: false)
         }
         return nil
     }
     
     @MainActor
     func getSetupTokenData() async -> PayPalVaultSetupTokenRes.SetupTokenData? {
-        isLoading = true
+        updateLoadingState(isLoading: true)
         do {
             let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId)
             return try await payPalVaultService.createSetupTokenData(req: request, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createSetupToken(error: errorResponse)))
-            isLoading = false
+            updateLoadingState(isLoading: false)
         } catch {
             completion(.failure(.unknownError(error as? RequestError)))
-            isLoading = false
+            updateLoadingState(isLoading: false)
         }
         return nil
     }
     
     @MainActor
     func createPaymentToken(setupToken: String) async {
-        isLoading = true
+        updateLoadingState(isLoading: true)
         do {
             let request = PayPalVaultPaymentTokenReq(gatewayId: config.gatewayId)
             let tokenData = try await payPalVaultService.createPaymentToken(request: request, setupToken: setupToken, accessToken: config.accessToken)
-            isLoading = false
+            updateLoadingState(isLoading: false)
             completion(.success(PayPalVaultResult(token: tokenData.token, email: tokenData.email)))
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createPaymentToken(error: errorResponse)))
-            isLoading = false
+            updateLoadingState(isLoading: false)
         } catch {
             completion(.failure(.unknownError(error as? RequestError)))
-            isLoading = false
+            updateLoadingState(isLoading: false)
         }
+    }
+    
+    // MARK: - State Management
+    
+    func updateLoadingState(isLoading: Bool) {
+        if (loadingDelegate != nil) {
+            if (isLoading) {
+                loadingDelegate?.loadingDidStart()
+            } else {
+                loadingDelegate?.loadingDidFinish()
+            }
+        }
+        
+        self.isLoading = isLoading
+        self.config.widgetOptions.isDisabled = isLoading
     }
 }
 
@@ -126,12 +149,11 @@ extension PayPalSavePaymentSourceVM: PayPalVaultDelegate {
     func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultError vaultError: CorePayments.CoreSDKError) {
         let errorDescription = vaultError.errorDescription ?? ""
         completion(.failure(.sdkException(description: errorDescription)))
-        isLoading = false
+        updateLoadingState(isLoading: false)
     }
     
     func paypalDidCancel(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient) {
         completion(.failure(.userCancelled))
-        isLoading = false
+        updateLoadingState(isLoading: false)
     }
-    
 }

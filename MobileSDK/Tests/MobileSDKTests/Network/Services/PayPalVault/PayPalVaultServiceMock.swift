@@ -54,5 +54,4 @@ class PayPalVaultServiceMock: Mockable, PayPalVaultService {
             return response.resource.data
         }
     }
-
 }

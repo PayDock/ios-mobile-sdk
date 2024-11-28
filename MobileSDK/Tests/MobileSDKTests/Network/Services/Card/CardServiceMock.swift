@@ -20,5 +20,4 @@ class CardServiceMock: Mockable, CardService {
         let cardTokenRes = loadJSON(filename: "card_tokenisation_success_response", type: CardTokenRes.self)
         return cardTokenRes.resource.data
     }
-
 }

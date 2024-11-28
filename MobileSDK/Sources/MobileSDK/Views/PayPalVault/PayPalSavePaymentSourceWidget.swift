@@ -12,19 +12,24 @@ public struct PayPalSavePaymentSourceWidget: View {
     @StateObject private var viewModel: PayPalSavePaymentSourceVM
 
     public init(config: PayPalVaultConfig,
+                loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
-        _viewModel = StateObject(wrappedValue: PayPalSavePaymentSourceVM(config: config, completion: completion))
+        _viewModel = StateObject(wrappedValue: PayPalSavePaymentSourceVM(
+            config: config,
+            loadingDelegate: loadingDelegate,
+            completion: completion)
+        )
     }
 
     public var body: some View {
         SDKButton(
             title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
-            style: .outline(OutlineButtonStyle())) {
+            isLoading: viewModel.isLoading && viewModel.showLoaders,
+            style: .outline(OutlineButtonStyle(isDisabled: viewModel.config.widgetOptions.isDisabled))) {
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)
-            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
 

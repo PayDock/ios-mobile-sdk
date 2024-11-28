@@ -17,20 +17,24 @@ public struct CardDetailsWidget: View {
 
     // MARK: - Initialisation
 
-    public init(gatewayId: String?,
+    public init(options: WidgetOptions? = nil,
+                gatewayId: String?,
                 accessToken: String,
                 actionText: String = "Submit",
                 showCardTitle: Bool = true,
                 collectCardholderName: Bool = true,
                 allowSaveCard: SaveCardConfig? = nil,
+                loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
+            options: options ?? WidgetOptions(state: .none),
             gatewayId: gatewayId,
             accessToken: accessToken,
             actionText: actionText,
             showCardTitle: showCardTitle,
             collectCardholderName: collectCardholderName,
             allowSaveCard: allowSaveCard,
+            loadingDelegate: loadingDelegate,
             completion: completion))
     }
 
@@ -57,10 +61,14 @@ public struct CardDetailsWidget: View {
                         errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
                         editing: $viewModel.cardDetailsFormManager.editingCardholderName,
                         valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
+                        disabled: $viewModel.options.isDisabled,
                         onTapGesture: {
-                            self.textFieldInFocus = .cardholderName
-                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
-                        })
+                            if (!viewModel.options.isDisabled) {
+                                self.textFieldInFocus = .cardholderName
+                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                            }
+                        }
+                    )
                     .focused($textFieldInFocus, equals: .cardholderName)
                 }
 
@@ -72,10 +80,14 @@ public struct CardDetailsWidget: View {
                     leftImage: $viewModel.cardDetailsFormManager.cardImage,
                     editing: $viewModel.cardDetailsFormManager.editingCardNumber,
                     valid: $viewModel.cardDetailsFormManager.cardNumberValid,
+                    disabled: $viewModel.options.isDisabled,
                     onTapGesture: {
-                        self.textFieldInFocus = .cardNumber
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-                    })
+                        if (!viewModel.options.isDisabled) {
+                            self.textFieldInFocus = .cardNumber
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+                        }
+                    }
+                )
                 .keyboardType(.numberPad)
                 .focused($textFieldInFocus, equals: .cardNumber)
 
@@ -87,10 +99,14 @@ public struct CardDetailsWidget: View {
                         errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
                         editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
                         valid: $viewModel.cardDetailsFormManager.expiryDateValid,
+                        disabled: $viewModel.options.isDisabled,
                         onTapGesture: {
-                            self.textFieldInFocus = .expiryDate
-                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-                        })
+                            if (!viewModel.options.isDisabled) {
+                                self.textFieldInFocus = .expiryDate
+                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+                            }
+                        }
+                    )
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .expiryDate)
 
@@ -101,10 +117,14 @@ public struct CardDetailsWidget: View {
                         errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
                         editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
                         valid: $viewModel.cardDetailsFormManager.securityCodeValid,
+                        disabled: $viewModel.options.isDisabled,
                         onTapGesture: {
-                            self.textFieldInFocus = .securityCode
-                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-                        })
+                            if (!viewModel.options.isDisabled) {
+                                self.textFieldInFocus = .securityCode
+                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+                            }
+                        }
+                    )
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .securityCode)
                 }
@@ -112,7 +132,10 @@ public struct CardDetailsWidget: View {
                     privacyView
                 }
             }
-            SDKButton(title: viewModel.actionText, style: .fill(FillButtonStyle(isDisabled: !viewModel.cardDetailsFormManager.isFormValid()))) {
+            SDKButton(title: viewModel.actionText,
+                      isLoading: viewModel.isLoading && viewModel.showLoaders,
+                      style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
+            ) {
                 viewModel.tokeniseCardDetails()
             }
             .frame(height: 48)
@@ -121,7 +144,6 @@ public struct CardDetailsWidget: View {
             .customFont(.body)
         }
         .padding(.horizontal, max(16, .spacing))
-        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 
     private var privacyView: some View {
@@ -137,11 +159,13 @@ public struct CardDetailsWidget: View {
                         .customFont(.body3)
                         .foregroundColor(.textColor)
                         .underline()
+                        .disabled(viewModel.options.isDisabled)
                 }
                 Spacer()
                 Toggle(isOn: $viewModel.policyAccepted) {}
                     .tint(.primaryColor)
                     .frame(width: 64, height: 44)
+                    .disabled(viewModel.options.isDisabled)
         }
     }
 }

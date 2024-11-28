@@ -215,8 +215,8 @@
 		280EB39B2AFE42920036E575 /* PayPal */ = {
 			isa = PBXGroup;
 			children = (
-				280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */,
 				280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */,
+				280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */,
 			);
 			path = PayPal;
 			sourceTree = "<group>";
