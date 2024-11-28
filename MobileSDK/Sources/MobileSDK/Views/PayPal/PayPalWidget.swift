@@ -11,10 +11,12 @@ import SwiftUI
 public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
-    public init(loadingDelegate: WidgetLoadingDelegate? = nil,
+    public init(options: WidgetOptions? = nil,
+                loadingDelegate: WidgetLoadingDelegate? = nil,
                 payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalVM(
+            options: options ?? WidgetOptions(state: .none),
             payPalToken: payPalToken,
             loadingDelegate: loadingDelegate,
             completion: completion)
@@ -22,11 +24,26 @@ public struct PayPalWidget: View {
     }
 
     public var body: some View {
-        if (!viewModel.isLoading) {
+        if (viewModel.isLoading && viewModel.showLoaders) {
+            SDKButton(
+                title: "",
+                isLoading: viewModel.isLoading && viewModel.showLoaders,
+                style: .fill(FillButtonStyle(
+                        backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
+                        foregroundColor: .black,
+                        isDisabled: viewModel.options.isDisabled
+                    )
+                )
+            ) {}
+        } else {
             SDKButton(
                 title: "",
                 image: Image("pay-pal", bundle: Bundle.module),
-                style: .fill(FillButtonStyle(backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30)))) {
+                style: .fill(FillButtonStyle(
+                        backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
+                        isDisabled: viewModel.options.isDisabled
+                    )
+                )) {
                     viewModel.handleButtonTap()
                 }
                 .sheet(isPresented: $viewModel.showWebView, onDismiss: {
@@ -46,12 +63,6 @@ public struct PayPalWidget: View {
                         }
                     }
                 }
-        } else {
-            SDKButton(
-                title: "",
-                isLoading: viewModel.isLoading,
-                style: .fill(FillButtonStyle(backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30), foregroundColor: .black))
-            ) {}
         }
     }
 }

@@ -30,8 +30,9 @@ class CardDetailsVM: ObservableObject {
     private let completion: (Result<CardResult, CardDetailsError>) -> Void
 
     @Published var isLoading = false
-    @Published var isDisabled = false
+    @Published var showLoaders = true
     @Published var policyAccepted = false
+    var options: WidgetOptions
     private weak var loadingDelegate: WidgetLoadingDelegate?
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
@@ -39,6 +40,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
+         options: WidgetOptions,
          gatewayId: String?,
          accessToken: String,
          actionText: String,
@@ -48,6 +50,7 @@ class CardDetailsVM: ObservableObject {
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
+        self.options = options
         self.gatewayId = gatewayId
         self.accessToken = accessToken
         self.actionText = actionText
@@ -58,6 +61,10 @@ class CardDetailsVM: ObservableObject {
         self.completion = completion
         
         self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: collectCardholderName)
+        
+        if (loadingDelegate != nil) {
+            showLoaders = false
+        }
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
@@ -101,7 +108,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Validation
     
     func isActionButtonDisabled() -> Bool {
-        return isDisabled || !cardDetailsFormManager.isFormValid()
+        return options.isDisabled || !cardDetailsFormManager.isFormValid()
     }
     
     // MARK: - State Management
@@ -113,10 +120,10 @@ class CardDetailsVM: ObservableObject {
             } else {
                 loadingDelegate?.loadingDidFinish()
             }
-        } else {
-            self.isLoading = isLoading
         }
-        self.isDisabled = isLoading
+        
+        self.isLoading = isLoading
+        options.isDisabled = isLoading
     }
 
     private func createResult(token: String) -> CardResult {

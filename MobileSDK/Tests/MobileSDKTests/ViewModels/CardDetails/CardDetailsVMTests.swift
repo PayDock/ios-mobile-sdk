@@ -15,6 +15,7 @@ class CardDetailsVMTests: XCTestCase {
     var viewModel: CardDetailsVM!
     var mockService: CardServiceMock!
     var config: SaveCardConfig!
+    var options: WidgetOptions!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<CardResult, CardDetailsError>?
     var cancellables = Set<AnyCancellable>()
@@ -23,9 +24,11 @@ class CardDetailsVMTests: XCTestCase {
         super.setUp()
         mockService = CardServiceMock()
         config = SaveCardConfig(consentText: "Remember", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Policy test", privacyPolicyURL: "https://www.example.com"))
+        options = WidgetOptions()
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
         viewModel = CardDetailsVM(cardService: mockService,
+                                  options: options,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -45,23 +48,50 @@ class CardDetailsVMTests: XCTestCase {
         super.tearDown()
     }
     
-    func testIsActionButtonEnabledWithStateDisabled() {
-        viewModel.isDisabled = true
-        
-        // TODO: Need to be able to Mock CardDetailsFormManager
-        //XCTAssertEqual(viewModel.isActionButtonDisabled(), false)
+    func testInitialisationWithOptionsStateNone() {
+        XCTAssertEqual(viewModel.options.isDisabled, false)
     }
     
-    func testIsActionButtonEnabledWithStateEnabled() {
-        viewModel.isDisabled = false
+    func testInitialisationWithOptionsStateDisabled() {
+        viewModel = CardDetailsVM(cardService: mockService,
+                                  options: WidgetOptions(state: .disabled),
+                                  gatewayId: "gatewayId",
+                                  accessToken: "accessToken",
+                                  actionText: "actionText",
+                                  showCardTitle: true,
+                                  collectCardholderName: false,
+                                  allowSaveCard: config,
+                                  loadingDelegate: nil) { result in
+            self.completionResult = result
+        }
         
-        // TODO: Need to be able to Mock CardDetailsFormManager
-//        XCTAssertEqual(viewModel.isActionButtonDisabled(), true)
+        XCTAssertEqual(viewModel.options.isDisabled, true)
+    }
+    
+    func testInitialisationWithDelegateShowLoader() {
+        XCTAssertEqual(viewModel.showLoaders, false)
+    }
+    
+    func testInitialisationWithoutDelegateShowLoader() {
+        viewModel = CardDetailsVM(cardService: mockService,
+                                  options: options,
+                                  gatewayId: "gatewayId",
+                                  accessToken: "accessToken",
+                                  actionText: "actionText",
+                                  showCardTitle: true,
+                                  collectCardholderName: false,
+                                  allowSaveCard: config,
+                                  loadingDelegate: nil) { result in
+            self.completionResult = result
+        }
+        
+        XCTAssertEqual(viewModel.showLoaders, true)
     }
     
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
+                                  options: options,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -76,13 +106,15 @@ class CardDetailsVMTests: XCTestCase {
         viewModel.updateLoadingState(isLoading: true)
         
         // Then
-        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, true)
+        XCTAssertEqual(viewModel.options.isDisabled, true)
     }
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
+                                  options: options,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -101,11 +133,13 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
+        XCTAssertEqual(viewModel.options.isDisabled, true)
     }
     
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
+                                  options: options,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -124,11 +158,13 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
+        XCTAssertEqual(viewModel.options.isDisabled, false)
     }
     
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
+                                  options: options,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -147,5 +183,6 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
+        XCTAssertEqual(viewModel.options.isDisabled, false)
     }
 }

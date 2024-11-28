@@ -15,14 +15,14 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
     // MARK: - Dependencies
 
+    let config: PayPalVaultConfig
     private let payPalVaultService: PayPalVaultService
-    private let config: PayPalVaultConfig
     
     // MARK: - Properties
     
     @Published var actionText: String = ""
     @Published var isLoading = false
-    @Published var isDisabled = false
+    @Published var showLoaders = true
     private weak var loadingDelegate: WidgetLoadingDelegate?
 
     // MARK: - Handlers
@@ -39,6 +39,10 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         self.payPalVaultService = payPalVaultService
         self.loadingDelegate = loadingDelegate
         self.completion = completion
+        
+        if (loadingDelegate != nil) {
+            showLoaders = false
+        }
         
         setUp()
     }
@@ -142,10 +146,10 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             } else {
                 loadingDelegate?.loadingDidFinish()
             }
-        } else {
-            self.isLoading = isLoading
         }
-        self.isDisabled = isLoading
+        
+        self.isLoading = isLoading
+        self.config.widgetOptions.isDisabled = isLoading
     }
 }
 
