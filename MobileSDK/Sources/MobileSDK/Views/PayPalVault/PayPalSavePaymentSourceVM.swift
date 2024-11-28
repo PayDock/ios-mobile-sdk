@@ -49,8 +49,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     func initializePayPalSDK() {
         Task {
             guard let clientId = await getClientId(),
-                  let authToken = await getAuthToken(),
-                  let setupTokenData = await getSetupTokenData(authToken: authToken) else {
+                  let setupTokenData = await getSetupTokenData() else {
                 isLoading = false
                 return
             }
@@ -80,27 +79,27 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-    @MainActor
-    func getAuthToken() async -> String? {
-        isLoading = true
-        do {
-            let request = PayPalVaultAuthReq(gatewayId: config.gatewayId)
-            return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
-        } catch let RequestError.requestError(errorResponse: errorResponse) {
-            completion(.failure(.createSessionAuthToken(error: errorResponse)))
-            isLoading = false
-        } catch {
-            completion(.failure(.unknownError(error as? RequestError)))
-            isLoading = false
-        }
-        return nil
-    }
+//    @MainActor
+//    func getAuthToken() async -> String? {
+//        isLoading = true
+//        do {
+//            let request = PayPalVaultAuthReq(gatewayId: config.gatewayId)
+//            return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
+//        } catch let RequestError.requestError(errorResponse: errorResponse) {
+//            completion(.failure(.createSessionAuthToken(error: errorResponse)))
+//            isLoading = false
+//        } catch {
+//            completion(.failure(.unknownError(error as? RequestError)))
+//            isLoading = false
+//        }
+//        return nil
+//    }
     
     @MainActor
-    func getSetupTokenData(authToken: String) async -> PayPalVaultSetupTokenRes.SetupTokenData? {
+    func getSetupTokenData() async -> PayPalVaultSetupTokenRes.SetupTokenData? {
         isLoading = true
         do {
-            let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId, token: authToken)
+            let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId)
             return try await payPalVaultService.createSetupTokenData(req: request, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createSetupToken(error: errorResponse)))

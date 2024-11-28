@@ -58,6 +58,11 @@
 		28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */; };
 		28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */; };
 		28AD05F12CF50F7400B12FB4 /* AccountProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */; };
+		28AD05F42CF76FAE00B12FB4 /* AccountProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F32CF76FAA00B12FB4 /* AccountProfileVM.swift */; };
+		28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */; };
+		28AD05F82CF7767800B12FB4 /* CreateCustomerTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F72CF7767200B12FB4 /* CreateCustomerTokenRes.swift */; };
+		28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F92CF7792100B12FB4 /* CustomersService.swift */; };
+		28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
 		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
@@ -146,6 +151,11 @@
 		28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSRes.swift; sourceTree = "<group>"; };
 		28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSReq.swift; sourceTree = "<group>"; };
 		28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileView.swift; sourceTree = "<group>"; };
+		28AD05F32CF76FAA00B12FB4 /* AccountProfileVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileVM.swift; sourceTree = "<group>"; };
+		28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenReq.swift; sourceTree = "<group>"; };
+		28AD05F72CF7767200B12FB4 /* CreateCustomerTokenRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenRes.swift; sourceTree = "<group>"; };
+		28AD05F92CF7792100B12FB4 /* CustomersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersService.swift; sourceTree = "<group>"; };
+		28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersEndpoints.swift; sourceTree = "<group>"; };
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28D541F92A6FFC290041BAE0 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
@@ -253,7 +263,7 @@
 		282D31602A66B7EB00E3ECAD /* Checkout */ = {
 			isa = PBXGroup;
 			children = (
-				28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */,
+				28AD05F22CF76F9F00B12FB4 /* AccountProfile */,
 				282D31632A66B81C00E3ECAD /* CheckoutView.swift */,
 				282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */,
 				282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */,
@@ -440,6 +450,15 @@
 			path = Integrated3DS;
 			sourceTree = "<group>";
 		};
+		28AD05F22CF76F9F00B12FB4 /* AccountProfile */ = {
+			isa = PBXGroup;
+			children = (
+				28AD05F32CF76FAA00B12FB4 /* AccountProfileVM.swift */,
+				28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */,
+			);
+			path = AccountProfile;
+			sourceTree = "<group>";
+		};
 		28E86F592ACC11A2008E827E /* Network */ = {
 			isa = PBXGroup;
 			children = (
@@ -454,6 +473,7 @@
 		28E86F652ACC1350008E827E /* Endpoints */ = {
 			isa = PBXGroup;
 			children = (
+				28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */,
 				28E86F662ACC1361008E827E /* WalletEndpoints.swift */,
 			);
 			path = Endpoints;
@@ -462,6 +482,7 @@
 		28E86F682ACC1399008E827E /* Requests */ = {
 			isa = PBXGroup;
 			children = (
+				28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */,
 				28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */,
 				28A81F502B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift */,
 				28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */,
@@ -476,6 +497,7 @@
 		28E86F692ACC13A1008E827E /* Responses */ = {
 			isa = PBXGroup;
 			children = (
+				28AD05F72CF7767200B12FB4 /* CreateCustomerTokenRes.swift */,
 				28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */,
 				28A81F522B14E13E0068FE75 /* CardTokenRes.swift */,
 				28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */,
@@ -487,6 +509,7 @@
 		28E86F6A2ACC13AD008E827E /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				28AD05F92CF7792100B12FB4 /* CustomersService.swift */,
 				28E86F6D2ACC213F008E827E /* WalletService.swift */,
 			);
 			path = Services;
@@ -664,6 +687,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
+				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
 				2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				28AD05F12CF50F7400B12FB4 /* AccountProfileView.swift in Sources */,
@@ -677,6 +701,7 @@
 				2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
+				28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */,
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				28A81F532B14E13E0068FE75 /* CardTokenRes.swift in Sources */,
 				282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */,
@@ -686,6 +711,7 @@
 				28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
+				28AD05F82CF7767800B12FB4 /* CreateCustomerTokenRes.swift in Sources */,
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
@@ -694,6 +720,7 @@
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
+				28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */,
 				28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
@@ -713,6 +740,7 @@
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
 				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
 				282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */,
+				28AD05F42CF76FAE00B12FB4 /* AccountProfileVM.swift in Sources */,
 				282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */,
 				28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */,
 				28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */,

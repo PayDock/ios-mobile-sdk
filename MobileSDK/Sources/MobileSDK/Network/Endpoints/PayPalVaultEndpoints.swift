@@ -11,7 +11,7 @@ import NetworkingLib
 
 enum PayPalVaultEndpoints {
 
-    case authToken(request: PayPalVaultAuthReq, accessToken: String)
+//    case authToken(request: PayPalVaultAuthReq, accessToken: String)
     case setupToken(request: PayPalVaultSetupTokenReq, accessToken: String)
     case clientId(gatewayId: String, accessToken: String)
     case paymentToken(setupToken: String, request: PayPalVaultPaymentTokenReq, accessToken: String)
@@ -22,7 +22,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var path: String {
         switch self {
-        case .authToken: return "/v1/payment_sources/oauth-tokens"
+//        case .authToken: return "/v1/payment_sources/oauth-tokens"
         case .setupToken: return "/v1/payment_sources/setup-tokens"
         case .clientId(let gatewayId, _): return "/v1/gateways/\(gatewayId)/wallet-config"
         case .paymentToken(let setupToken, _, _): return "/v1/payment_sources/setup-tokens/\(setupToken)/tokens"
@@ -31,7 +31,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var method: RequestMethod {
         switch self {
-        case .authToken: return .post
+//        case .authToken: return .post
         case .setupToken: return .post
         case .clientId: return .get
         case .paymentToken: return .post
@@ -40,7 +40,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var header: [String: String]? {
         switch self {
-        case let .authToken(_ , accessToken),
+        case //let .authToken(_ , accessToken),
             let .setupToken(_ , accessToken),
             let .clientId(_, accessToken),
             let .paymentToken(_, _, accessToken):
@@ -53,7 +53,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var body: Data? {
         switch self {
-        case .authToken(let request, _): return try? encoder.encode(request)
+//        case .authToken(let request, _): return try? encoder.encode(request)
         case .setupToken(let request, _): return try? encoder.encode(request)
         case .clientId: return nil
         case .paymentToken(_, let request, _): return try? encoder.encode(request)
@@ -62,7 +62,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var parameters: [URLQueryItem] {
         switch self {
-        case .authToken: return []
+//        case .authToken: return []
         case .setupToken: return []
         case .clientId: return []
         case .paymentToken: return []
@@ -71,7 +71,7 @@ extension PayPalVaultEndpoints: Endpoint {
     
     var mockFile: String? {
         switch self {
-        case .authToken: return "paypal_vault_session_auth_success_response"
+//        case .authToken: return "paypal_vault_session_auth_success_response"
         case .setupToken: return "paypal_vault_setup_token_success_response"
         case .clientId: return "paypal_vault_get_client_id_success_response"
         case .paymentToken: return "paypal_vault_payment_token_success_response"

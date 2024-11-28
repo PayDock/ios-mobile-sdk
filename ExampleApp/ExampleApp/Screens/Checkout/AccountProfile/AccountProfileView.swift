@@ -11,9 +11,7 @@ import MobileSDK
 
 struct AccountProfileView: View {
     
-    @State var showAlert = false
-    @State var alertTitle = ""
-    @State var alertMessage = ""
+    @StateObject private var viewModel = AccountProfileVM()
     
     var body: some View {
             VStack{
@@ -23,8 +21,8 @@ struct AccountProfileView: View {
                     .padding()
                 Spacer()
             }
-            .alert(alertTitle, isPresented: $showAlert, actions: {}, message: {
-                Text(alertMessage)
+            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+                Text(viewModel.alertMessage)
             })
         .background(Color.white)
         .navigationBarTitleDisplayMode(.inline)
@@ -58,40 +56,17 @@ struct AccountProfileView: View {
     }
     
     private func vaultWidget() -> some View {
-        PayPalSavePaymentSourceWidget(config: getVaultConfig()) { result in
+        PayPalSavePaymentSourceWidget(config: viewModel.getVaultConfig()) { result in
             switch result {
             case let .success(payPalVaultResult):
-                handleSuccess(result: payPalVaultResult)
+                viewModel.handleSuccess(result: payPalVaultResult)
             case let .failure(error):
-                handleError(error: error)
+                viewModel.handleError(error: error)
             }
         }
         .frame(height: 48.0)
         .padding()
         .padding(.bottom, 8)
-    }
-    
-    private func getVaultConfig() -> PayPalVaultConfig {
-        let config = PayPalVaultConfig(
-            accessToken: ProjectEnvironment.shared.getAccessToken(),
-            gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "")
-        return config
-    }
-    
-    private func handleError(error: PayPalVaultError) {
-        alertTitle = "Error"
-        alertMessage = "\(error.customMessage)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showAlert = true
-        }
-    }
-
-    private func handleSuccess(result: PayPalVaultResult) {
-        alertTitle = "Success"
-        alertMessage = "Token:\n \(result.token)\n\n Email:\n \(result.email)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showAlert = true
-        }
     }
 }
 
