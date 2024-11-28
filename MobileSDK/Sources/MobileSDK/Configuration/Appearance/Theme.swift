@@ -39,7 +39,7 @@ public struct Theme {
             border: Color(red: 0.55, green: 0.55, blue: 0.55),
             placeholder: Color(red: 0.55, green: 0.55, blue: 0.55)),
 
-        dimensions: Dimensions = Dimensions(cornerRadius: 4, borderWidth: 1, spacing: 16),
+        dimensions: Dimensions = Dimensions(buttonCornerRadius: 4, textFieldCornerRadius: 4, borderWidth: 1, spacing: 16),
         fontName: String = "FFF-AcidGrotesk-Normal") {
             self.lightThemeColors = lighThemeColorst
             self.darkThemeColors = darkThemeColors
