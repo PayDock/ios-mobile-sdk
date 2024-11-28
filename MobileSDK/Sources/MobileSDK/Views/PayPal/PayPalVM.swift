@@ -19,12 +19,13 @@ class PayPalVM: ObservableObject {
     // MARK: - Properties
 
     private let payPalToken: (_ payPalToken: @escaping (String) -> Void) -> Void
-    var payPalUrl: URL?
+    
     @Published var showWebView = false
     @Published var isLoading = false
-    @Published var isDisabled = false
+    @Published var showLoaders = true
     @Published var sheetAction: SheetAction = SheetAction.nothing
-
+    var options: WidgetOptions
+    var payPalUrl: URL?
     private var token = ""
 
     // MARK: - Handlers
@@ -34,15 +35,21 @@ class PayPalVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
+    init(options: WidgetOptions,
+         payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
+        self.options = options
         self.payPalToken = payPalToken
         self.walletService = walletService
         self.loadingDelegate = loadingDelegate
         self.completion = completion
         self.sheetAction = SheetAction.nothing
+        
+        if (loadingDelegate != nil) {
+            showLoaders = false
+        }
     }
 
     func getPayPalURL(token: String) {
@@ -83,27 +90,20 @@ class PayPalVM: ObservableObject {
 
         Task {
             do {
-                await MainActor.run {
-                    updateLoadingState(isLoading: true)
-                }
-                
                 let charge = try await walletService.captureCharge(token: token, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
                 await MainActor.run {
-                    updateLoadingState(isLoading: false)
                     self.completion(.success(charge))
                     self.sheetAction = .completion
                     self.showWebView = false
                 }
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 await MainActor.run {
-                    updateLoadingState(isLoading: false)
                     self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
                     self.sheetAction = .completion
                     self.showWebView = false
                 }
             } catch {
                 await MainActor.run {
-                    updateLoadingState(isLoading: false)
                     self.completion(.failure(.unknownError))
                     self.sheetAction = .completion
                     self.showWebView = false
@@ -121,7 +121,6 @@ class PayPalVM: ObservableObject {
     }
 
     func handleWebViewFailure(_ error: PayPalError) {
-        updateLoadingState(isLoading: false)
         sheetAction = .completion
         showWebView = false
         completion(.failure(error))
@@ -138,9 +137,9 @@ class PayPalVM: ObservableObject {
             } else {
                 loadingDelegate?.loadingDidFinish()
             }
-        } else {
-            self.isLoading = isLoading
         }
-        self.isDisabled = isLoading
+        
+        self.isLoading = isLoading
+        options.isDisabled = isLoading
     }
 }

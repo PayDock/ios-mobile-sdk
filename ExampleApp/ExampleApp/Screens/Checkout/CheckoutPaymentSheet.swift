@@ -27,7 +27,8 @@ struct CheckoutPaymentSheet: View {
             switch viewModel.selectedMethod {
             case .card:
                 VStack {
-                    CardDetailsWidget(gatewayId: nil,
+                    CardDetailsWidget(options: viewModel.widgetOptions,
+                                      gatewayId: nil,
                                       accessToken: ProjectEnvironment.shared.getAccessToken(),
                                       actionText: "Pay",
                                       showCardTitle: false,

@@ -25,8 +25,8 @@ public struct PayPalSavePaymentSourceWidget: View {
         SDKButton(
             title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
-            isLoading: viewModel.isLoading,
-            style: .outline(OutlineButtonStyle(isDisabled: viewModel.isDisabled))) {
+            isLoading: viewModel.isLoading && viewModel.showLoaders,
+            style: .outline(OutlineButtonStyle(isDisabled: viewModel.config.widgetOptions.isDisabled))) {
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)
