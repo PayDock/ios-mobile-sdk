@@ -28,32 +28,28 @@ class AccountProfileVM: ObservableObject {
         return config
     }
     
-    func handleError(error: PayPalVaultError) {
-        alertTitle = "Error"
-        alertMessage = "\(error.customMessage)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showAlert = true
-        }
-    }
-
-    func handleSuccess(result: PayPalVaultResult) {
-//        alertTitle = "Success"
-//        alertMessage = "Token:\n \(result.token)\n\n Email:\n \(result.email)"
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//            self.showAlert = true
-//        }
-        createCustomer(payPalVaultResult: result)
+    @MainActor func handleError(error: PayPalVaultError) {
+        showAlert(title: "Error", message: "\(error.customMessage)")
     }
     
-    private func createCustomer(payPalVaultResult: PayPalVaultResult) {
+    func createCustomer(payPalVaultResult: PayPalVaultResult) {
         Task {
             let request = CreateCustomerTokenReq(token: payPalVaultResult.token)
             do {
                 let response = try await customersService.createCustomer(request: request)
-                print("a")
+                await showAlert(
+                    title: "Customer Created",
+                    message: "\(response.resource.data.firstName) \(response.resource.data.lastName)\n\(response.resource.data.email)")
             } catch {
-                print("some error")
+                await showAlert(title: "Error", message: "Customer creation failed!")
             }
         }
+    }
+    
+    @MainActor
+    private func showAlert(title: String, message: String) {
+        alertTitle = title
+        alertMessage = message
+        showAlert = true
     }
 }

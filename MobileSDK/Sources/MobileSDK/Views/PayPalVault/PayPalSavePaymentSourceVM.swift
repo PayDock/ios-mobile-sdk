@@ -79,22 +79,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-//    @MainActor
-//    func getAuthToken() async -> String? {
-//        isLoading = true
-//        do {
-//            let request = PayPalVaultAuthReq(gatewayId: config.gatewayId)
-//            return try await payPalVaultService.createToken(request: request, accessToken: config.accessToken)
-//        } catch let RequestError.requestError(errorResponse: errorResponse) {
-//            completion(.failure(.createSessionAuthToken(error: errorResponse)))
-//            isLoading = false
-//        } catch {
-//            completion(.failure(.unknownError(error as? RequestError)))
-//            isLoading = false
-//        }
-//        return nil
-//    }
-    
     @MainActor
     func getSetupTokenData() async -> PayPalVaultSetupTokenRes.SetupTokenData? {
         isLoading = true

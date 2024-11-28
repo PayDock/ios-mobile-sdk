@@ -58,8 +58,8 @@ struct AccountProfileView: View {
     private func vaultWidget() -> some View {
         PayPalSavePaymentSourceWidget(config: viewModel.getVaultConfig()) { result in
             switch result {
-            case let .success(payPalVaultResult):
-                viewModel.handleSuccess(result: payPalVaultResult)
+            case let .success(result):
+                viewModel.createCustomer(payPalVaultResult: result)
             case let .failure(error):
                 viewModel.handleError(error: error)
             }

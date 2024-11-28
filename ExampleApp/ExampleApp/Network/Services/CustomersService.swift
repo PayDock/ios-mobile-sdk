@@ -12,13 +12,13 @@ import NetworkingLib
 
 protocol CustomersService {
 
-    func createCustomer(request: CreateCustomerTokenReq) async throws -> String
+    func createCustomer(request: CreateCustomerTokenReq) async throws -> CreateCustomerTokenRes
 }
 
 struct CustomersServiceImpl: HTTPClient, CustomersService {
     
-    func createCustomer(request: CreateCustomerTokenReq) async throws -> String {
-        let response = try await sendRequest(endpoint: CustomersEndpoints.createCustomer(request: request), responseModel: String.self)
+    func createCustomer(request: CreateCustomerTokenReq) async throws -> CreateCustomerTokenRes {
+        let response = try await sendRequest(endpoint: CustomersEndpoints.createCustomer(request: request), responseModel: CreateCustomerTokenRes.self)
         return response
     }
 }
