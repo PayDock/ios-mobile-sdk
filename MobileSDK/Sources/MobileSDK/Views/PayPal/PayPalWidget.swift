@@ -11,12 +11,12 @@ import SwiftUI
 public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
 
-    public init(options: WidgetOptions? = nil,
+    public init(viewState: ViewState? = nil,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalVM(
-            options: options ?? WidgetOptions(state: .none),
+            viewState: viewState ?? ViewState(state: .none),
             payPalToken: payPalToken,
             loadingDelegate: loadingDelegate,
             completion: completion)
@@ -31,7 +31,7 @@ public struct PayPalWidget: View {
                 style: .fill(FillButtonStyle(
                         backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
                         foregroundColor: .black,
-                        isDisabled: viewModel.options.isDisabled
+                        isDisabled: viewModel.viewState.isDisabled
                     )
                 )
             ) {}
@@ -41,7 +41,7 @@ public struct PayPalWidget: View {
                 image: Image("pay-pal", bundle: Bundle.module),
                 style: .fill(FillButtonStyle(
                         backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-                        isDisabled: viewModel.options.isDisabled
+                        isDisabled: viewModel.viewState.isDisabled
                     )
                 )) {
                     viewModel.handleButtonTap()

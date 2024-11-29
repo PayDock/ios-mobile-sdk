@@ -29,18 +29,17 @@ class CheckoutPaymentVM: ObservableObject {
     @Published var selectedMethod: PaymentMethod = .card
     @Published var showAlert = false
     @Published var isLoading = false
-    
     @Published var showMastercardWebView = false
 
     var alertTitle = ""
     var alertMessage = ""
-    var widgetOptions: WidgetOptions?
+    var viewState: ViewState?
 
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
-        self.widgetOptions = WidgetOptions(state: .none)
+        self.viewState = ViewState(state: .none)
     }
 }
 
@@ -166,7 +165,7 @@ extension CheckoutPaymentVM {
         self.cardToken = token
         guard !cardToken.isEmpty else { return }
         isLoading = true
-        widgetOptions?.setState(.disabled)
+        viewState?.setState(.disabled)
 
         let request = ConvertToVaultTokenReq(token: cardToken, vaultType: "session")
         Task {
@@ -234,14 +233,14 @@ extension CheckoutPaymentVM {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
-                    widgetOptions?.setState(.none)
+                    viewState?.setState(.none)
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
             } catch {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
-                    widgetOptions?.setState(.none)
+                    viewState?.setState(.none)
                 }
             }
         }
