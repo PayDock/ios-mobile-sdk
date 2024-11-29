@@ -62,7 +62,9 @@ struct CheckoutView: View {
                         Image("demoLogo")
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Image(systemName: "person")
+                        NavigationLink(destination: AccountProfileView()) {
+                            Image(systemName: "person")
+                        }
                     }
                 }
                 .bottomSheet(isPresented: $isSheetPresented) {
