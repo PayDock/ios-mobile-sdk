@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class WidgetOptions: ObservableObject {
+public class ViewState: ObservableObject {
     @Published var isDisabled: Bool
     
     public init(state: WidgetState = .none) {

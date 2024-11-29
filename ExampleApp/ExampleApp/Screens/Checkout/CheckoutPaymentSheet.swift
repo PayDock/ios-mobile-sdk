@@ -27,7 +27,7 @@ struct CheckoutPaymentSheet: View {
             switch viewModel.selectedMethod {
             case .card:
                 VStack {
-                    CardDetailsWidget(options: viewModel.widgetOptions,
+                    CardDetailsWidget(viewState: viewModel.viewState,
                                       gatewayId: nil,
                                       accessToken: ProjectEnvironment.shared.getAccessToken(),
                                       actionText: "Pay",
@@ -62,7 +62,7 @@ struct CheckoutPaymentSheet: View {
                 }
                 .padding()
             case .payPal:
-                PayPalWidget(loadingDelegate: viewModel) { onPayPalButtonTap in
+                PayPalWidget(viewState: viewModel.viewState, loadingDelegate: viewModel) { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
                     switch result {

@@ -15,7 +15,7 @@ class CardDetailsVMTests: XCTestCase {
     var viewModel: CardDetailsVM!
     var mockService: CardServiceMock!
     var config: SaveCardConfig!
-    var options: WidgetOptions!
+    var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<CardResult, CardDetailsError>?
     var cancellables = Set<AnyCancellable>()
@@ -24,11 +24,11 @@ class CardDetailsVMTests: XCTestCase {
         super.setUp()
         mockService = CardServiceMock()
         config = SaveCardConfig(consentText: "Remember", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Policy test", privacyPolicyURL: "https://www.example.com"))
-        options = WidgetOptions()
+        viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: options,
+                                  viewState: viewState,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -49,12 +49,12 @@ class CardDetailsVMTests: XCTestCase {
     }
     
     func testInitialisationWithOptionsStateNone() {
-        XCTAssertEqual(viewModel.options.isDisabled, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
     
     func testInitialisationWithOptionsStateDisabled() {
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: WidgetOptions(state: .disabled),
+                                  viewState: ViewState(state: .disabled),
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -65,7 +65,7 @@ class CardDetailsVMTests: XCTestCase {
             self.completionResult = result
         }
         
-        XCTAssertEqual(viewModel.options.isDisabled, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
     
     func testInitialisationWithDelegateShowLoader() {
@@ -74,7 +74,7 @@ class CardDetailsVMTests: XCTestCase {
     
     func testInitialisationWithoutDelegateShowLoader() {
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: options,
+                                  viewState: viewState,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -91,7 +91,7 @@ class CardDetailsVMTests: XCTestCase {
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: options,
+                                  viewState: viewState,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -108,13 +108,13 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, true)
-        XCTAssertEqual(viewModel.options.isDisabled, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: options,
+                                  viewState: viewState,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -133,13 +133,13 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.options.isDisabled, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
     
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: options,
+                                  viewState: viewState,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -158,13 +158,13 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.options.isDisabled, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
     
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
-                                  options: options,
+                                  viewState: viewState,
                                   gatewayId: "gatewayId",
                                   accessToken: "accessToken",
                                   actionText: "actionText",
@@ -183,6 +183,6 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.options.isDisabled, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
 }

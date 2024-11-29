@@ -32,7 +32,7 @@ class CardDetailsVM: ObservableObject {
     @Published var isLoading = false
     @Published var showLoaders = true
     @Published var policyAccepted = false
-    var options: WidgetOptions
+    var viewState: ViewState
     private weak var loadingDelegate: WidgetLoadingDelegate?
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
@@ -40,7 +40,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
-         options: WidgetOptions,
+         viewState: ViewState,
          gatewayId: String?,
          accessToken: String,
          actionText: String,
@@ -50,7 +50,7 @@ class CardDetailsVM: ObservableObject {
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
-        self.options = options
+        self.viewState = viewState
         self.gatewayId = gatewayId
         self.accessToken = accessToken
         self.actionText = actionText
@@ -108,7 +108,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Validation
     
     func isActionButtonDisabled() -> Bool {
-        return options.isDisabled || !cardDetailsFormManager.isFormValid()
+        return viewState.isDisabled || !cardDetailsFormManager.isFormValid()
     }
     
     // MARK: - State Management
@@ -123,7 +123,7 @@ class CardDetailsVM: ObservableObject {
         }
         
         self.isLoading = isLoading
-        options.isDisabled = isLoading
+        viewState.isDisabled = isLoading
     }
 
     private func createResult(token: String) -> CardResult {
