@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.6.0] - 2024-11-29
+
+### Added
+
+- New `loadingDelegate` field added to `CardDetailsWidget`, `PayPalWidget` and `PayPalSavePaymentSourceWidget` for taking control of showing loaders
+- New `viewState` field added to `CardDetailsWidget`, `PayPalWidget` and `PayPalSavePaymentSourceWidget` for externally controlling widget state
+
+### Changed
+
+- Separated `cornerRadius` into 2 parts (`textFieldCornerRadius` & `buttonCornerRadius`)
+
 ## [1.5.0] - 2024-11-22
 
 ### Added
