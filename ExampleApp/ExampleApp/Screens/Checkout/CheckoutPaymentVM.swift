@@ -198,6 +198,8 @@ extension CheckoutPaymentVM {
         case .notSupported: captureCharge()
         case .pending:
             DispatchQueue.main.async {
+                self.isLoading = false
+                self.viewState?.setState(.none)
                 self.token3DS = response.resource.data.threeDS.token ?? ""
                 self.show3dsWebView = true
             }
@@ -226,6 +228,8 @@ extension CheckoutPaymentVM {
 
     /// Captures the charge as the final step in the payment flow
     private func captureCharge() {
+        isLoading = true
+        viewState?.setState(.disabled)
         Task {
             let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
             do {
