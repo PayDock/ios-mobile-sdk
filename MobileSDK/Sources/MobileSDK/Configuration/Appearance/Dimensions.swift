@@ -10,14 +10,17 @@ import Foundation
 
 public struct Dimensions {
 
-    public let cornerRadius: Double
+    public let buttonCornerRadius: Double
+    public let textFieldCornerRadius: Double
     public let borderWidth: Double
     public let spacing: CGFloat
 
-    public init(cornerRadius: Double = 4,
+    public init(buttonCornerRadius: Double = 4,
+                textFieldCornerRadius: Double = 4,
                 borderWidth: Double = 1,
                 spacing: CGFloat = 16) {
-        self.cornerRadius = cornerRadius
+        self.buttonCornerRadius = buttonCornerRadius
+        self.textFieldCornerRadius = textFieldCornerRadius
         self.borderWidth = borderWidth
         self.spacing = spacing
     }

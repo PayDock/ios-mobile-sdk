@@ -26,6 +26,9 @@ class GiftCardVM: ObservableObject {
     // MARK: - Properties
 
     @Published var isLoading = false
+    @Published var isDisabled = false
+    private weak var loadingDelegate: WidgetLoadingDelegate?
+    
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
@@ -34,21 +37,25 @@ class GiftCardVM: ObservableObject {
          cardService: CardService = CardServiceImpl(),
          accessToken: String,
          storePin: Bool,
+         loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<String, GiftCardError>) -> Void) {
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
         self.accessToken = accessToken
         self.storePin = storePin
+        self.loadingDelegate = loadingDelegate
         self.completion = completion
 
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
     }
+    
+    // MARK: - Requests
 
     func tokeniseGiftCard() {
         Task {
-            isLoading = true
+            updateLoadingState(isLoading: true)
             let tokeniseGiftCardReq = TokeniseGiftCardReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 pin: giftCardFormManager.pinText,
@@ -56,14 +63,30 @@ class GiftCardVM: ObservableObject {
 
             do {
                 let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: accessToken)
-                isLoading = false
+                updateLoadingState(isLoading: false)
                 completion(.success(cardToken))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                isLoading = false
+                updateLoadingState(isLoading: false)
                 completion(.failure(.errorTokenisingCard(error: errorResponse)))
             } catch {
+                updateLoadingState(isLoading: false)
                 completion(.failure(.unknownError))
             }
         }
+    }
+    
+    // MARK: - State Management
+    
+    func updateLoadingState(isLoading: Bool) {
+        if (loadingDelegate != nil) {
+            if (isLoading) {
+                loadingDelegate?.loadingDidStart()
+            } else {
+                loadingDelegate?.loadingDidFinish()
+            }
+        } else {
+            self.isLoading = isLoading
+        }
+        self.isDisabled = isLoading
     }
 }

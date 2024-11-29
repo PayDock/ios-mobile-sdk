@@ -15,7 +15,8 @@ public struct ThreeDSWidget: UIViewRepresentable {
     private let baseUrl: URL?
     private let completion: (Result<ThreeDSResult, ThreeDSError>) -> Void
 
-    public init(token: String, baseURL: URL?, completion: @escaping (Result<ThreeDSResult, ThreeDSError>) -> Void) {
+    public init(token: String, baseURL: URL?,
+                completion: @escaping (Result<ThreeDSResult, ThreeDSError>) -> Void) {
         self.token = token
         self.baseUrl = baseURL
         self.completion = completion

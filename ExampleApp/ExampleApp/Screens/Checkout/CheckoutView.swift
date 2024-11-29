@@ -17,14 +17,14 @@ struct CheckoutView: View {
             id: "1",
             title: "ThinkPad X1 Yoga Gen 7",
             description: "ThinkPad X1 Yoga Gen 7\n14” Intel 2 in 1 Laptop",
-            price: "£3,299", 
+            price: "$3,299",
             image: "demoItem1"
         ),
         .init(
             id: "2",
             title: "Galaxy S23 Ultra",
             description: "SM-S918BZGHSEK\n512 GB｜12 GB｜Green",
-            price: "£2,199",
+            price: "$2,199",
             image: "demoItem2"
         )
     ]
@@ -41,10 +41,10 @@ struct CheckoutView: View {
                 }
                 Spacer()
                 VStack (spacing: 16) {
-                    TotalRowView(title: "Subtotal", value: "£5,498", color: .gray)
+                    TotalRowView(title: "Subtotal", value: "$5,498", color: .gray)
                     TotalRowView(title: "Shipping", value: "Free", color: .gray)
                     Divider()
-                    TotalRowView(title: "Total", value: "£5,498", color: .black)
+                    TotalRowView(title: "Total", value: "$5,498", color: .black)
                 }
                 Button("Checkout") {
                     isSheetPresented = true
@@ -62,7 +62,9 @@ struct CheckoutView: View {
                         Image("demoLogo")
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Image(systemName: "person")
+                        NavigationLink(destination: AccountProfileView()) {
+                            Image(systemName: "person")
+                        }
                     }
                 }
                 .bottomSheet(isPresented: $isSheetPresented) {

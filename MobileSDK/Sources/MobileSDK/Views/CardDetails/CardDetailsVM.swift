@@ -30,30 +30,41 @@ class CardDetailsVM: ObservableObject {
     private let completion: (Result<CardResult, CardDetailsError>) -> Void
 
     @Published var isLoading = false
+    @Published var showLoaders = true
     @Published var policyAccepted = false
+    var viewState: ViewState
+    private weak var loadingDelegate: WidgetLoadingDelegate?
 
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
+         viewState: ViewState,
          gatewayId: String?,
          accessToken: String,
          actionText: String,
          showCardTitle: Bool,
          collectCardholderName: Bool,
          allowSaveCard: SaveCardConfig?,
+         loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
+        self.viewState = viewState
         self.gatewayId = gatewayId
         self.accessToken = accessToken
         self.actionText = actionText
         self.showCardTitle = showCardTitle
         self.collectCardholderName = collectCardholderName
         self.allowSaveCard = allowSaveCard
+        self.loadingDelegate = loadingDelegate
         self.completion = completion
         
         self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: collectCardholderName)
+        
+        if (loadingDelegate != nil) {
+            showLoaders = false
+        }
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
@@ -80,18 +91,39 @@ class CardDetailsVM: ObservableObject {
                 cardCcv: cardDetailsFormManager.securityCodeText)
 
             do {
-                isLoading = true
+                updateLoadingState(isLoading: true)
                 let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: accessToken)
-                isLoading = false
+                updateLoadingState(isLoading: false)
                 completion(.success(createResult(token: cardToken)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
+                updateLoadingState(isLoading: false)
                 completion(.failure(.errorTokenisingCard(error: errorResponse)))
-                isLoading = false
             } catch {
+                updateLoadingState(isLoading: false)
                 completion(.failure(.unknownError))
-                isLoading = false
             }
         }
+    }
+    
+    // MARK: - Validation
+    
+    func isActionButtonDisabled() -> Bool {
+        return viewState.isDisabled || !cardDetailsFormManager.isFormValid()
+    }
+    
+    // MARK: - State Management
+    
+    func updateLoadingState(isLoading: Bool) {
+        if (loadingDelegate != nil) {
+            if (isLoading) {
+                loadingDelegate?.loadingDidStart()
+            } else {
+                loadingDelegate?.loadingDidFinish()
+            }
+        }
+        
+        self.isLoading = isLoading
+        viewState.isDisabled = isLoading
     }
 
     private func createResult(token: String) -> CardResult {
@@ -101,5 +133,4 @@ class CardDetailsVM: ObservableObject {
             return CardResult(token: token, saveCard: nil)
         }
     }
-
 }
