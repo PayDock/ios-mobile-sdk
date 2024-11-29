@@ -22,7 +22,7 @@ struct FillButtonStyle: ButtonStyle {
             .imageScale(.small)
             .foregroundColor(currentForegroundColor)
             .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.8) : backgroundColor)
-            .cornerRadius(.cornerRadius)
+            .cornerRadius(.buttonCornerRadius)
             .font(Font.system(size: 19, weight: .semibold))
     }
 }
