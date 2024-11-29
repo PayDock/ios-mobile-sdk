@@ -17,5 +17,4 @@ public struct PayPalVaultConfig {
         self.gatewayId = gatewayId
         self.actionText = actionText
     }
-
 }

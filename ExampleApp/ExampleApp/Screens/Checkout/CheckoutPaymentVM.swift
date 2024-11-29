@@ -29,16 +29,17 @@ class CheckoutPaymentVM: ObservableObject {
     @Published var selectedMethod: PaymentMethod = .card
     @Published var showAlert = false
     @Published var isLoading = false
-
     @Published var showMastercardWebView = false
 
     var alertTitle = ""
     var alertMessage = ""
+    var viewState: ViewState?
 
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
+        self.viewState = ViewState(state: .none)
     }
 }
 
@@ -146,7 +147,7 @@ extension CheckoutPaymentVM {
         let initializeWalletChargeReq = InitialiseWalletChargeReq(
             customer: customer,
             amount: 10,
-            currency: "USD",
+            currency: "AUD",
             reference: UUID().uuidString,
             description: "Test purchase",
             meta: metaData)
@@ -164,6 +165,7 @@ extension CheckoutPaymentVM {
         self.cardToken = token
         guard !cardToken.isEmpty else { return }
         isLoading = true
+        viewState?.setState(.disabled)
 
         let request = ConvertToVaultTokenReq(token: cardToken, vaultType: "session")
         Task {
@@ -196,6 +198,8 @@ extension CheckoutPaymentVM {
         case .notSupported: captureCharge()
         case .pending:
             DispatchQueue.main.async {
+                self.isLoading = false
+                self.viewState?.setState(.none)
                 self.token3DS = response.resource.data.threeDS.token ?? ""
                 self.show3dsWebView = true
             }
@@ -224,6 +228,8 @@ extension CheckoutPaymentVM {
 
     /// Captures the charge as the final step in the payment flow
     private func captureCharge() {
+        isLoading = true
+        viewState?.setState(.disabled)
         Task {
             let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
             do {
@@ -231,12 +237,14 @@ extension CheckoutPaymentVM {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
+                    viewState?.setState(.none)
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
             } catch {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
+                    viewState?.setState(.none)
                 }
             }
         }
@@ -329,5 +337,16 @@ extension CheckoutPaymentVM {
         case payPal
         case afterpay
         case mastercard
+    }
+}
+
+extension CheckoutPaymentVM: WidgetLoadingDelegate {
+    
+    func loadingDidStart() {
+        isLoading = true
+    }
+    
+    func loadingDidFinish() {
+        isLoading = false
     }
 }

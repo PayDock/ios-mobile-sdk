@@ -24,6 +24,7 @@ struct AutocompleteTextField: View {
     // MARK: - AutocompleteTextField Properties
 
     @Binding private var showPopup: Bool
+    @Binding private var disabled: Bool
     @Binding private var options: [String]
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
@@ -52,6 +53,7 @@ struct AutocompleteTextField: View {
                 editing: Binding<Bool>,
                 valid: Binding<Bool>,
                 showPopup: Binding<Bool>,
+                disabled: Binding<Bool>,
                 options: Binding<Array<String>>,
                 onSelection: @escaping (Int?) -> (),
                 onTapGesture: @escaping () -> Void) {
@@ -63,6 +65,7 @@ struct AutocompleteTextField: View {
         self._editing = editing
         self._valid = valid
         self._showPopup = showPopup
+        self._disabled = disabled
         self._options = options
         self.onSelection = onSelection
         self.onTapGesture = onTapGesture
@@ -77,8 +80,10 @@ struct AutocompleteTextField: View {
                 errorMessage: $errorMessage,
                 editing: $editing,
                 valid: $valid,
+                disabled: $disabled,
                 validationIconEnabled: false,
-                onTapGesture: onTapGesture)
+                onTapGesture: onTapGesture
+            )
             .overlay(
                 autocompletePopup
                     .offset(x: -1, y: 52), alignment: .topLeading
@@ -165,6 +170,9 @@ struct AutocompleteTextField_Previews: PreviewProvider {
             editing: .constant(true),
             valid: .constant(true),
             showPopup: .constant(true),
-            options: .constant(options), onSelection: {_ in }, onTapGesture: {})
+            disabled: .constant(false),
+            options: .constant(options), onSelection: {_ in },
+            onTapGesture: {}
+        )
     }
 }

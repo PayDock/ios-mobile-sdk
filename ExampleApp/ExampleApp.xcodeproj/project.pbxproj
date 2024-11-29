@@ -57,6 +57,7 @@
 		28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */; };
 		28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */; };
 		28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */; };
+		28AD05F12CF50F7400B12FB4 /* AccountProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28D541FA2A6FFC290041BAE0 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F92A6FFC290041BAE0 /* SettingsVM.swift */; };
 		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
@@ -144,6 +145,7 @@
 		28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSReq.swift; sourceTree = "<group>"; };
 		28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSRes.swift; sourceTree = "<group>"; };
 		28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSReq.swift; sourceTree = "<group>"; };
+		28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileView.swift; sourceTree = "<group>"; };
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28D541F92A6FFC290041BAE0 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
@@ -203,8 +205,8 @@
 		280EB39B2AFE42920036E575 /* PayPal */ = {
 			isa = PBXGroup;
 			children = (
-				280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */,
 				280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */,
+				280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */,
 			);
 			path = PayPal;
 			sourceTree = "<group>";
@@ -251,6 +253,7 @@
 		282D31602A66B7EB00E3ECAD /* Checkout */ = {
 			isa = PBXGroup;
 			children = (
+				28AD05F02CF50F6F00B12FB4 /* AccountProfileView.swift */,
 				282D31632A66B81C00E3ECAD /* CheckoutView.swift */,
 				282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */,
 				282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */,
@@ -663,6 +666,7 @@
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
 				2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
+				28AD05F12CF50F7400B12FB4 /* AccountProfileView.swift in Sources */,
 				282D31682A66B83100E3ECAD /* SettingsView.swift in Sources */,
 				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,

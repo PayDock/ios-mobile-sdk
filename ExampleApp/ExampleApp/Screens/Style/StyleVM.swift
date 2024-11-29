@@ -31,7 +31,8 @@ class StyleVM: ObservableObject {
 
     @Published var fontName = "FFF-AcidGrotesk-Normal"
 
-    @Published var cornerRadius = "4"
+    @Published var buttonCornerRadius = "4"
+    @Published var textFieldCornerRadius = "4"
     @Published var padding = "16"
     @Published var borderWidth = "1"
 
@@ -83,7 +84,8 @@ class StyleVM: ObservableObject {
         }
 
         let dimensions = Dimensions(
-            cornerRadius: Double(cornerRadius) ?? 4,
+            buttonCornerRadius: Double(buttonCornerRadius) ?? 4,
+            textFieldCornerRadius: Double(textFieldCornerRadius) ?? 4,
             borderWidth: Double(borderWidth) ?? 1,
             spacing: Double(padding) ?? 16)
 
