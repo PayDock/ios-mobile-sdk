@@ -33,13 +33,13 @@ class CheckoutPaymentVM: ObservableObject {
 
     var alertTitle = ""
     var alertMessage = ""
-    var widgetOptions: WidgetOptions?
+    var viewState: ViewState?
 
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
-        self.widgetOptions = WidgetOptions(state: .none)
+        self.viewState = ViewState(state: .none)
     }
 }
 
@@ -165,7 +165,7 @@ extension CheckoutPaymentVM {
         self.cardToken = token
         guard !cardToken.isEmpty else { return }
         isLoading = true
-        widgetOptions?.setState(.disabled)
+        viewState?.setState(.disabled)
 
         let request = ConvertToVaultTokenReq(token: cardToken, vaultType: "session")
         Task {
@@ -199,7 +199,7 @@ extension CheckoutPaymentVM {
         case .pending:
             DispatchQueue.main.async {
                 self.isLoading = false
-                self.widgetOptions?.setState(.none)
+                self.viewState?.setState(.none)
                 self.token3DS = response.resource.data.threeDS.token ?? ""
                 self.show3dsWebView = true
             }
@@ -229,7 +229,7 @@ extension CheckoutPaymentVM {
     /// Captures the charge as the final step in the payment flow
     private func captureCharge() {
         isLoading = true
-        widgetOptions?.setState(.disabled)
+        viewState?.setState(.disabled)
         Task {
             let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
             do {
@@ -237,14 +237,14 @@ extension CheckoutPaymentVM {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
-                    widgetOptions?.setState(.none)
+                    viewState?.setState(.none)
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
             } catch {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
-                    widgetOptions?.setState(.none)
+                    viewState?.setState(.none)
                 }
             }
         }

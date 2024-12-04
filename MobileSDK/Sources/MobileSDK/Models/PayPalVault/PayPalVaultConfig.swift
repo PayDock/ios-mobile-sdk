@@ -11,12 +11,12 @@ public struct PayPalVaultConfig {
     public let accessToken: String
     public let gatewayId: String
     public let actionText: String?
-    public let widgetOptions: WidgetOptions
+    public let viewState: ViewState
 
-    public init(accessToken: String, gatewayId: String, actionText: String? = nil, widgetOptions: WidgetOptions? = nil) {
+    public init(accessToken: String, gatewayId: String, actionText: String? = nil, viewState: ViewState? = nil) {
         self.accessToken = accessToken
         self.gatewayId = gatewayId
         self.actionText = actionText
-        self.widgetOptions = widgetOptions ?? WidgetOptions(state: .none)
+        self.viewState = viewState ?? ViewState(state: .none)
     }
 }

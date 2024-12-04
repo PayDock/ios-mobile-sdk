@@ -132,7 +132,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
         
         self.isLoading = isLoading
-        self.config.widgetOptions.isDisabled = isLoading
+        self.config.viewState.isDisabled = isLoading
     }
 }
 

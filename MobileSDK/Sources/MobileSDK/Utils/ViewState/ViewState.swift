@@ -7,19 +7,19 @@
 
 import SwiftUI
 
-//public class ViewState: ObservableObject {
-//    @Published var isDisabled: Bool
-//    
-//    public init(state: WidgetState = .none) {
-//        isDisabled = state == .disabled
-//    }
-//    
-//    public func setState(_ state: WidgetState) {
-//        isDisabled = state == .disabled
-//    }
-//}
-//
-//public enum WidgetState {
-//    case none
-//    case disabled
-//}
+public class ViewState: ObservableObject {
+    @Published var isDisabled: Bool
+    
+    public init(state: WidgetState = .none) {
+        isDisabled = state == .disabled
+    }
+    
+    public func setState(_ state: WidgetState) {
+        isDisabled = state == .disabled
+    }
+}
+
+public enum WidgetState {
+    case none
+    case disabled
+}
