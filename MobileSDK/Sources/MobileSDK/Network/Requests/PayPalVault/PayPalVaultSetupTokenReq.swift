@@ -9,10 +9,6 @@
 struct PayPalVaultSetupTokenReq: Encodable {
     
     let gatewayId: String
-<<<<<<< HEAD
-=======
-    let token: String
->>>>>>> main
     let returnUrl = "sdk.ios.paypal://vault/success"
     let cancelUrl = "sdk.ios.paypal://vault/cancel"
     

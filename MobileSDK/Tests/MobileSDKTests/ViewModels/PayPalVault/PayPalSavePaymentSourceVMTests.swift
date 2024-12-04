@@ -14,10 +14,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     
     var viewModel: PayPalSavePaymentSourceVM!
     var mockService: PayPalVaultServiceMock!
-<<<<<<< HEAD
-=======
-    var viewState: ViewState!
->>>>>>> main
     var config: PayPalVaultConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<PayPalVaultResult, PayPalVaultError>?
@@ -26,19 +22,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         mockService = PayPalVaultServiceMock()
-<<<<<<< HEAD
         config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: "Custom Action Text", widgetOptions: WidgetOptions())
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
         viewModel = PayPalSavePaymentSourceVM(
-=======
-        viewState = ViewState()
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: "Custom Action Text")
-        loadingDelegate = WidgetLoadingDelegateUtil()
-        completionResult = nil
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: ViewState(),
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: nil)
@@ -50,17 +37,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         mockService = nil
-<<<<<<< HEAD
-=======
-        viewState = nil
->>>>>>> main
         completionResult = nil
         cancellables.removeAll()
         super.tearDown()
     }
     
     func testInitialisationWithOptionsStateNone() {
-<<<<<<< HEAD
         XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, false)
     }
     
@@ -70,14 +52,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
                                    actionText: "Custom Action Text",
                                    widgetOptions: WidgetOptions(state: .disabled))
         viewModel = PayPalSavePaymentSourceVM(
-=======
-        XCTAssertEqual(viewModel.viewState.isDisabled, false)
-    }
-    
-    func testInitialisationWithOptionsStateDisabled() {
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: ViewState(state: .disabled),
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -85,7 +59,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             self.completionResult = result
         }
         
-<<<<<<< HEAD
         XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, true)
     }
     
@@ -95,18 +68,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     
     func testInitialisationWithoutDelegateShowLoader() {
         viewModel = PayPalSavePaymentSourceVM(
-=======
-        XCTAssertEqual(viewModel.viewState.isDisabled, true)
-    }
-    
-    func testInitialisationWithoutDelegateShowLoader() {
-        XCTAssertEqual(viewModel.showLoaders, true)
-    }
-    
-    func testInitialisationWithDelegateShowLoader() {
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: viewState,
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -123,16 +84,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     
     func testDefaultActionTextIfNil() {
         config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: nil)
-<<<<<<< HEAD
         viewModel = PayPalSavePaymentSourceVM(config: config, payPalVaultService: mockService, loadingDelegate: nil) { _ in }
-=======
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: viewState,
-            config: config,
-            payPalVaultService: mockService,
-            loadingDelegate: nil
-        ) { _ in }
->>>>>>> main
         
         XCTAssertEqual(viewModel.actionText, "Link PayPal account", "The actionText should default to 'Link PayPal account' when nil.")
     }
@@ -149,28 +101,11 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         XCTAssertEqual(viewModel.isLoading, true)
     }
     
-<<<<<<< HEAD
-=======
-    func testGetAuthTokenSuccess() async {
-        mockService.sendError = false
-        mockService.responseFilename = .authSuccess
-        
-        let authToken = await viewModel.getAuthToken()
-        
-        XCTAssertEqual(authToken, "some_access_token")
-        XCTAssertEqual(viewModel.isLoading, true)
-    }
-    
->>>>>>> main
     func testGetSetupTokenSuccess() async {
         mockService.sendError = false
         mockService.responseFilename = .setupTokenSuccess
         
-<<<<<<< HEAD
         let setupTokenData = await viewModel.getSetupTokenData()
-=======
-        let setupTokenData = await viewModel.getSetupTokenData(authToken: "some_auth_token")
->>>>>>> main
         
         XCTAssertEqual(setupTokenData?.setupToken, "XObCsxdHXe")
         XCTAssertEqual(setupTokenData?.approveLink, URL(string: "www.something.com")!)
@@ -211,36 +146,11 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         }
     }
     
-<<<<<<< HEAD
-=======
-    func testGetAuthTokenSetsCompletionOnFailure() async {
-        mockService.sendError = true
-        mockService.responseFilename = .authFail
-        
-        let authToken = await viewModel.getAuthToken()
-        
-        XCTAssertNil(authToken, "Auth token should be nil on error.")
-        if case .failure(let error) = completionResult {
-            switch error {
-            case .createSessionAuthToken: XCTAssert(true)
-            default: XCTFail("Error message should always be createSessionAuthToken.")
-            }
-        } else {
-            XCTFail("Expected completion to be called with a createSessionAuthToken failure.")
-        }
-        XCTAssertEqual(viewModel.isLoading, false)
-    }
-    
->>>>>>> main
     func testGetSetupTokenIdSetsCompletionOnFailure() async {
         mockService.sendError = true
         mockService.responseFilename = .authFail
         
-<<<<<<< HEAD
         let setupToken = await viewModel.getSetupTokenData()
-=======
-        let setupToken = await viewModel.getSetupTokenData(authToken: "auth_token")
->>>>>>> main
         
         XCTAssertNil(setupToken, "Setup token should be nil on error.")
         if case .failure(let error) = completionResult {
@@ -274,10 +184,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
-<<<<<<< HEAD
-=======
-            viewState: viewState,
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -291,20 +197,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, true)
-<<<<<<< HEAD
         XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, true)
-=======
-        XCTAssertEqual(viewModel.viewState.isDisabled, true)
->>>>>>> main
     }
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
-<<<<<<< HEAD
-=======
-            viewState: viewState,
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: nil)
@@ -320,20 +218,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-<<<<<<< HEAD
         XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, true)
-=======
-        XCTAssertEqual(viewModel.viewState.isDisabled, true)
->>>>>>> main
     }
     
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
-<<<<<<< HEAD
-=======
-            viewState: viewState,
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -349,20 +239,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-<<<<<<< HEAD
         XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, false)
-=======
-        XCTAssertEqual(viewModel.viewState.isDisabled, false)
->>>>>>> main
     }
     
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
-<<<<<<< HEAD
-=======
-            viewState: viewState,
->>>>>>> main
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: nil)
@@ -378,10 +260,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-<<<<<<< HEAD
         XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, false)
-=======
-        XCTAssertEqual(viewModel.viewState.isDisabled, false)
->>>>>>> main
     }
 }

@@ -24,11 +24,7 @@ class PayPalVM: ObservableObject {
     @Published var isLoading = false
     @Published var showLoaders = true
     @Published var sheetAction: SheetAction = SheetAction.nothing
-<<<<<<< HEAD
     var options: WidgetOptions
-=======
-    var viewState: ViewState
->>>>>>> main
     var payPalUrl: URL?
     private var token = ""
 
@@ -39,20 +35,12 @@ class PayPalVM: ObservableObject {
 
     // MARK: - Initialisation
 
-<<<<<<< HEAD
     init(options: WidgetOptions,
-=======
-    init(viewState: ViewState,
->>>>>>> main
          payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
-<<<<<<< HEAD
         self.options = options
-=======
-        self.viewState = viewState
->>>>>>> main
         self.payPalToken = payPalToken
         self.walletService = walletService
         self.loadingDelegate = loadingDelegate
@@ -152,10 +140,6 @@ class PayPalVM: ObservableObject {
         }
         
         self.isLoading = isLoading
-<<<<<<< HEAD
         options.isDisabled = isLoading
-=======
-        viewState.isDisabled = isLoading
->>>>>>> main
     }
 }

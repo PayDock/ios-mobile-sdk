@@ -22,15 +22,9 @@ struct OutlineButtonStyle: ButtonStyle {
             .customFont(.body)
             .imageScale(.small)
             .foregroundColor(currentForegroundColor)
-<<<<<<< HEAD
-            .cornerRadius(.cornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: .cornerRadius)
-=======
             .cornerRadius(.buttonCornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: .buttonCornerRadius)
->>>>>>> main
                     .stroke(currentBorderColor)
             )
             .font(Font.system(size: 19, weight: .semibold))

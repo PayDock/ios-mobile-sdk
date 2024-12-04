@@ -11,10 +11,6 @@ import NetworkingLib
 
 protocol PayPalVaultService {
 
-<<<<<<< HEAD
-=======
-    func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String
->>>>>>> main
     func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData
     func getClientId(gatewayId: String, accessToken: String) async throws -> String
     func createPaymentToken(request: PayPalVaultPaymentTokenReq, setupToken: String, accessToken: String) async throws -> PayPalVaultPaymentTokenRes.PaymentTokenData
@@ -25,14 +21,6 @@ protocol PayPalVaultService {
 
 struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
 
-<<<<<<< HEAD
-=======
-    func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String {
-        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.authToken(request: request, accessToken: accessToken), responseModel: PayPalVaultAuthRes.self)
-        return response.resource.data.accessToken
-    }
-    
->>>>>>> main
     func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.setupToken(request: req, accessToken: accessToken), responseModel: PayPalVaultSetupTokenRes.self)
         return response.resource.data
@@ -54,14 +42,6 @@ struct PayPalVaultServiceImpl: HTTPClient, PayPalVaultService {
 
 struct PayPalVaultMockServiceImpl: MockHTTPClient, PayPalVaultService {
     
-<<<<<<< HEAD
-=======
-    func createToken(request: PayPalVaultAuthReq, accessToken: String) async throws -> String {
-        let response = try await sendRequest(endpoint: PayPalVaultEndpoints.authToken(request: request, accessToken: accessToken), responseModel: PayPalVaultAuthRes.self)
-        return response.resource.data.accessToken
-    }
-    
->>>>>>> main
     func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData {
         let response = try await sendRequest(endpoint: PayPalVaultEndpoints.setupToken(request: req, accessToken: accessToken), responseModel: PayPalVaultSetupTokenRes.self)
         return response.resource.data
