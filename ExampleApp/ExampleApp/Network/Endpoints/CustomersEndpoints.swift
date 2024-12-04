@@ -30,12 +30,11 @@ extension CustomersEndpoints: Endpoint {
     }
 
     var header: [String: String]? {
-        let secretKey = ProjectEnvironment.shared.getSecretKey()
         let accessToken =  ProjectEnvironment.shared.getAccessToken()
         switch self {
         case .createCustomer:
             return [
-                "x-user-secret-key": "\(secretKey)",
+                "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
             ]
         }
