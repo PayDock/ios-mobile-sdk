@@ -33,11 +33,7 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
     func testCreateSetupTokenSuccess() async {
         sut.responseFilename = .setupTokenSuccess
         do {
-<<<<<<< HEAD
-            let req = PayPalVaultSetupTokenReq(gatewayId: "some_gateway_id")
-=======
             let req = PayPalVaultSetupTokenReq(gatewayId: "some_gateway_id", token: "some_oauth_token")
->>>>>>> main
             let tokenData = try await sut.createSetupTokenData(req: req, accessToken: "some_access_token")
             XCTAssertEqual(tokenData.setupToken, "XObCsxdHXe")
         } catch {

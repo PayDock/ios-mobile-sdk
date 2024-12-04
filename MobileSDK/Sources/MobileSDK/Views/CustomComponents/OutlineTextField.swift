@@ -151,7 +151,7 @@ struct OutlineTextField: View {
         }
         .contentShape(Rectangle())
         .padding([.leading, .trailing], 16.0)
-        .background(RoundedRectangle(cornerRadius: .cornerRadius, style: .continuous)
+        .background(RoundedRectangle(cornerRadius: .textFieldCornerRadius, style: .continuous)
             .stroke(borderColor, lineWidth: borderWidth))
     }
 

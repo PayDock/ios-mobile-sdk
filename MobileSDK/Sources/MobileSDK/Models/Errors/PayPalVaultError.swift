@@ -11,6 +11,10 @@ import NetworkingLib
 
 public enum PayPalVaultError: Error {
 
+<<<<<<< HEAD
+=======
+    case createSessionAuthToken(error: ErrorRes)
+>>>>>>> main
     case createSetupToken(error: ErrorRes)
     case getPayPalClientId(error: ErrorRes)
     case createPaymentToken(error: ErrorRes)
@@ -20,6 +24,10 @@ public enum PayPalVaultError: Error {
 
     public var customMessage: String {
         switch self {
+<<<<<<< HEAD
+=======
+        case .createSessionAuthToken: return "Error creating session auth token."
+>>>>>>> main
         case .createSetupToken: return "Error creating setup token."
         case .getPayPalClientId: return "Error getting PayPal client ID."
         case .createPaymentToken: return "Error creating payment token."

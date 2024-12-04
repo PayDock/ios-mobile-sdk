@@ -37,11 +37,7 @@ final class PayPalVaultServiceNegativeTests: XCTestCase {
         // TODO: - Update error responses once we know how they will look
         sut.responseFilename = .authFail
         do {
-<<<<<<< HEAD
-            let req = PayPalVaultSetupTokenReq(gatewayId: "some_gateway_id")
-=======
             let req = PayPalVaultSetupTokenReq(gatewayId: "some_gateway_id", token: "received_oauth_token")
->>>>>>> main
             _ = try await sut.createSetupTokenData(req: req, accessToken: "some_access_token")
             XCTFail("Expected to throw an error, but no error was thrown.")
         } catch let RequestError.requestError(errorResponse: errorResponse) {

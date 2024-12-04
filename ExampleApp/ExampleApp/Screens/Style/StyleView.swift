@@ -34,8 +34,11 @@ struct StyleView: View {
                     divider
 
                     sectionTitle("Design")
-                    HStack {
-                        designTextView(title: "Corner", text: $viewModel.cornerRadius)
+                    VStack {
+                        HStack {
+                            designTextView(title: "TextField Corner", text: $viewModel.textFieldCornerRadius)
+                            designTextView(title: "Button Corner", text: $viewModel.buttonCornerRadius)
+                        }
                         designTextView(title: "Padding", text: $viewModel.padding)
                         designTextView(title: "Border Width", text: $viewModel.borderWidth)
                     }

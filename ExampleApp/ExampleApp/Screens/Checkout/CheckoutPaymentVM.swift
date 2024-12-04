@@ -29,18 +29,29 @@ class CheckoutPaymentVM: ObservableObject {
     @Published var selectedMethod: PaymentMethod = .card
     @Published var showAlert = false
     @Published var isLoading = false
+<<<<<<< HEAD
     
+=======
+>>>>>>> main
     @Published var showMastercardWebView = false
 
     var alertTitle = ""
     var alertMessage = ""
+<<<<<<< HEAD
     var widgetOptions: WidgetOptions?
+=======
+    var viewState: ViewState?
+>>>>>>> main
 
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
+<<<<<<< HEAD
         self.widgetOptions = WidgetOptions(state: .none)
+=======
+        self.viewState = ViewState(state: .none)
+>>>>>>> main
     }
 }
 
@@ -166,7 +177,11 @@ extension CheckoutPaymentVM {
         self.cardToken = token
         guard !cardToken.isEmpty else { return }
         isLoading = true
+<<<<<<< HEAD
         widgetOptions?.setState(.disabled)
+=======
+        viewState?.setState(.disabled)
+>>>>>>> main
 
         let request = ConvertToVaultTokenReq(token: cardToken, vaultType: "session")
         Task {
@@ -199,6 +214,8 @@ extension CheckoutPaymentVM {
         case .notSupported: captureCharge()
         case .pending:
             DispatchQueue.main.async {
+                self.isLoading = false
+                self.viewState?.setState(.none)
                 self.token3DS = response.resource.data.threeDS.token ?? ""
                 self.show3dsWebView = true
             }
@@ -227,6 +244,8 @@ extension CheckoutPaymentVM {
 
     /// Captures the charge as the final step in the payment flow
     private func captureCharge() {
+        isLoading = true
+        viewState?.setState(.disabled)
         Task {
             let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
             do {
@@ -234,14 +253,22 @@ extension CheckoutPaymentVM {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
+<<<<<<< HEAD
                     widgetOptions?.setState(.none)
+=======
+                    viewState?.setState(.none)
+>>>>>>> main
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
             } catch {
                 // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
+<<<<<<< HEAD
                     widgetOptions?.setState(.none)
+=======
+                    viewState?.setState(.none)
+>>>>>>> main
                 }
             }
         }

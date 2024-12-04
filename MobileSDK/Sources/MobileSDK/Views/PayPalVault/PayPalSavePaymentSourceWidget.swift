@@ -11,10 +11,19 @@ import SwiftUI
 public struct PayPalSavePaymentSourceWidget: View {
     @StateObject private var viewModel: PayPalSavePaymentSourceVM
 
+<<<<<<< HEAD
     public init(config: PayPalVaultConfig,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalSavePaymentSourceVM(
+=======
+    public init(viewState: ViewState? = nil,
+                config: PayPalVaultConfig,
+                loadingDelegate: WidgetLoadingDelegate? = nil,
+                completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: PayPalSavePaymentSourceVM(
+            viewState: viewState ?? ViewState(),
+>>>>>>> main
             config: config,
             loadingDelegate: loadingDelegate,
             completion: completion)
@@ -26,7 +35,11 @@ public struct PayPalSavePaymentSourceWidget: View {
             title: viewModel.actionText,
             image: Image("link", bundle: Bundle.module),
             isLoading: viewModel.isLoading && viewModel.showLoaders,
+<<<<<<< HEAD
             style: .outline(OutlineButtonStyle(isDisabled: viewModel.config.widgetOptions.isDisabled))) {
+=======
+            style: .outline(OutlineButtonStyle(isDisabled: viewModel.viewState.isDisabled))) {
+>>>>>>> main
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)

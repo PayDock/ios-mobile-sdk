@@ -1,5 +1,5 @@
 //
-//  OutlineButtonStyle.swift
+//  FillButtonStyle.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,31 +8,21 @@
 
 import SwiftUI
 
-struct OutlineButtonStyle: ButtonStyle {
+struct FillButtonStyle: ButtonStyle {
 
-    var foregroundColor: Color = .primaryColor
-    var borderColor: Color = .primaryColor
+    var backgroundColor: Color = .primaryColor
+    var foregroundColor: Color = .onPrimaryColor
     var isDisabled: Bool = false
 
     func makeBody(configuration: Self.Configuration) -> some View {
         let currentForegroundColor = isDisabled || configuration.isPressed ? foregroundColor.opacity(0.3) : foregroundColor
-        let currentBorderColor = isDisabled || configuration.isPressed ? borderColor.opacity(0.3) : borderColor
-        
+    
         return configuration.label
             .customFont(.body)
             .imageScale(.small)
             .foregroundColor(currentForegroundColor)
-<<<<<<< HEAD
-            .cornerRadius(.cornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: .cornerRadius)
-=======
+            .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.8) : backgroundColor)
             .cornerRadius(.buttonCornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: .buttonCornerRadius)
->>>>>>> main
-                    .stroke(currentBorderColor)
-            )
             .font(Font.system(size: 19, weight: .semibold))
     }
 }

@@ -11,6 +11,7 @@ public struct PayPalVaultConfig {
     public let accessToken: String
     public let gatewayId: String
     public let actionText: String?
+<<<<<<< HEAD
     public let widgetOptions: WidgetOptions
 
     public init(accessToken: String, gatewayId: String, actionText: String? = nil, widgetOptions: WidgetOptions? = nil) {
@@ -18,5 +19,12 @@ public struct PayPalVaultConfig {
         self.gatewayId = gatewayId
         self.actionText = actionText
         self.widgetOptions = widgetOptions ?? WidgetOptions(state: .none)
+=======
+
+    public init(accessToken: String, gatewayId: String, actionText: String? = nil) {
+        self.accessToken = accessToken
+        self.gatewayId = gatewayId
+        self.actionText = actionText
+>>>>>>> main
     }
 }
