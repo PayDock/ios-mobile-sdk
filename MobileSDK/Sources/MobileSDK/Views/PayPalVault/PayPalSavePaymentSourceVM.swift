@@ -23,6 +23,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     @Published var actionText: String = ""
     @Published var isLoading = false
     @Published var showLoaders = true
+    var viewState: ViewState
     private weak var loadingDelegate: WidgetLoadingDelegate?
 
     // MARK: - Handlers
@@ -31,10 +32,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(config: PayPalVaultConfig,
+    init(viewState: ViewState,
+         config: PayPalVaultConfig,
          payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
+        self.viewState = viewState
         self.config = config
         self.payPalVaultService = payPalVaultService
         self.loadingDelegate = loadingDelegate
@@ -132,7 +135,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
         
         self.isLoading = isLoading
-        self.config.viewState.isDisabled = isLoading
+        self.viewState.isDisabled = isLoading
     }
 }
 

@@ -62,7 +62,7 @@ struct CheckoutPaymentSheet: View {
                 }
                 .padding()
             case .payPal:
-                PayPalWidget(loadingDelegate: viewModel) { onPayPalButtonTap in
+                PayPalWidget(viewState: viewModel.viewState, loadingDelegate: viewModel) { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
                     switch result {
