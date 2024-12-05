@@ -11,7 +11,6 @@
 
 - Separated `cornerRadius` into 2 parts (`textFieldCornerRadius` & `buttonCornerRadius`)
 
->>>>>>> main
 ## [1.5.0] - 2024-11-22
 
 ### Added
