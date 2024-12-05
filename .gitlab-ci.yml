@@ -6,26 +6,26 @@
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 
-#stages:
+stages:
 #  - test
 #  - build
-#  - security
-#
-#include:
-#  - project: 'paydock/platform/gitlab-templates'
-#    ref: main
-#    file: '/security/gitlab-defectdojo.yaml'
-#
-#variables:
-#  LC_ALL: "en_US.UTF-8"
-#  LANG: "en_US.UTF-8"
-#  GIT_STRATEGY: clone
-#
-#.macos_saas_runners:
-#  tags:
-#    - saas-macos-medium-m1
-#  image: macos-13-xcode-14
-#
+  - security
+
+include:
+  - project: 'paydock/platform/gitlab-templates'
+    ref: main
+    file: '/security/gitlab-defectdojo.yaml'
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+  GIT_STRATEGY: clone
+
+.macos_saas_runners:
+  tags:
+    - saas-macos-medium-m1
+  image: macos-13-xcode-14
+
 #test_exampleApp:
 #  extends:
 #    - .macos_saas_runners
@@ -48,41 +48,3 @@
 #  artifacts:
 #    paths:
 #      - ExampleApp/fastlane/test_output
-
-stages:
-  - test
-  - build
-  - security
-
-variables:
-  LC_ALL: "en_US.UTF-8"
-  LANG: "en_US.UTF-8"
-  GIT_STRATEGY: clone
-  RUN_TESTS: "false"  # Set to "false" to skip test jobs
-  RUN_BUILD: "false"  # Set to "false" to skip build jobs
-
-# .macos_saas_runners is defined elsewhere as it was in your original config
-.macos_saas_runners:
-  tags:
-    - saas-macos-medium-m1
-  image: macos-13-xcode-14
-
-test_exampleApp:
-  extends:
-    - .macos_saas_runners
-  stage: test
-  script:
-    - if [ "$RUN_TESTS" == "true" ]; then bundle install && bundle exec fastlane build_and_test device:'iPhone 14 Pro'; fi
-  artifacts:
-    paths:
-      - MobileSDK/fastlane/test_output
-
-export_exampleApp:
-  extends:
-    - .macos_saas_runners
-  stage: build
-  script:
-    - if [ "$RUN_BUILD" == "true" ]; then cd ExampleApp/ && bundle install && bundle exec fastlane archive_ci; fi
-  artifacts:
-    paths:
-      - ExampleApp/fastlane/test_output
