@@ -14,6 +14,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     
     var viewModel: PayPalSavePaymentSourceVM!
     var mockService: PayPalVaultServiceMock!
+    var viewState: ViewState!
     var config: PayPalVaultConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<PayPalVaultResult, PayPalVaultError>?
@@ -22,10 +23,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         mockService = PayPalVaultServiceMock()
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: "Custom Action Text", widgetOptions: WidgetOptions())
+        viewState = ViewState()
+        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: "Custom Action Text")
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: ViewState(),
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: nil)
@@ -37,21 +40,19 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         mockService = nil
+        viewState = nil
         completionResult = nil
         cancellables.removeAll()
         super.tearDown()
     }
     
     func testInitialisationWithOptionsStateNone() {
-        XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
     
     func testInitialisationWithOptionsStateDisabled() {
-        config = PayPalVaultConfig(accessToken: "test_access_token",
-                                   gatewayId: "test_gateway",
-                                   actionText: "Custom Action Text",
-                                   widgetOptions: WidgetOptions(state: .disabled))
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: ViewState(state: .disabled),
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -59,15 +60,16 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             self.completionResult = result
         }
         
-        XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, true)
-    }
-    
-    func testInitialisationWithDelegateShowLoader() {
-        XCTAssertEqual(viewModel.showLoaders, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
     
     func testInitialisationWithoutDelegateShowLoader() {
+        XCTAssertEqual(viewModel.showLoaders, true)
+    }
+    
+    func testInitialisationWithDelegateShowLoader() {
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -84,7 +86,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     
     func testDefaultActionTextIfNil() {
         config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: nil)
-        viewModel = PayPalSavePaymentSourceVM(config: config, payPalVaultService: mockService, loadingDelegate: nil) { _ in }
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            payPalVaultService: mockService,
+            loadingDelegate: nil
+        ) { _ in }
         
         XCTAssertEqual(viewModel.actionText, "Link PayPal account", "The actionText should default to 'Link PayPal account' when nil.")
     }
@@ -184,6 +191,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -197,12 +205,13 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, true)
-        XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: nil)
@@ -218,12 +227,13 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
     
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: loadingDelegate)
@@ -239,12 +249,13 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
     
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
             config: config,
             payPalVaultService: mockService,
             loadingDelegate: nil)
@@ -260,6 +271,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.config.widgetOptions.isDisabled, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
 }
