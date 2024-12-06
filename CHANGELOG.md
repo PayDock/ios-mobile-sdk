@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added `AccountScreen` as an example for collection of PayPal Vault token and creating of Customer
+- Added `AccountProfileView` as an example for collection of PayPal Vault token and creating of Customer
 
 ### Fixed
 
