@@ -88,7 +88,6 @@ class PayPalVMTests: XCTestCase {
     }
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
-        // Given
         viewModel = PayPalVM(viewState: viewState, payPalToken: { payPalToken in
             
         }, walletService: mockService, loadingDelegate: nil) { result in

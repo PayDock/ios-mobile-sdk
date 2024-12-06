@@ -108,21 +108,11 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         XCTAssertEqual(viewModel.isLoading, true)
     }
     
-    func testGetAuthTokenSuccess() async {
-        mockService.sendError = false
-        mockService.responseFilename = .authSuccess
-        
-        let authToken = await viewModel.getAuthToken()
-        
-        XCTAssertEqual(authToken, "some_access_token")
-        XCTAssertEqual(viewModel.isLoading, true)
-    }
-    
     func testGetSetupTokenSuccess() async {
         mockService.sendError = false
         mockService.responseFilename = .setupTokenSuccess
         
-        let setupTokenData = await viewModel.getSetupTokenData(authToken: "some_auth_token")
+        let setupTokenData = await viewModel.getSetupTokenData()
         
         XCTAssertEqual(setupTokenData?.setupToken, "XObCsxdHXe")
         XCTAssertEqual(setupTokenData?.approveLink, URL(string: "www.something.com")!)
@@ -163,29 +153,11 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         }
     }
     
-    func testGetAuthTokenSetsCompletionOnFailure() async {
-        mockService.sendError = true
-        mockService.responseFilename = .authFail
-        
-        let authToken = await viewModel.getAuthToken()
-        
-        XCTAssertNil(authToken, "Auth token should be nil on error.")
-        if case .failure(let error) = completionResult {
-            switch error {
-            case .createSessionAuthToken: XCTAssert(true)
-            default: XCTFail("Error message should always be createSessionAuthToken.")
-            }
-        } else {
-            XCTFail("Expected completion to be called with a createSessionAuthToken failure.")
-        }
-        XCTAssertEqual(viewModel.isLoading, false)
-    }
-    
     func testGetSetupTokenIdSetsCompletionOnFailure() async {
         mockService.sendError = true
         mockService.responseFilename = .authFail
         
-        let setupToken = await viewModel.getSetupTokenData(authToken: "auth_token")
+        let setupToken = await viewModel.getSetupTokenData()
         
         XCTAssertNil(setupToken, "Setup token should be nil on error.")
         if case .failure(let error) = completionResult {
