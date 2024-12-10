@@ -239,6 +239,16 @@ class CardDetailsFormManager: ObservableObject {
     func formatExpiryDate(updatedText: String) {
         expiryDateText = cardDetailsFormatter.formatExpiryDate(updatedText: updatedText)
     }
+    
+    // MARK: - Editing
+    
+    func endEditing() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        editingCardholderName = false
+        editingCardNumber = false
+        editingExpiryDate = false
+        editingSecurityCode = false
+    }
 
 }
 

@@ -143,6 +143,7 @@ public struct CardDetailsWidget: View {
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
                       style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
             ) {
+                viewModel.cardDetailsFormManager.endEditing()
                 viewModel.tokeniseCardDetails()
             }
             .frame(height: 48)
