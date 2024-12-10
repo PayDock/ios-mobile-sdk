@@ -219,11 +219,15 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func isFormValid() -> Bool {
-        let isCardholderNameValid = shouldValidateCardholderName ? !cardholderNameText.isEmpty : true
+        let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardIssuerValidator.isValidCreditCardNumber(number: cardholderNameText)) : true
+        let creditCardValid = cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText)
+        let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
         
-        let isFormFilled = isCardholderNameValid && !cardNumberText.isEmpty && !expiryDateText.isEmpty && !securityCodeText.isEmpty
-        let isFormValid = cardHolderNameValid && cardNumberValid && expiryDateValid && securityCodeValid
-        return isFormFilled && isFormValid
+        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
+        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
+        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType)
+        
+        return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
     }
 
     // MARK: - Formatting
