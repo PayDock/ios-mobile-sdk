@@ -48,69 +48,38 @@ class CardDetailsFormManager: ObservableObject {
     var expiryDatePlaceholder = "MM/YY"
     @Published var securityCodePlaceholder = "XXX"
 
-    private(set) var cardholderNameText: String = ""
-    private(set) var cardNumberText: String = ""
-    private(set) var expiryDateText = ""
-    private(set) var securityCodeText = ""
+    var cardholderNameText: String = "" {
+        didSet {
+            if !self.cardHolderNameValid {
+                self.validateTextField(.cardholderName)
+            }
+        }
+    }
+    var cardNumberText: String = "" {
+        didSet {
+            self.updateCardIssuerIcon()
+            self.updateSecurityCodeTitleAndPlaceholder()
+            if !self.cardNumberValid {
+                self.validateTextField(.cardNumber)
+            }
+        }
+    }
+    var expiryDateText = "" {
+        didSet {
+            if !self.expiryDateValid {
+                self.validateTextField(.expiryDate)
+            }
+        }
+    }
+    var securityCodeText = "" {
+        didSet {
+            if !self.securityCodeValid {
+                self.validateTextField(.securityCode)
+            }
+        }
+    }
 
     private var currentTextField: CardDetailsFocusable?
-
-    // MARK: - Custom bindings
-
-    var cardHolderNameBinding: Binding<String> {
-        Binding(
-            get: {
-                self.cardholderNameText
-            }, set: {
-                self.cardholderNameText = $0
-                if !self.cardHolderNameValid {
-                    self.validateTextField(.cardholderName)
-                }
-            }
-        )
-    }
-
-    var cardNumberBinding: Binding<String> {
-        Binding(
-            get: {
-                self.cardNumberText
-            }, set: {
-                self.cardNumberText = self.formatCardNumber(updatedText: $0)
-                self.updateCardIssuerIcon()
-                self.updateSecurityCodeTitleAndPlaceholder()
-                if !self.cardNumberValid {
-                    self.validateTextField(.cardNumber)
-                }
-            }
-        )
-    }
-
-    var expiryDateBinding: Binding<String> {
-        Binding(
-            get: {
-                self.expiryDateText
-            }, set: {
-                let newText = self.formatExpiryDate(updatedText: $0)
-                self.expiryDateText = newText
-                if !self.expiryDateValid {
-                    self.validateTextField(.expiryDate)
-                }
-            }
-        )
-    }
-
-    var securityCodeBinding: Binding<String> {
-        Binding(
-            get: {
-                self.securityCodeText
-            }, set: {
-                self.securityCodeText = $0
-                if !self.securityCodeValid {
-                    self.validateTextField(.securityCode)
-                }
-            }
-        )
-    }
 
     // MARK: - Initialisation
 
@@ -259,12 +228,12 @@ class CardDetailsFormManager: ObservableObject {
 
     // MARK: - Formatting
 
-    func formatCardNumber(updatedText: String) -> String {
-        cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
+    func formatCardNumber(updatedText: String) {
+        cardNumberText = cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
     }
 
-    func formatExpiryDate(updatedText: String) -> String {
-        cardDetailsFormatter.formatExpiryDate(updatedText: updatedText)
+    func formatExpiryDate(updatedText: String) {
+        expiryDateText = cardDetailsFormatter.formatExpiryDate(updatedText: updatedText)
     }
 
 }

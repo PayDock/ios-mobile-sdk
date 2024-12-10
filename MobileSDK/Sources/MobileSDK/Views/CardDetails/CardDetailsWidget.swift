@@ -55,7 +55,7 @@ public struct CardDetailsWidget: View {
             VStack(spacing: max(max(.spacing - 10, 0), 0)) {
                 if viewModel.collectCardholderName {
                     OutlineTextField(
-                        text: viewModel.cardDetailsFormManager.cardHolderNameBinding,
+                        text: $viewModel.cardDetailsFormManager.cardholderNameText,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
                         placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
@@ -73,7 +73,7 @@ public struct CardDetailsWidget: View {
                 }
 
                 OutlineTextField(
-                    text: viewModel.cardDetailsFormManager.cardNumberBinding,
+                    text: $viewModel.cardDetailsFormManager.cardNumberText,
                     title: viewModel.cardDetailsFormManager.cardNumberTitle,
                     placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
                     errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
@@ -90,16 +90,20 @@ public struct CardDetailsWidget: View {
                 )
                 .keyboardType(.numberPad)
                 .focused($textFieldInFocus, equals: .cardNumber)
+                .onChange(of: viewModel.cardDetailsFormManager.cardNumberText) { newValue in
+                    viewModel.cardDetailsFormManager.formatCardNumber(updatedText: newValue)
+                }
 
                 HStack(alignment: .top, spacing: .spacing * 0.75) {
                     OutlineTextField(
-                        text: viewModel.cardDetailsFormManager.expiryDateBinding,
+                        text: $viewModel.cardDetailsFormManager.expiryDateText,
                         title: viewModel.cardDetailsFormManager.expiryDateTitle,
                         placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
                         editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
                         valid: $viewModel.cardDetailsFormManager.expiryDateValid,
                         disabled: $viewModel.viewState.isDisabled,
+                        
                         onTapGesture: {
                             if (!viewModel.viewState.isDisabled) {
                                 self.textFieldInFocus = .expiryDate
@@ -109,9 +113,12 @@ public struct CardDetailsWidget: View {
                     )
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .expiryDate)
+                    .onChange(of: viewModel.cardDetailsFormManager.expiryDateText) { newValue in
+                        viewModel.cardDetailsFormManager.formatExpiryDate(updatedText: newValue)
+                    }
 
                     OutlineTextField(
-                        text: viewModel.cardDetailsFormManager.securityCodeBinding,
+                        text: $viewModel.cardDetailsFormManager.securityCodeText,
                         title: viewModel.cardDetailsFormManager.securityCodeTitle,
                         placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
                         errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
