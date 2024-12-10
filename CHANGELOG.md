@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.7.0] - 2024-12-06
+
+### Added
+
+- Added `AccountProfileView` as an example for collection of PayPal Vault token and creating of Customer
+
+### Fixed
+
+- PayPal Vault endpoints updated to work with latest changes
+
 ## [1.6.0] - 2024-11-29
 
 ### Added
