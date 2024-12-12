@@ -31,10 +31,10 @@ class CardDetailsFormManager: ObservableObject {
     @Published var editingExpiryDate = false
     @Published var editingSecurityCode = false
     
-    @Published var cardHolderNameValid = true
-    @Published var cardNumberValid = true
-    @Published var expiryDateValid = true
-    @Published var securityCodeValid = true
+    @Published var cardHolderNameValid: Bool?
+    @Published var cardNumberValid: Bool?
+    @Published var expiryDateValid: Bool?
+    @Published var securityCodeValid: Bool?
 
     @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
@@ -50,7 +50,7 @@ class CardDetailsFormManager: ObservableObject {
 
     var cardholderNameText: String = "" {
         didSet {
-            if !self.cardHolderNameValid {
+            if !cardholderNameText.isEmpty {
                 self.validateTextField(.cardholderName)
             }
         }
@@ -59,21 +59,21 @@ class CardDetailsFormManager: ObservableObject {
         didSet {
             self.updateCardIssuerIcon()
             self.updateSecurityCodeTitleAndPlaceholder()
-            if !self.cardNumberValid {
+            if !cardNumberText.isEmpty {
                 self.validateTextField(.cardNumber)
             }
         }
     }
     var expiryDateText = "" {
         didSet {
-            if !self.expiryDateValid {
+            if !expiryDateText.isEmpty {
                 self.validateTextField(.expiryDate)
             }
         }
     }
     var securityCodeText = "" {
         didSet {
-            if !self.securityCodeValid {
+            if !securityCodeText.isEmpty {
                 self.validateTextField(.securityCode)
             }
         }
@@ -98,7 +98,6 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
-        validateTextField(currentTextField)
         currentTextField = focusedField
 
         guard let focusedField = focusedField else { return }
