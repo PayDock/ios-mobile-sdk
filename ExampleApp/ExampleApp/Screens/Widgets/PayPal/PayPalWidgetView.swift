@@ -24,7 +24,6 @@ struct PayPalWidgetView: View {
                     case .failure(let error): viewModel.handleError(error: error)
                     }
                 }
-                .frame(height: 48)
                 .padding()
             }
             .background(Color(hex: "#EAE0D7"))

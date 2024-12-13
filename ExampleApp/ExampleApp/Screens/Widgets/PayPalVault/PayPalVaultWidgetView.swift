@@ -24,7 +24,6 @@ struct PayPalVaultWidgetView: View {
                         viewModel.handleError(error: error)
                     }
                 }
-                .frame(height: 48)
                 .padding()
             }
             .background(.white)
