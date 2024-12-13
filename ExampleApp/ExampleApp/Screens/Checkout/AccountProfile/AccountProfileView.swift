@@ -27,7 +27,6 @@ struct AccountProfileView: View {
         .background(Color.white)
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("My Account")
-    
     }
     
     private func title() -> some View {

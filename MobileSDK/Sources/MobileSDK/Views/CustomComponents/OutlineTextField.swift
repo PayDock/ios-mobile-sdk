@@ -29,19 +29,16 @@ struct OutlineTextField: View {
     @State private var showErrorView = false
 
     @Binding private var text: String
-    @Binding private var valid: Bool
+    @Binding private var valid: Bool?
     @Binding private var leftImage: Image?
     @Binding private var editing: Bool
     @Binding private var errorMessage: String
     @Binding private var disabled: Bool
 
-    @FocusState private var focusField: Field?
-
     private let title: String
     private let placeholder: String
     private let validationIconEnabled: Bool
     private let onTapGesture: () -> Void
-
 
     // MARK: - Initialization
 
@@ -62,7 +59,7 @@ struct OutlineTextField: View {
                 errorMessage: Binding<String>,
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
-                valid: Binding<Bool>,
+                valid: Binding<Bool?>,
                 disabled: Binding<Bool>,
                 validationIconEnabled: Bool = true,
                 onTapGesture: @escaping (() -> Void)
@@ -98,6 +95,9 @@ struct OutlineTextField: View {
         .contentShape(Rectangle())
         .padding(.top, 0)
         .padding(.bottom, 0)
+        .onTapGesture {
+            onTapGesture()
+        }
         .onChange(of: editing) { _ in
             withAnimation(.easeOut(duration: 0.15)) {
                 updateBorder()
@@ -130,26 +130,20 @@ struct OutlineTextField: View {
                 .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
 
-            TextField(editing ? placeholder : "", text: $text, onEditingChanged: { editingChanged in
-                if editingChanged {
-                    onTapGesture()
-                }
-            })
+            TextField(editing ? placeholder : "", text: $text)
+            .simultaneousGesture(TapGesture().onEnded({ _ in
+                onTapGesture()
+            }))
             .disabled(disabled)
             .frame(height: 48)
             .customFont(.body)
-            .contentShape(Rectangle())
             .foregroundColor(.textColor)
             .tint(.primaryColor)
-            .onTapGesture {
-                onTapGesture()
-            }
             
             if validationIconEnabled {
                 validationIconView
             }
         }
-        .contentShape(Rectangle())
         .padding([.leading, .trailing], 16.0)
         .background(RoundedRectangle(cornerRadius: .textFieldCornerRadius, style: .continuous)
             .stroke(borderColor, lineWidth: borderWidth))
@@ -225,6 +219,11 @@ private extension OutlineTextField {
     }
 
     func updateBorderColor() {
+        guard let valid = valid else {
+            borderColor = editing ? .primaryColor : .borderColor
+            validationIconState = .none
+            return
+        }
         if !valid {
             borderColor = .errorColor
             validationIconState = .invalid
@@ -233,7 +232,7 @@ private extension OutlineTextField {
             validationIconState = .none
         } else {
             borderColor = .borderColor
-            validationIconState = .valid
+            validationIconState = text.isEmpty ? .none : .valid
         }
     }
 
@@ -257,6 +256,10 @@ private extension OutlineTextField {
     }
 
     func updateTitleColor() {
+        guard let valid = valid else {
+            titleColor = editing ? .primaryColor : .borderColor
+            return
+        }
         if valid {
             titleColor = editing ? .primaryColor : .borderColor
         } else if text.isEmpty {
