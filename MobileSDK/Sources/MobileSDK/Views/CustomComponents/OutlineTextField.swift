@@ -95,7 +95,6 @@ struct OutlineTextField: View {
         .contentShape(Rectangle())
         .padding(.top, 0)
         .padding(.bottom, 0)
-        .contentShape(RoundedRectangle(cornerRadius: 5))
         .onTapGesture {
             onTapGesture()
         }
