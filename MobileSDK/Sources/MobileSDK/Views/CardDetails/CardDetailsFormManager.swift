@@ -31,10 +31,10 @@ class CardDetailsFormManager: ObservableObject {
     @Published var editingExpiryDate = false
     @Published var editingSecurityCode = false
     
-    @Published var cardHolderNameValid: Bool?
-    @Published var cardNumberValid: Bool?
-    @Published var expiryDateValid: Bool?
-    @Published var securityCodeValid: Bool?
+    @Published var cardHolderNameValid = true
+    @Published var cardNumberValid = true
+    @Published var expiryDateValid = true
+    @Published var securityCodeValid = true
 
     @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
 
@@ -48,38 +48,69 @@ class CardDetailsFormManager: ObservableObject {
     var expiryDatePlaceholder = "MM/YY"
     @Published var securityCodePlaceholder = "XXX"
 
-    var cardholderNameText: String = "" {
-        didSet {
-            if !cardholderNameText.isEmpty {
-                self.validateTextField(.cardholderName)
-            }
-        }
-    }
-    var cardNumberText: String = "" {
-        didSet {
-            self.updateCardIssuerIcon()
-            self.updateSecurityCodeTitleAndPlaceholder()
-            if !cardNumberText.isEmpty {
-                self.validateTextField(.cardNumber)
-            }
-        }
-    }
-    var expiryDateText = "" {
-        didSet {
-            if !expiryDateText.isEmpty {
-                self.validateTextField(.expiryDate)
-            }
-        }
-    }
-    var securityCodeText = "" {
-        didSet {
-            if !securityCodeText.isEmpty {
-                self.validateTextField(.securityCode)
-            }
-        }
-    }
+    private(set) var cardholderNameText: String = ""
+    private(set) var cardNumberText: String = ""
+    private(set) var expiryDateText = ""
+    private(set) var securityCodeText = ""
 
     private var currentTextField: CardDetailsFocusable?
+
+    // MARK: - Custom bindings
+
+    var cardHolderNameBinding: Binding<String> {
+        Binding(
+            get: {
+                self.cardholderNameText
+            }, set: {
+                self.cardholderNameText = $0
+                if !self.cardHolderNameValid {
+                    self.validateTextField(.cardholderName)
+                }
+            }
+        )
+    }
+
+    var cardNumberBinding: Binding<String> {
+        Binding(
+            get: {
+                self.cardNumberText
+            }, set: {
+                self.cardNumberText = self.formatCardNumber(updatedText: $0)
+                self.updateCardIssuerIcon()
+                self.updateSecurityCodeTitleAndPlaceholder()
+                if !self.cardNumberValid {
+                    self.validateTextField(.cardNumber)
+                }
+            }
+        )
+    }
+
+    var expiryDateBinding: Binding<String> {
+        Binding(
+            get: {
+                self.expiryDateText
+            }, set: {
+                let newText = self.formatExpiryDate(updatedText: $0)
+                self.expiryDateText = newText
+                if !self.expiryDateValid {
+                    self.validateTextField(.expiryDate)
+                }
+            }
+        )
+    }
+
+    var securityCodeBinding: Binding<String> {
+        Binding(
+            get: {
+                self.securityCodeText
+            }, set: {
+                self.securityCodeText = $0
+                if !self.securityCodeValid {
+                    self.validateTextField(.securityCode)
+                }
+            }
+        )
+    }
 
     // MARK: - Initialisation
 
@@ -98,6 +129,7 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: CardDetailsFocusable?) {
+        validateTextField(currentTextField)
         currentTextField = focusedField
 
         guard let focusedField = focusedField else { return }
@@ -218,35 +250,21 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func isFormValid() -> Bool {
-        let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardIssuerValidator.isValidCreditCardNumber(number: cardholderNameText)) : true
-        let creditCardValid = cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText)
-        let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
+        let isCardholderNameValid = shouldValidateCardholderName ? !cardholderNameText.isEmpty : true
         
-        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
-        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType)
-        
-        return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
+        let isFormFilled = isCardholderNameValid && !cardNumberText.isEmpty && !expiryDateText.isEmpty && !securityCodeText.isEmpty
+        let isFormValid = cardHolderNameValid && cardNumberValid && expiryDateValid && securityCodeValid
+        return isFormFilled && isFormValid
     }
 
     // MARK: - Formatting
 
-    func formatCardNumber(updatedText: String) {
-        cardNumberText = cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
+    func formatCardNumber(updatedText: String) -> String {
+        cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
     }
 
-    func formatExpiryDate(updatedText: String) {
-        expiryDateText = cardDetailsFormatter.formatExpiryDate(updatedText: updatedText)
-    }
-    
-    // MARK: - Editing
-    
-    func endEditing() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        editingCardholderName = false
-        editingCardNumber = false
-        editingExpiryDate = false
-        editingSecurityCode = false
+    func formatExpiryDate(updatedText: String) -> String {
+        cardDetailsFormatter.formatExpiryDate(updatedText: updatedText)
     }
 
 }

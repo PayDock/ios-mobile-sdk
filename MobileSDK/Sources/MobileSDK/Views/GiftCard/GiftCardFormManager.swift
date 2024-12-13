@@ -18,8 +18,8 @@ class GiftCardFormManager: ObservableObject {
     @Published var editingCardNumber = false
     @Published var editingPin = false
 
-    @Published var cardNumberValid: Bool?
-    @Published var pinValid: Bool?
+    @Published var cardNumberValid = true
+    @Published var pinValid = true
 
     let cardNumberTitle = "Card number"
     let pinTitle = "PIN"
@@ -38,7 +38,7 @@ class GiftCardFormManager: ObservableObject {
                 self.cardNumberText
             }, set: {
                 self.cardNumberText = self.formatCardNumber(updatedText: $0)
-                if !(self.cardNumberValid ?? true) {
+                if !self.cardNumberValid {
                     self.validateTextField(.cardNumber)
                 }
             }
@@ -51,7 +51,7 @@ class GiftCardFormManager: ObservableObject {
                 self.pinText
             }, set: {
                 self.pinText = $0
-                if !(self.pinValid ?? true) {
+                if !self.pinValid {
                     self.validateTextField(.pin)
                 }
             }

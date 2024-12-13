@@ -13,7 +13,7 @@ struct AutocompleteTextField: View {
     // MARK: - OutlineTextField Properties
 
     @Binding private var text: String
-    @Binding private var valid: Bool?
+    @Binding private var valid: Bool
     @Binding private var leftImage: Image?
     @Binding private var editing: Bool
     @Binding private var errorMessage: String
@@ -51,7 +51,7 @@ struct AutocompleteTextField: View {
                 errorMessage: Binding<String>,
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
-                valid: Binding<Bool?>,
+                valid: Binding<Bool>,
                 showPopup: Binding<Bool>,
                 disabled: Binding<Bool>,
                 options: Binding<Array<String>>,
