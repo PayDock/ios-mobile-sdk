@@ -137,6 +137,16 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         self.isLoading = isLoading
         self.viewState.isDisabled = isLoading
     }
+    
+    // MARK: - Helpers
+    
+    func getButtonIcon() -> Image? {
+        switch config.icon {
+        case .none: return nil
+        case .defaultIcon: return Image("link", bundle: Bundle.module)
+        case .customIcon(let image): return image
+        }
+    }
 }
 
 // MARK: - PayPalVaultDelegate

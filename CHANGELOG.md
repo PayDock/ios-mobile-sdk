@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.8.0] - 2024-12-18
+
+### Added
+
+- Added option to `PayPalPaymentSourceWidget` to use custom icon in the button or no icon at all.
+
+### Changed
+
+- `PayPalPaymentSourceWidget` button will always have black border and text.
+- Reverted button based Widgets to have a fixed height.
+
+### Fixed
+
+- Various fixes for `CardDetailsWidget` validations and focus states.
+
 ## [1.7.0] - 2024-12-06
 
 ### Added
@@ -31,7 +46,7 @@
 ### Changed
 
 - Updated NetworkingLib to `1.2.0`
-- Button based Widgets now have flexible height
+- Button based Widgets now have flexible height.
 
 ### Fixed
 

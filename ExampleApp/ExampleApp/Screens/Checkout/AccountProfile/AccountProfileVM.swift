@@ -24,7 +24,8 @@ class AccountProfileVM: ObservableObject {
     func getVaultConfig() -> PayPalVaultConfig {
         let config = PayPalVaultConfig(
             accessToken: ProjectEnvironment.shared.getAccessToken(),
-            gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "")
+            gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "",
+            icon: .customIcon(image: Image("payPalSmall")))
         return config
     }
     

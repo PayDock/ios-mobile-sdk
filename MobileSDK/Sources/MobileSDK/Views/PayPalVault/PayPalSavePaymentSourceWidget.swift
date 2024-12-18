@@ -26,13 +26,17 @@ public struct PayPalSavePaymentSourceWidget: View {
     public var body: some View {
         SDKButton(
             title: viewModel.actionText,
-            image: Image("link", bundle: Bundle.module),
+            image: viewModel.getButtonIcon(),
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            style: .outline(OutlineButtonStyle(isDisabled: viewModel.viewState.isDisabled))) {
+            style: .outline(OutlineButtonStyle(
+                foregroundColor: Color(red: 0.129, green: 0.129, blue: 0.129),
+                borderColor: Color(red: 0.129, green: 0.129, blue: 0.129),
+                isDisabled: viewModel.viewState.isDisabled))) {
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)
     }
+    
 }
 
 struct PayPalSavePaymentSourceWidget_Previews: PreviewProvider {

@@ -32,15 +32,15 @@ class AddressFormManager: ObservableObject {
     @Published var editingPostcode = false
     @Published var editingCountry = false
 
-    @Published var firstNameValid = true
-    @Published var lastNameValid = true
-    @Published var addressSearchValid = true
-    @Published var addressLine1Valid = true
-    @Published var addressLine2Valid = true
-    @Published var cityValid = true
-    @Published var stateValid = true
-    @Published var postcodeValid = true
-    @Published var countryValid = true
+    @Published var firstNameValid: Bool?
+    @Published var lastNameValid: Bool?
+    @Published var addressSearchValid: Bool?
+    @Published var addressLine1Valid: Bool?
+    @Published var addressLine2Valid: Bool?
+    @Published var cityValid: Bool?
+    @Published var stateValid: Bool?
+    @Published var postcodeValid: Bool?
+    @Published var countryValid: Bool?
 
     let firstNameTitle = "First name"
     let lastNameTitle = "Last name"
