@@ -1,5 +1,6 @@
 # Changelog
 
+<<<<<<< HEAD
 ## [1.8.0] - 2024-12-18
 
 ### Added
@@ -15,6 +16,8 @@
 
 - Various fixes for `CardDetailsWidget` validations and focus states.
 
+=======
+>>>>>>> release
 ## [1.7.0] - 2024-12-06
 
 ### Added
