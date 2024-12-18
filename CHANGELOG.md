@@ -4,11 +4,11 @@
 
 ### Added
 
-- Added option to `PayPalPaymentSourceWidget` to use custom icon in the button or no icon at all
+- Added option to `PayPalPaymentSourceWidget` to use custom icon in the button or no icon at all.
 
 ### Changed
 
-- PayPalVault Button will always have black color.
+- `PayPalPaymentSourceWidget` button will always have black border and text.
 - Reverted button based Widgets to have a fixed height.
 
 ### Fixed
