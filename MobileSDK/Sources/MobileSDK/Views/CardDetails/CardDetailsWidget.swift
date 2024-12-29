@@ -18,22 +18,12 @@ public struct CardDetailsWidget: View {
     // MARK: - Initialisation
 
     public init(viewState: ViewState? = nil,
-                gatewayId: String?,
-                accessToken: String,
-                actionText: String = "Submit",
-                showCardTitle: Bool = true,
-                collectCardholderName: Bool = true,
-                allowSaveCard: SaveCardConfig? = nil,
+                config: CardDetailsWidgetConfig,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
             viewState: viewState ?? ViewState(state: .none),
-            gatewayId: gatewayId,
-            accessToken: accessToken,
-            actionText: actionText,
-            showCardTitle: showCardTitle,
-            collectCardholderName: collectCardholderName,
-            allowSaveCard: allowSaveCard,
+            config: config,
             loadingDelegate: loadingDelegate,
             completion: completion))
     }
@@ -42,7 +32,7 @@ public struct CardDetailsWidget: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if viewModel.showCardTitle {
+            if viewModel.config.showCardTitle {
                 HStack {
                     Text("Card information")
                         .customFont(.body)
@@ -53,7 +43,7 @@ public struct CardDetailsWidget: View {
             }
 
             VStack(spacing: max(max(.spacing - 10, 0), 0)) {
-                if viewModel.collectCardholderName {
+                if viewModel.config.collectCardholderName {
                     OutlineTextField(
                         text: $viewModel.cardDetailsFormManager.cardholderNameText,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
@@ -135,11 +125,11 @@ public struct CardDetailsWidget: View {
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .securityCode)
                 }
-                if viewModel.allowSaveCard != nil {
+                if viewModel.config.allowSaveCard != nil {
                     privacyView
                 }
             }
-            SDKButton(title: viewModel.actionText,
+            SDKButton(title: viewModel.config.actionText,
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
                       style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
             ) {
@@ -157,11 +147,11 @@ public struct CardDetailsWidget: View {
     private var privacyView: some View {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(viewModel.allowSaveCard?.consentText ?? "")
+                    Text(viewModel.config.allowSaveCard?.consentText ?? "")
                         .customFont(.body3)
                         .foregroundColor(.textColor)
-                    let text = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
-                    let url = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
+                    let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
+                    let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                     let link = "[\(text)](\(url))"
                     Text(.init(link))
                         .customFont(.body3)
@@ -180,7 +170,7 @@ public struct CardDetailsWidget: View {
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsWidget(gatewayId: "", accessToken: "", completion: { _ in })
+        CardDetailsWidget(config: CardDetailsWidgetConfig(gatewayId: "", accessToken: ""), completion: { _ in })
             .previewLayout(.sizeThatFits)
     }
 }

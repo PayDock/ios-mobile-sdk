@@ -28,12 +28,14 @@ struct CheckoutPaymentSheet: View {
             case .card:
                 VStack {
                     CardDetailsWidget(viewState: viewModel.viewState,
-                                      gatewayId: nil,
-                                      accessToken: ProjectEnvironment.shared.getAccessToken(),
-                                      actionText: "Pay",
-                                      showCardTitle: false,
-                                      collectCardholderName: false,
-                                      allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                                      config: CardDetailsWidgetConfig(
+                                        gatewayId: nil,
+                                        accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                        actionText: "Pay",
+                                        showCardTitle: false,
+                                        collectCardholderName: false,
+                                        allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
+                                      ),
                                       loadingDelegate: viewModel,
                                       completion: { result in
                         switch result {
