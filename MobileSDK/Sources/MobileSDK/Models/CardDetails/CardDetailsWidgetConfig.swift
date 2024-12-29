@@ -13,13 +13,15 @@ public struct CardDetailsWidgetConfig {
     public let showCardTitle: Bool
     public let collectCardholderName: Bool
     public let allowSaveCard: SaveCardConfig?
+    public let supportedSchemes: [CardScheme]?
     
-    public init(gatewayId: String?, accessToken: String, actionText: String = "Submit", showCardTitle: Bool = true, collectCardholderName: Bool = true, allowSaveCard: SaveCardConfig? = nil) {
+    public init(gatewayId: String?, accessToken: String, actionText: String = "Submit", showCardTitle: Bool = true, collectCardholderName: Bool = true, allowSaveCard: SaveCardConfig? = nil, supportedSchemes: [CardScheme]? = nil) {
         self.accessToken = accessToken
         self.gatewayId = gatewayId
         self.actionText = actionText
         self.showCardTitle = showCardTitle
         self.collectCardholderName = collectCardholderName
         self.allowSaveCard = allowSaveCard
+        self.supportedSchemes = supportedSchemes
     }
 }
