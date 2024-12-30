@@ -13,6 +13,7 @@ enum CardIssuerType {
     case visa
     case mastercard
     case amex
+    case ausbc
     case diners
     case jcb
     case maestro
@@ -21,6 +22,7 @@ enum CardIssuerType {
     case interPay
     case instaPayment
     case uatp
+    case solo
     case other
 
 }

@@ -41,6 +41,19 @@ public struct CardDetailsWidget: View {
                 }
                 .padding(.bottom, 14)
             }
+            
+            if let supportedSchemes = viewModel.config.supportedSchemes, !supportedSchemes.isEmpty {
+                HStack(spacing: 7) {
+                    ForEach(supportedSchemes, id: \.self) { scheme in
+                        getSchemeIcon(for: scheme)
+                            .resizable()
+                            .frame(width: 26, height: 20)
+                            .scaledToFit()
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.bottom, .spacing)
+            }
 
             VStack(spacing: max(max(.spacing - 10, 0), 0)) {
                 if viewModel.config.collectCardholderName {
@@ -164,6 +177,19 @@ public struct CardDetailsWidget: View {
                     .tint(.primaryColor)
                     .frame(width: 64, height: 44)
                     .disabled(viewModel.viewState.isDisabled)
+        }
+    }
+    
+    private func getSchemeIcon(for scheme: CardScheme) -> Image {
+        switch scheme {
+        case .amex: Image("amex", bundle: Bundle.module)
+        case .ausbc: Image("ausbc", bundle: Bundle.module)
+        case .diners: Image("diners", bundle: Bundle.module)
+        case .discover: Image("discover", bundle: Bundle.module)
+        case .jcb: Image("jcb", bundle: Bundle.module)
+        case .mastercard: Image("mastercard", bundle: Bundle.module)
+        case .solo: Image("solo", bundle: Bundle.module)
+        case .visa: Image("visa", bundle: Bundle.module)
         }
     }
 }

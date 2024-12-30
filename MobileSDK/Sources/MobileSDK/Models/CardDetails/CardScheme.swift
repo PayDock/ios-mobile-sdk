@@ -5,7 +5,7 @@
 //  Created by Ricardo Da Silva on 2024/12/29.
 //
 
-public enum CardScheme {
+public enum CardScheme: CaseIterable {
     
     case amex
     case ausbc
@@ -15,6 +15,5 @@ public enum CardScheme {
     case mastercard
     case solo
     case visa
-    case other
 
 }
