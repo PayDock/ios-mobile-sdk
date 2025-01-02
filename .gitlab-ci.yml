@@ -7,9 +7,9 @@
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 
 stages:
+  - quality
   - test
   - build
-  - security
 
 include:
   - project: 'paydock/platform/gitlab-templates'
