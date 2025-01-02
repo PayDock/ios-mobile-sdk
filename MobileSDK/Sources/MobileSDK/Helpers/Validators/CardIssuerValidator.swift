@@ -33,17 +33,17 @@ class CardIssuerValidator {
     private let cardIssuerRegexMap: [NSRegularExpression: CardIssuerType] = [
         try! NSRegularExpression(pattern: "^3[47][0-9]{13}$") : .amex,
         try! NSRegularExpression(pattern: "^3(?:0[0-5]|[68][0-9])[0-9]{11}$") : .diners,
-        try! NSRegularExpression(pattern: "^4[0-9]{12}(?:[0-9]{3})?$") : .visa,
-        try! NSRegularExpression(pattern: "^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$") : .mastercard,
-        try! NSRegularExpression(pattern: "^65[4-9][0-9]{13}|64[4-9][0-9]{13}|6011[0-9]{12}|(622(?:12[6-9]|1[3-9][0-9]|[2-8][0-9][0-9]|9[01][0-9]|92[0-5])[0-9]{10})$") : .discover,
+        try! NSRegularExpression(pattern: "^4[0-9]{12}(?:[0-9]{3,6})?$") : .visa,
+        try! NSRegularExpression(pattern: "^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$") : .mastercard,
+        try! NSRegularExpression(pattern: "^6(?:011|5[0-9]{2})[0-9]{12,15}$") : .discover,
         try! NSRegularExpression(pattern: "^(62[0-9]{14,17})$") : .unionPay,
         try! NSRegularExpression(pattern: "^636[0-9]*$") : .interPay,
         try! NSRegularExpression(pattern: "^63[7-9][0-9]{13}$") : .instaPayment,
         try! NSRegularExpression(pattern: "^(?:2131|1800|35\\d{3})\\d{11}$") : .jcb,
         try! NSRegularExpression(pattern: "^1[0-9]*$") : .uatp,
         try! NSRegularExpression(pattern: "^(6334|6767)[0-9]{12}|(6334|6767)[0-9]{14}|(6334|6767)[0-9]{15}$") : .solo,
-        try! NSRegularExpression(pattern: "^(5893|6304|677189|67719[0-9])[0-9]{8,15}$") : .ausbc,
         try! NSRegularExpression(pattern: "^(5018|5020|5038|5893|6304|6759|6761|6762|6763)[0-9]{8,15}$") : .maestro,
+        try! NSRegularExpression(pattern: "^(5893|6304|677189|67719[0-9])[0-9]{8,15}$") : .ausbc,
         // The generic pattern for all other card issuers
         try! NSRegularExpression(pattern: ".*") : .other
     ]
@@ -57,6 +57,7 @@ class CardIssuerValidator {
     func detectCardIssuer(number: String) -> CardIssuerType {
         let cleanNumber = number.filter { !$0.isWhitespace }
         for (regex, issuer) in cardIssuerRegexMap {
+            if issuer == .other { continue } // Skip 'other' until all specific patterns are tested
             if let _ = regex.firstMatch(in: cleanNumber, options: [], range: NSRange(location: 0, length: cleanNumber.utf16.count)) {
                 return issuer
             }

@@ -45,7 +45,7 @@ class CardDetailsVM: ObservableObject {
         self.loadingDelegate = loadingDelegate
         self.completion = completion
         
-        self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: config.collectCardholderName)
+        self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: config.collectCardholderName, supportedSchemes: config.supportedSchemes)
         
         if (loadingDelegate != nil) {
             showLoaders = false

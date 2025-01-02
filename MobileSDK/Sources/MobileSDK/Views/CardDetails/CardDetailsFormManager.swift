@@ -14,6 +14,7 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Dependencies
     
     private let shouldValidateCardholderName: Bool
+    private let supportedSchemes: [CardScheme]?
     private let cardIssuerValidator: CardIssuerValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
@@ -84,11 +85,13 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Initialisation
 
     init(shouldValidateCardholderName: Bool = true,
+         supportedSchemes: [CardScheme]? = nil,
          cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
          cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
         self.shouldValidateCardholderName = shouldValidateCardholderName
+        self.supportedSchemes = supportedSchemes
         self.cardIssuerValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
@@ -135,6 +138,7 @@ class CardDetailsFormManager: ObservableObject {
     private func getCardIssuerIcon(for cardIssuerType: CardIssuerType) -> Image {
         switch cardIssuerType {
         case .amex: return Image("amex", bundle: Bundle.module)
+        case .ausbc: return Image("ausbc", bundle: Bundle.module)
         case .diners: return Image("diners", bundle: Bundle.module)
         case .discover: return Image("discover", bundle: Bundle.module)
         case .instaPayment: return Image("insta-payment", bundle: Bundle.module)
@@ -145,6 +149,7 @@ class CardDetailsFormManager: ObservableObject {
         case .uatp: return Image("uatp", bundle: Bundle.module)
         case .unionPay: return Image("union-pay", bundle: Bundle.module)
         case .visa: return Image("visa", bundle: Bundle.module)
+        case .solo: return Image("solo", bundle: Bundle.module)
         case .other: return Image("credit-card", bundle: Bundle.module)
         }
     }
@@ -178,12 +183,41 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardNumber() {
-        if cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText) {
-            cardNumberValid = true
-            cardNumberError = ""
-        } else {
+        // Validate card number format
+        guard cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText) else {
             cardNumberValid = false
             cardNumberError = "Invalid card number"
+            return
+        }
+        
+        // Detect card issuer and map to scheme
+        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
+        let cardScheme = mapIssuerToScheme(for: cardIssuer)
+        
+        // Validate against supported schemes if provided
+        if let supportedSchemes = supportedSchemes, !supportedSchemes.isEmpty {
+            guard let cardScheme = cardScheme, supportedSchemes.contains(cardScheme) else {
+                cardNumberValid = false
+                cardNumberError = "Card type not accepted"
+                return
+            }
+        }
+        
+        cardNumberValid = true
+        cardNumberError = ""
+    }
+    
+    private func mapIssuerToScheme(for cardIssuerType: CardIssuerType) -> CardScheme? {
+        switch cardIssuerType {
+        case .amex: return CardScheme.amex
+        case .ausbc: return CardScheme.ausbc
+        case .diners: return CardScheme.diners
+        case .discover: return CardScheme.discover
+        case .jcb: return CardScheme.jcb
+        case .mastercard: return CardScheme.mastercard
+        case .visa: return CardScheme.visa
+        case .solo: return CardScheme.solo
+        default: return nil
         }
     }
 

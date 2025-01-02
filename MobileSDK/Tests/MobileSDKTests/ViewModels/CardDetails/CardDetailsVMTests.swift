@@ -29,12 +29,14 @@ class CardDetailsVMTests: XCTestCase {
         completionResult = nil
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: viewState,
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
@@ -55,12 +57,14 @@ class CardDetailsVMTests: XCTestCase {
     func testInitialisationWithOptionsStateDisabled() {
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: ViewState(state: .disabled),
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: nil) { result in
             self.completionResult = result
         }
@@ -75,12 +79,14 @@ class CardDetailsVMTests: XCTestCase {
     func testInitialisationWithoutDelegateShowLoader() {
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: viewState,
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: nil) { result in
             self.completionResult = result
         }
@@ -92,12 +98,14 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: viewState,
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
@@ -115,12 +123,14 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: viewState,
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: nil) { result in
             self.completionResult = result
         }
@@ -140,12 +150,14 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: viewState,
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
@@ -165,12 +177,14 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         viewModel = CardDetailsVM(cardService: mockService,
                                   viewState: viewState,
-                                  gatewayId: "gatewayId",
-                                  accessToken: "accessToken",
-                                  actionText: "actionText",
-                                  showCardTitle: true,
-                                  collectCardholderName: false,
-                                  allowSaveCard: config,
+                                  config: CardDetailsWidgetConfig(
+                                    gatewayId: "gatewayId",
+                                    accessToken: "accessToken",
+                                    actionText: "actionText",
+                                    showCardTitle: true,
+                                    collectCardholderName: false,
+                                    allowSaveCard: config
+                                  ),
                                   loadingDelegate: nil) { result in
             self.completionResult = result
         }
