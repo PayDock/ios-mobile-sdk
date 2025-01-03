@@ -11,7 +11,7 @@ public enum CardScheme: CaseIterable {
     case ausbc
     case diners
     case discover
-    case jcb
+    case japcb
     case mastercard
     case solo
     case visa

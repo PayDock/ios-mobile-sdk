@@ -51,7 +51,7 @@ public struct CardDetailsWidget: View {
                             .scaledToFit()
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, .spacing)
             }
 
@@ -186,7 +186,7 @@ public struct CardDetailsWidget: View {
         case .ausbc: Image("ausbc", bundle: Bundle.module)
         case .diners: Image("diners", bundle: Bundle.module)
         case .discover: Image("discover", bundle: Bundle.module)
-        case .jcb: Image("jcb", bundle: Bundle.module)
+        case .japcb: Image("jcb", bundle: Bundle.module)
         case .mastercard: Image("mastercard", bundle: Bundle.module)
         case .solo: Image("solo", bundle: Bundle.module)
         case .visa: Image("visa", bundle: Bundle.module)

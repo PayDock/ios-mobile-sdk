@@ -31,15 +31,15 @@ import Foundation
     }
 
     /**
-     Detects the type of security code based on the specified card issuer type.
+     Detects the type of security code based on the specified card scheme type.
 
-     - Parameter cardIssuer: The type of card issuer.
+     - Parameter cardScheme: The type of card scheme.
 
      - Returns: The detected `CardSecurityCodeType` based on the card issuer.
      */
-    func detectSecurityCodeType(cardIssuer: CardIssuerType) -> CardSecurityCodeType {
-        switch cardIssuer {
-        case .visa, .discover, .unionPay:
+     func detectSecurityCodeType(cardScheme: CardScheme?) -> CardSecurityCodeType {
+        switch cardScheme {
+        case .visa, .discover:
             return .cvv
         case .amex, .diners:
             return .csc

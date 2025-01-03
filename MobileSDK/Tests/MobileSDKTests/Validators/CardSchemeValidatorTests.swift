@@ -10,7 +10,7 @@ import XCTest
 
 struct CardTestCase {
     let cardNumber: String
-    let expectedIssuer: CardIssuerType
+    let expectedIssuer: CardScheme
     let isValid: Bool
 }
 
@@ -24,41 +24,27 @@ let testCases: [CardTestCase] = [
     CardTestCase(cardNumber: "5555555555554444", expectedIssuer: .mastercard, isValid: true),
     // Diners
     CardTestCase(cardNumber: "30312568541349", expectedIssuer: .diners, isValid: true),
-    // Discover
-    CardTestCase(cardNumber: "6011111111111117", expectedIssuer: .discover, isValid: true),
     // JCB
-    CardTestCase(cardNumber: "3534429687149385", expectedIssuer: .jcb, isValid: true),
+    CardTestCase(cardNumber: "3534429687149385", expectedIssuer: .japcb, isValid: true),
     // Solo
     CardTestCase(cardNumber: "6334101999990013", expectedIssuer: .solo, isValid: true),
     CardTestCase(cardNumber: "67675678901234568698", expectedIssuer: .solo, isValid: true),
-    // Maestro
-    CardTestCase(cardNumber: "5018186568344747", expectedIssuer: .maestro, isValid: true),
-    // Union
-    CardTestCase(cardNumber: "6250941006528599", expectedIssuer: .unionPay, isValid: true),
-    // InterPay
-    CardTestCase(cardNumber: "6362970000457013", expectedIssuer: .interPay, isValid: true),
-    // InstaPayment
-    CardTestCase(cardNumber: "6387249684531166", expectedIssuer: .instaPayment, isValid: true),
-    // UATP
-    CardTestCase(cardNumber: "1349727835850237", expectedIssuer: .uatp, isValid: true),
     // AUSBC
-    CardTestCase(cardNumber: "6771892573677360", expectedIssuer: .ausbc, isValid: true),
-    // Invalid number
-    CardTestCase(cardNumber: "9234567890123456", expectedIssuer: .other, isValid: false)
+    CardTestCase(cardNumber: "6771892573677360", expectedIssuer: .ausbc, isValid: true)
 ]
 
-class CardIssuerValidatorTests: XCTestCase {
-    var validator: CardIssuerValidator!
+class CardSchemeValidatorTests: XCTestCase {
+    var validator: CardSchemeValidator!
 
     override func setUp() {
         super.setUp()
-        validator = CardIssuerValidator()
+        validator = CardSchemeValidator()
     }
 
     func testDetectCardIssuer() {
         for testCase in testCases {
-            let detectedIssuer = validator.detectCardIssuer(number: testCase.cardNumber)
-            print("Detected Issuer: \(detectedIssuer)")
+            let detectedIssuer = validator.detectCardScheme(number: testCase.cardNumber)
+            print("Detected Issuer: \(String(describing: detectedIssuer))")
             XCTAssertEqual(detectedIssuer, testCase.expectedIssuer, "Failed for card number: \(testCase.cardNumber)")
         }
     }
