@@ -13,7 +13,7 @@ public struct CardDetailsWidgetConfig {
     public let showCardTitle: Bool
     public let collectCardholderName: Bool
     public let allowSaveCard: SaveCardConfig?
-    public let supportedSchemes: [CardScheme]?
+    public let supportedSchemes: Set<CardScheme>?
     
     public init(
         gatewayId: String?,
@@ -22,7 +22,7 @@ public struct CardDetailsWidgetConfig {
         showCardTitle: Bool = true,
         collectCardholderName: Bool = true,
         allowSaveCard: SaveCardConfig? = nil,
-        supportedSchemes: [CardScheme]? = nil
+        supportedSchemes: Set<CardScheme>? = nil
     ) {
         self.accessToken = accessToken
         self.gatewayId = gatewayId

@@ -14,7 +14,7 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Dependencies
     
     private let shouldValidateCardholderName: Bool
-    private let supportedSchemes: [CardScheme]?
+    private let supportedSchemes: Set<CardScheme>?
     private let cardSchemeValidator: CardSchemeValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
@@ -85,7 +85,7 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Initialisation
 
     init(shouldValidateCardholderName: Bool = true,
-         supportedSchemes: [CardScheme]? = nil,
+         supportedSchemes: Set<CardScheme>? = nil,
          cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
