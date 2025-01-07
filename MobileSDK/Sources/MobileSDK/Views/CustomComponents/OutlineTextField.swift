@@ -10,6 +10,8 @@ import SwiftUI
 
 struct OutlineTextField: View {
 
+    @Environment(\.sizeCategory) var sizeCategory
+    
     // MARK: Properties
 
     @State private var borderColor = Color.borderColor
@@ -135,7 +137,7 @@ struct OutlineTextField: View {
                 onTapGesture()
             }))
             .disabled(disabled)
-            .frame(height: 48)
+            .frame(height: getTextFieldHeight())
             .customFont(.body)
             .foregroundColor(.textColor)
             .tint(.primaryColor)
@@ -279,7 +281,7 @@ private extension OutlineTextField {
 
     func updateTitlePosition() {
         if editing || !text.isEmpty {
-            titleBottomPadding = 48.0
+            titleBottomPadding = 48.0 + getTitleExtraPadding()
             titleLeadingPadding = 14.0
             titleVerticalPadding = -10
 
@@ -299,7 +301,49 @@ private extension OutlineTextField {
         case invalid
         case none
     }
+}
 
+// MARK: - Accessibility handling
+
+extension OutlineTextField {
+    
+    private func getTextFieldHeight() -> CGFloat {
+        switch sizeCategory {
+        case .extraSmall: return 38
+        case .small: return 42
+        case .medium: return 44
+        case .large: return 50
+        case .extraLarge: return 54
+        case .extraExtraLarge: return 58
+        case .extraExtraExtraLarge: return 62
+            
+        case .accessibilityMedium: return 66
+        case .accessibilityLarge: return 70
+        case .accessibilityExtraLarge: return 74
+        case .accessibilityExtraExtraLarge: return 78
+        case .accessibilityExtraExtraExtraLarge: return 82
+        @unknown default: return 48
+        }
+    }
+    
+    private func getTitleExtraPadding() -> CGFloat {
+        switch sizeCategory {
+        case .extraSmall: return -8.0
+        case .small: return -4.0
+        case .medium: return 0.0
+        case .large: return 4.0
+        case .extraLarge: return 8.0
+        case .extraExtraLarge: return 12.0
+        case .extraExtraExtraLarge: return 16.0
+            
+        case .accessibilityMedium: return 20.0
+        case .accessibilityLarge: return 24.0
+        case .accessibilityExtraLarge: return 28.0
+        case .accessibilityExtraExtraLarge: return 32.0
+        case .accessibilityExtraExtraExtraLarge: return 36.0
+        @unknown default: return 48
+        }
+    }
 }
 
 // MARK: - OutlineTextField_Previews
