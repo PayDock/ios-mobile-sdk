@@ -317,11 +317,11 @@ extension OutlineTextField {
         case .extraExtraLarge: return 58
         case .extraExtraExtraLarge: return 62
             
-        case .accessibilityMedium: return 66
-        case .accessibilityLarge: return 70
-        case .accessibilityExtraLarge: return 74
-        case .accessibilityExtraExtraLarge: return 78
-        case .accessibilityExtraExtraExtraLarge: return 82
+        case .accessibilityMedium: return 70
+        case .accessibilityLarge: return 90
+        case .accessibilityExtraLarge: return 110
+        case .accessibilityExtraExtraLarge: return 130
+        case .accessibilityExtraExtraExtraLarge: return 140
         @unknown default: return 48
         }
     }
@@ -336,11 +336,11 @@ extension OutlineTextField {
         case .extraExtraLarge: return 12.0
         case .extraExtraExtraLarge: return 16.0
             
-        case .accessibilityMedium: return 20.0
-        case .accessibilityLarge: return 24.0
-        case .accessibilityExtraLarge: return 28.0
-        case .accessibilityExtraExtraLarge: return 32.0
-        case .accessibilityExtraExtraExtraLarge: return 36.0
+        case .accessibilityMedium: return 22.0
+        case .accessibilityLarge: return 42.0
+        case .accessibilityExtraLarge: return 62.0
+        case .accessibilityExtraExtraLarge: return 82.0
+        case .accessibilityExtraExtraExtraLarge: return 102.0
         @unknown default: return 48
         }
     }
