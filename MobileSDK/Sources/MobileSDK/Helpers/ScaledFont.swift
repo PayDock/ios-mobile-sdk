@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ScaledFont: ViewModifier {
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var sizeCategory
     var size: Double
 
     func body(content: Content) -> some View {
