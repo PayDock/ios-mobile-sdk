@@ -12,6 +12,7 @@ public struct CardDetailsWidget: View {
 
     // MARK: - Properties
 
+    @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
 
@@ -97,7 +98,10 @@ public struct CardDetailsWidget: View {
                     viewModel.cardDetailsFormManager.formatCardNumber(updatedText: newValue)
                 }
 
-                HStack(alignment: .top, spacing: .spacing * 0.75) {
+                let layout = shouldAlignVertically() ?
+                    AnyLayout(VStackLayout(spacing: max(max(.spacing - 10, 0), 0))) :
+                    AnyLayout(HStackLayout(alignment: .top, spacing: .spacing * 0.75))
+                layout {
                     OutlineTextField(
                         text: $viewModel.cardDetailsFormManager.expiryDateText,
                         title: viewModel.cardDetailsFormManager.expiryDateTitle,
@@ -190,6 +194,14 @@ public struct CardDetailsWidget: View {
         case .mastercard: Image("mastercard", bundle: Bundle.module)
         case .solo: Image("solo", bundle: Bundle.module)
         case .visa: Image("visa", bundle: Bundle.module)
+        }
+    }
+    
+    private func shouldAlignVertically() -> Bool {
+        switch sizeCategory {
+        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
+        @unknown default: return false
         }
     }
 }

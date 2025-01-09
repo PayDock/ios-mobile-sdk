@@ -10,7 +10,7 @@ import SwiftUI
 
 struct OutlineTextField: View {
 
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var sizeCategory
     
     // MARK: Properties
 
@@ -309,38 +309,38 @@ extension OutlineTextField {
     
     private func getTextFieldHeight() -> CGFloat {
         switch sizeCategory {
-        case .extraSmall: return 38
+        case .xSmall: return 38
         case .small: return 42
         case .medium: return 44
         case .large: return 50
-        case .extraLarge: return 54
-        case .extraExtraLarge: return 58
-        case .extraExtraExtraLarge: return 62
+        case .xLarge: return 54
+        case .xxLarge: return 58
+        case .xxxLarge: return 62
             
-        case .accessibilityMedium: return 70
-        case .accessibilityLarge: return 90
-        case .accessibilityExtraLarge: return 110
-        case .accessibilityExtraExtraLarge: return 130
-        case .accessibilityExtraExtraExtraLarge: return 140
+        case .accessibility1: return 70
+        case .accessibility2: return 100
+        case .accessibility3: return 130
+        case .accessibility4: return 160
+        case .accessibility5: return 190
         @unknown default: return 48
         }
     }
     
     private func getTitleExtraPadding() -> CGFloat {
         switch sizeCategory {
-        case .extraSmall: return -8.0
+        case .xSmall: return -8.0
         case .small: return -4.0
         case .medium: return 0.0
         case .large: return 4.0
-        case .extraLarge: return 8.0
-        case .extraExtraLarge: return 12.0
-        case .extraExtraExtraLarge: return 16.0
+        case .xLarge: return 8.0
+        case .xxLarge: return 12.0
+        case .xxxLarge: return 16.0
             
-        case .accessibilityMedium: return 22.0
-        case .accessibilityLarge: return 42.0
-        case .accessibilityExtraLarge: return 62.0
-        case .accessibilityExtraExtraLarge: return 82.0
-        case .accessibilityExtraExtraExtraLarge: return 102.0
+        case .accessibility1: return 22.0
+        case .accessibility2: return 52.0
+        case .accessibility3: return 82.0
+        case .accessibility4: return 112.0
+        case .accessibility5: return 142.0
         @unknown default: return 48
         }
     }

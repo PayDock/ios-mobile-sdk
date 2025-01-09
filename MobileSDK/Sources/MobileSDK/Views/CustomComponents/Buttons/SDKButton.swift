@@ -44,6 +44,7 @@ struct SDKButton: View {
             }
             .myStyle(style)
             .disabled(style.isDisabled)
+            .dynamicTypeSize(.xSmall ... .xLarge)
         }
         .frame(maxWidth:.infinity, minHeight: 48)
     }
