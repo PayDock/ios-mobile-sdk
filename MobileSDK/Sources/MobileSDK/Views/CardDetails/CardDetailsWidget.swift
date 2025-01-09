@@ -42,7 +42,7 @@ public struct CardDetailsWidget: View {
                 .padding(.bottom, 14)
             }
             
-            if let supportedSchemes = viewModel.config.supportedSchemes, !supportedSchemes.isEmpty {
+            if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 HStack(spacing: 7) {
                     ForEach(Array(supportedSchemes), id: \.self) { scheme in
                         getSchemeIcon(for: scheme)

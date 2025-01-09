@@ -47,7 +47,8 @@ class CardDetailsVM: ObservableObject {
         
         self.cardDetailsFormManager = CardDetailsFormManager(
             shouldValidateCardholderName: config.collectCardholderName,
-            supportedSchemes: config.supportedSchemes
+            supportedSchemes: config.schemeSupport.supportedSchemes,
+            enableCardValidation: config.schemeSupport.enableValidation
         )
         
         if (loadingDelegate != nil) {
