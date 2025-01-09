@@ -20,10 +20,7 @@ struct OutlineButtonStyle: ButtonStyle {
         
         return configuration.label
             .customFont(.body)
-            .lineLimit(1)
-            .minimumScaleFactor(0.1)
             .imageScale(.small)
-            .frame(height: 48)
             .foregroundColor(currentForegroundColor)
             .cornerRadius(.buttonCornerRadius)
             .overlay(

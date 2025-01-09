@@ -153,7 +153,6 @@ public struct CardDetailsWidget: View {
                 viewModel.cardDetailsFormManager.endEditing()
                 viewModel.tokeniseCardDetails()
             }
-            .frame(height: 48)
             .padding(.bottom, 16)
             .padding(.top, .spacing)
             .customFont(.body)

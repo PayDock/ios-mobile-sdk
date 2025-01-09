@@ -39,12 +39,12 @@ struct SDKButton: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     getTitle()
+                        .padding(4)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .myStyle(style)
             .disabled(style.isDisabled)
-            .dynamicTypeSize(.xSmall ... .xLarge)
         }
         .frame(maxWidth:.infinity, minHeight: 48)
     }
