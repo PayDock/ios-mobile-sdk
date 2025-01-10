@@ -14,7 +14,8 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Dependencies
     
     private let shouldValidateCardholderName: Bool
-    private let supportedSchemes: [CardScheme]?
+    private let supportedSchemes: Set<CardScheme>?
+    private let enableCardValidation: Bool
     private let cardSchemeValidator: CardSchemeValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
@@ -85,13 +86,15 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Initialisation
 
     init(shouldValidateCardholderName: Bool = true,
-         supportedSchemes: [CardScheme]? = nil,
+         supportedSchemes: Set<CardScheme>? = nil,
+         enableCardValidation: Bool = true,
          cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
          cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
         self.shouldValidateCardholderName = shouldValidateCardholderName
         self.supportedSchemes = supportedSchemes
+        self.enableCardValidation = enableCardValidation
         self.cardSchemeValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
@@ -180,25 +183,34 @@ class CardDetailsFormManager: ObservableObject {
     private func validateCardNumber() {
         // Validate card number format
         guard cardSchemeValidator.isValidCreditCardNumber(number: cardNumberText) else {
-            cardNumberValid = false
-            cardNumberError = "Invalid card number"
+            updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
+            return
+        }
+                
+        // If card validation is enabled, validate against supported schemes
+        guard !enableCardValidation else {
+            validateAgainstSupportedSchemes()
             return
         }
         
-        // Detect card issuer and map to scheme
-        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
-        
+        // If all validations pass, clear any errors
+        updateCardNumberValidationState(isValid: true, errorMessage: nil)
+    }
+    
+    private func validateAgainstSupportedSchemes() {
         // Validate against supported schemes if provided
-        if let supportedSchemes = supportedSchemes, !supportedSchemes.isEmpty {
-            guard let scheme = cardScheme, supportedSchemes.contains(scheme) else {
-                cardNumberValid = false
-                cardNumberError = "Card type not accepted"
-                return
-            }
+        guard let detectedScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText),
+              let supportedSchemes = supportedSchemes, supportedSchemes.contains(detectedScheme) else {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Card type not accepted")
+            return
         }
         
-        cardNumberValid = true
-        cardNumberError = ""
+        updateCardNumberValidationState(isValid: true, errorMessage: nil)
+    }
+
+    private func updateCardNumberValidationState(isValid: Bool, errorMessage: String?) {
+        cardNumberValid = isValid
+        cardNumberError = errorMessage ?? ""
     }
 
     private func validateExpiryDate() {
