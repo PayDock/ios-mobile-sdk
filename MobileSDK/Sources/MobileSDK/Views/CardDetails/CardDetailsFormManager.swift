@@ -121,19 +121,26 @@ class CardDetailsFormManager: ObservableObject {
 
     func updateSecurityCodeTitleAndPlaceholder() {
         let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardScheme: cardScheme)
 
-        switch cardSecurityCodeType {
-        case .cvv:
+        switch cardScheme {
+        case .visa, .diners, .japcb:
             securityCodeTitle = "CVV"
             securityCodePlaceholder = "XXX"
-
-        case .csc:
-            securityCodeTitle = "CSC"
+        
+        case .mastercard, .solo, .ausbc:
+            securityCodeTitle = "CVC"
+            securityCodePlaceholder = "XXX"
+        
+        case .amex:
+            securityCodeTitle = "CID"
             securityCodePlaceholder = "XXXX"
 
-        case .cvc:
-            securityCodeTitle = "CVC"
+        case .discover:
+            securityCodeTitle = "CIC"
+            securityCodePlaceholder = "XXX"
+            
+        case .none:
+            securityCodeTitle = "CVV"
             securityCodePlaceholder = "XXX"
         }
     }
@@ -231,10 +238,9 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateSecurityCode() {
-        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardScheme: cardScheme)
+        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText) ?? .visa // Default to 3 digit CVV validation
 
-        if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType) {
+        if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, cardScheme: cardScheme) {
             securityCodeValid = true
             securityCodeError = ""
         } else {
@@ -249,8 +255,7 @@ class CardDetailsFormManager: ObservableObject {
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
         
         let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardScheme: cardScheme)
-        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType)
+        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, cardScheme: cardScheme ?? .visa) // Default to 3 digit CVV validation
         
         return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
     }
