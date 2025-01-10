@@ -19,6 +19,9 @@ struct FillButtonStyle: ButtonStyle {
     
         return configuration.label
             .customFont(.body)
+            .lineLimit(1)
+            .minimumScaleFactor(0.1)
+            .frame(height: 48)
             .imageScale(.small)
             .foregroundColor(currentForegroundColor)
             .background(isDisabled || configuration.isPressed ? backgroundColor.opacity(0.8) : backgroundColor)
