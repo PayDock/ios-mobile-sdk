@@ -136,7 +136,7 @@ class CardDetailsFormManager: ObservableObject {
             securityCodePlaceholder = "XXXX"
 
         case .discover:
-            securityCodeTitle = "CIC"
+            securityCodeTitle = "CID"
             securityCodePlaceholder = "XXX"
             
         case .none:
