@@ -53,8 +53,8 @@ struct Constants {
         }
 
         switch environment {
-        case .production: return "v1.108.0"
-        case .sandbox, .staging: return "v1.108.0-beta"
+        case .production: return "v1.113.2"
+        case .sandbox, .staging: return "v1.113.2"
         }
     }
 
