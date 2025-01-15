@@ -16,14 +16,6 @@ struct TokeniseCardDetailsReq: Codable {
     let expireMonth: String
     let expireYear: String
     let cardCcv: String
-
-    enum CodingKeys: String, CodingKey {
-        case gatewayId = "gateway_id"
-        case cardName = "card_name"
-        case cardNumber = "card_number"
-        case expireMonth = "expire_month"
-        case expireYear = "expire_year"
-        case cardCcv = "card_ccv"
-    }
+    let storeCcv: Bool = true
 
 }
