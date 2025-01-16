@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2025-01-14
+## [2.0.0] - 2025-01-16
 
 ### Added
 
@@ -11,6 +11,7 @@
 ### Changed
 
 - `CardDetailsWidget`contract with config.
+- `CardDetailsWidget` now stores security code by default.
 - Card scheme list matching supported schemes.
 - Card security code validation is now based on card scheme.
 
