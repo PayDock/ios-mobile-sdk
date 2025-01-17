@@ -69,15 +69,15 @@ extension WalletEndpoints: Endpoint {
 
     var body: Data? {
         switch self {
-        case .initialiseWalletCharge(let request): return try? JSONEncoder().encode(request)
-        case .initialiseFlyPayWalletCharge(let request): return try? JSONEncoder().encode(request)
-        case .cardToken(let request): return try? JSONEncoder().encode(request)
-        case .integrated3ds(let request): return try? JSONEncoder().encode(request)
-        case .integrated3dsVault(let request): return try? JSONEncoder().encode(request)
-        case .standalone3ds(let request): return try? JSONEncoder().encode(request)
-        case .vaultToken(let request): return try? JSONEncoder().encode(request)
-        case .convertToVaultToken(let request): return try? JSONEncoder().encode(request)
-        case .captureCharge(let request): return try? JSONEncoder().encode(request)
+        case .initialiseWalletCharge(let request): return try? encoder.encode(request)
+        case .initialiseFlyPayWalletCharge(let request): return try? encoder.encode(request)
+        case .cardToken(let request): return try? encoder.encode(request)
+        case .integrated3ds(let request): return try? encoder.encode(request)
+        case .integrated3dsVault(let request): return try? encoder.encode(request)
+        case .standalone3ds(let request): return try? encoder.encode(request)
+        case .vaultToken(let request): return try? encoder.encode(request)
+        case .convertToVaultToken(let request): return try? encoder.encode(request)
+        case .captureCharge(let request): return try? encoder.encode(request)
         }
     }
 

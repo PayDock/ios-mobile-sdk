@@ -12,28 +12,19 @@ public struct CardDetailsWidget: View {
 
     // MARK: - Properties
 
+    @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
 
     // MARK: - Initialisation
 
     public init(viewState: ViewState? = nil,
-                gatewayId: String?,
-                accessToken: String,
-                actionText: String = "Submit",
-                showCardTitle: Bool = true,
-                collectCardholderName: Bool = true,
-                allowSaveCard: SaveCardConfig? = nil,
+                config: CardDetailsWidgetConfig,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
             viewState: viewState ?? ViewState(state: .none),
-            gatewayId: gatewayId,
-            accessToken: accessToken,
-            actionText: actionText,
-            showCardTitle: showCardTitle,
-            collectCardholderName: collectCardholderName,
-            allowSaveCard: allowSaveCard,
+            config: config,
             loadingDelegate: loadingDelegate,
             completion: completion))
     }
@@ -42,7 +33,7 @@ public struct CardDetailsWidget: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if viewModel.showCardTitle {
+            if viewModel.config.showCardTitle {
                 HStack {
                     Text("Card information")
                         .customFont(.body)
@@ -51,9 +42,22 @@ public struct CardDetailsWidget: View {
                 }
                 .padding(.bottom, 14)
             }
+            
+            if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
+                HStack(spacing: 7) {
+                    ForEach(Array(supportedSchemes), id: \.self) { scheme in
+                        getSchemeIcon(for: scheme)
+                            .resizable()
+                            .frame(width: 26, height: 20)
+                            .scaledToFit()
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, .spacing)
+            }
 
             VStack(spacing: max(max(.spacing - 10, 0), 0)) {
-                if viewModel.collectCardholderName {
+                if viewModel.config.collectCardholderName {
                     OutlineTextField(
                         text: $viewModel.cardDetailsFormManager.cardholderNameText,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
@@ -94,7 +98,10 @@ public struct CardDetailsWidget: View {
                     viewModel.cardDetailsFormManager.formatCardNumber(updatedText: newValue)
                 }
 
-                HStack(alignment: .top, spacing: .spacing * 0.75) {
+                let layout = shouldAlignVertically() ?
+                    AnyLayout(VStackLayout(spacing: max(max(.spacing - 10, 0), 0))) :
+                    AnyLayout(HStackLayout(alignment: .top, spacing: .spacing * 0.75))
+                layout {
                     OutlineTextField(
                         text: $viewModel.cardDetailsFormManager.expiryDateText,
                         title: viewModel.cardDetailsFormManager.expiryDateTitle,
@@ -135,18 +142,17 @@ public struct CardDetailsWidget: View {
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .securityCode)
                 }
-                if viewModel.allowSaveCard != nil {
+                if viewModel.config.allowSaveCard != nil {
                     privacyView
                 }
             }
-            SDKButton(title: viewModel.actionText,
+            SDKButton(title: viewModel.config.actionText,
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
                       style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
             ) {
                 viewModel.cardDetailsFormManager.endEditing()
                 viewModel.tokeniseCardDetails()
             }
-            .frame(height: 48)
             .padding(.bottom, 16)
             .padding(.top, .spacing)
             .customFont(.body)
@@ -157,11 +163,11 @@ public struct CardDetailsWidget: View {
     private var privacyView: some View {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(viewModel.allowSaveCard?.consentText ?? "")
+                    Text(viewModel.config.allowSaveCard?.consentText ?? "")
                         .customFont(.body3)
                         .foregroundColor(.textColor)
-                    let text = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
-                    let url = viewModel.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
+                    let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
+                    let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                     let link = "[\(text)](\(url))"
                     Text(.init(link))
                         .customFont(.body3)
@@ -176,11 +182,32 @@ public struct CardDetailsWidget: View {
                     .disabled(viewModel.viewState.isDisabled)
         }
     }
+    
+    private func getSchemeIcon(for scheme: CardScheme) -> Image {
+        switch scheme {
+        case .amex: Image("amex", bundle: Bundle.module)
+        case .ausbc: Image("ausbc", bundle: Bundle.module)
+        case .diners: Image("diners", bundle: Bundle.module)
+        case .discover: Image("discover", bundle: Bundle.module)
+        case .japcb: Image("jcb", bundle: Bundle.module)
+        case .mastercard: Image("mastercard", bundle: Bundle.module)
+        case .solo: Image("solo", bundle: Bundle.module)
+        case .visa: Image("visa", bundle: Bundle.module)
+        }
+    }
+    
+    private func shouldAlignVertically() -> Bool {
+        switch sizeCategory {
+        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
+        @unknown default: return false
+        }
+    }
 }
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsWidget(gatewayId: "", accessToken: "", completion: { _ in })
+        CardDetailsWidget(config: CardDetailsWidgetConfig(gatewayId: "", accessToken: ""), completion: { _ in })
             .previewLayout(.sizeThatFits)
     }
 }

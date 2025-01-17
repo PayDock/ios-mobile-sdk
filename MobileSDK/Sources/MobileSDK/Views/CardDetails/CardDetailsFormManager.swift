@@ -14,7 +14,9 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Dependencies
     
     private let shouldValidateCardholderName: Bool
-    private let cardIssuerValidator: CardIssuerValidator
+    private let supportedSchemes: Set<CardScheme>?
+    private let enableCardValidation: Bool
+    private let cardSchemeValidator: CardSchemeValidator
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
     private let cardDetailsFormatter: CardDetailsFormatter
@@ -84,12 +86,16 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Initialisation
 
     init(shouldValidateCardholderName: Bool = true,
-         cardIssuerValidator: CardIssuerValidator = CardIssuerValidator(),
+         supportedSchemes: Set<CardScheme>? = nil,
+         enableCardValidation: Bool = true,
+         cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
          cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
         self.shouldValidateCardholderName = shouldValidateCardholderName
-        self.cardIssuerValidator = cardIssuerValidator
+        self.supportedSchemes = supportedSchemes
+        self.enableCardValidation = enableCardValidation
+        self.cardSchemeValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
         self.cardDetailsFormatter = cardExpiryDateFormatter
@@ -109,43 +115,47 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func updateCardIssuerIcon() {
-        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
-        cardImage = getCardIssuerIcon(for: cardIssuer)
+        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
+        cardImage = getCardSchemeIcon(for: cardScheme)
     }
 
     func updateSecurityCodeTitleAndPlaceholder() {
-        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
+        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
 
-        switch cardSecurityCodeType {
-        case .cvv:
+        switch cardScheme {
+        case .visa, .diners, .japcb:
             securityCodeTitle = "CVV"
             securityCodePlaceholder = "XXX"
-
-        case .csc:
-            securityCodeTitle = "CSC"
+        
+        case .mastercard, .solo, .ausbc:
+            securityCodeTitle = "CVC"
+            securityCodePlaceholder = "XXX"
+        
+        case .amex:
+            securityCodeTitle = "CID"
             securityCodePlaceholder = "XXXX"
 
-        case .cvc:
-            securityCodeTitle = "CVC"
+        case .discover:
+            securityCodeTitle = "CID"
+            securityCodePlaceholder = "XXX"
+            
+        case .none:
+            securityCodeTitle = "CVV"
             securityCodePlaceholder = "XXX"
         }
     }
 
-    private func getCardIssuerIcon(for cardIssuerType: CardIssuerType) -> Image {
-        switch cardIssuerType {
+    private func getCardSchemeIcon(for cardScheme: CardScheme?) -> Image {
+        switch cardScheme {
         case .amex: return Image("amex", bundle: Bundle.module)
+        case .ausbc: return Image("ausbc", bundle: Bundle.module)
         case .diners: return Image("diners", bundle: Bundle.module)
         case .discover: return Image("discover", bundle: Bundle.module)
-        case .instaPayment: return Image("insta-payment", bundle: Bundle.module)
-        case .interPay: return Image("inter-payment", bundle: Bundle.module)
-        case .jcb: return Image("jcb", bundle: Bundle.module)
-        case .maestro: return Image("maestro", bundle: Bundle.module)
+        case .japcb: return Image("jcb", bundle: Bundle.module)
         case .mastercard: return Image("mastercard", bundle: Bundle.module)
-        case .uatp: return Image("uatp", bundle: Bundle.module)
-        case .unionPay: return Image("union-pay", bundle: Bundle.module)
         case .visa: return Image("visa", bundle: Bundle.module)
-        case .other: return Image("credit-card", bundle: Bundle.module)
+        case .solo: return Image("solo", bundle: Bundle.module)
+        default: return Image("credit-card", bundle: Bundle.module)
         }
     }
 
@@ -163,7 +173,7 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardholderName() {
-        if cardIssuerValidator.isValidCreditCardNumber(number: cardholderNameText) {
+        if cardSchemeValidator.isValidCreditCardNumber(number: cardholderNameText) {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
 
@@ -178,13 +188,36 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardNumber() {
-        if cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText) {
-            cardNumberValid = true
-            cardNumberError = ""
-        } else {
-            cardNumberValid = false
-            cardNumberError = "Invalid card number"
+        // Validate card number format
+        guard cardSchemeValidator.isValidCreditCardNumber(number: cardNumberText) else {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
+            return
         }
+                
+        // If card validation is enabled, validate against supported schemes
+        guard !enableCardValidation else {
+            validateAgainstSupportedSchemes()
+            return
+        }
+        
+        // If all validations pass, clear any errors
+        updateCardNumberValidationState(isValid: true, errorMessage: nil)
+    }
+    
+    private func validateAgainstSupportedSchemes() {
+        // Validate against supported schemes if provided
+        guard let detectedScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText),
+              let supportedSchemes = supportedSchemes, supportedSchemes.contains(detectedScheme) else {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Card type not accepted")
+            return
+        }
+        
+        updateCardNumberValidationState(isValid: true, errorMessage: nil)
+    }
+
+    private func updateCardNumberValidationState(isValid: Bool, errorMessage: String?) {
+        cardNumberValid = isValid
+        cardNumberError = errorMessage ?? ""
     }
 
     private func validateExpiryDate() {
@@ -205,10 +238,9 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateSecurityCode() {
-        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
+        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText) ?? .visa // Default to 3 digit CVV validation
 
-        if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType) {
+        if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, cardScheme: cardScheme) {
             securityCodeValid = true
             securityCodeError = ""
         } else {
@@ -218,13 +250,12 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func isFormValid() -> Bool {
-        let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardIssuerValidator.isValidCreditCardNumber(number: cardholderNameText)) : true
-        let creditCardValid = cardIssuerValidator.isValidCreditCardNumber(number: cardNumberText)
+        let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardSchemeValidator.isValidCreditCardNumber(number: cardholderNameText)) : true
+        let creditCardValid = cardSchemeValidator.isValidCreditCardNumber(number: cardNumberText)
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
         
-        let cardIssuer = cardIssuerValidator.detectCardIssuer(number: cardNumberText)
-        let cardSecurityCodeType = cardSecurityCodeValidator.detectSecurityCodeType(cardIssuer: cardIssuer)
-        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, securityCodeType: cardSecurityCodeType)
+        let cardScheme = cardSchemeValidator.detectCardScheme(number: cardNumberText)
+        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, cardScheme: cardScheme ?? .visa) // Default to 3 digit CVV validation
         
         return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
     }

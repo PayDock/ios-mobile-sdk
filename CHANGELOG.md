@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.0.0] - 2025-01-16
+
+### Added
+
+- New `CardDetailsWidgetConfig` to manage card details.
+- Supported card scheme functionality (optional)
+- Added accessibility font and UI scaling.
+
+### Changed
+
+- `CardDetailsWidget`contract with config.
+- `CardDetailsWidget` now stores security code by default.
+- Card scheme list matching supported schemes.
+- Card security code validation is now based on card scheme.
+
 ## [1.8.0] - 2024-12-18
 
 ### Added

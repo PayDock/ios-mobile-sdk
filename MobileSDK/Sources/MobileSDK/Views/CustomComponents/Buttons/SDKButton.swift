@@ -39,6 +39,7 @@ struct SDKButton: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     getTitle()
+                        .padding(4)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }

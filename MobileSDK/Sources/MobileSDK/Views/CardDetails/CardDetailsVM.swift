@@ -18,15 +18,10 @@ class CardDetailsVM: ObservableObject {
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
     private let cardService: CardService
-    private let accessToken: String
+    let config: CardDetailsWidgetConfig
 
     // MARK: - Properties
 
-    private let gatewayId: String?
-    let actionText: String
-    let showCardTitle: Bool
-    let collectCardholderName: Bool
-    let allowSaveCard: SaveCardConfig?
     private let completion: (Result<CardResult, CardDetailsError>) -> Void
 
     @Published var isLoading = false
@@ -41,26 +36,20 @@ class CardDetailsVM: ObservableObject {
 
     init(cardService: CardService = CardServiceImpl(),
          viewState: ViewState,
-         gatewayId: String?,
-         accessToken: String,
-         actionText: String,
-         showCardTitle: Bool,
-         collectCardholderName: Bool,
-         allowSaveCard: SaveCardConfig?,
+         config: CardDetailsWidgetConfig,
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
         self.viewState = viewState
-        self.gatewayId = gatewayId
-        self.accessToken = accessToken
-        self.actionText = actionText
-        self.showCardTitle = showCardTitle
-        self.collectCardholderName = collectCardholderName
-        self.allowSaveCard = allowSaveCard
+        self.config = config
         self.loadingDelegate = loadingDelegate
         self.completion = completion
         
-        self.cardDetailsFormManager = CardDetailsFormManager(shouldValidateCardholderName: collectCardholderName)
+        self.cardDetailsFormManager = CardDetailsFormManager(
+            shouldValidateCardholderName: config.collectCardholderName,
+            supportedSchemes: config.schemeSupport.supportedSchemes,
+            enableCardValidation: config.schemeSupport.enableValidation
+        )
         
         if (loadingDelegate != nil) {
             showLoaders = false
@@ -83,7 +72,7 @@ class CardDetailsVM: ObservableObject {
             let cardName = cardDetailsFormManager.cardholderNameText.isEmpty ? nil : cardDetailsFormManager.cardholderNameText
 
             let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
-                gatewayId: gatewayId,
+                gatewayId: config.gatewayId,
                 cardName: cardName,
                 cardNumber: cardDetailsFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 expireMonth: String(expireMonth),
@@ -92,7 +81,7 @@ class CardDetailsVM: ObservableObject {
 
             do {
                 updateLoadingState(isLoading: true)
-                let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: accessToken)
+                let cardToken = try await cardService.createToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: config.accessToken)
                 updateLoadingState(isLoading: false)
                 completion(.success(createResult(token: cardToken)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
@@ -127,7 +116,7 @@ class CardDetailsVM: ObservableObject {
     }
 
     private func createResult(token: String) -> CardResult {
-        if let _ = allowSaveCard {
+        if let _ = config.allowSaveCard {
             return CardResult(token: token, saveCard: policyAccepted)
         } else {
             return CardResult(token: token, saveCard: nil)

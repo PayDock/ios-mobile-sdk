@@ -18,9 +18,15 @@ struct CardDetailsWidgetView: View {
         NavigationStack {
             ScrollView {
                 CardDetailsWidget(
-                    gatewayId: nil,
-                    accessToken: ProjectEnvironment.shared.getAccessToken(),
-                    allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                    config: CardDetailsWidgetConfig(
+                        gatewayId: nil,
+                        accessToken: ProjectEnvironment.shared.getAccessToken(),
+                        allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                        schemeSupport: SupportedSchemesConfig(
+                            supportedSchemes: Set(CardScheme.allCases),
+                            enableValidation: true
+                        )
+                    ),
                     completion: { result in
                         switch result {
                         case .success(let result): alertMessage = result.token

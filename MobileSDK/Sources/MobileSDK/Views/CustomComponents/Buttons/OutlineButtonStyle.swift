@@ -21,6 +21,8 @@ struct OutlineButtonStyle: ButtonStyle {
         return configuration.label
             .customFont(.body)
             .imageScale(.small)
+            .lineLimit(1)
+            .minimumScaleFactor(0.1)
             .frame(height: 48)
             .foregroundColor(currentForegroundColor)
             .cornerRadius(.buttonCornerRadius)
@@ -28,6 +30,5 @@ struct OutlineButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: .buttonCornerRadius)
                     .stroke(currentBorderColor)
             )
-            .font(Font.system(size: 19, weight: .semibold))
     }
 }

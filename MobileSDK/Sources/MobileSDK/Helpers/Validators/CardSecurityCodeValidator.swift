@@ -11,42 +11,37 @@ import Foundation
 /**
  A utility object for detecting the type of security code (CVV, CSC, CVC) based on the card issuer type.
  */
- class CardSecurityCodeValidator {
-
-    func isSecurityCodeValid(code: String, securityCodeType: CardSecurityCodeType) -> Bool {
-        return checkSecurityCode(code: code, securityCodeType: securityCodeType) && code.count == securityCodeType.requiredDigits
+class CardSecurityCodeValidator {
+    
+    func isSecurityCodeValid(code: String, cardScheme: CardScheme) -> Bool {
+        return checkSecurityCode(code: code, cardScheme: cardScheme) && code.count ==  requiredDigits(cardScheme: cardScheme)
     }
-
+    
     /**
      Checks if the security code input is valid based on the specified security code type.
-
+     
      - Parameters:
-        - code: The security code input string to validate.
-        - cardSecurityCodeType: The type of security code to validate against.
-
+     - code: The security code input string to validate.
+     - cardScheme: The type of card scheme to validate against.
+     
      - Returns: True if the security code input is valid, false otherwise.
      */
-    private func checkSecurityCode(code: String, securityCodeType: CardSecurityCodeType) -> Bool {
-        return !code.isEmpty && code.range(of: "^[0-9]+$", options: .regularExpression) != nil && code.count <= securityCodeType.requiredDigits
+    private func checkSecurityCode(code: String, cardScheme: CardScheme) -> Bool {
+        return !code.isEmpty && code.range(of: "^[0-9]+$", options: .regularExpression) != nil && code.count <= requiredDigits(cardScheme: cardScheme)
     }
-
+    
     /**
-     Detects the type of security code based on the specified card issuer type.
-
-     - Parameter cardIssuer: The type of card issuer.
-
-     - Returns: The detected `CardSecurityCodeType` based on the card issuer.
+     Checks if the security code input is valid based on the specified security code type.
+     
+     - Parameters:
+     - cardScheme: The card scheme to check.
+     
+     - Returns: Number of digits required.
      */
-    func detectSecurityCodeType(cardIssuer: CardIssuerType) -> CardSecurityCodeType {
-        switch cardIssuer {
-        case .visa, .discover, .unionPay:
-            return .cvv
-        case .amex, .diners:
-            return .csc
-        case .mastercard:
-            return .cvc
-        default:
-            return .cvv
+    private func requiredDigits(cardScheme: CardScheme) -> Int {
+        switch cardScheme {
+        case .amex: return 4
+        case .mastercard, .visa, .diners, .discover, .japcb, .solo, .ausbc: return 3
         }
     }
 }

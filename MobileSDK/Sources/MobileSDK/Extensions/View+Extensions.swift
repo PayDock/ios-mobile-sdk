@@ -15,7 +15,7 @@ extension View {
     }
 
     func customFont(_ size: Fonts.Size) -> some View {
-        font(.custom(Appearance.shared.fontName, size: size.rawValue))
+        return self.modifier(ScaledFont(size: size.rawValue))
     }
 
 }
