@@ -87,6 +87,7 @@ struct OutlineTextField: View {
             ZStack {
                 textFieldView
                 placeholderView()
+                    .accessibilityHidden(true)
             }
             if showErrorView {
                 errorView()
@@ -131,6 +132,7 @@ struct OutlineTextField: View {
             leftImage?
                 .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
+                .accessibilityHidden(true)
 
             TextField(editing ? placeholder : "", text: $text)
             .simultaneousGesture(TapGesture().onEnded({ _ in
@@ -141,6 +143,8 @@ struct OutlineTextField: View {
             .customFont(.body)
             .foregroundColor(.textColor)
             .tint(.primaryColor)
+            .accessibilityLabel(title)
+            .accessibilityHint(errorMessage)
             
             if validationIconEnabled {
                 validationIconView

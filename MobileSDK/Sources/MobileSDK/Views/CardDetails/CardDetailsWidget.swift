@@ -38,6 +38,7 @@ public struct CardDetailsWidget: View {
                     Text("Card information")
                         .customFont(.body)
                         .foregroundColor(.placeholderColor)
+                        .accessibilityAddTraits(.isHeader)
                     Spacer()
                 }
                 .padding(.bottom, 14)
@@ -174,12 +175,14 @@ public struct CardDetailsWidget: View {
                         .foregroundColor(.textColor)
                         .underline()
                         .disabled(viewModel.viewState.isDisabled)
+                        .accessibilityAddTraits(.isLink)
                 }
                 Spacer()
                 Toggle(isOn: $viewModel.policyAccepted) {}
                     .tint(.primaryColor)
                     .frame(width: 64, height: 44)
                     .disabled(viewModel.viewState.isDisabled)
+                    .accessibilityLabel("Save card toggle")
         }
     }
     
