@@ -107,6 +107,7 @@ public struct AddressWidget: View {
                 .customFont(.body)
                 .font(.largeTitle)
                 .foregroundColor(.placeholderColor)
+                .accessibilityAddTraits(.isHeader)
             Spacer()
         }
         .padding(.bottom, 20)

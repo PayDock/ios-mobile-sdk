@@ -116,6 +116,7 @@ struct AutocompleteTextField: View {
                                         .onTapGesture {
                                             onSelection(getOptionIndex(option: option))
                                         }
+                                        .accessibilityAddTraits(.isButton)
                                     Spacer()
                                 }
                             }

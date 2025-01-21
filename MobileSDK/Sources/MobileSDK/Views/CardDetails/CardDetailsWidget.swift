@@ -182,7 +182,7 @@ public struct CardDetailsWidget: View {
                     .tint(.primaryColor)
                     .frame(width: 64, height: 44)
                     .disabled(viewModel.viewState.isDisabled)
-                    .accessibilityLabel("Save card toggle")
+                    .accessibilityLabel("Remember card toggle")
         }
     }
     

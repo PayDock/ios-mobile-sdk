@@ -144,10 +144,11 @@ struct OutlineTextField: View {
             .foregroundColor(.textColor)
             .tint(.primaryColor)
             .accessibilityLabel(title)
-            .accessibilityHint(errorMessage)
+            .accessibilityHint(getValidMessage())
             
             if validationIconEnabled {
                 validationIconView
+                    .accessibilityHidden(true)
             }
         }
         .padding([.leading, .trailing], 16.0)
@@ -347,6 +348,12 @@ extension OutlineTextField {
         case .accessibility5: return 142.0
         @unknown default: return 48
         }
+    }
+    
+    private func getValidMessage() -> String {
+        guard let valid = valid else { return "" }
+        return valid ? "Valid" : errorMessage
+
     }
 }
 
