@@ -175,7 +175,6 @@ public struct CardDetailsWidget: View {
                         .foregroundColor(.textColor)
                         .underline()
                         .disabled(viewModel.viewState.isDisabled)
-                        .accessibilityAddTraits(.isLink)
                 }
                 Spacer()
                 Toggle(isOn: $viewModel.policyAccepted) {}
@@ -188,8 +187,8 @@ public struct CardDetailsWidget: View {
     
     private func getSchemeIcon(for scheme: CardScheme) -> Image {
         switch scheme {
-        case .amex: Image("amex", bundle: Bundle.module)
-        case .ausbc: Image("ausbc", bundle: Bundle.module)
+        case .amex: Image("american-express", bundle: Bundle.module)
+        case .ausbc: Image("australian-commonwealth-bank", bundle: Bundle.module)
         case .diners: Image("diners", bundle: Bundle.module)
         case .discover: Image("discover", bundle: Bundle.module)
         case .japcb: Image("jcb", bundle: Bundle.module)

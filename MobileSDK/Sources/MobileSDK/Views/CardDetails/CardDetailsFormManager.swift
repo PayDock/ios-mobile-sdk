@@ -147,8 +147,8 @@ class CardDetailsFormManager: ObservableObject {
 
     private func getCardSchemeIcon(for cardScheme: CardScheme?) -> Image {
         switch cardScheme {
-        case .amex: return Image("amex", bundle: Bundle.module)
-        case .ausbc: return Image("ausbc", bundle: Bundle.module)
+        case .amex: return Image("american-express", bundle: Bundle.module)
+        case .ausbc: return Image("australian-commonwealth-bank", bundle: Bundle.module)
         case .diners: return Image("diners", bundle: Bundle.module)
         case .discover: return Image("discover", bundle: Bundle.module)
         case .japcb: return Image("jcb", bundle: Bundle.module)
