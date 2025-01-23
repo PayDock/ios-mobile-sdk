@@ -45,5 +45,15 @@ class CardDetailsFormatter {
         }
         return groomed
     }
+    
+    func formatSecurityCode(updatedText: String) -> String {
+       var groomed = ""
+        for c in updatedText {
+            if c.isASCII && c.isNumber {
+                groomed.append(c)
+            }
+        }
+        return groomed
+    }
 
 }

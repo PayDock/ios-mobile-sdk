@@ -142,6 +142,9 @@ public struct CardDetailsWidget: View {
                     )
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .securityCode)
+                    .onChange(of: viewModel.cardDetailsFormManager.securityCodeText) { newValue in
+                        viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: newValue)
+                    }
                 }
                 if viewModel.config.allowSaveCard != nil {
                     privacyView

@@ -352,7 +352,7 @@ extension OutlineTextField {
     
     private func getValidMessage() -> String {
         guard let valid = valid else { return "" }
-        return valid ? "Valid" : errorMessage
+        return valid ? "Valid" : "Invalid. \(errorMessage)"
 
     }
 }

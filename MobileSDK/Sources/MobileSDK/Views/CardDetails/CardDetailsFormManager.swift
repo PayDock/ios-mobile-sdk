@@ -270,6 +270,10 @@ class CardDetailsFormManager: ObservableObject {
         expiryDateText = cardDetailsFormatter.formatExpiryDate(updatedText: updatedText)
     }
     
+    func formatSecurityCode(updatedText: String) {
+        securityCodeText = cardDetailsFormatter.formatSecurityCode(updatedText: updatedText)
+    }
+    
     // MARK: - Editing
     
     func endEditing() {
