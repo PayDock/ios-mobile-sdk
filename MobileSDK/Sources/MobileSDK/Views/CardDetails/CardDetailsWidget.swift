@@ -53,6 +53,8 @@ public struct CardDetailsWidget: View {
                             .scaledToFit()
                     }
                 }
+                .accessibilityElement()
+                .accessibilityLabel("Supported card schemes: \(supportedSchemes.map(\.voiceoverName).joined(separator: ", "))")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, .spacing)
             }
@@ -184,7 +186,7 @@ public struct CardDetailsWidget: View {
                     .tint(.primaryColor)
                     .frame(width: 64, height: 44)
                     .disabled(viewModel.viewState.isDisabled)
-                    .accessibilityLabel("Remember card toggle")
+                    .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
         }
     }
     
