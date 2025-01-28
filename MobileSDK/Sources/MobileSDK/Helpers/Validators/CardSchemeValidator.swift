@@ -12,47 +12,55 @@ import Foundation
  A utility object for detecting card schemes based on card numbers
  */
 class CardSchemeValidator {
-
-    /**
-     Constants for the regex patterns and their corresponding card scheme
-
-     - seealso: CardScheme.visa - Visa cards begin with a 4 and have 13-16-19-digit
-     - seealso: CardScheme.mastercard - Mastercard cards begin with a 5 and has 16 digits (51, 52, 53, 54, 55, 222100-272099)
-     - seealso: CardScheme.amex - American Express cards begin with a 3, followed by a 4 or a 7 has 15 digits
-     - seealso: CardScheme.diners (Diners Club - Carte Blanche) - is a 14-digit number beginning with 300–305,
-     - seealso: CardScheme.diners (Diners Club - International) - is a 14-digit number beginning with 36, 38, or
-     - seealso: CardScheme.diners (Diners Club - USA & Canada) - is a 16-digit number beginning with 54
-     - seealso: CardScheme.japcb - JCB CCN is a 16-19-digit number beginning with 3528 or 3589.
-     - seealso: CardScheme.discover - Credit Card Number (Discover) is a 16-19-digit number beginning with 6011, 644–649 or 65.
-     */
-    private let cardSchemeRegexMap: [NSRegularExpression: CardScheme?] = [
-        try! NSRegularExpression(pattern: "^3[47][0-9]{13}$") : .amex,
-        try! NSRegularExpression(pattern: "^3(?:0[0-5]|[68][0-9])[0-9]{11}$") : .diners,
-        try! NSRegularExpression(pattern: "^4[0-9]{12}(?:[0-9]{3,6})?$") : .visa,
-        try! NSRegularExpression(pattern: "^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$") : .mastercard,
-        try! NSRegularExpression(pattern: "^6(?:011|5[0-9]{2})[0-9]{12,15}$") : .discover,
-        try! NSRegularExpression(pattern: "^(?:2131|1800|35\\d{3})\\d{11}$") : .japcb,
-        try! NSRegularExpression(pattern: "^(6334|6767)[0-9]{12}|(6334|6767)[0-9]{14}|(6334|6767)[0-9]{15}$") : .solo,
-        try! NSRegularExpression(pattern: "^(5893|6304|677189|67719[0-9])[0-9]{8,15}$") : .ausbc,
-        // The generic pattern for all other card schemes
-        try! NSRegularExpression(pattern: ".*") : nil
-    ]
-
-    /**
-     Detects the card scheme based on the provided credit card number using regex patterns.
-
-     - parameter number: The credit card number to detect the scheme for.
-     - returns: The `CardScheme` enum representing the detected card issuer, or `nil` if no scheme is matched.
-     */
-    func detectCardScheme(number: String) -> CardScheme? {
-        let cleanNumber = number.filter { !$0.isWhitespace }
-        for (regex, issuer) in cardSchemeRegexMap {
-            if issuer == nil { continue } // Skip 'other' until all specific patterns are tested
-            if let _ = regex.firstMatch(in: cleanNumber, options: [], range: NSRange(location: 0, length: cleanNumber.utf16.count)) {
-                return issuer
+    
+    private let cardService: CardService
+    private let cardServiceMock: CardService
+    private var binSchemas: [BinSchemaRes.BinSchema]
+    
+    // MARK: - Initialization
+    
+    init(cardService: CardService = CardServiceImpl(), cardServiceMock: CardService = CardServiceMock()) {
+        self.cardService = cardService
+        self.cardServiceMock = cardServiceMock
+        self.binSchemas = []
+        
+        loadLocalBin()
+        loadRemoteBin()
+    }
+    
+    // MARK: - Data Loading
+    
+    private func loadLocalBin() {
+        Task {
+            do {
+                binSchemas =  try await cardServiceMock.getCardBinSchema(accessToken: "")
+                print("success loading bin")
+            } catch {
+                print(error)
+                print("Error loading local BIN .json!")
             }
         }
-        return nil
+    }
+    
+    private func loadRemoteBin() {
+        Task {
+            do {
+                binSchemas =  try await cardService.getCardBinSchema(accessToken: "")
+            } catch {
+                print("Error loading remote BIN .json!")
+            }
+        }
+    }
+    
+    private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
+        switch scheme {
+        case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
+        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}|\\d{16}$")
+        case .visa: return try? NSRegularExpression(pattern: "^\\d{13}(\\d{3})?(\\d{3})?$")
+        case .mastercard: return try? NSRegularExpression(pattern: "^\\d{15}$")
+        case .discover: return try? NSRegularExpression(pattern: "^\\d{16}$")
+        case .japcb, .solo, .ausbc: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
+        }
     }
 
     /// Validates card PAN number using Luhn's algorithm.
@@ -60,7 +68,7 @@ class CardSchemeValidator {
     /// - Parameters:
     ///    - number: Card PAN number that contains only digits with or without whitespaces.
     ///    - Returns: true if valid, false otherwise.
-    func isValidCreditCardNumber(number: String) -> Bool {
+    func isPotentialCreditCardNumber(number: String) -> Bool {
         let cleanNumber = number.filter { !$0.isWhitespace }
         guard containsOnlyNumbers(input: cleanNumber), !cleanNumber.isEmpty else { return false }
         
@@ -86,5 +94,48 @@ class CardSchemeValidator {
         return input.allSatisfy { chr in
             "1234567890".contains(chr)
         }
+    }
+    
+//    func isCardNumberValid(number: String) -> Bool {
+//        let isValidBin = getCardSchemeFromBIN(cardNumber: number)
+//        let isCardNumberLengthValid = isCardNumberLengthValid(number: number, scheme: isValidBin)
+//        
+//        return isValidBin != nil && isCardNumberLengthValid
+//    }
+    
+    func getCardSchemeFromBIN(cardNumber: String) -> CardScheme? {
+        let cleanNumber = cardNumber.filter { !$0.isWhitespace }
+        print("ASD")
+        
+        for schema in binSchemas {
+            let binParts = schema.bin.split(separator: "~")
+            
+            if binParts.count == 1 {
+                // Exact match
+                if cleanNumber.starts(with: String(binParts[0])) {
+                    return CardScheme(rawValue: schema.schema)
+                }
+            } else if binParts.count == 2 {
+                // Range match
+                guard let lowerBound = Int(binParts[0]),
+                      let upperBound = Int(binParts[1]),
+                      let cardPrefix = Int(String(cleanNumber.prefix(binParts[0].count))) else { continue }
+                
+                if cardPrefix >= lowerBound && cardPrefix <= upperBound {
+                    return CardScheme(rawValue: schema.schema)
+                }
+            }
+        }
+        return nil
+    }
+    
+    func isCardNumberLengthValid(number: String, scheme: CardScheme?) -> Bool {
+        guard let scheme = scheme, let regex = cardLengthRegex(for: scheme) else { return false }
+        let cleanNumber = number.filter { !$0.isWhitespace }
+        
+        let range = NSRange(location: 0, length: cleanNumber.utf16.count)
+        let matches = regex.matches(in: cleanNumber, options: [], range: range)
+        
+        return !matches.isEmpty
     }
 }

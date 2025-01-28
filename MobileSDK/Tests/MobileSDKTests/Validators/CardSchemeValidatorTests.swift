@@ -52,7 +52,7 @@ class CardSchemeValidatorTests: XCTestCase {
 
     func testIsValidCreditCardNumber() {
         for testCase in testCases {
-            let isValid = validator.isValidCreditCardNumber(number: testCase.cardNumber)
+            let isValid = validator.isPotentialCreditCardNumber(number: testCase.cardNumber)
             XCTAssertEqual(isValid, testCase.isValid, "Failed for card number: \(testCase.cardNumber)")
         }
     }
