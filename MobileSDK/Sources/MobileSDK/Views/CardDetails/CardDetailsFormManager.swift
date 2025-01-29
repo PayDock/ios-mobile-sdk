@@ -173,7 +173,7 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardholderName() {
-        if cardSchemeValidator.isPotentialCreditCardNumber(number: cardholderNameText) {
+        if cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText) {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
 
@@ -250,8 +250,8 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func isFormValid() -> Bool {
-        let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardSchemeValidator.isPotentialCreditCardNumber(number: cardholderNameText)) : true
-        let creditCardValid = cardSchemeValidator.isPotentialCreditCardNumber(number: cardNumberText)
+        let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText)) : true
+        let creditCardValid = cardSchemeValidator.isCardNumberValid(number: cardNumberText)
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
         
         let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)

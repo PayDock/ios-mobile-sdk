@@ -16,6 +16,7 @@ class CardSchemeValidator {
     private let cardService: CardService
     private let cardServiceMock: CardService
     private var binSchemas: [BinSchemaRes.BinSchema]
+    private var lastResult: LastBINResult?
     
     // MARK: - Initialization
     
@@ -36,7 +37,6 @@ class CardSchemeValidator {
                 binSchemas =  try await cardServiceMock.getCardBinSchema(accessToken: "")
                 print("success loading bin")
             } catch {
-                print(error)
                 print("Error loading local BIN .json!")
             }
         }
@@ -51,24 +51,13 @@ class CardSchemeValidator {
             }
         }
     }
-    
-    private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
-        switch scheme {
-        case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
-        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}|\\d{16}$")
-        case .visa: return try? NSRegularExpression(pattern: "^\\d{13}(\\d{3})?(\\d{3})?$")
-        case .mastercard: return try? NSRegularExpression(pattern: "^\\d{15}$")
-        case .discover: return try? NSRegularExpression(pattern: "^\\d{16}$")
-        case .japcb, .solo, .ausbc: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
-        }
-    }
 
     /// Validates card PAN number using Luhn's algorithm.
     ///
     /// - Parameters:
     ///    - number: Card PAN number that contains only digits with or without whitespaces.
     ///    - Returns: true if valid, false otherwise.
-    func isPotentialCreditCardNumber(number: String) -> Bool {
+    func isPossibleCreditCardNumber(number: String) -> Bool {
         let cleanNumber = number.filter { !$0.isWhitespace }
         guard containsOnlyNumbers(input: cleanNumber), !cleanNumber.isEmpty else { return false }
         
@@ -96,16 +85,20 @@ class CardSchemeValidator {
         }
     }
     
-//    func isCardNumberValid(number: String) -> Bool {
-//        let isValidBin = getCardSchemeFromBIN(cardNumber: number)
-//        let isCardNumberLengthValid = isCardNumberLengthValid(number: number, scheme: isValidBin)
-//        
-//        return isValidBin != nil && isCardNumberLengthValid
-//    }
+    func isCardNumberValid(number: String) -> Bool {
+        let isValidBin = getCardSchemeFromBIN(cardNumber: number)
+        let isCardNumberLengthValid = isCardNumberLengthValid(number: number, scheme: isValidBin)
+        
+        return isValidBin != nil && isCardNumberLengthValid
+    }
     
     func getCardSchemeFromBIN(cardNumber: String) -> CardScheme? {
         let cleanNumber = cardNumber.filter { !$0.isWhitespace }
-        print("ASD")
+        guard !cleanNumber.isEmpty else { return nil }
+        
+        if let cachedSchema = lastResult, cachedSchema.cardNumber == cleanNumber {
+            return CardScheme(rawValue: cachedSchema.resolvedScheme ?? "")
+        }
         
         for schema in binSchemas {
             let binParts = schema.bin.split(separator: "~")
@@ -113,6 +106,7 @@ class CardSchemeValidator {
             if binParts.count == 1 {
                 // Exact match
                 if cleanNumber.starts(with: String(binParts[0])) {
+                    lastResult = LastBINResult(cardNumber: cleanNumber, resolvedScheme: schema.schema)
                     return CardScheme(rawValue: schema.schema)
                 }
             } else if binParts.count == 2 {
@@ -122,12 +116,15 @@ class CardSchemeValidator {
                       let cardPrefix = Int(String(cleanNumber.prefix(binParts[0].count))) else { continue }
                 
                 if cardPrefix >= lowerBound && cardPrefix <= upperBound {
+                    lastResult = LastBINResult(cardNumber: cleanNumber, resolvedScheme: schema.schema)
                     return CardScheme(rawValue: schema.schema)
                 }
             }
         }
         return nil
     }
+    
+    // MARK: - Card number length
     
     func isCardNumberLengthValid(number: String, scheme: CardScheme?) -> Bool {
         guard let scheme = scheme, let regex = cardLengthRegex(for: scheme) else { return false }
@@ -137,5 +134,21 @@ class CardSchemeValidator {
         let matches = regex.matches(in: cleanNumber, options: [], range: range)
         
         return !matches.isEmpty
+    }
+
+    private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
+        switch scheme {
+        case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
+        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}|\\d{16}$")
+        case .visa: return try? NSRegularExpression(pattern: "^\\d{13}(\\d{3})?(\\d{3})?$")
+        case .mastercard: return try? NSRegularExpression(pattern: "^\\d{16}$")
+        case .discover: return try? NSRegularExpression(pattern: "^\\d{16}$")
+        case .japcb, .solo, .ausbc: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
+        }
+    }
+    
+    struct LastBINResult {
+        var cardNumber: String
+        var resolvedScheme: String?
     }
 }
