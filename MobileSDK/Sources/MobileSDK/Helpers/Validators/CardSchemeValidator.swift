@@ -34,8 +34,8 @@ class CardSchemeValidator {
     private func loadLocalBin() {
         Task {
             do {
+                // TODO: - Update once we have endpoint live
                 binSchemas =  try await cardServiceMock.getCardBinSchema(accessToken: "")
-                print("success loading bin")
             } catch {
                 print("Error loading local BIN .json!")
             }
@@ -86,15 +86,15 @@ class CardSchemeValidator {
     }
     
     func isCardNumberValid(number: String) -> Bool {
-        let isValidBin = getCardSchemeFromBIN(cardNumber: number)
-        let isCardNumberLengthValid = isCardNumberLengthValid(number: number, scheme: isValidBin)
+        let cardScheme = getCardSchemeFromBIN(cardNumber: number)
+        let isCardNumberLengthValid = isCardNumberLengthValid(number: number, scheme: cardScheme)
+        let isCardNumberPossible = isPossibleCreditCardNumber(number: number)
         
-        return isValidBin != nil && isCardNumberLengthValid
+        return cardScheme != nil && isCardNumberLengthValid && isCardNumberPossible
     }
     
     func getCardSchemeFromBIN(cardNumber: String) -> CardScheme? {
         let cleanNumber = cardNumber.filter { !$0.isWhitespace }
-        guard !cleanNumber.isEmpty else { return nil }
         
         if let cachedSchema = lastResult, cachedSchema.cardNumber == cleanNumber {
             return CardScheme(rawValue: cachedSchema.resolvedScheme ?? "")
@@ -139,11 +139,11 @@ class CardSchemeValidator {
     private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
         switch scheme {
         case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
-        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}|\\d{16}$")
-        case .visa: return try? NSRegularExpression(pattern: "^\\d{13}(\\d{3})?(\\d{3})?$")
-        case .mastercard: return try? NSRegularExpression(pattern: "^\\d{16}$")
-        case .discover: return try? NSRegularExpression(pattern: "^\\d{16}$")
-        case .japcb, .solo, .ausbc: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
+        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}$")
+        case .visa: return try? NSRegularExpression(pattern: "^(\\d{16}|\\d{18}|\\d{19})$")
+        case .mastercard, .japcb: return try? NSRegularExpression(pattern: "^\\d{16}$")
+        case .solo, .ausbc: return try? NSRegularExpression(pattern: "^(\\d{12}|\\d{19})$")
+        case .discover: return try? NSRegularExpression(pattern: "^(\\d{16}|\\d{19})$")
         }
     }
     
