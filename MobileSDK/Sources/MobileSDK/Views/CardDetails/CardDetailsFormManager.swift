@@ -190,7 +190,7 @@ class CardDetailsFormManager: ObservableObject {
     private func validateCardNumber() {
         // Validate card number format
         guard let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText),
-              cardSchemeValidator.isCardNumberLengthValid(number: cardNumberText, scheme: scheme) else {
+              cardSchemeValidator.isCardNumberValid(number: cardNumberText) else {
             updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
             return
         }
