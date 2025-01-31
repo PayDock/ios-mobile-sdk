@@ -13,43 +13,22 @@ import Foundation
  */
 class CardSchemeValidator {
     
-    private let cardService: CardService
-    private let cardServiceMock: CardService
+    private let jsonLoader: JSONLoader
     private var binSchemas: [BinSchemaRes.BinSchema]
     private var lastResult: LastBINResult?
     
     // MARK: - Initialization
     
-    init(cardService: CardService = CardServiceImpl(), cardServiceMock: CardService = CardServiceMock()) {
-        self.cardService = cardService
-        self.cardServiceMock = cardServiceMock
+    init(jsonLoader: JSONLoader = JSONLoader()) {
+        self.jsonLoader = jsonLoader
         self.binSchemas = []
-        
-        loadLocalBin()
-        loadRemoteBin()
+        loadLocalBinSchema()
     }
     
     // MARK: - Data Loading
     
-    private func loadLocalBin() {
-        Task {
-            do {
-                // TODO: - Update once we have endpoint live
-                binSchemas =  try await cardServiceMock.getCardBinSchema(accessToken: "")
-            } catch {
-                print("Error loading local BIN .json!")
-            }
-        }
-    }
-    
-    private func loadRemoteBin() {
-        Task {
-            do {
-                binSchemas =  try await cardService.getCardBinSchema(accessToken: "")
-            } catch {
-                print("Error loading remote BIN .json!")
-            }
-        }
+    private func loadLocalBinSchema() {
+        binSchemas = jsonLoader.loadJSON(filename: "card-schemes", type: BinSchemaRes.self).cardSchemas
     }
 
     /// Validates card PAN number using Luhn's algorithm.
