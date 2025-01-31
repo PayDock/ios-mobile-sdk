@@ -21,7 +21,7 @@ class CardDetailsFormatter {
                 }
                 groomed.append(c)
             }
-            if groomed.count == 24 {
+            if groomed.count == 23 {
                 break
             }
         }
