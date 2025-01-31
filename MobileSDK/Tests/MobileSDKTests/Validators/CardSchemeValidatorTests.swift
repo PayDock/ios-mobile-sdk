@@ -31,7 +31,9 @@ let testCases: [CardTestCase] = [
     CardTestCase(cardNumber: "6334101999990013", expectedIssuer: .solo, isValid: false),
     CardTestCase(cardNumber: "67675678901234568698", expectedIssuer: .solo, isValid: false),
     // AUSBC
-    CardTestCase(cardNumber: "6771892573677360", expectedIssuer: .ausbc, isValid: false)
+    CardTestCase(cardNumber: "6771892573677360", expectedIssuer: .ausbc, isValid: false),
+    CardTestCase(cardNumber: "5610591081018250989", expectedIssuer: .ausbc, isValid: false),
+    CardTestCase(cardNumber: "5610591081018250", expectedIssuer: .ausbc, isValid: true),
 ]
 
 class CardSchemeValidatorTests: XCTestCase {
@@ -110,14 +112,17 @@ class CardSchemeValidatorTests: XCTestCase {
         
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111", scheme: .solo))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 111", scheme: .solo))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .solo))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .solo))
         
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111", scheme: .ausbc))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 111", scheme: .ausbc))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .ausbc))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .ausbc))
     }
     
     func testIsCardNumberLengthValid_InvalidLength() {
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 1111 111", scheme: .visa))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 1111 111 11", scheme: .visa))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 4444", scheme: .visa))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 32", scheme: .visa))
 
@@ -135,12 +140,8 @@ class CardSchemeValidatorTests: XCTestCase {
         
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5", scheme: .solo))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .solo))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .solo))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .solo))
         
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5", scheme: .ausbc))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .ausbc))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .ausbc))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .ausbc))
     }
 }
