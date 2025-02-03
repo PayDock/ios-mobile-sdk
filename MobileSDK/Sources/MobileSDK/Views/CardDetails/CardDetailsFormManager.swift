@@ -87,7 +87,7 @@ class CardDetailsFormManager: ObservableObject {
 
     init(shouldValidateCardholderName: Bool = true,
          supportedSchemes: Set<CardScheme>? = nil,
-         enableCardValidation: Bool = true,
+         enableCardValidation: Bool = false,
          cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
@@ -186,9 +186,29 @@ class CardDetailsFormManager: ObservableObject {
             cardholderNameError = "Invalid name"
         }
     }
+    
+    // MARK: - Validate card number
 
     private func validateCardNumber() {
-        // Validate card number format
+        if enableCardValidation {
+            validateCardNumberForEnabledCardValidation()
+        } else {
+            validateCardNumberForDisabledCardValidation()
+        }
+    }
+    
+    private func validateCardNumberForDisabledCardValidation() {
+        guard cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText),
+              cardSchemeValidator.isUnknownCardNumberLengthValid(number: cardNumberText) else {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
+            return
+        }
+        
+        // If all validations pass, clear any errors
+        updateCardNumberValidationState(isValid: true, errorMessage: nil)
+    }
+    
+    private func validateCardNumberForEnabledCardValidation() {
         guard let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText),
               cardSchemeValidator.isCardNumberValid(number: cardNumberText) else {
             updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
@@ -219,6 +239,8 @@ class CardDetailsFormManager: ObservableObject {
         cardNumberValid = isValid
         cardNumberError = errorMessage ?? ""
     }
+    
+    // MARK: - Validate expiry date
 
     private func validateExpiryDate() {
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText)
@@ -236,6 +258,8 @@ class CardDetailsFormManager: ObservableObject {
             expiryDateError = "Invalid expiry date"
         }
     }
+    
+    // MARK: - Validate security code
 
     private func validateSecurityCode() {
         let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) ?? .visa // Default to 3 digit CVV validation

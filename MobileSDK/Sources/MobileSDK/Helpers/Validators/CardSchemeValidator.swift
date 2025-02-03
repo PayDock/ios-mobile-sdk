@@ -114,6 +114,11 @@ class CardSchemeValidator {
         
         return !matches.isEmpty
     }
+    
+    func isUnknownCardNumberLengthValid(number: String) -> Bool {
+        let cleanNumber = number.filter { !$0.isWhitespace }
+        return cleanNumber.count >= 12 && cleanNumber.count <= 19
+    }
 
     private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
         switch scheme {
