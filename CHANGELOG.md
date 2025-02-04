@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.1.0] - 2025-02-04
+
+### Added
+
+- Voiceover support for widgets.
+- Card validation is now based on the Paydock's supported BIN list.
+
+### Changed
+
+- Increased Client SDK version to v1.117.0.
+
 ## [2.0.0] - 2025-01-16
 
 ### Added
