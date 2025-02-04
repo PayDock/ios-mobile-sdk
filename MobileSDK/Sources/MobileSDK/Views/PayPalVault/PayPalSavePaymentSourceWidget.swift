@@ -35,6 +35,7 @@ public struct PayPalSavePaymentSourceWidget: View {
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)
+            .accessibilityHint("Initiates linking of PayPal account.")
     }
     
 }

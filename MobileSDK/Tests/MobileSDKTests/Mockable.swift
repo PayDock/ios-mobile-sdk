@@ -38,5 +38,4 @@ extension Mockable {
             fatalError("Failed to decode loaded JSON \(filename) as \(T.self)")
         }
     }
-
 }

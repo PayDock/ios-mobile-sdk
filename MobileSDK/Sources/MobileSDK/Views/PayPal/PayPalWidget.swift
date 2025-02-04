@@ -46,6 +46,7 @@ public struct PayPalWidget: View {
                 )) {
                     viewModel.handleButtonTap()
                 }
+                .accessibilityHint("Initiates payment using PayPal.")
                 .sheet(isPresented: $viewModel.showWebView, onDismiss: {
                     if viewModel.sheetAction == .nothing {
                         viewModel.handleSheetCancellation()

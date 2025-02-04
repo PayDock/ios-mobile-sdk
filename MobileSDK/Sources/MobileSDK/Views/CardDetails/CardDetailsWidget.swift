@@ -38,6 +38,7 @@ public struct CardDetailsWidget: View {
                     Text("Card information")
                         .customFont(.body)
                         .foregroundColor(.placeholderColor)
+                        .accessibilityAddTraits(.isHeader)
                     Spacer()
                 }
                 .padding(.bottom, 14)
@@ -45,13 +46,15 @@ public struct CardDetailsWidget: View {
             
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 HStack(spacing: 7) {
-                    ForEach(Array(supportedSchemes), id: \.self) { scheme in
+                    ForEach(CardScheme.sortedArray(from: supportedSchemes), id: \.self) { scheme in
                         getSchemeIcon(for: scheme)
                             .resizable()
                             .frame(width: 26, height: 20)
                             .scaledToFit()
                     }
                 }
+                .accessibilityElement()
+                .accessibilityLabel("Supported card schemes: \(supportedSchemes.map(\.voiceoverName).joined(separator: ", "))")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, .spacing)
             }
@@ -141,6 +144,9 @@ public struct CardDetailsWidget: View {
                     )
                     .keyboardType(.numberPad)
                     .focused($textFieldInFocus, equals: .securityCode)
+                    .onChange(of: viewModel.cardDetailsFormManager.securityCodeText) { newValue in
+                        viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: newValue)
+                    }
                 }
                 if viewModel.config.allowSaveCard != nil {
                     privacyView
@@ -180,13 +186,14 @@ public struct CardDetailsWidget: View {
                     .tint(.primaryColor)
                     .frame(width: 64, height: 44)
                     .disabled(viewModel.viewState.isDisabled)
+                    .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
         }
     }
     
     private func getSchemeIcon(for scheme: CardScheme) -> Image {
         switch scheme {
-        case .amex: Image("amex", bundle: Bundle.module)
-        case .ausbc: Image("ausbc", bundle: Bundle.module)
+        case .amex: Image("american-express", bundle: Bundle.module)
+        case .ausbc: Image("australian-commonwealth-bank", bundle: Bundle.module)
         case .diners: Image("diners", bundle: Bundle.module)
         case .discover: Image("discover", bundle: Bundle.module)
         case .japcb: Image("jcb", bundle: Bundle.module)

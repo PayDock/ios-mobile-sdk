@@ -21,7 +21,7 @@ class CardDetailsFormatter {
                 }
                 groomed.append(c)
             }
-            if groomed.count == 24 {
+            if groomed.count == 23 {
                 break
             }
         }
@@ -41,6 +41,16 @@ class CardDetailsFormatter {
             }
             if groomed.count == 5 {
                 break
+            }
+        }
+        return groomed
+    }
+    
+    func formatSecurityCode(updatedText: String) -> String {
+       var groomed = ""
+        for c in updatedText {
+            if c.isASCII && c.isNumber {
+                groomed.append(c)
             }
         }
         return groomed

@@ -74,5 +74,4 @@ extension PayPalVaultEndpoints: Endpoint {
     var bundle: Bundle? {
         return Bundle.module
     }
-
 }
