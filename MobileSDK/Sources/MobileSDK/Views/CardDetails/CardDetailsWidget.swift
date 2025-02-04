@@ -46,7 +46,7 @@ public struct CardDetailsWidget: View {
             
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 HStack(spacing: 7) {
-                    ForEach(Array(supportedSchemes), id: \.self) { scheme in
+                    ForEach(CardScheme.sortedArray(from: supportedSchemes), id: \.self) { scheme in
                         getSchemeIcon(for: scheme)
                             .resizable()
                             .frame(width: 26, height: 20)

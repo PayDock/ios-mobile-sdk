@@ -6,7 +6,9 @@
 //  Copyright © 2025 Paydock Ltd.
 //
 
-public enum CardScheme: CaseIterable {
+import Foundation
+
+public enum CardScheme: String, CaseIterable {
     
     case amex
     case ausbc
@@ -29,5 +31,12 @@ public enum CardScheme: CaseIterable {
         case .visa: return "Visa"
         }
     }
-
+    
+    static let preferredOrder: [CardScheme] = [
+        .visa, .mastercard, .amex, .ausbc, .diners, .discover, .japcb, .solo
+    ]
+    
+    static func sortedArray(from set: Set<CardScheme>) -> [CardScheme] {
+        return set.sorted { preferredOrder.firstIndex(of: $0)! < preferredOrder.firstIndex(of: $1)! }
+    }
 }

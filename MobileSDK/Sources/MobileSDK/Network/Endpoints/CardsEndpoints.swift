@@ -55,11 +55,12 @@ extension CardsEndpoints: Endpoint {
     }
     
     var mockFile: String? {
-        return nil
+        switch self {
+        case .cardToken, .giftCardToken: return nil
+        }
     }
     
     var bundle: Bundle? {
-        return nil
+        return Bundle.module
     }
-
 }

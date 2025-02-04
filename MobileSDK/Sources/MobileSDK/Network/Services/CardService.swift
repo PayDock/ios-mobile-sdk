@@ -27,5 +27,4 @@ struct CardServiceImpl: HTTPClient, CardService {
         let response = try await sendRequest(endpoint: CardsEndpoints.giftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: accessToken), responseModel: CardTokenRes.self)
         return response.resource.data
     }
-
 }
