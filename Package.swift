@@ -30,7 +30,10 @@ let package = Package(
                 .product(name: "NetworkingLib", package: "ios-core-networking"),
                 .product(name: "FraudProtection", package: "paypal-ios"),
                 .product(name: "PayPalWebPayments", package: "paypal-ios")],
-            path: "MobileSDK/Sources"
+            path: "MobileSDK/Sources",
+            resources: [
+                .copy("MobileSDK/Resources/JSON/card-schemes.json"),
+            ]
         ),
         .testTarget(
             name: "MobileSDKTests",
