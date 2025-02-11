@@ -65,7 +65,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
                 return
             }
             
-            let vaultRequest = PayPalVaultRequest(url: setupTokenData.approveLink, setupTokenID: setupTokenData.setupToken)
+            let vaultRequest = PayPalVaultRequest(setupTokenID: setupTokenData.setupToken)
             let environment = Constants.payPalVaultEnvironment
             let payPalConfig = CoreConfig(clientID: clientId, environment: environment)
             let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)

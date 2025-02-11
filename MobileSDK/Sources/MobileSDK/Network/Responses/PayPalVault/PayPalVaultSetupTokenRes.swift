@@ -19,6 +19,5 @@ struct PayPalVaultSetupTokenRes: Codable {
 
     struct SetupTokenData: Codable {
         let setupToken: String
-        let approveLink: URL
     }
 }
