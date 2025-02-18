@@ -195,7 +195,7 @@ extension CheckoutPaymentVM {
     /// Based on 3DS auth status selects the appropriate flow
     private func handleAuthStatus(_ response: Integrated3DSRes) {
         switch response.authStatus {
-        case .notSupported: captureCharge()
+        case .notSupported: captureCharge(_3dsId: response.resource.data.threeDS.id ?? "")
         case .pending:
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -217,7 +217,7 @@ extension CheckoutPaymentVM {
             case .chargeAuthInfo: break
             case .chargeAuthSuccess:
                 self.show3dsWebView = false
-                self.captureCharge()
+                self.captureCharge(_3dsId: event.charge3dsId)
             case .chargeAuthReject: break
             case .error:
                 self.show3dsWebView = false
@@ -227,11 +227,19 @@ extension CheckoutPaymentVM {
     }
 
     /// Captures the charge as the final step in the payment flow
-    private func captureCharge() {
-        isLoading = true
+    private func captureCharge(_3dsId: String) {
+        DispatchQueue.main.async {
+            self.isLoading = true
+        }
         viewState?.setState(.disabled)
         Task {
-            let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
+            let request = CaptureChargeReq(
+                amount: "5.50",
+                currency: "AUD",
+                reference: UUID().uuidString,
+                description: "Test Payment",
+                _3ds: .init(_id: _3dsId))
+
             do {
                 let result = try await walletService.captureCharge(request: request)
                 // Ensure UI updates are performed on the main thread
