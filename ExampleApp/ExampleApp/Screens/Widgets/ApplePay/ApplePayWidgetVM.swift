@@ -79,7 +79,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: "merchant.test-paydock")
+            merchantIdentifier: "merchant.com.paydock.test")
 
         let applePayRequest = ApplePayRequest(
             token: walletToken,
