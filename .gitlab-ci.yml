@@ -34,7 +34,7 @@ test_exampleApp:
 export_exampleApp:
   stage: build
   script:
-    - cp bin_schema/card-schemes.json ./MobileSDK/Sources/MobileSDK/Resources/JSON/card-schemes.json
+    - cp bin_schema/card-schemes.json ./Sources/MobileSDK/Resources/JSON/card-schemes.json
     - echo "success"
   needs: ["pull_bin_file"]
   dependencies:
