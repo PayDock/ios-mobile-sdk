@@ -207,18 +207,25 @@ extension CheckoutPaymentVM {
             showAlert(title: .error, message: "Error getting 3DS auth status!")
         }
     }
-
-    /// Handles the outcome of 3DS WebView check
-    func handle3dsEvent(_ event: ThreeDSResult) {
+    
+    /// Handles the outcome of integrated 3DS WebView check
+    func handle3dsEvent(_ event: Integrated3DSResult) {
         DispatchQueue.main.async {
             switch event.event {
-            case .chargeAuthChallenge: break
-            case .chargeAuthDecoupled: break
-            case .chargeAuthInfo: break
+            case .chargeAuth: break
+            case .additionalDataCollectSuccess: break
+            case .chargeAuthReject:
+                self.show3dsWebView = false
+                self.showAlert(title: .error, message: "3DS auth rejected!")
+            case .additionalDataCollectReject:
+                self.show3dsWebView = false
+                self.showAlert(title: .error, message: "3DS additional data rejected!")
+            case .chargeAuthCancelled:
+                self.show3dsWebView = false
+                self.showAlert(title: .error, message: "3DS cancelled!")
             case .chargeAuthSuccess:
                 self.show3dsWebView = false
                 self.captureCharge(_3dsId: event.charge3dsId)
-            case .chargeAuthReject: break
             case .error:
                 self.show3dsWebView = false
                 self.showAlert(title: .error, message: "3DS failed!")

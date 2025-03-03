@@ -1,14 +1,13 @@
 //
-//  ThreeDSResult.swift
+//  Standalone3DSResult.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 06.12.2023..
+//  Created by Domagoj Grizelj on 25.02.2025..
 //
 
 import Foundation
 
-public struct ThreeDSResult {
+public struct Standalone3DSResult {
   public let event: EventType
   public let charge3dsId: String
 

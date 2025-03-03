@@ -1,5 +1,5 @@
 //
-//  ThreeDSWidget.swift
+//  Integrated3DSWidget.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -7,19 +7,30 @@
 //
 
 import SwiftUI
-import WebKit
+@preconcurrency import WebKit
 import AuthenticationServices
 
-public struct ThreeDSWidget: UIViewRepresentable {
+public struct Integrated3DSWidget: UIViewRepresentable {
     private let token: String
     private let baseUrl: URL?
-    private let completion: (Result<ThreeDSResult, ThreeDSError>) -> Void
+    private let completion: (Result<Integrated3DSResult, Integrated3DSError>) -> Void
+    private let base64Decoder: Base64Decoder = Base64Decoder()
 
     public init(token: String, baseURL: URL?,
-                completion: @escaping (Result<ThreeDSResult, ThreeDSError>) -> Void) {
+                completion: @escaping (Result<Integrated3DSResult, Integrated3DSError>) -> Void) {
         self.token = token
         self.baseUrl = baseURL
         self.completion = completion
+        
+        validateToken()
+    }
+    
+    private func validateToken() {
+        guard let decodedToken = base64Decoder.decodeBase64(token, to: Decoded3DSToken.self),
+              decodedToken.format == .html || decodedToken.format == .url else {
+            completion(.failure(.invalidToken))
+            return
+        }
     }
 
     public func makeUIView(context: Context) -> UIView {
@@ -64,7 +75,7 @@ public struct ThreeDSWidget: UIViewRepresentable {
             return
         }
         if !context.coordinator.isLoaded {
-            let html = ThreeDSWidget.html(token)
+            let html = Integrated3DSWidget.html(token)
             webView.loadHTMLString(html, baseURL: baseUrl)
         }
     }
@@ -74,24 +85,27 @@ public struct ThreeDSWidget: UIViewRepresentable {
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
-        private let completion: (Result<ThreeDSResult, ThreeDSError>) -> Void
+        private let completion: (Result<Integrated3DSResult, Integrated3DSError>) -> Void
         var isLoaded = false
         var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
 
-        init(completion: @escaping (Result<ThreeDSResult, ThreeDSError>) -> Void) {
+        init(completion: @escaping (Result<Integrated3DSResult, Integrated3DSError>) -> Void) {
             self.completion = completion
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard let data = message.body as? [String: Any],
                   let eventRaw = data["event"] as? String,
-                  let event = ThreeDSResult.EventType(rawValue: eventRaw),
+                  let event = Integrated3DSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completion(.success(ThreeDSResult(event: .error, charge3dsId: "")))
+                completion(.success(Integrated3DSResult(event: .error, charge3dsId: "")))
                 return
             }
-           completion(.success(ThreeDSResult(event: event, charge3dsId: token)))
+            let statusRaw = data["status"] as? String
+            let _ = Integrated3DSStatus(rawValue: statusRaw ?? "") // Not used currently
+            
+            completion(.success(Integrated3DSResult(event: event, charge3dsId: token)))
         }
         
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -196,6 +210,7 @@ public struct ThreeDSWidget: UIViewRepresentable {
                                 window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
                                     event,
                                     charge3dsId: data.charge_3ds_id,
+                                    status: data.status,
                                 });
                             }
                         });
@@ -203,9 +218,10 @@ public struct ThreeDSWidget: UIViewRepresentable {
 
                     watchEvent("chargeAuthSuccess");
                     watchEvent("chargeAuthReject");
-                    watchEvent("chargeAuthChallenge");
-                    watchEvent("chargeAuthDecoupled");
-                    watchEvent("chargeAuthInfo");
+                    watchEvent("chargeAuthCancelled");
+                    watchEvent("additionalDataCollectSuccess");
+                    watchEvent("additionalDataCollectReject");
+                    watchEvent("chargeAuth");
                     watchEvent("error");
 
                     canvas3ds.load();

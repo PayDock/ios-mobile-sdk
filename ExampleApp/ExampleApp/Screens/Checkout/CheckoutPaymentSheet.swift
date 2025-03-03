@@ -161,7 +161,7 @@ struct CheckoutPaymentSheet: View {
         .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }) {
             NavigationStack {
                 VStack {
-                    ThreeDSWidget(
+                    Integrated3DSWidget(
                         token: viewModel.token3DS,
                         baseURL: viewModel.getBaseUrl(),
                         completion: { result in

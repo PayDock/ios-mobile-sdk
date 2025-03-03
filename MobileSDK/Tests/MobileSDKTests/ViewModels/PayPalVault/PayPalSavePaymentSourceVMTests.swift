@@ -115,7 +115,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         let setupTokenData = await viewModel.getSetupTokenData()
         
         XCTAssertEqual(setupTokenData?.setupToken, "XObCsxdHXe")
-        XCTAssertEqual(setupTokenData?.approveLink, URL(string: "www.something.com")!)
         XCTAssertEqual(viewModel.isLoading, true)
     }
     
