@@ -99,7 +99,7 @@ public struct Integrated3DSWidget: UIViewRepresentable {
                   let event = Integrated3DSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completion(.success(Integrated3DSResult(event: .error, charge3dsId: "")))
+                completion(.failure(.mappingFailed))
                 return
             }
             let statusRaw = data["status"] as? String

@@ -130,7 +130,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 self.alertMessage = "3DS Auth rejected!"
                 self.showAlert = true
                 
-            case .error:
+            case .chargeError:
                 self.showWebView = false
                 self.alertMessage = "3DS failed!"
                 self.showAlert = true

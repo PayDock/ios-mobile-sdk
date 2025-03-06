@@ -17,6 +17,6 @@ public struct Standalone3DSResult {
     case chargeAuthChallenge
     case chargeAuthDecoupled
     case chargeAuthInfo
-    case error
+    case chargeError
   }
 }

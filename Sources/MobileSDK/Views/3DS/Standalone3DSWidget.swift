@@ -98,7 +98,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                   let event = Standalone3DSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completion(.success(Standalone3DSResult(event: .error, charge3dsId: "")))
+                completion(.failure(.mappingFailed))
                 return
             }
             

@@ -115,9 +115,8 @@ class Standalone3DSTests: XCTestCase {
         let mockMessage = createMockScriptMessage(body: ["invalid": "data"])
         coordinator.userContentController(userContentController, didReceive: mockMessage)
 
-        if case .success(let result) = receivedResult {
-            XCTAssertEqual(result.event, .error)
-            XCTAssertEqual(result.charge3dsId, "")
+        if case .failure(let error) = receivedResult {
+            XCTAssertEqual(error, .mappingFailed)
         } else {
             XCTFail("Expected fallback error result")
         }

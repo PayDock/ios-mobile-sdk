@@ -226,9 +226,6 @@ extension CheckoutPaymentVM {
             case .chargeAuthSuccess:
                 self.show3dsWebView = false
                 self.captureCharge(_3dsId: event.charge3dsId)
-            case .error:
-                self.show3dsWebView = false
-                self.showAlert(title: .error, message: "3DS failed!")
             }
         }
     }

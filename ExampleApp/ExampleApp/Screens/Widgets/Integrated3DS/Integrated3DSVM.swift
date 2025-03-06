@@ -99,10 +99,6 @@ class Integrated3DSVM: NSObject, ObservableObject {
         case .chargeAuthSuccess:
             self.showWebView = false
             alertMessage = event.charge3dsId
-
-        case .error:
-            self.showWebView = false
-            alertMessage = "3DS failed!"
         }
     }
     

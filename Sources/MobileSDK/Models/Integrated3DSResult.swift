@@ -19,6 +19,5 @@ public struct Integrated3DSResult {
         case additionalDataCollectSuccess
         case additionalDataCollectReject
         case chargeAuth
-        case error
     }
 }

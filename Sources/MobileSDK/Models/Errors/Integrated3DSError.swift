@@ -8,16 +8,16 @@
 
 import Foundation
 
-public enum Integrated3DSError: Error {
+public enum Integrated3DSError: Error, Equatable {
     case webViewFailed(error: NSError)
     case invalidToken
-    case unknownError
+    case mappingFailed
     
     public var customMessage: String {
         switch self {
         case .webViewFailed: return "3DS WebView widget has failed"
         case .invalidToken: return "Provided 3DS token is not valid"
-        case .unknownError: return "Unknown error"
+        case .mappingFailed: return "3DS response mapping failed"
         }
     }
 }
