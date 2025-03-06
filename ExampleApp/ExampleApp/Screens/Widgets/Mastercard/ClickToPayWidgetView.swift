@@ -22,7 +22,7 @@ struct ClickToPayWidgetView: View {
                                 VStack {
                                     ClickToPayWidget(
                                         serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                        accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                                         meta: nil,
                                         completion: { result in
                                             switch result {

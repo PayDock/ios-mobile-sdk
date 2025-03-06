@@ -30,7 +30,7 @@ struct CheckoutPaymentSheet: View {
                     CardDetailsWidget(viewState: viewModel.viewState,
                                       config: CardDetailsWidgetConfig(
                                         gatewayId: nil,
-                                        accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                                         actionText: "Pay",
                                         showCardTitle: false,
                                         collectCardholderName: false,
@@ -132,7 +132,7 @@ struct CheckoutPaymentSheet: View {
                         VStack {
                             ClickToPayWidget(
                                 serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                                 meta: nil) { result in
                                     switch result {
                                     case .success(let result):
