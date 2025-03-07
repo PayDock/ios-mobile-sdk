@@ -89,6 +89,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
     }
 
     func handleError(error: ApplePayError) {
+        isLoading = false
         alertTitle = "Error"
         alertMessage = "\(error.customMessage)"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
