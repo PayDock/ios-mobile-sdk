@@ -138,6 +138,9 @@ struct OutlineTextField: View {
             .simultaneousGesture(TapGesture().onEnded({ _ in
                 onTapGesture()
             }))
+            .simultaneousGesture(LongPressGesture().onEnded({ _ in
+                onTapGesture()
+            }))
             .disabled(disabled)
             .frame(height: getTextFieldHeight())
             .customFont(.body)
