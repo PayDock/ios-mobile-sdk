@@ -83,6 +83,7 @@ class StyleVM: ObservableObject {
     @Published var buttonCornerRadius = "4"
     @Published var textFieldCornerRadius = "4"
     @Published var borderWidth = "1"
+    @Published var spacing = "16"
 
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
 
@@ -134,7 +135,8 @@ class StyleVM: ObservableObject {
         let dimensions = Dimensions(
             buttonCornerRadius: Double(buttonCornerRadius) ?? 4,
             textFieldCornerRadius: Double(textFieldCornerRadius) ?? 4,
-            borderWidth: Double(borderWidth) ?? 1)
+            borderWidth: Double(borderWidth) ?? 1,
+            spacing: Double(spacing) ?? 16)
 
         let theme = {
             if isDarkModeEnabled {

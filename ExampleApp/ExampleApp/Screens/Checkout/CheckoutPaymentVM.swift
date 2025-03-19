@@ -118,7 +118,7 @@ extension CheckoutPaymentVM {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: "merchant.test-paydock")
+            merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
 
         let applePayRequest = ApplePayRequest(
             token: walletToken,

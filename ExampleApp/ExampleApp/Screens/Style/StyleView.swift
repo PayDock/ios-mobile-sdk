@@ -39,7 +39,10 @@ struct StyleView: View {
                             designTextView(title: "TextField Corner", text: $viewModel.textFieldCornerRadius)
                             designTextView(title: "Button Corner", text: $viewModel.buttonCornerRadius)
                         }
-                        designTextView(title: "Border Width", text: $viewModel.borderWidth)
+                        HStack {
+                            designTextView(title: "Border Width", text: $viewModel.borderWidth)
+                            designTextView(title: "Spacing", text: $viewModel.spacing)
+                        }
                     }
                     .padding(.trailing, 16)
                     divider

@@ -27,36 +27,22 @@ class GiftCardFormManager: ObservableObject {
     var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"
     @Published var pinPlaceholder = "XXXX"
 
-    private(set) var cardNumberText: String = ""
-    private(set) var pinText = ""
+    var cardNumberText: String = "" {
+        didSet {
+            if !cardNumberText.isEmpty {
+                self.validateTextField(.cardNumber)
+            }
+        }
+    }
+    var pinText = "" {
+        didSet {
+            if !pinText.isEmpty {
+                self.validateTextField(.pin)
+            }
+        }
+    }
 
     private var currentTextField: GiftCardFocusable?
-
-    var cardNumberBinding: Binding<String> {
-        Binding(
-            get: {
-                self.cardNumberText
-            }, set: {
-                self.cardNumberText = self.formatCardNumber(updatedText: $0)
-                if !(self.cardNumberValid ?? true) {
-                    self.validateTextField(.cardNumber)
-                }
-            }
-        )
-    }
-
-    var pinBinding: Binding<String> {
-        Binding(
-            get: {
-                self.pinText
-            }, set: {
-                self.pinText = $0
-                if !(self.pinValid ?? true) {
-                    self.validateTextField(.pin)
-                }
-            }
-        )
-    }
 
     // MARK: - Initialisation
 
@@ -108,13 +94,24 @@ class GiftCardFormManager: ObservableObject {
             pinError = "Invalid PIN number"
         }
     }
+    
+    func isFormValid() -> Bool {
+        return pinValid ?? false && cardNumberValid ?? false
+    }
 
     // MARK: - Formatting
 
     func formatCardNumber(updatedText: String) -> String {
         cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
     }
-
+    
+    // MARK: - Editing
+    
+    func endEditing() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        editingCardNumber = false
+        editingPin = false
+    }
 }
 
 // MARK: - GiftCardFocusable
@@ -125,6 +122,5 @@ extension GiftCardFormManager {
         case cardNumber
         case pin
     }
-
 }
 

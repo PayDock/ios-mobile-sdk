@@ -24,5 +24,7 @@
 	<string>$(PAY_PAL_GATEWAY_ID)</string>
 	<key>STANDALONE_3DS_GATEWAY_ID</key>
 	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
+	<key>MERCHANT_ID</key>
+	<string>$(MERCHANT_ID)</string>
 </dict>
 </plist>

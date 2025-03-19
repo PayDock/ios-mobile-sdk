@@ -57,7 +57,7 @@ public struct AddressWidget: View {
         HStack {
             Text("Name")
                 .customFont(.body)
-                .foregroundColor(.placeholderColor)
+                .foregroundColor(.textColor)
             Spacer()
         }
         .padding(.bottom, 20)
@@ -106,7 +106,7 @@ public struct AddressWidget: View {
             Text("Find an address")
                 .customFont(.body)
                 .font(.largeTitle)
-                .foregroundColor(.placeholderColor)
+                .foregroundColor(.textColor)
                 .accessibilityAddTraits(.isHeader)
             Spacer()
         }

@@ -37,7 +37,7 @@ public struct CardDetailsWidget: View {
                 HStack {
                     Text("Card information")
                         .customFont(.body)
-                        .foregroundColor(.placeholderColor)
+                        .foregroundColor(.textColor)
                         .accessibilityAddTraits(.isHeader)
                     Spacer()
                 }
@@ -103,7 +103,7 @@ public struct CardDetailsWidget: View {
 
                 let layout = shouldAlignVertically() ?
                     AnyLayout(VStackLayout(spacing: max(max(.spacing - 10, 0), 0))) :
-                    AnyLayout(HStackLayout(alignment: .top, spacing: .spacing * 0.75))
+                    AnyLayout(HStackLayout(alignment: .top, spacing: .spacing))
                 layout {
                     OutlineTextField(
                         text: $viewModel.cardDetailsFormManager.expiryDateText,
@@ -164,6 +164,7 @@ public struct CardDetailsWidget: View {
             .customFont(.body)
         }
         .padding(.horizontal, max(16, .spacing))
+        .background(Color.backgroundColor)
     }
 
     private var privacyView: some View {
@@ -177,8 +178,8 @@ public struct CardDetailsWidget: View {
                     let link = "[\(text)](\(url))"
                     Text(.init(link))
                         .customFont(.body3)
-                        .foregroundColor(.textColor)
                         .underline()
+                        .accentColor(.textColor)
                         .disabled(viewModel.viewState.isDisabled)
                 }
                 Spacer()

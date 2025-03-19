@@ -89,4 +89,8 @@ class GiftCardVM: ObservableObject {
         }
         self.isDisabled = isLoading
     }
+    
+    func isActionButtonDisabled() -> Bool {
+        return !giftCardFormManager.isFormValid()
+    }
 }

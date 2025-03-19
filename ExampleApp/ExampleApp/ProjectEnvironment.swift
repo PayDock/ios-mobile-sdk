@@ -24,6 +24,7 @@ struct ProjectEnvironment {
         static let afterpayGatewayId = "AFTERPAY_GATEWAY_ID"
         static let mastercardServiceId = "MASTERCARD_SERVICE_ID"
         static let flypayClientId = "FLYPAY_CLIENT_ID"
+        static let merchantId = "MERCHANT_ID"
     }
 
     private static let infoDictionary: [String: Any] = {
@@ -139,5 +140,13 @@ struct ProjectEnvironment {
             return nil
         }
         return clientId
+    }
+    
+    func getMerchantId() -> String? {
+        guard let merchantId = Self.infoDictionary[Keys.merchantId] as? String else {
+            print("Merchant ID not found in .plist!")
+            return nil
+        }
+        return merchantId
     }
 }

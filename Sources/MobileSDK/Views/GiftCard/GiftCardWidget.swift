@@ -26,18 +26,10 @@ public struct GiftCardWidget: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                HStack {
-                    Text("Gift Card")
-                        .customFont(.body)
-                        .foregroundColor(.placeholderColor)
-                    Spacer()
-                }
-                .padding(.bottom, 12)
-
                 VStack(spacing: max(max(.spacing - 10, 0), 0)) {
                     HStack(spacing: .spacing * 0.75) {
                         OutlineTextField(
-                            text: viewModel.giftCardFormManager.cardNumberBinding,
+                            text: $viewModel.giftCardFormManager.cardNumberText,
                             title: viewModel.giftCardFormManager.cardNumberTitle,
                             placeholder: viewModel.giftCardFormManager.cardNumberPlaceholder,
                             errorMessage: $viewModel.giftCardFormManager.cardNumberError,
@@ -54,7 +46,7 @@ public struct GiftCardWidget: View {
                         .frame(width: UIScreen.main.bounds.width * 0.65)
                         
                         OutlineTextField(
-                            text: viewModel.giftCardFormManager.pinBinding,
+                            text: $viewModel.giftCardFormManager.pinText,
                             title: viewModel.giftCardFormManager.pinTitle,
                             placeholder: viewModel.giftCardFormManager.pinPlaceholder,
                             errorMessage: $viewModel.giftCardFormManager.pinError,
@@ -70,17 +62,18 @@ public struct GiftCardWidget: View {
                     }
                 }
                 let plusIcon = Image(systemName: "plus.circle")
-                SDKButton(title: "Add", image: plusIcon, style: .fill(FillButtonStyle(isDisabled: viewModel.isDisabled))) {
+                SDKButton(title: "Add", image: plusIcon, style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))) {
+                    viewModel.giftCardFormManager.endEditing()
                     viewModel.tokeniseGiftCard()
                 }
                 .padding(.bottom, 16)
                 .padding(.top, .spacing)
                 .customFont(.body)
             }
-            .padding(.horizontal, max(16, .spacing))
+            .padding(max(16, .spacing))
         }
-        .frame(height: 200, alignment: .top)
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        .background(Color.backgroundColor)
     }
 }
 
