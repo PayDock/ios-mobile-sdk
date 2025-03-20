@@ -44,6 +44,7 @@ public struct FlyPayWidget: View {
                     .navigationBarTitleDisplayMode(.inline)
                 }
             }
+            .accessibilityLabel(Text("Pay with FlyPay"))
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
 }
