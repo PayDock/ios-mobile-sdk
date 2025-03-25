@@ -33,8 +33,7 @@ public struct MobileSDKConfig {
     private func setupTheme() {
         guard let theme = theme else { return }
         
-        Appearance.shared.lightThemeColors = theme.lightThemeColors
-        Appearance.shared.darkThemeColors = theme.darkThemeColors
+        Appearance.shared.colors = theme.colors
         Appearance.shared.dimensions = theme.dimensions
         Appearance.shared.fontName = theme.fontName
     }

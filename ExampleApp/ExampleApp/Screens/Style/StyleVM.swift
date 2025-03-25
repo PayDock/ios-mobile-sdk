@@ -20,61 +20,61 @@ class StyleVM: ObservableObject {
     
     // MARK: - Properties
     
-    @Published var primaryColorHex = "6750A4" { didSet { primaryColor = Color(hex: primaryColorHex) }}
-    @Published var onPrimaryColorHex = "FFFFFF" { didSet { onPrimaryColor = Color(hex: onPrimaryColorHex) }}
-    @Published var textColorHex = "000000" { didSet { textColor = Color(hex: textColorHex) }}
-    @Published var successColorHex = "1ABA1A" { didSet { successColor = Color(hex: successColorHex) }}
-    @Published var errorColorHex = "B3261E" { didSet { errorColor = Color(hex: errorColorHex) }}
-    @Published var backgroundColorHex = "FFFFFF" { didSet { backgroundColor = Color(hex: backgroundColorHex) }}
-    @Published var borderColorHex = "8C8C8C" { didSet { borderColor = Color(hex: borderColorHex) }}
-    @Published var placeholderColorHex = "8C8C8C" { didSet { placeholderColor = Color(hex: placeholderColorHex) }}
+    @Published var primaryColorHex = Color.defaultPrimary.toHex() { didSet { primaryColor = Color(hex: primaryColorHex) }}
+    @Published var onPrimaryColorHex = Color.defaultOnPrimary.toHex() { didSet { onPrimaryColor = Color(hex: onPrimaryColorHex) }}
+    @Published var textColorHex = Color.defaultText.toHex() { didSet { textColor = Color(hex: textColorHex) }}
+    @Published var successColorHex = Color.defaultSuccess.toHex() { didSet { successColor = Color(hex: successColorHex) }}
+    @Published var errorColorHex = Color.defaultError.toHex() { didSet { errorColor = Color(hex: errorColorHex) }}
+    @Published var backgroundColorHex = Color.defaultBackground.toHex() { didSet { backgroundColor = Color(hex: backgroundColorHex) }}
+    @Published var borderColorHex = Color.defaultBorder.toHex() { didSet { borderColor = Color(hex: borderColorHex) }}
+    @Published var placeholderColorHex = Color.defaultPlaceholder.toHex() { didSet { placeholderColor = Color(hex: placeholderColorHex) }}
     
-    lazy var primaryColor = Color(red: 0.4, green: 0.31, blue: 0.64) {
+    lazy var primaryColor = Color.primaryColor {
         didSet {
             guard primaryColor != oldValue else { return }
-            primaryColorHex = primaryColor.toHex() ?? ""
+            primaryColorHex = primaryColor.toHex()
         }
     }
-    lazy var onPrimaryColor = Color.white  {
+    lazy var onPrimaryColor = Color.onPrimaryColor  {
         didSet {
             guard onPrimaryColor != oldValue else { return }
-            onPrimaryColorHex = onPrimaryColor.toHex() ?? ""
+            onPrimaryColorHex = onPrimaryColor.toHex()
         }
     }
-    lazy var textColor = Color.black {
+    lazy var textColor = Color.textColor {
         didSet {
             guard textColor != oldValue else { return }
-            textColorHex = textColor.toHex() ?? ""
+            textColorHex = textColor.toHex()
         }
     }
-    lazy var successColor = Color(red: 0.1, green: 0.73, blue: 0.1) {
+    lazy var successColor = Color.successColor {
         didSet {
             guard successColor != oldValue else { return }
-            successColorHex = successColor.toHex() ?? ""
+            successColorHex = successColor.toHex()
         }
     }
-    lazy var errorColor: Color = Color(red: 0.7, green: 0.15, blue: 0.12) {
+    lazy var errorColor = Color.errorColor {
         didSet {
             guard errorColor != oldValue else { return }
-            errorColorHex = errorColor.toHex() ?? ""
+            errorColorHex = errorColor.toHex()
         }
     }
-    lazy var backgroundColor = Color.white {
+    lazy var backgroundColor = Color.backgroundColor {
         didSet {
             guard backgroundColor != oldValue else { return }
-            backgroundColorHex = backgroundColor.toHex() ?? ""
+            backgroundColorHex = backgroundColor.toHex()
         }
     }
-    lazy var borderColor = Color(red: 0.55, green: 0.55, blue: 0.55) {
+    lazy var borderColor = Color.borderColor {
         didSet {
             guard borderColor != oldValue else { return }
-            borderColorHex = borderColor.toHex() ?? ""
+            borderColorHex = borderColor.toHex()
         }
     }
-    lazy var placeholderColor = Color(red: 0.55, green: 0.55, blue: 0.55) {
+    lazy var placeholderColor = Color.placeholderColor {
         didSet {
             guard placeholderColor != oldValue else { return }
-            placeholderColorHex = placeholderColor.toHex() ?? ""
+            placeholderColorHex = placeholderColor.toHex()
         }
     }
 
@@ -88,26 +88,14 @@ class StyleVM: ObservableObject {
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
 
     var savedLightThemeColors = Colors(
-        primary: Color(red: 0.4, green: 0.31, blue: 0.64),
-        onPrimary: .white,
-        text: .black,
-        success: Color(red: 0.1, green: 0.73, blue: 0.1),
-        error: Color(red: 0.7, green: 0.15, blue: 0.12),
-        background: .white,
-        border: Color(red: 0.55, green: 0.55, blue: 0.55),
-        placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
-
-    var savedDarkThemeColors = Colors(
-        primary: Color(red: 0.4, green: 0.31, blue: 0.64),
-        onPrimary: .white,
-        text: .white,
-        success: Color(red: 0.1, green: 0.73, blue: 0.1),
-        error: Color(red: 0.7, green: 0.15, blue: 0.12),
-        background: .black,
-        border: Color(red: 0.55, green: 0.55, blue: 0.55),
-        placeholder: Color(red: 0.55, green: 0.55, blue: 0.55))
-
-    var isDarkModeEnabled: Bool { UITraitCollection.current.userInterfaceStyle == .dark }
+        primary: .defaultPrimary,
+        onPrimary: .defaultOnPrimary,
+        text: .defaultText,
+        success: .defaultSuccess,
+        error: .defaultError,
+        background: .defaultBackground,
+        border: .defaultBorder,
+        placeholder: .defaultPlaceholder)
 
     // MARK: - Initialisation
 
@@ -126,11 +114,7 @@ class StyleVM: ObservableObject {
             border: borderColor,
             placeholder: placeholderColor)
 
-        if isDarkModeEnabled {
-            savedDarkThemeColors = colors
-        } else {
             savedLightThemeColors = colors
-        }
 
         let dimensions = Dimensions(
             buttonCornerRadius: Double(buttonCornerRadius) ?? 4,
@@ -139,11 +123,7 @@ class StyleVM: ObservableObject {
             spacing: Double(spacing) ?? 16)
 
         let theme = {
-            if isDarkModeEnabled {
-                return Theme(darkThemeColors: colors, dimensions: dimensions, fontName: self.fontName)
-            } else {
-                return Theme(lighThemeColorst: colors, dimensions: dimensions, fontName: self.fontName)
-            }
+            return Theme(colors: colors, dimensions: dimensions, fontName: self.fontName)
         }()
 
         let config = {
@@ -162,28 +142,13 @@ class StyleVM: ObservableObject {
     }
 
     func colorSchemeChangedTo(_ colorScheme: ColorScheme) {
-        switch colorScheme {
-        case .light:
-            primaryColor = savedLightThemeColors.primary
-            onPrimaryColor = savedLightThemeColors.onPrimary
-            textColor = savedLightThemeColors.text
-            successColor = savedLightThemeColors.success
-            errorColor = savedLightThemeColors.error
-            backgroundColor = savedLightThemeColors.background
-            borderColor = savedLightThemeColors.border
-            placeholderColor = savedLightThemeColors.placeholder
-
-        case .dark:
-            primaryColor = savedDarkThemeColors.primary
-            onPrimaryColor = savedDarkThemeColors.onPrimary
-            textColor = savedDarkThemeColors.text
-            successColor = savedDarkThemeColors.success
-            errorColor = savedDarkThemeColors.error
-            backgroundColor = savedDarkThemeColors.background
-            borderColor = savedDarkThemeColors.border
-            placeholderColor = savedDarkThemeColors.placeholder
-
-        @unknown default: break
-        }
+        primaryColor = .defaultPrimary
+        onPrimaryColor = .defaultOnPrimary
+        textColor = .defaultText
+        successColor = .defaultSuccess
+        errorColor = .defaultError
+        backgroundColor = .defaultBackground
+        borderColor = .defaultBorder
+        placeholderColor = .defaultPlaceholder
     }
 }

@@ -7,73 +7,24 @@
 //
 
 import Foundation
-
 import SwiftUI
 
-extension Color {
-
-    init(light lightModeColor: @escaping @autoclosure () -> Color,
-        dark darkModeColor: @escaping @autoclosure () -> Color) {
-        self.init(UIColor(light: UIColor(lightModeColor()), dark: UIColor(darkModeColor())))
-    }
-
-    public static var primaryColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.primary,
-             dark: Appearance.shared.darkThemeColors.primary)
-    }
-
-    static var primaryLightColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.primary.opacity(0.3),
-             dark: Appearance.shared.darkThemeColors.primary.opacity(0.3))
-    }
-
-    static var onPrimaryColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.onPrimary,
-             dark: Appearance.shared.darkThemeColors.onPrimary)
-    }
-
-    static var textColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.text,
-             dark: Appearance.shared.darkThemeColors.text)
-    }
-
-    static var successColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.success,
-             dark: Appearance.shared.darkThemeColors.success)
-    }
-
-    static var errorColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.error,
-             dark: Appearance.shared.darkThemeColors.error)
-    }
-
-    static var backgroundColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.background,
-             dark: Appearance.shared.darkThemeColors.background)
-    }
-
-    static var borderColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.border,
-             dark: Appearance.shared.darkThemeColors.border)
-    }
-
-    static var placeholderColor: Self {
-        Self(light: Appearance.shared.lightThemeColors.placeholder,
-             dark: Appearance.shared.darkThemeColors.placeholder)
-    }
-
-}
-
-extension UIColor {
-    convenience init(light lightModeColor: @escaping @autoclosure () -> UIColor,
-                     dark darkModeColor: @escaping @autoclosure () -> UIColor) {
-        self.init { traitCollection in
-            switch traitCollection.userInterfaceStyle {
-            case .light: return lightModeColor()
-            case .dark: return darkModeColor()
-            case .unspecified: return lightModeColor()
-            @unknown default: return lightModeColor()
-            }
-        }
-    }
+public extension Color {
+    static var defaultPrimary: Color { Color(.primary) }
+    static var defaultOnPrimary: Color { Color(.onPrimary) }
+    static var defaultText: Color { Color(.text) }
+    static var defaultSuccess: Color { Color(.success) }
+    static var defaultError: Color { Color(.error) }
+    static var defaultBackground: Color { Color(.background) }
+    static var defaultBorder: Color { Color(.border) }
+    static var defaultPlaceholder: Color { Color(.placeholder) }
+    
+    static var primaryColor: Color { Appearance.shared.colors.primary }
+    static var onPrimaryColor: Color { Appearance.shared.colors.onPrimary }
+    static var textColor: Color { Appearance.shared.colors.text }
+    static var successColor: Color { Appearance.shared.colors.success }
+    static var errorColor: Color { Appearance.shared.colors.error }
+    static var backgroundColor: Color { Appearance.shared.colors.background }
+    static var borderColor: Color { Appearance.shared.colors.border }
+    static var placeholderColor: Color { Appearance.shared.colors.placeholder }
 }

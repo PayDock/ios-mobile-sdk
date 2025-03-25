@@ -132,7 +132,7 @@ struct AutocompleteTextField: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .foregroundColor(.primaryLightColor)
+                            .foregroundColor(.primaryColor).opacity(0.3)
                             .shadow(radius: 4)
                     )
                     .opacity(popupOpacity)
