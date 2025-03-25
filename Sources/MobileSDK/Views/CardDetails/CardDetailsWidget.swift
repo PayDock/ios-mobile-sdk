@@ -11,7 +11,7 @@ import SwiftUI
 public struct CardDetailsWidget: View {
 
     // MARK: - Properties
-
+    @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
@@ -263,6 +263,12 @@ public struct CardDetailsWidget: View {
                     .underline()
                     .accentColor(.textColor)
                     .disabled(viewModel.viewState.isDisabled)
+                    .frame(minHeight: 24.0)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        guard let url = URL(string: url) else { return }
+                        openURL(url)
+                    }
             }
             Spacer()
             Toggle(isOn: $viewModel.policyAccepted) {}
