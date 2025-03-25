@@ -89,10 +89,10 @@ struct AutocompleteTextField: View {
                 textContentType: textContentType,
                 onTapGesture: onTapGesture
             )
-            .overlay(
+            .overlay(content: {
                 autocompletePopup
-                    .offset(x: -1, y: 52), alignment: .topLeading
-            )
+                    .offset(x: -1, y: 52)
+            })
         }
         .frame(height: 48)
     }
@@ -110,6 +110,7 @@ struct AutocompleteTextField: View {
                                 .foregroundColor(.textColor)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
+                                .accessibilityLabel(Text("Dropdown menu has no results."))
                         } else {
                             ForEach(options, id: \.self) { option in
                                 HStack {
@@ -149,6 +150,7 @@ struct AutocompleteTextField: View {
                     }
                 }
             }
+            .accessibilityLabel(Text("No search results."))
             .background(Color.backgroundColor)
         }
     }
