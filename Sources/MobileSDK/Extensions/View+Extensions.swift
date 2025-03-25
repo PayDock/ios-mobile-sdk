@@ -17,6 +17,26 @@ extension View {
     func customFont(_ size: Fonts.Size) -> some View {
         return self.modifier(ScaledFont(size: size.rawValue))
     }
-
+    
+    @ViewBuilder
+    func onConditionalKeyPress(key: KeyEquivalent, action: @escaping () -> Void) -> some View {
+        if #available(iOS 17.0, *) {
+            self.onKeyPress(.tab, action: {
+                action()
+                return .handled
+            })
+        } else {
+            self
+        }
+    }
+    
+    @ViewBuilder
+    func conditionalFocusable() -> some View {
+        if #available(iOS 17.0, *) {
+            self.focusable()
+        } else {
+            self
+        }
+    }
 }
 

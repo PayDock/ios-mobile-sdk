@@ -15,6 +15,7 @@ public struct CardDetailsWidget: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
+    @FocusState private var isViewFocused: Bool
 
     // MARK: - Initialisation
 
@@ -30,7 +31,7 @@ public struct CardDetailsWidget: View {
     }
 
     // MARK: - View protocol properties
-
+    
     public var body: some View {
         VStack(spacing: 0) {
             if viewModel.config.showCardTitle {
@@ -76,6 +77,15 @@ public struct CardDetailsWidget: View {
                             }
                         }
                     )
+                    .submitLabel(.next)
+                    .onSubmit {
+                        textFieldInFocus = .cardNumber
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+                    }
+                    .onConditionalKeyPress(key: .tab, action: {
+                        textFieldInFocus = .cardNumber
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+                    })
                     .focused($textFieldInFocus, equals: .cardholderName)
                 }
 
@@ -96,6 +106,25 @@ public struct CardDetailsWidget: View {
                     }
                 )
                 .keyboardType(.numberPad)
+                .toolbar {
+                    if textFieldInFocus == .cardNumber {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button {
+                                textFieldInFocus = .expiryDate
+                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+                            } label: {
+                                Text("Next")
+                                    .customFont(.body)
+                                    .foregroundColor(.primaryColor)
+                            }
+                        }
+                    }
+                }
+                .onConditionalKeyPress(key: .tab, action: {
+                    textFieldInFocus = .expiryDate
+                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+                })
                 .focused($textFieldInFocus, equals: .cardNumber)
                 .onChange(of: viewModel.cardDetailsFormManager.cardNumberText) { newValue in
                     viewModel.cardDetailsFormManager.formatCardNumber(updatedText: newValue)
@@ -122,6 +151,25 @@ public struct CardDetailsWidget: View {
                         }
                     )
                     .keyboardType(.numberPad)
+                    .toolbar {
+                        if textFieldInFocus == .expiryDate {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button {
+                                    textFieldInFocus = .securityCode
+                                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+                                } label: {
+                                    Text("Next")
+                                        .customFont(.body)
+                                        .foregroundColor(.primaryColor)
+                                }
+                            }
+                        }
+                    }
+                    .onConditionalKeyPress(key: .tab, action: {
+                        textFieldInFocus = .securityCode
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+                    })
                     .focused($textFieldInFocus, equals: .expiryDate)
                     .onChange(of: viewModel.cardDetailsFormManager.expiryDateText) { newValue in
                         viewModel.cardDetailsFormManager.formatExpiryDate(updatedText: newValue)
@@ -143,6 +191,25 @@ public struct CardDetailsWidget: View {
                         }
                     )
                     .keyboardType(.numberPad)
+                    .toolbar {
+                        if textFieldInFocus == .securityCode {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button {
+                                    textFieldInFocus = nil
+                                    viewModel.cardDetailsFormManager.endEditing()
+                                } label: {
+                                    Text("Done")
+                                        .customFont(.body)
+                                        .foregroundColor(.primaryColor)
+                                }
+                            }
+                        }
+                    }
+                    .onConditionalKeyPress(key: .tab, action: {
+                        textFieldInFocus = .cardholderName
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                    })
                     .focused($textFieldInFocus, equals: .securityCode)
                     .onChange(of: viewModel.cardDetailsFormManager.securityCodeText) { newValue in
                         viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: newValue)
@@ -152,6 +219,7 @@ public struct CardDetailsWidget: View {
                     privacyView
                 }
             }
+            
             SDKButton(title: viewModel.config.actionText,
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
                       style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
@@ -162,32 +230,43 @@ public struct CardDetailsWidget: View {
             .padding(.bottom, 16)
             .padding(.top, .spacing)
             .customFont(.body)
+            // Initial dummy focus
+            .conditionalFocusable()
+            .focused($isViewFocused)
+            .onConditionalKeyPress(key: .tab, action: {
+                textFieldInFocus = .cardholderName
+                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+            })
+            .onAppear {
+                isViewFocused = true
+            }
         }
         .padding(.horizontal, max(16, .spacing))
         .background(Color.backgroundColor)
+
     }
 
     private var privacyView: some View {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(viewModel.config.allowSaveCard?.consentText ?? "")
-                        .customFont(.body3)
-                        .foregroundColor(.textColor)
-                    let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
-                    let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
-                    let link = "[\(text)](\(url))"
-                    Text(.init(link))
-                        .customFont(.body3)
-                        .underline()
-                        .accentColor(.textColor)
-                        .disabled(viewModel.viewState.isDisabled)
-                }
-                Spacer()
-                Toggle(isOn: $viewModel.policyAccepted) {}
-                    .tint(.primaryColor)
-                    .frame(width: 64, height: 44)
+        HStack {
+            VStack(alignment: .leading) {
+                Text(viewModel.config.allowSaveCard?.consentText ?? "")
+                    .customFont(.body3)
+                    .foregroundColor(.textColor)
+                let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
+                let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
+                let link = "[\(text)](\(url))"
+                Text(.init(link))
+                    .customFont(.body3)
+                    .underline()
+                    .accentColor(.textColor)
                     .disabled(viewModel.viewState.isDisabled)
-                    .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
+            }
+            Spacer()
+            Toggle(isOn: $viewModel.policyAccepted) {}
+                .tint(.primaryColor)
+                .frame(width: 64, height: 44)
+                .disabled(viewModel.viewState.isDisabled)
+                .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
         }
     }
     

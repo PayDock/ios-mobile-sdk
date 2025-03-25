@@ -123,7 +123,6 @@ class AddressVM: NSObject, ObservableObject {
 
         completion(.success(address))
     }
-
 }
 
 // MARK: - MKLocalSearchCompleterDelegate

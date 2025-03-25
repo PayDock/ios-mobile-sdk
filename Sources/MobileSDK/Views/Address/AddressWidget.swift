@@ -12,6 +12,7 @@ public struct AddressWidget: View {
 
     @StateObject var viewModel: AddressVM
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
+    @FocusState private var isViewFocused: Bool
 
     @State private var address: Address?
 
@@ -79,7 +80,17 @@ public struct AddressWidget: View {
                     onTapGesture: {
                         self.textFieldInFocus = .firstName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
-                    })
+                    }
+                )
+                .submitLabel(.next)
+                .onSubmit {
+                    textFieldInFocus = .lastName
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
+                }
+                .onConditionalKeyPress(key: .tab, action: {
+                    textFieldInFocus = .lastName
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
+                })
                 .focused($textFieldInFocus, equals: .firstName)
 
                 OutlineTextField(
@@ -95,6 +106,15 @@ public struct AddressWidget: View {
                         viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
                     }
                 )
+                .submitLabel(.next)
+                .onSubmit {
+                    textFieldInFocus = .searchAddress
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
+                }
+                .onConditionalKeyPress(key: .tab, action: {
+                    textFieldInFocus = .searchAddress
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
+                })
                 .focused($textFieldInFocus, equals: .lastName)
             }
             .padding(.bottom, 20)
@@ -134,7 +154,24 @@ public struct AddressWidget: View {
                 onTapGesture: {
                     self.textFieldInFocus = .searchAddress
                     viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
-                })
+                }
+            )
+            .submitLabel(.next)
+            .onSubmit {
+                let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
+                textFieldInFocus = isFormExpanded ? .addressLine1 : nil
+                
+                if isFormExpanded {
+                    viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
+                } else {
+                    viewModel.addressFormManager.endEditing()
+                }
+            }
+            .onConditionalKeyPress(key: .tab, action: {
+                let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
+                textFieldInFocus = isFormExpanded ? .addressLine1 : .firstName
+                viewModel.addressFormManager.setEditingTextField(focusedField: isFormExpanded ? .addressLine1 : .firstName)
+            })
             .focused($textFieldInFocus, equals: .searchAddress)
             .padding(.bottom, 6)
         }
@@ -169,7 +206,17 @@ public struct AddressWidget: View {
             onTapGesture: {
                 self.textFieldInFocus = .addressLine1
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
-            })
+            }
+        )
+        .submitLabel(.next)
+        .onSubmit {
+            textFieldInFocus = .addressLine2
+            viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .addressLine2
+            viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
+        })
         .focused($textFieldInFocus, equals: .addressLine1)
     }
 
@@ -185,7 +232,17 @@ public struct AddressWidget: View {
             onTapGesture: {
                 self.textFieldInFocus = .addressLine2
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
-            })
+            }
+        )
+        .submitLabel(.next)
+        .onSubmit {
+            textFieldInFocus = .city
+            viewModel.addressFormManager.setEditingTextField(focusedField: .city)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .city
+            viewModel.addressFormManager.setEditingTextField(focusedField: .city)
+        })
         .focused($textFieldInFocus, equals: .addressLine2)
     }
 
@@ -201,7 +258,17 @@ public struct AddressWidget: View {
             onTapGesture: {
                 self.textFieldInFocus = .city
                 viewModel.addressFormManager.setEditingTextField(focusedField: .city)
-            })
+            }
+        )
+        .submitLabel(.next)
+        .onSubmit {
+            textFieldInFocus = .state
+            viewModel.addressFormManager.setEditingTextField(focusedField: .state)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .state
+            viewModel.addressFormManager.setEditingTextField(focusedField: .state)
+        })
         .focused($textFieldInFocus, equals: .city)
     }
 
@@ -219,6 +286,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .state)
             }
         )
+        .submitLabel(.next)
+        .onSubmit {
+            textFieldInFocus = .postcode
+            viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .postcode
+            viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
+        })
         .focused($textFieldInFocus, equals: .state)
     }
 
@@ -236,6 +312,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
             }
         )
+        .submitLabel(.next)
+        .onSubmit {
+            textFieldInFocus = .country
+            viewModel.addressFormManager.setEditingTextField(focusedField: .country)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .country
+            viewModel.addressFormManager.setEditingTextField(focusedField: .country)
+        })
         .focused($textFieldInFocus, equals: .postcode)
     }
 
@@ -253,6 +338,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .country)
             }
         )
+        .submitLabel(.done)
+        .onSubmit {
+            textFieldInFocus = nil
+            viewModel.addressFormManager.endEditing()
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .firstName
+            viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
+        })
         .focused($textFieldInFocus, equals: .country)
     }
 
@@ -262,6 +356,16 @@ public struct AddressWidget: View {
         }
         .padding(.vertical, 16)
         .customFont(.body)
+        // Initial dummy focus
+        .conditionalFocusable()
+        .focused($isViewFocused)
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .firstName
+            viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
+        })
+        .onAppear {
+            isViewFocused = true
+        }
     }
 }
 

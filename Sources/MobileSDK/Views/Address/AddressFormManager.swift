@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 class AddressFormManager: ObservableObject {
 
@@ -176,6 +177,21 @@ class AddressFormManager: ObservableObject {
         countryText = address.country
 
         validateAllTextFields()
+    }
+    
+    // MARK: - Editing
+    
+    func endEditing() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        editingFirstName = false
+        editingLastName = false
+        editingAddressSearch = false
+        editingAddressLine1 = false
+        editingAddressLine2 = false
+        editingCity = false
+        editingState = false
+        editingPostcode = false
+        editingCountry = false
     }
 
 }
