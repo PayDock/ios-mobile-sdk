@@ -77,6 +77,7 @@ public struct AddressWidget: View {
                     editing: $viewModel.addressFormManager.editingFirstName,
                     valid: $viewModel.addressFormManager.firstNameValid,
                     disabled: $viewModel.isDisabled,
+                    textContentType: .givenName,
                     onTapGesture: {
                         self.textFieldInFocus = .firstName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
@@ -101,6 +102,7 @@ public struct AddressWidget: View {
                     editing: $viewModel.addressFormManager.editingLastName,
                     valid: $viewModel.addressFormManager.lastNameValid,
                     disabled: $viewModel.isDisabled,
+                    textContentType: .familyName,
                     onTapGesture: {
                         self.textFieldInFocus = .lastName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
@@ -148,6 +150,7 @@ public struct AddressWidget: View {
                 showPopup: $viewModel.addressFormManager.showAddressSearchPopup,
                 disabled: $viewModel.isDisabled,
                 options: $viewModel.addressSearchSuggestions,
+                textContentType: .location,
                 onSelection: {
                     viewModel.handleTapOnOptionAt(index: $0)
                 },
@@ -203,6 +206,7 @@ public struct AddressWidget: View {
             editing: $viewModel.addressFormManager.editingAddressLine1,
             valid: $viewModel.addressFormManager.addressLine1Valid,
             disabled: $viewModel.isDisabled,
+            textContentType: .streetAddressLine1,
             onTapGesture: {
                 self.textFieldInFocus = .addressLine1
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
@@ -229,6 +233,7 @@ public struct AddressWidget: View {
             editing: $viewModel.addressFormManager.editingAddressLine2,
             valid: $viewModel.addressFormManager.addressLine2Valid,
             disabled: $viewModel.isDisabled,
+            textContentType: .streetAddressLine2,
             onTapGesture: {
                 self.textFieldInFocus = .addressLine2
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
@@ -255,6 +260,7 @@ public struct AddressWidget: View {
             editing: $viewModel.addressFormManager.editingCity,
             valid: $viewModel.addressFormManager.cityValid,
             disabled: $viewModel.isDisabled,
+            textContentType: .addressCity,
             onTapGesture: {
                 self.textFieldInFocus = .city
                 viewModel.addressFormManager.setEditingTextField(focusedField: .city)
@@ -281,6 +287,7 @@ public struct AddressWidget: View {
             editing: $viewModel.addressFormManager.editingState,
             valid: $viewModel.addressFormManager.stateValid,
             disabled: $viewModel.isDisabled,
+            textContentType: .addressState,
             onTapGesture: {
                 self.textFieldInFocus = .state
                 viewModel.addressFormManager.setEditingTextField(focusedField: .state)
@@ -307,6 +314,7 @@ public struct AddressWidget: View {
             editing: $viewModel.addressFormManager.editingPostcode,
             valid: $viewModel.addressFormManager.postcodeValid,
             disabled: $viewModel.isDisabled,
+            textContentType: .postalCode,
             onTapGesture: {
                 self.textFieldInFocus = .postcode
                 viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
@@ -333,6 +341,7 @@ public struct AddressWidget: View {
             editing: $viewModel.addressFormManager.editingCountry,
             valid: $viewModel.addressFormManager.countryValid,
             disabled: $viewModel.isDisabled,
+            textContentType: .countryName,
             onTapGesture: {
                 self.textFieldInFocus = .country
                 viewModel.addressFormManager.setEditingTextField(focusedField: .country)

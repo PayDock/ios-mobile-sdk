@@ -40,6 +40,7 @@ struct OutlineTextField: View {
     private let title: String
     private let placeholder: String
     private let validationIconEnabled: Bool
+    private let textContentType: UITextContentType?
     private let onTapGesture: () -> Void
 
     // MARK: - Initialization
@@ -54,6 +55,7 @@ struct OutlineTextField: View {
     ///   - valid: Whether the field is in the valid state.
     ///   - disabled: Whether the field is in a disabled state.
     ///   - validationIconEnabled: Whether to enabled the validation icon.
+    ///   - textContentType: Content type used for the suggested prefill.
     ///   - onTapGesture: Action to take on tap gesture activaction.
     public init(text: Binding<String>,
                 title: String,
@@ -64,6 +66,7 @@ struct OutlineTextField: View {
                 valid: Binding<Bool?>,
                 disabled: Binding<Bool>,
                 validationIconEnabled: Bool = true,
+                textContentType: UITextContentType? = nil,
                 onTapGesture: @escaping (() -> Void)
     ) {
         self._text = text
@@ -75,6 +78,7 @@ struct OutlineTextField: View {
         self._valid = valid
         self._disabled = disabled
         self.validationIconEnabled = validationIconEnabled
+        self.textContentType = textContentType
         self.onTapGesture = onTapGesture
 
         titleLeadingPadding = (leftImage != nil) ? 52 : 12
@@ -133,21 +137,22 @@ struct OutlineTextField: View {
                 .foregroundColor(.placeholderColor)
                 .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
-
+            
             TextField(editing ? placeholder : "", text: $text)
-            .simultaneousGesture(TapGesture().onEnded({ _ in
-                onTapGesture()
-            }))
-            .simultaneousGesture(LongPressGesture().onEnded({ _ in
-                onTapGesture()
-            }))
-            .disabled(disabled)
-            .frame(height: getTextFieldHeight())
-            .customFont(.body)
-            .foregroundColor(.textColor)
-            .tint(.primaryColor)
-            .accessibilityLabel(title)
-            .accessibilityHint(getValidMessage())
+                .textContentType(textContentType)
+                .simultaneousGesture(TapGesture().onEnded({ _ in
+                    onTapGesture()
+                }))
+                .simultaneousGesture(LongPressGesture().onEnded({ _ in
+                    onTapGesture()
+                }))
+                .disabled(disabled)
+                .frame(height: getTextFieldHeight())
+                .customFont(.body)
+                .foregroundColor(.textColor)
+                .tint(.primaryColor)
+                .accessibilityLabel(title)
+                .accessibilityHint(getValidMessage())
             
             if validationIconEnabled {
                 validationIconView

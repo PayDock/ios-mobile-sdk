@@ -70,6 +70,7 @@ public struct CardDetailsWidget: View {
                         editing: $viewModel.cardDetailsFormManager.editingCardholderName,
                         valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
                         disabled: $viewModel.viewState.isDisabled,
+                        textContentType: getCreditCardName(),
                         onTapGesture: {
                             if (!viewModel.viewState.isDisabled) {
                                 self.textFieldInFocus = .cardholderName
@@ -98,6 +99,7 @@ public struct CardDetailsWidget: View {
                     editing: $viewModel.cardDetailsFormManager.editingCardNumber,
                     valid: $viewModel.cardDetailsFormManager.cardNumberValid,
                     disabled: $viewModel.viewState.isDisabled,
+                    textContentType: .creditCardNumber,
                     onTapGesture: {
                         if (!viewModel.viewState.isDisabled) {
                             self.textFieldInFocus = .cardNumber
@@ -142,7 +144,7 @@ public struct CardDetailsWidget: View {
                         editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
                         valid: $viewModel.cardDetailsFormManager.expiryDateValid,
                         disabled: $viewModel.viewState.isDisabled,
-                        
+                        textContentType: getCreditCardExpiryDate(),
                         onTapGesture: {
                             if (!viewModel.viewState.isDisabled) {
                                 self.textFieldInFocus = .expiryDate
@@ -183,6 +185,7 @@ public struct CardDetailsWidget: View {
                         editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
                         valid: $viewModel.cardDetailsFormManager.securityCodeValid,
                         disabled: $viewModel.viewState.isDisabled,
+                        textContentType: getCreditCardSecurityCode(),
                         onTapGesture: {
                             if (!viewModel.viewState.isDisabled) {
                                 self.textFieldInFocus = .securityCode
@@ -288,6 +291,32 @@ public struct CardDetailsWidget: View {
         case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
         case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
         @unknown default: return false
+        }
+    }
+    
+    // MARK: - Autofill
+    
+    private func getCreditCardName() -> UITextContentType {
+        if #available(iOS 17.0, *) {
+            return .creditCardName
+        } else {
+            return .name
+        }
+    }
+    
+    private func getCreditCardExpiryDate() -> UITextContentType? {
+        if #available(iOS 17.0, *) {
+            return .creditCardExpiration
+        } else {
+            return .none
+        }
+    }
+    
+    private func getCreditCardSecurityCode() -> UITextContentType? {
+        if #available(iOS 17.0, *) {
+            return .creditCardSecurityCode
+        } else {
+            return .none
         }
     }
 }

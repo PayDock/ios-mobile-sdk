@@ -26,6 +26,7 @@ struct AutocompleteTextField: View {
     @Binding private var showPopup: Bool
     @Binding private var disabled: Bool
     @Binding private var options: [String]
+    private var textContentType: UITextContentType?
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
     private var onSelection: (Int?) -> ()
@@ -43,6 +44,7 @@ struct AutocompleteTextField: View {
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
     ///   - showPopup: Whether the autocomplete field is displayed..
+    ///   - textContentType: Content type used for the suggested prefill.
     ///   - option: Autocomplete popup list of options.
     ///   - onSelection: Returns selected value
     public init(text: Binding<String>,
@@ -55,6 +57,7 @@ struct AutocompleteTextField: View {
                 showPopup: Binding<Bool>,
                 disabled: Binding<Bool>,
                 options: Binding<Array<String>>,
+                textContentType: UITextContentType? = nil,
                 onSelection: @escaping (Int?) -> (),
                 onTapGesture: @escaping () -> Void) {
         self._text = text
@@ -67,6 +70,7 @@ struct AutocompleteTextField: View {
         self._showPopup = showPopup
         self._disabled = disabled
         self._options = options
+        self.textContentType = textContentType
         self.onSelection = onSelection
         self.onTapGesture = onTapGesture
     }
@@ -82,6 +86,7 @@ struct AutocompleteTextField: View {
                 valid: $valid,
                 disabled: $disabled,
                 validationIconEnabled: false,
+                textContentType: textContentType,
                 onTapGesture: onTapGesture
             )
             .overlay(
