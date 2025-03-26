@@ -9,6 +9,7 @@
 import CorePayments
 import FraudProtection
 import NetworkingLib
+import Foundation
 
 public class PayPalDataCollectorUtil {
     
@@ -39,11 +40,26 @@ public class PayPalDataCollectorUtil {
         }
     }
     
-    public func collectDeviceData(additionalData: [String: String] = [:]) -> String {
+    public func collectDeviceId(additionalData: [String: String] = [:]) throws -> String {
         let config = CoreConfig(clientID: clientId, environment: Constants.payPalVaultEnvironment)
         let payPalDataCollector = PayPalDataCollector(config: config)
-        
+    
         let deviceData = payPalDataCollector.collectDeviceData(additionalData: additionalData)
-        return deviceData
+        do {
+            let correlationId = try extractCorrelationId(from: deviceData)
+            return correlationId
+        } catch {
+            throw error
+        }
+    }
+    
+    private func extractCorrelationId(from jsonString: String) throws -> String {
+        guard let jsonData = jsonString.data(using: .utf8),
+              let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any],
+              let correlationId = jsonObject["correlation_id"] as? String else {
+            throw PayPalDataCollectorError.parsingError
+        }
+        
+        return correlationId
     }
 }
