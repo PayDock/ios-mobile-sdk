@@ -210,8 +210,9 @@ public struct CardDetailsWidget: View {
                         }
                     }
                     .onConditionalKeyPress(key: .tab, action: {
-                        textFieldInFocus = .cardholderName
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                        let collectCardholderName = viewModel.config.collectCardholderName
+                        textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: collectCardholderName ? .cardholderName : .cardNumber)
                     })
                     .focused($textFieldInFocus, equals: .securityCode)
                     .onChange(of: viewModel.cardDetailsFormManager.securityCodeText) { newValue in
@@ -227,6 +228,7 @@ public struct CardDetailsWidget: View {
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
                       style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
             ) {
+                textFieldInFocus = nil
                 viewModel.cardDetailsFormManager.endEditing()
                 viewModel.tokeniseCardDetails()
             }
@@ -237,8 +239,9 @@ public struct CardDetailsWidget: View {
             .conditionalFocusable()
             .focused($isViewFocused)
             .onConditionalKeyPress(key: .tab, action: {
-                textFieldInFocus = .cardholderName
-                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                let collectCardholderName = viewModel.config.collectCardholderName
+                textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
+                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: collectCardholderName ? .cardholderName : .cardNumber)
             })
             .onAppear {
                 isViewFocused = true
