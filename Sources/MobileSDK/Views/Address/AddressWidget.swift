@@ -42,6 +42,7 @@ public struct AddressWidget: View {
                 }
 
                 saveButton
+                emptyFocusView
             }
             .padding(.horizontal, .spacing)
         }
@@ -365,16 +366,19 @@ public struct AddressWidget: View {
         }
         .padding(.vertical, 16)
         .customFont(.body)
-        // Initial dummy focus
-        .conditionalFocusable()
-        .focused($isViewFocused)
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .firstName
-            viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
-        })
-        .onAppear {
-            isViewFocused = true
-        }
+    }
+    
+    private var emptyFocusView: some View {
+        VStack {}
+            .conditionalFocusable()
+            .focused($isViewFocused)
+            .onConditionalKeyPress(key: .tab, action: {
+                textFieldInFocus = .firstName
+                viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
+            })
+            .onAppear {
+                isViewFocused = true
+            }
     }
 }
 

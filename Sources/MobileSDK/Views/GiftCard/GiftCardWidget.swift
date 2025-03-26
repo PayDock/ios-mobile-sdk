@@ -33,6 +33,7 @@ public struct GiftCardWidget: View {
                         pinTextField
                     }
                     primaryButton
+                    emptyFocusView
                 }
                 .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
                 .background(Color.backgroundColor)
@@ -124,16 +125,20 @@ public struct GiftCardWidget: View {
         .padding(.bottom, 16)
         .padding(.top, .spacing)
         .customFont(.body)
-        // Initial dummy focus
-        .conditionalFocusable()
-        .focused($isViewFocused)
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .cardNumber
-            viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
-        })
-        .onAppear {
-            isViewFocused = true
-        }
+
+    }
+    
+    private var emptyFocusView: some View {
+        VStack {}
+            .conditionalFocusable()
+            .focused($isViewFocused)
+            .onConditionalKeyPress(key: .tab, action: {
+                textFieldInFocus = .cardNumber
+                viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
+            })
+            .onAppear {
+                isViewFocused = true
+            }
     }
 }
 
