@@ -26,24 +26,30 @@ struct CheckoutPaymentSheet: View {
             selector()
             switch viewModel.selectedMethod {
             case .card:
-                VStack {
-                    CardDetailsWidget(viewState: viewModel.viewState,
-                                      config: CardDetailsWidgetConfig(
-                                        gatewayId: nil,
-                                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                                        actionText: "Pay",
-                                        showCardTitle: false,
-                                        collectCardholderName: false,
-                                        allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
-                                      ),
-                                      loadingDelegate: viewModel,
-                                      completion: { result in
-                        switch result {
-                        case .success(let result): viewModel.payWithCard(result.token)
-                        case .failure: break
+                NavigationStack {
+                    ScrollView {
+                        VStack {
+                            Spacer()
+                                .frame(height: 20.0)
+                            CardDetailsWidget(viewState: viewModel.viewState,
+                                              config: CardDetailsWidgetConfig(
+                                                gatewayId: nil,
+                                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                                                actionText: "Pay",
+                                                showCardTitle: false,
+                                                collectCardholderName: false,
+                                                allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
+                                              ),
+                                              loadingDelegate: viewModel,
+                                              completion: { result in
+                                switch result {
+                                case .success(let result): viewModel.payWithCard(result.token)
+                                case .failure: break
+                                }
+                            })
+                            Spacer()
                         }
-                    })
-                    .frame(height: 240)
+                    }
                 }
 
             case .applePay:
