@@ -118,7 +118,7 @@ extension CheckoutPaymentVM {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: "merchant.test-paydock")
+            merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
 
         let applePayRequest = ApplePayRequest(
             token: walletToken,
@@ -195,7 +195,7 @@ extension CheckoutPaymentVM {
     /// Based on 3DS auth status selects the appropriate flow
     private func handleAuthStatus(_ response: Integrated3DSRes) {
         switch response.authStatus {
-        case .notSupported: captureCharge()
+        case .notSupported: captureCharge(_3dsId: response.resource.data.threeDS.id ?? "")
         case .pending:
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -207,31 +207,43 @@ extension CheckoutPaymentVM {
             showAlert(title: .error, message: "Error getting 3DS auth status!")
         }
     }
-
-    /// Handles the outcome of 3DS WebView check
-    func handle3dsEvent(_ event: ThreeDSResult) {
+    
+    /// Handles the outcome of integrated 3DS WebView check
+    func handle3dsEvent(_ event: Integrated3DSResult) {
         DispatchQueue.main.async {
             switch event.event {
-            case .chargeAuthChallenge: break
-            case .chargeAuthDecoupled: break
-            case .chargeAuthInfo: break
+            case .chargeAuth: break
+            case .additionalDataCollectSuccess: break
+            case .chargeAuthReject:
+                self.show3dsWebView = false
+                self.showAlert(title: .error, message: "3DS auth rejected!")
+            case .additionalDataCollectReject:
+                self.show3dsWebView = false
+                self.showAlert(title: .error, message: "3DS additional data rejected!")
+            case .chargeAuthCancelled:
+                self.show3dsWebView = false
+                self.showAlert(title: .error, message: "3DS cancelled!")
             case .chargeAuthSuccess:
                 self.show3dsWebView = false
-                self.captureCharge()
-            case .chargeAuthReject: break
-            case .error:
-                self.show3dsWebView = false
-                self.showAlert(title: .error, message: "3DS failed!")
+                self.captureCharge(_3dsId: event.charge3dsId)
             }
         }
     }
 
     /// Captures the charge as the final step in the payment flow
-    private func captureCharge() {
-        isLoading = true
+    private func captureCharge(_3dsId: String) {
+        DispatchQueue.main.async {
+            self.isLoading = true
+        }
         viewState?.setState(.disabled)
         Task {
-            let request = CaptureChargeReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)))
+            let request = CaptureChargeReq(
+                amount: "5.50",
+                currency: "AUD",
+                reference: UUID().uuidString,
+                description: "Test Payment",
+                _3ds: .init(_id: _3dsId))
+
             do {
                 let result = try await walletService.captureCharge(request: request)
                 // Ensure UI updates are performed on the main thread

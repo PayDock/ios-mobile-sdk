@@ -1,5 +1,29 @@
 # Changelog
 
+## [3.0.0] - 2025-03-26
+
+### Added
+
+- Add support for high contrast accessibility colors.
+- Add support for hardware and software keyboard navigation.
+- Add support for autofill for the text fields in widgets.
+
+### Removed
+
+- Settings screen from sample app
+- secretKey functionality in place of apiAccessToken
+
+### Changed
+
+- `Theme()` object now receives only a single color instead of the light mode and dark mode separately. Provided colors should have traits assigned to them.
+- SDK default theme now supports light and dark mode along with the high contrast accessibility.
+- Refactored ThreeDSWidget to Integrated3DSWidget and Standalone3DSWidget
+- `PayPalDataCollectorUtil` calling function from `collectDeviceData()` to `collectDeviceId()`
+
+### Fixed
+
+- Various accessibility fixes and improvements.
+
 ## [2.1.1] - 2025-02-07
 
 ### Fixed

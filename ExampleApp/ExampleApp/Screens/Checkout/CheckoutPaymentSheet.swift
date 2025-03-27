@@ -26,24 +26,30 @@ struct CheckoutPaymentSheet: View {
             selector()
             switch viewModel.selectedMethod {
             case .card:
-                VStack {
-                    CardDetailsWidget(viewState: viewModel.viewState,
-                                      config: CardDetailsWidgetConfig(
-                                        gatewayId: nil,
-                                        accessToken: ProjectEnvironment.shared.getAccessToken(),
-                                        actionText: "Pay",
-                                        showCardTitle: false,
-                                        collectCardholderName: false,
-                                        allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
-                                      ),
-                                      loadingDelegate: viewModel,
-                                      completion: { result in
-                        switch result {
-                        case .success(let result): viewModel.payWithCard(result.token)
-                        case .failure: break
+                NavigationStack {
+                    ScrollView {
+                        VStack {
+                            Spacer()
+                                .frame(height: 20.0)
+                            CardDetailsWidget(viewState: viewModel.viewState,
+                                              config: CardDetailsWidgetConfig(
+                                                gatewayId: nil,
+                                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                                                actionText: "Pay",
+                                                showCardTitle: false,
+                                                collectCardholderName: false,
+                                                allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
+                                              ),
+                                              loadingDelegate: viewModel,
+                                              completion: { result in
+                                switch result {
+                                case .success(let result): viewModel.payWithCard(result.token)
+                                case .failure: break
+                                }
+                            })
+                            Spacer()
                         }
-                    })
-                    .frame(height: 240)
+                    }
                 }
 
             case .applePay:
@@ -124,7 +130,7 @@ struct CheckoutPaymentSheet: View {
                 .font(Font.system(size: 16, weight: .semibold))
                 .frame(height: 48)
                 .frame(maxWidth:.infinity)
-                .background(Color(hex: "6750A4"))
+                .background(Color.primaryColor)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .padding()
                 .sheet(isPresented: $viewModel.showMastercardWebView, content: {
@@ -132,7 +138,7 @@ struct CheckoutPaymentSheet: View {
                         VStack {
                             ClickToPayWidget(
                                 serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                accessToken: ProjectEnvironment.shared.getAccessToken(),
+                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                                 meta: nil) { result in
                                     switch result {
                                     case .success(let result):
@@ -161,7 +167,7 @@ struct CheckoutPaymentSheet: View {
         .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }) {
             NavigationStack {
                 VStack {
-                    ThreeDSWidget(
+                    Integrated3DSWidget(
                         token: viewModel.token3DS,
                         baseURL: viewModel.getBaseUrl(),
                         completion: { result in
@@ -211,13 +217,13 @@ struct CheckoutPaymentSheet: View {
             if let title = title {
                 Text(title)
                     .font(.subheadline)
-                    .foregroundColor(Color(red: 0.4, green: 0.31, blue: 0.64))
+                    .foregroundColor(.textColor)
             }
         }
         .frame(width: 90, height: 49)
         .overlay(
             RoundedRectangle(cornerRadius: 4)
-                .stroke( type == viewModel.selectedMethod ? Color(red: 0.4, green: 0.31, blue: 0.64) : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
+                .stroke( type == viewModel.selectedMethod ? Color.primaryColor : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
         )
         .onTapGesture {
             withAnimation {

@@ -11,23 +11,15 @@ import Foundation
 struct CaptureChargeReq: Codable {
     let amount: String
     let currency: String
-    let customer: Customer
-
-    struct Customer: Codable {
-        let paymentSource: PaymentSource
-
+    let reference: String
+    let description: String
+    let _3ds: ThreeDS
+    
+    struct ThreeDS: Codable {
+        let _id: String
+        
         enum CodingKeys: String, CodingKey {
-            case paymentSource = "payment_source"
-        }
-
-        struct PaymentSource: Codable {
-            let vaultToken: String
-            let gatewayId: String
-
-            enum CodingKeys: String, CodingKey {
-                case vaultToken = "vault_token"
-                case gatewayId = "gateway_id"
-            }
+            case _id = "id"
         }
     }
 }

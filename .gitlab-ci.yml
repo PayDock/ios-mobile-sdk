@@ -30,8 +30,22 @@ test_exampleApp:
   stage: test
   script:
     - echo "success"
-    
+
 export_exampleApp:
   stage: build
   script:
+    - cp bin_schema/card-schemes.json ./Sources/MobileSDK/Resources/JSON/card-schemes.json
     - echo "success"
+  needs: ["pull_bin_file"]
+  dependencies:
+    - pull_bin_file
+
+pull_bin_file:
+  stage: build
+  image: 412245956714.dkr.ecr.ap-southeast-2.amazonaws.com/ci:20241212-1584910654
+  script: |
+    aws s3 cp s3://pd-app-bin-management-staging-11/bins.zip bin_schema/bins.zip
+    unzip bin_schema/bins.zip -d bin_schema/
+  artifacts:
+    paths:
+      - bin_schema/

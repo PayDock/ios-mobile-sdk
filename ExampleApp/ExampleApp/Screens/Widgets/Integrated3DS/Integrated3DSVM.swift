@@ -31,8 +31,8 @@ class Integrated3DSVM: NSObject, ObservableObject {
     }
 
     func tokeniseCardDetails() {
+        isLoading = true
         Task {
-            isLoading = true
             let req = TokeniseCardDetailsReq(
                 gatewayId: ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? "",
                 cardName: "Carlie Kuvalis",
@@ -46,7 +46,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
                 create3dsToken(cardToken: token)
             } catch {
                 alertMessage = "Error tokenising card details!"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                await MainActor.run {
                     self.isLoading = false
                     self.showAlert = true
                 }
@@ -59,13 +59,13 @@ class Integrated3DSVM: NSObject, ObservableObject {
             let req = Integrated3DSReq(amount: "10", currency: "AUD", _3ds: .init(browserDetails: .init()), token: cardToken)
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isLoading = false
                     self.token3DS = token3DS ?? ""
                     self.showWebView = true
                 }
             } catch {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isLoading = false
                     self.showWebView = false
                     self.alertMessage = "Error tokenising card details!"
@@ -79,19 +79,33 @@ class Integrated3DSVM: NSObject, ObservableObject {
         let urlString = "https://paydock.com"
         return URL(string: urlString)
     }
-
-    func handle3dsEvent(_ event: ThreeDSResult) {
+    
+    func handle3dsEvent(_ event: Integrated3DSResult) {
         switch event.event {
-        case .chargeAuthChallenge: break
-        case .chargeAuthDecoupled: break
-        case .chargeAuthInfo: break
+        case .chargeAuth: break
+        case .additionalDataCollectSuccess: break
+        case .chargeAuthReject:
+            self.showWebView = false
+            alertMessage = "3DS auth rejected!"
+            
+        case .additionalDataCollectReject:
+            self.showWebView = false
+            alertMessage = "3DS additional data rejected!"
+            
+        case .chargeAuthCancelled:
+            self.showWebView = false
+            alertMessage = "3DS cancelled!"
+            
         case .chargeAuthSuccess:
-            showWebView = false
+            self.showWebView = false
             alertMessage = event.charge3dsId
-        case .error, .chargeAuthReject:
-            showWebView = false
-            alertMessage = "3DS failed!"
         }
     }
-
+    
+    @MainActor
+    func handleFailure(error: Integrated3DSError) {
+        showWebView = false
+        alertMessage = error.customMessage
+        showAlert = true
+    }
 }

@@ -14,8 +14,8 @@ struct ProjectEnvironment {
 
     enum Keys {
         static let configuration = "CONFIGURATION"
-        static let secretKey = "SECRET_KEY"
-        static let accessToken = "ACCESS_TOKEN"
+        static let apiAccessToken = "API_ACCESS_TOKEN"
+        static let widgetAccessToken = "WIDGET_ACCESS_TOKEN"
         static let applePayGatewayId = "APPLE_PAY_GATEWAY_ID"
         static let payPalGatewayId = "PAY_PAL_GATEWAY_ID"
         static let integrated3dsGatewayId = "INTEGRATED_3DS_GATEWAY_ID"
@@ -24,6 +24,7 @@ struct ProjectEnvironment {
         static let afterpayGatewayId = "AFTERPAY_GATEWAY_ID"
         static let mastercardServiceId = "MASTERCARD_SERVICE_ID"
         static let flypayClientId = "FLYPAY_CLIENT_ID"
+        static let merchantId = "MERCHANT_ID"
     }
 
     private static let infoDictionary: [String: Any] = {
@@ -62,20 +63,17 @@ struct ProjectEnvironment {
         case .staging: return "apista.paydock.com"
         }
     }
-
-    func getSecretKey() -> String {
-        guard let secretKey = Self.infoDictionary[Keys.secretKey] as? String else {
-            fatalError("Secret key not found in .plist!")
+    
+    func getApiAccessToken() -> String {
+        guard let accessToken = Self.infoDictionary[Keys.apiAccessToken] as? String else {
+            fatalError("API access token not found in .plist!")
         }
-        return secretKey
+        return accessToken
     }
 
-    func getAccessToken() -> String {
-        if let accessToken = Self.accessToken {
-            return accessToken
-        }
-        guard let accessToken = Self.infoDictionary[Keys.accessToken] as? String else {
-            fatalError("Access token not found in .plist!")
+    func getWidgetAccessToken() -> String {
+        guard let accessToken = Self.infoDictionary[Keys.widgetAccessToken] as? String else {
+            fatalError("Widget access token not found in .plist!")
         }
         return accessToken
     }
@@ -143,6 +141,12 @@ struct ProjectEnvironment {
         }
         return clientId
     }
-
-    static var accessToken: String? = nil
+    
+    func getMerchantId() -> String? {
+        guard let merchantId = Self.infoDictionary[Keys.merchantId] as? String else {
+            print("Merchant ID not found in .plist!")
+            return nil
+        }
+        return merchantId
+    }
 }

@@ -51,15 +51,9 @@ extension WalletEndpoints: Endpoint {
     }
 
     var header: [String: String]? {
-        let secretKey = ProjectEnvironment.shared.getSecretKey()
-        let accessToken =  ProjectEnvironment.shared.getAccessToken()
+        let accessToken =  ProjectEnvironment.shared.getApiAccessToken()
         switch self {
-        case .initialiseWalletCharge, .initialiseFlyPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge:
-            return [
-                "x-user-secret-key": "\(secretKey)",
-                "Content-Type": "application/json;charset=utf-8"
-            ]
-        case .cardToken, .integrated3ds, .integrated3dsVault:
+        case .initialiseWalletCharge, .initialiseFlyPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge, .cardToken, .integrated3ds, .integrated3dsVault:
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"

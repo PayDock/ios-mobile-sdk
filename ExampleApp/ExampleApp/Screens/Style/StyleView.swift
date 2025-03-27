@@ -10,7 +10,7 @@ import SwiftUI
 
 struct StyleView: View {
 
-    @ObservedObject var viewModel = StyleVM()
+    @StateObject var viewModel = StyleVM()
     @Environment(\.colorScheme) var colorScheme
 
     init() {
@@ -39,8 +39,10 @@ struct StyleView: View {
                             designTextView(title: "TextField Corner", text: $viewModel.textFieldCornerRadius)
                             designTextView(title: "Button Corner", text: $viewModel.buttonCornerRadius)
                         }
-                        designTextView(title: "Padding", text: $viewModel.padding)
-                        designTextView(title: "Border Width", text: $viewModel.borderWidth)
+                        HStack {
+                            designTextView(title: "Border Width", text: $viewModel.borderWidth)
+                            designTextView(title: "Spacing", text: $viewModel.spacing)
+                        }
                     }
                     .padding(.trailing, 16)
                     divider
@@ -83,17 +85,18 @@ struct StyleView: View {
 
     private var colorListView: some View {
         VStack {
-            colorFieldView(title: "Primary", text: $viewModel.primaryColorHex)
-            colorFieldView(title: "On Primary", text: $viewModel.onPrimaryColorHex)
-            colorFieldView(title: "Text", text: $viewModel.textColorHex)
-            colorFieldView(title: "Success", text: $viewModel.successColorHex)
-            colorFieldView(title: "Error", text: $viewModel.errorColorHex)
-            colorFieldView(title: "Background", text: $viewModel.backgroundColorHex)
-            colorFieldView(title: "Placeholder", text: $viewModel.placeholderColorHex)
+            colorFieldView(title: "Primary", text: $viewModel.primaryColorHex, pickerColor: $viewModel.primaryColor)
+            colorFieldView(title: "On Primary", text: $viewModel.onPrimaryColorHex, pickerColor: $viewModel.onPrimaryColor)
+            colorFieldView(title: "Text", text: $viewModel.textColorHex, pickerColor: $viewModel.textColor)
+            colorFieldView(title: "Success", text: $viewModel.successColorHex, pickerColor: $viewModel.successColor)
+            colorFieldView(title: "Error", text: $viewModel.errorColorHex, pickerColor: $viewModel.errorColor)
+            colorFieldView(title: "Background", text: $viewModel.backgroundColorHex, pickerColor: $viewModel.backgroundColor)
+            colorFieldView(title: "Border", text: $viewModel.borderColorHex, pickerColor: $viewModel.borderColor)
+            colorFieldView(title: "Placeholder", text: $viewModel.placeholderColorHex, pickerColor: $viewModel.placeholderColor)
         }
     }
 
-    private func colorFieldView(title: String, text: Binding<String>) -> some View {
+    private func colorFieldView(title: String, text: Binding<String>, pickerColor: Binding<Color>) -> some View {
         VStack {
             HStack {
                 Text(title)
@@ -113,11 +116,9 @@ struct StyleView: View {
                         .background(Color.white)
                         .padding(.leading, 32)
                 }
-
-                Rectangle()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(Color(hex: "#\(text.wrappedValue)"))
-                    .padding(16)
+                ColorPicker(selection: pickerColor, supportsOpacity: false, label: {})
+                .frame(width: 44, height: 44)
+                .padding(.trailing, 24)
             }
         }
     }

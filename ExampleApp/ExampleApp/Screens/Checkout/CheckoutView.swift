@@ -53,7 +53,7 @@ struct CheckoutView: View {
                 .font(Font.system(size: 16, weight: .semibold))
                 .frame(height: 48)
                 .frame(maxWidth:.infinity)
-                .background(Color(hex: "6750A4"))
+                .background(Color.primaryColor)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
             }.padding(16)
@@ -125,7 +125,7 @@ struct BasketItemView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(Color(hex: "EDEDFF"))
+        .background(Color.primaryColor.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }

@@ -79,7 +79,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: "merchant.test-paydock")
+            merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
 
         let applePayRequest = ApplePayRequest(
             token: walletToken,
@@ -89,6 +89,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
     }
 
     func handleError(error: ApplePayError) {
+        isLoading = false
         alertTitle = "Error"
         alertMessage = "\(error.customMessage)"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

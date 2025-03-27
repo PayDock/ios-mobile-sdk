@@ -27,7 +27,7 @@ struct Integrated3DSWidgetView: View {
                         }) {
                             NavigationStack {
                                 VStack {
-                                    ThreeDSWidget(
+                                    Integrated3DSWidget(
                                         token: viewModel.token3DS,
                                         baseURL: viewModel.getBaseUrl(),
                                         completion: { result in
@@ -36,8 +36,7 @@ struct Integrated3DSWidgetView: View {
                                                 viewModel.handle3dsEvent(result)
                                                 
                                             case .failure(let error):
-                                                viewModel.alertMessage = error.localizedDescription
-                                                viewModel.showAlert = true
+                                                viewModel.handleFailure(error: error)
                                             }
                                         })
                                     .navigationTitle("3DS Check")

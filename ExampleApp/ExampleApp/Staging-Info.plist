@@ -2,27 +2,29 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>API_ACCESS_TOKEN</key>
+	<string>$(API_ACCESS_TOKEN)</string>
+	<key>WIDGET_ACCESS_TOKEN</key>
+	<string>$(WIDGET_ACCESS_TOKEN)</string>
 	<key>AFTERPAY_GATEWAY_ID</key>
 	<string>$(AFTERPAY_GATEWAY_ID)</string>
-	<key>SECRET_KEY</key>
-	<string>$(SECRET_KEY)</string>
-	<key>ACCESS_TOKEN</key>
-	<string>$(ACCESS_TOKEN)</string>
 	<key>APPLE_PAY_GATEWAY_ID</key>
 	<string>$(APPLE_PAY_GATEWAY_ID)</string>
+	<key>CONFIGURATION</key>
+	<string>$(CONFIGURATION)</string>
+	<key>FLYPAY_CLIENT_ID</key>
+	<string>$(FLYPAY_CLIENT_ID)</string>
 	<key>FLYPAY_GATEWAY_ID</key>
 	<string>$(FLYPAY_GATEWAY_ID)</string>
 	<key>INTEGRATED_3DS_GATEWAY_ID</key>
 	<string>$(INTEGRATED_3DS_GATEWAY_ID)</string>
-	<key>PAY_PAL_GATEWAY_ID</key>
-	<string>$(PAY_PAL_GATEWAY_ID)</string>
 	<key>MASTERCARD_SERVICE_ID</key>
 	<string>$(MASTERCARD_SERVICE_ID)</string>
-	<key>CONFIGURATION</key>
-	<string>$(CONFIGURATION)</string>
+	<key>PAY_PAL_GATEWAY_ID</key>
+	<string>$(PAY_PAL_GATEWAY_ID)</string>
 	<key>STANDALONE_3DS_GATEWAY_ID</key>
 	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
-    <key>FLYPAY_CLIENT_ID</key>
-    <string>$(FLYPAY_CLIENT_ID)</string>
+	<key>MERCHANT_ID</key>
+	<string>$(MERCHANT_ID)</string>
 </dict>
 </plist>

@@ -106,25 +106,42 @@ class Standalone3DSVM: NSObject, ObservableObject {
         return URL(string: urlString)
     }
 
-    func handle3dsEvent(_ event: ThreeDSResult) {
-        switch event.event {
-        case .chargeAuthChallenge: break
-        case .chargeAuthDecoupled: break
-        case .chargeAuthInfo: break
-        case .chargeAuthSuccess:
-            showWebView = false
-            alertMessage = event.charge3dsId
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+    func handle3dsEvent(_ event: Standalone3DSResult) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            switch event.event {
+            case .chargeAuthChallenge: break
+            case .chargeAuthDecoupled:
+                self.showWebView = false
+                self.alertMessage = "3DS Auth Decoupled!"
                 self.showAlert = true
-            }
-        case .chargeAuthReject: break
-        case .error:
-            showWebView = false
-            alertMessage = "3DS failed!"
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                
+            case .chargeAuthInfo:
+                self.showWebView = false
+                self.alertMessage = "3DS Auth Info!"
+                self.showAlert = true
+                
+            case .chargeAuthSuccess:
+                self.showWebView = false
+                self.alertMessage = event.charge3dsId
+                self.showAlert = true
+                
+            case .chargeAuthReject:
+                self.showWebView = false
+                self.alertMessage = "3DS Auth rejected!"
+                self.showAlert = true
+                
+            case .chargeError:
+                self.showWebView = false
+                self.alertMessage = "3DS failed!"
                 self.showAlert = true
             }
         }
     }
-
+    
+    @MainActor
+    func handleFailure(error: Standalone3DSError) {
+        showWebView = false
+        alertMessage = error.customMessage
+        showAlert = true
+    }
 }

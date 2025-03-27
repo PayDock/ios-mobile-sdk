@@ -21,23 +21,21 @@ struct MainView: View {
             CheckoutView()
                 .tabItem {
                     Label("Checkout", image: selection == 0 ? "cart-active" : "cart")
-                }.tag(0)
+                }
+                .tag(0)
 
             WidgetsView()
                 .tabItem {
                     Label("Widgets", image: selection == 1 ? "grid-layout-active" : "grid-layout")
-                }.tag(1)
+                }
+                .tag(1)
 
             StyleView()
                 .tabItem {
                     Label("Style", image: selection == 2 ? "paintbucket-active" : "paintbucket")
-                }.tag(2)
+                }
+                .tag(2)
                 .toolbarBackground(Color.white, for: .tabBar)
-
-            SettingsView()
-                .tabItem {
-                    Label("Settings", image: selection == 3 ? "cog-active" : "cog")
-                }.tag(3)
         }
         .toolbarBackground(Color.red, for: .tabBar)
         .accentColor(.black)

@@ -21,7 +21,7 @@ class PayPalVaultWidgetVM: ObservableObject {
     // MARK: - Config
     
     func getConfig() -> PayPalVaultConfig {
-        let accessToken = ProjectEnvironment.shared.getAccessToken()
+        let accessToken = ProjectEnvironment.shared.getWidgetAccessToken()
         let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
         let config = PayPalVaultConfig(accessToken: accessToken, gatewayId: gatewayId)
         return config

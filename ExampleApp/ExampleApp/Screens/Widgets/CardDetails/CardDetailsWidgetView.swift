@@ -20,7 +20,7 @@ struct CardDetailsWidgetView: View {
                 CardDetailsWidget(
                     config: CardDetailsWidgetConfig(
                         gatewayId: nil,
-                        accessToken: ProjectEnvironment.shared.getAccessToken(),
+                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                         allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
                         schemeSupport: SupportedSchemesConfig(
                             supportedSchemes: Set(CardScheme.allCases),

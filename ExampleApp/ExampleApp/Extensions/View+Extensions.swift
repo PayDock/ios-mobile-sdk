@@ -19,5 +19,4 @@ extension View {
     func focusablePadding(_ edges: Edge.Set = .all, _ size: CGFloat? = nil) -> some View {
         modifier(FocusablePadding(edges, size))
     }
-
 }
