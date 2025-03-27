@@ -180,7 +180,6 @@ class CardDetailsFormManager: ObservableObject {
         } else if !cardholderNameText.isEmpty {
             cardHolderNameValid = true
             cardholderNameError = ""
-
         } else {
             cardHolderNameValid = false
             cardholderNameError = "Invalid name"
@@ -211,7 +210,11 @@ class CardDetailsFormManager: ObservableObject {
     private func validateCardNumberForEnabledCardValidation() {
         guard let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText),
               cardSchemeValidator.isCardNumberValid(number: cardNumberText) else {
-            updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
+            // Card number is not valid. Check for the reason below.
+            let isLuhnValid = cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText)
+            let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
+            let errorMessage = (isLuhnValid && scheme == nil) ? "Card type not accepted" : "Invalid card number"
+            updateCardNumberValidationState(isValid: false, errorMessage: errorMessage)
             return
         }
                         
@@ -275,7 +278,7 @@ class CardDetailsFormManager: ObservableObject {
 
     func isFormValid() -> Bool {
         let cardHolderNameValid = shouldValidateCardholderName ? (!cardholderNameText.isEmpty && !cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText)) : true
-        let creditCardValid = cardSchemeValidator.isCardNumberValid(number: cardNumberText)
+        let creditCardValid = enableCardValidation ? cardSchemeValidator.isCardNumberValid(number: cardNumberText) : cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText)
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
         
         let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)

@@ -255,7 +255,7 @@ public struct CardDetailsWidget: View {
                 Text(.init(link))
                     .customFont(.body3)
                     .underline()
-                    .accentColor(.textColor)
+                    .accentColor(.primaryColor)
                     .disabled(viewModel.viewState.isDisabled)
                     .frame(minHeight: 24.0)
                     .contentShape(Rectangle())
