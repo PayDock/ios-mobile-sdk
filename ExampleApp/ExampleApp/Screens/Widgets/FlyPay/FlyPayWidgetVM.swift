@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class FlyPayWidgetVM: ObservableObject {
 
     // MARK: - Dependencies

@@ -11,6 +11,7 @@ import NetworkingLib
 import CorePayments
 import PayPalWebPayments
 
+@MainActor
 class PayPalSavePaymentSourceVM: ObservableObject {
 
     // MARK: - Dependencies

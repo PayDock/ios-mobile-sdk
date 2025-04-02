@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class Integrated3DSVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies

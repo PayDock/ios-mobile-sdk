@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808B3412A7056F100E86C7E /* CardDetailsWidgetView.swift */; };
-		280CD6772C189699004C8788 /* Sandbox-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 280CD6762C189699004C8788 /* Sandbox-Info.plist */; };
-		280CD6792C1896A9004C8788 /* Staging-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 280CD6782C1896A9004C8788 /* Staging-Info.plist */; };
 		280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96312B176ED000BE8C3E /* Standalone3DSWidgetView.swift */; };
 		280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96332B176FD600BE8C3E /* Standalone3DSVM.swift */; };
 		280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */; };
@@ -601,7 +599,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = "Paydock Ltd.";
 				TargetAttributes = {
 					2889B7D02A558F1800D6C7BE = {
@@ -646,8 +644,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2889B7DD2A558F1A00D6C7BE /* Preview Assets.xcassets in Resources */,
-				280CD6772C189699004C8788 /* Sandbox-Info.plist in Resources */,
-				280CD6792C1896A9004C8788 /* Staging-Info.plist in Resources */,
 				2889B7D92A558F1A00D6C7BE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -879,7 +875,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -906,7 +901,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1041,7 +1035,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1068,7 +1061,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1196,7 +1188,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1223,7 +1214,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1351,7 +1341,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1378,7 +1367,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1615,7 +1603,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1642,7 +1629,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1669,7 +1655,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1695,7 +1680,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;

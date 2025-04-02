@@ -40,7 +40,7 @@ class AccountProfileVM: ObservableObject {
                 let response = try await customersService.createCustomer(request: request)
                 await showAlert(
                     title: "Customer Created",
-                    message: "\(response.resource.data.firstName) \(response.resource.data.lastName)\n\(response.resource.data.email)")
+                    message: "\(response.resource.data.firstName) \(response.resource.data.lastName)\n\(response.resource.data.email ?? "")")
             } catch {
                 await showAlert(title: "Error", message: "Customer creation failed!")
             }

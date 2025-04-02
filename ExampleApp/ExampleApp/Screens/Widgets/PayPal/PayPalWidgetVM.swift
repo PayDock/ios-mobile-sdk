@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class PayPalWidgetVM: ObservableObject {
 
     // MARK: - Dependencies

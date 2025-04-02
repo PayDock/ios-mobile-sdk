@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class ApplePayWidgetVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
