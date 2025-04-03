@@ -55,29 +55,23 @@ class PayPalVM: ObservableObject {
     func getPayPalURL(token: String) {
         Task {
             do {
-                await MainActor.run {
-                    updateLoadingState(isLoading: true)
-                }
+                updateLoadingState(isLoading: true)
                 let payPalUrlString = try await walletService.getCallback(token: token, shipping: false)
-                await MainActor.run {
-                    updateLoadingState(isLoading: false)
-                    self.payPalUrl = URL(string: payPalUrlString)
-                    self.showWebView = true
-                }
+                updateLoadingState(isLoading: false)
+                self.payPalUrl = URL(string: payPalUrlString)
+                self.showWebView = true
+                
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                await MainActor.run {
-                    updateLoadingState(isLoading: false)
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                    self.completion(.failure(.errorFetchingPayPalUrl(error: errorResponse)))
-                }
+                updateLoadingState(isLoading: false)
+                self.sheetAction = .completion
+                self.showWebView = false
+                self.completion(.failure(.errorFetchingPayPalUrl(error: errorResponse)))
+                
             } catch {
-                await MainActor.run {
-                    updateLoadingState(isLoading: false)
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                    self.completion(.failure(.unknownError))
-                }
+                updateLoadingState(isLoading: false)
+                self.sheetAction = .completion
+                self.showWebView = false
+                self.completion(.failure(.unknownError))
             }
         }
     }
@@ -91,23 +85,19 @@ class PayPalVM: ObservableObject {
         Task {
             do {
                 let charge = try await walletService.captureCharge(token: token, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
-                await MainActor.run {
-                    self.completion(.success(charge))
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                }
+                self.completion(.success(charge))
+                self.sheetAction = .completion
+                self.showWebView = false
+                
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                await MainActor.run {
-                    self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                }
+                self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
+                self.sheetAction = .completion
+                self.showWebView = false
+                
             } catch {
-                await MainActor.run {
-                    self.completion(.failure(.unknownError))
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                }
+                self.completion(.failure(.unknownError))
+                self.sheetAction = .completion
+                self.showWebView = false
             }
         }
     }

@@ -9,6 +9,7 @@ import XCTest
 import Combine
 @testable import MobileSDK
 
+@MainActor
 class GiftCardVMTests: XCTestCase {
     
     var viewModel: GiftCardVM!

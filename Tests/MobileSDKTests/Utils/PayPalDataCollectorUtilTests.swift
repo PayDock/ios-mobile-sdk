@@ -44,15 +44,18 @@ class PayPalDataCollectorUtilTests: XCTestCase {
             XCTFail("Unexpected error type: \(error)")
         }
     }
-
+    
     func testCollectDeviceDataEmpty() {
         let config = PayPalDataCollectorConfig(accessToken: "testAccessToken", gatewayId: "testGateway")
         let clientId = "testClientID"
         let util = PayPalDataCollectorUtil(config: config, clientId: clientId)
         
-        let deviceData = util.collectDeviceData(additionalData: [:])
-        
-        XCTAssertFalse(deviceData.isEmpty, "Device data should not be empty.")
+        do {
+            let deviceData =  try util.collectDeviceId(additionalData: [:])
+            XCTAssertFalse(deviceData.isEmpty, "Device data should not be empty.")
+        } catch {
+            XCTFail("Collecting device data should succeed!")
+        }
     }
     
     func testCollectDeviceDataWithAdditionalData() {
@@ -61,8 +64,12 @@ class PayPalDataCollectorUtilTests: XCTestCase {
         let util = PayPalDataCollectorUtil(config: config, clientId: clientId)
         
         let additionalData: [String: String] = ["key1": "value1", "key2": "value2"]
-        let deviceData = util.collectDeviceData(additionalData: additionalData)
+        do {
+            let deviceData = try util.collectDeviceId(additionalData: additionalData)
+            XCTAssertFalse(deviceData.isEmpty, "Device data should not be empty.")
+        } catch {
+            XCTFail("Collecting device data should succeed!")
+        }
         
-        XCTAssertFalse(deviceData.isEmpty, "Device data should not be empty.")
     }
 }

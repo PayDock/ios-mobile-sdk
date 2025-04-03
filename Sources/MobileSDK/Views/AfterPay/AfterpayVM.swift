@@ -108,28 +108,24 @@ class AfterpayVM: ObservableObject {
             do {
                 isLoading = true
                 let afterPayOrderId = try await walletService.getAfterpayCallback(token: token)
-                await MainActor.run {
-                    self.isLoading = false
-                    self.afterPayOrderId = afterPayOrderId
-                    self.presentAfterpay()
-                    self.showWebView = true
-                }
+                self.isLoading = false
+                self.afterPayOrderId = afterPayOrderId
+                self.presentAfterpay()
+                self.showWebView = true
+                
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                await MainActor.run {
-                    self.isLoading = false
-                    self.showWebView = false
-                    self.completion(.failure(.errorFetchingAfterpayUrl(error: errorResponse)))
-                }
+                self.isLoading = false
+                self.showWebView = false
+                self.completion(.failure(.errorFetchingAfterpayUrl(error: errorResponse)))
+                
             } catch {
-                await MainActor.run {
-                    self.isLoading = false
-                    self.showWebView = false
-                    self.completion(.failure(.unknownError))
-                }
+                self.isLoading = false
+                self.showWebView = false
+                self.completion(.failure(.unknownError))
             }
         }
     }
-
+    
     private func captureWalletCharge() {
         isLoading = true
         Task {

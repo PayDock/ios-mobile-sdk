@@ -6,7 +6,7 @@
 //  Created by Domagoj Grizelj on 26.10.2023..
 //
 
-import WebKit
+@preconcurrency import WebKit
 import SwiftUI
 
 struct PayPalWebView: UIViewRepresentable {

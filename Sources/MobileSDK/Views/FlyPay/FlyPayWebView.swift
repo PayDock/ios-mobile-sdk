@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import WebKit
+@preconcurrency import WebKit
 import AuthenticationServices
 
 struct FlyPayWebView: UIViewRepresentable {

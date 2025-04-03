@@ -16,6 +16,6 @@ struct TokeniseCardDetailsReq: Codable {
     let expireMonth: String
     let expireYear: String
     let cardCcv: String
-    let storeCcv: Bool = true
+    var storeCcv: Bool = true
 
 }

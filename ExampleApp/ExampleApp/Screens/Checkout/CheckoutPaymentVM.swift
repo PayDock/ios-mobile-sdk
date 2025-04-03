@@ -246,14 +246,12 @@ extension CheckoutPaymentVM {
 
             do {
                 let result = try await walletService.captureCharge(request: request)
-                // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
                     viewState?.setState(.none)
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
             } catch {
-                // Ensure UI updates are performed on the main thread
                 await MainActor.run {
                     isLoading = false
                     viewState?.setState(.none)

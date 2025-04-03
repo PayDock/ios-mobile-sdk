@@ -48,26 +48,22 @@ class FlyPayVM: ObservableObject {
             do {
                 isLoading = true
                 let flyPayOrderId = try await walletService.getFlyPayCallback(token: token)
-                await MainActor.run {
-                    self.isLoading = false
-                    self.flyPayOrderId = flyPayOrderId
-                    self.sheetAction = .completion
-                    self.showWebView = true
-                }
+                self.isLoading = false
+                self.flyPayOrderId = flyPayOrderId
+                self.sheetAction = .completion
+                self.showWebView = true
+                
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                await MainActor.run {
-                    self.isLoading = false
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                    self.completion(.failure(.errorFetchingFlyPayOrder(error: errorResponse)))
-                }
+                self.isLoading = false
+                self.sheetAction = .completion
+                self.showWebView = false
+                self.completion(.failure(.errorFetchingFlyPayOrder(error: errorResponse)))
+                
             } catch {
-                await MainActor.run {
-                    self.isLoading = false
-                    self.sheetAction = .completion
-                    self.showWebView = false
-                    self.completion(.failure(.unknownError))
-                }
+                self.isLoading = false
+                self.sheetAction = .completion
+                self.showWebView = false
+                self.completion(.failure(.unknownError))
             }
         }
     }
