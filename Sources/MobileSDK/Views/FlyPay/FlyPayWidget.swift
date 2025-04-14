@@ -18,6 +18,13 @@ public struct FlyPayWidget: View {
     }
 
     public var body: some View {
+        flyPayButton
+            .sheet(isPresented: $viewModel.showWebView, content: {
+                webViewSheetContent
+            })
+    }
+    
+    private var flyPayButton: some View {
         SDKButton(
             title: "Pay with",
             image: Image("flypay", bundle: Bundle.module),
@@ -25,27 +32,45 @@ public struct FlyPayWidget: View {
             style: .fill(FillButtonStyle(backgroundColor: Color(red: 0.00, green: 0.48, blue: 0.75)))) {
                 viewModel.handleButtonTap()
             }
-            .sheet(isPresented: $viewModel.showWebView, onDismiss: {
-                if viewModel.sheetAction == .nothing {
-                    viewModel.handleSheetCancellation()
-                }
-            }) {
-                NavigationStack {
-                    FlyPayWebView(
-                        clientId: viewModel.clientId ?? "",
-                        flyPayOrderId: viewModel.flyPayOrderId,
-                        onApprove: {
-                            viewModel.handleSuccess()
-                        },
-                        onFailure: { error in
-                            viewModel.handleFailure(error: error)
-                        })
-                    .navigationTitle("Checkout with FlyPay")
-                    .navigationBarTitleDisplayMode(.inline)
-                }
-            }
             .accessibilityLabel(Text("Pay with FlyPay"))
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+    }
+    
+    private var webViewSheetContent: some View {
+        NavigationStack {
+            FlyPayWebView(
+                clientId: viewModel.clientId ?? "",
+                flyPayOrderId: viewModel.flyPayOrderId,
+                onApprove: {
+                    viewModel.handleSuccess()
+                },
+                onFailure: { error in
+                    viewModel.handleFailure(error: error)
+                })
+            .navigationTitle("Checkout with FlyPay")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        viewModel.showCancelConfirmation = true
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.title)
+                            .imageScale(.small)
+                    }
+                }
+            }
+        }
+        .interactiveDismiss(canDismissSheet: false) {
+            viewModel.showCancelConfirmation = true
+        }
+        .confirmationDialog("Are you sure you want to cancel?", isPresented: $viewModel.showCancelConfirmation, titleVisibility: .visible, actions: {
+            Button("Yes", role: .destructive) {
+                viewModel.showWebView = false
+                viewModel.handleSheetCancellation()
+            }
+            Button("No", role: .cancel) {}
+        })
     }
 }
 

@@ -23,7 +23,7 @@ class FlyPayVM: ObservableObject {
     let clientId: String?
     @Published var showWebView = false
     @Published var isLoading = false
-    @Published var sheetAction: SheetAction = SheetAction.nothing
+    @Published var showCancelConfirmation = false
     private var token = ""
     private(set) var flyPayOrderId = ""
 
@@ -40,7 +40,6 @@ class FlyPayVM: ObservableObject {
         self.flyPayToken = flyPayToken
         self.walletService = walletService
         self.completion = completion
-        self.sheetAction = SheetAction.nothing
     }
 
     func getFlyPayURL(token: String) {
@@ -50,18 +49,15 @@ class FlyPayVM: ObservableObject {
                 let flyPayOrderId = try await walletService.getFlyPayCallback(token: token)
                 self.isLoading = false
                 self.flyPayOrderId = flyPayOrderId
-                self.sheetAction = .completion
                 self.showWebView = true
                 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.isLoading = false
-                self.sheetAction = .completion
                 self.showWebView = false
                 self.completion(.failure(.errorFetchingFlyPayOrder(error: errorResponse)))
                 
             } catch {
                 self.isLoading = false
-                self.sheetAction = .completion
                 self.showWebView = false
                 self.completion(.failure(.unknownError))
             }
@@ -78,14 +74,12 @@ class FlyPayVM: ObservableObject {
 
     func handleSuccess() {
         isLoading = false
-        sheetAction = .completion
         showWebView = false
         completion(.success(()))
     }
 
     func handleFailure(error: FlyPayError) {
         isLoading = false
-        sheetAction = .completion
         showWebView = false
         completion(.failure(error))
     }

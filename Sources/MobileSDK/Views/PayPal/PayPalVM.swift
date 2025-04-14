@@ -23,7 +23,7 @@ class PayPalVM: ObservableObject {
     @Published var showWebView = false
     @Published var isLoading = false
     @Published var showLoaders = true
-    @Published var sheetAction: SheetAction = SheetAction.nothing
+    @Published var showCancelConfirmation = false
     var viewState: ViewState
     var payPalUrl: URL?
     private var token = ""
@@ -45,7 +45,6 @@ class PayPalVM: ObservableObject {
         self.walletService = walletService
         self.loadingDelegate = loadingDelegate
         self.completion = completion
-        self.sheetAction = SheetAction.nothing
         
         if (loadingDelegate != nil) {
             showLoaders = false
@@ -59,17 +58,17 @@ class PayPalVM: ObservableObject {
                 let payPalUrlString = try await walletService.getCallback(token: token, shipping: false)
                 updateLoadingState(isLoading: false)
                 self.payPalUrl = URL(string: payPalUrlString)
-                self.showWebView = true
+                withAnimation {
+                    self.showWebView = true
+                }
                 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
-                self.sheetAction = .completion
                 self.showWebView = false
                 self.completion(.failure(.errorFetchingPayPalUrl(error: errorResponse)))
                 
             } catch {
                 updateLoadingState(isLoading: false)
-                self.sheetAction = .completion
                 self.showWebView = false
                 self.completion(.failure(.unknownError))
             }
@@ -86,17 +85,14 @@ class PayPalVM: ObservableObject {
             do {
                 let charge = try await walletService.captureCharge(token: token, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
                 self.completion(.success(charge))
-                self.sheetAction = .completion
                 self.showWebView = false
                 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
-                self.sheetAction = .completion
                 self.showWebView = false
                 
             } catch {
                 self.completion(.failure(.unknownError))
-                self.sheetAction = .completion
                 self.showWebView = false
             }
         }
@@ -111,7 +107,6 @@ class PayPalVM: ObservableObject {
     }
 
     func handleWebViewFailure(_ error: PayPalError) {
-        sheetAction = .completion
         showWebView = false
         completion(.failure(error))
     }

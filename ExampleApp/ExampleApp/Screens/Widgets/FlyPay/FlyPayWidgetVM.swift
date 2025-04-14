@@ -69,9 +69,9 @@ class FlyPayWidgetVM: ObservableObject {
         }
     }
 
-    func handleError(error: Error) {
+    func handleError(error: FlyPayError) {
         alertTitle = "Error"
-        alertMessage = "\(error.localizedDescription)"
+        alertMessage = "\(error.customMessage)"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.showAlert = true
         }

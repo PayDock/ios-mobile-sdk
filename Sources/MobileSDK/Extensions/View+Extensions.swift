@@ -38,5 +38,12 @@ extension View {
             self
         }
     }
+    
+    func interactiveDismiss(canDismissSheet: Bool, onDismissalAttempt: (() -> ())? = nil) -> some View {
+        DismissDetectingView(
+            view: self,
+            canDismissSheet: canDismissSheet,
+            onDismissalAttempt: onDismissalAttempt
+        ).edgesIgnoringSafeArea(.all)
+    }
 }
-
