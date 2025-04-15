@@ -42,7 +42,8 @@ export_exampleApp:
 
 pull_bin_file:
   stage: build
-  image: 412245956714.dkr.ecr.ap-southeast-2.amazonaws.com/ci:20241212-1584910654
+  # image: 412245956714.dkr.ecr.ap-southeast-2.amazonaws.com/ci:20241212-1584910654
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   script: |
     aws s3 cp s3://pd-app-bin-management-staging-11/bins.zip bin_schema/bins.zip
     unzip bin_schema/bins.zip -d bin_schema/
