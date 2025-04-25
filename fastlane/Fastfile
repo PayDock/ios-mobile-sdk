@@ -1,11 +1,106 @@
-lane :build_and_test do |options|
-    device_string = options[:device] || UI.user_error!("Missing required parameeter `device`")
-    begin
-        run_tests(
-            package_path: '.',
-            scheme: 'MobileSDK',
-            device: device_string,
-            result_bundle: true,
-        )
-    end
+default_platform :ios
+
+# Fastlane runs all built in actions from one directory above where the Fastfile lives 
+# so make sure all the paths are relative in that regard.
+
+desc "Static analysis of the project. Configure the options in .swiftlint.yml"
+lane :lint do
+  swiftlint(
+    mode: :lint,
+    config_file: ".swiftlint.yml",
+    output_file: "swiftlint.result.txt",
+    raise_if_swiftlint_error: true
+  )
 end
+
+desc "Runs all the unit tests and UI Tests"
+desc "Configure the .env.default file in this directory before you run the test or build lanes."
+desc "Info on the .env files and how to use them can be found here: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#environment-variables"
+lane :test do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  run_tests(
+    project: "ExampleApp/ExampleApp.xcodeproj",
+    scheme: "ExampleApp",
+    configuration: "Debug (Staging)",
+    devices: ["iPhone 15"],
+    only_testing: [
+        "ExampleAppTests"
+    ],
+    result_bundle: true,
+    output_types: "junit",
+    output_directory: "fastlane/test_output"
+)
+end
+  
+lane :testPackage do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  run_tests(
+    package_path: ".",
+    scheme: "MobileSDK",
+    destination: "platform=iOS Simulator,name=iPhone 15",
+    result_bundle: true,
+    output_types: "junit",
+    output_directory: "fastlane/test_output"
+  )
+end
+
+lane :buildDebugStaging do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp Staging", 
+	configuration: "Debug (Staging)"
+  )
+  # upload_to_testflight(changelog: "Add rocket emoji")
+end
+
+lane :buildReleaseStaging do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp Staging", 
+	configuration: "Release (Staging)"
+  )
+  # upload_to_testflight(changelog: "Add rocket emoji")
+end
+
+lane :buildDebugSandbox do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp Sandbox", 
+	configuration: "Debug (Sandbox)"
+  )
+  # upload_to_testflight(changelog: "Add rocket emoji")
+end
+
+lane :buildReleaseSandbox do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp Sandbox", 
+	configuration: "Release (Sandbox)"
+  )
+  # upload_to_testflight(changelog: "Add rocket emoji")
+end
+
+lane :buildDebugProduction do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp", 
+	configuration: "Debug (Production)"
+  )
+  # upload_to_testflight(changelog: "Add rocket emoji")
+end
+
+lane :buildReleaseProduction do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp", 
+	configuration: "Release (Production)"
+  )
+  # upload_to_testflight(changelog: "Add rocket emoji")
+end
+
