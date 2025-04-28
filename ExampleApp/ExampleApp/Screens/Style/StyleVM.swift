@@ -123,7 +123,9 @@ class StyleVM: ObservableObject {
             spacing: Double(spacing) ?? 16)
 
         let theme = {
-            return Theme(colors: colors, dimensions: dimensions, fontName: self.fontName)
+            return Theme()
+            // TODO: - Update once new styling screens are implemented
+//            return Theme(colors: colors, dimensions: dimensions, fontName: self.fontName)
         }()
 
         let config = {

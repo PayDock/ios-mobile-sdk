@@ -18,6 +18,7 @@ public extension Color {
     static var defaultBackground: Color { Color(.background) }
     static var defaultBorder: Color { Color(.border) }
     static var defaultPlaceholder: Color { Color(.placeholder) }
+    static var defaultLoaderOverlay: Color { .black.opacity(0.3)}
     
     static var primaryColor: Color { Appearance.shared.colors.primary }
     static var onPrimaryColor: Color { Appearance.shared.colors.onPrimary }
@@ -27,4 +28,7 @@ public extension Color {
     static var backgroundColor: Color { Appearance.shared.colors.background }
     static var borderColor: Color { Appearance.shared.colors.border }
     static var placeholderColor: Color { Appearance.shared.colors.placeholder }
+    
+    // TODO: New entries - read from new theme structure
+    static var loaderOverlay: Color { .black.opacity(0.3)}
 }

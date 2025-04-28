@@ -20,7 +20,7 @@ struct OutlineTextField: View {
     @State private var titleBackgroundOpacity = 0.0
     @State private var titleBottomPadding = 0.0
     @State private var titleColor = Color.placeholderColor
-    @State private var titleFontSize = 16.0
+    @State private var titleFontSize = 16.0 // TODO: - Replace with new theme
     @State private var titleVerticalPadding: CGFloat = 0
     @State private var titleLeadingPadding: Double
 

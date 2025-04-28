@@ -19,7 +19,7 @@ struct OutlineButtonStyle: ButtonStyle {
         let currentBorderColor = isDisabled || configuration.isPressed ? borderColor.opacity(0.3) : borderColor
         
         return configuration.label
-            .customFont(.body)
+            .customFont(.body) // TODO: - Read from new Theme
             .imageScale(.small)
             .lineLimit(1)
             .minimumScaleFactor(0.1)

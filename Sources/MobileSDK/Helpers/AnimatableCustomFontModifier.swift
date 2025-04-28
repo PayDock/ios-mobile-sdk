@@ -21,5 +21,4 @@ struct AnimatableCustomFontModifier: AnimatableModifier {
         content
             .font(Font.custom(Appearance.shared.fontName, size: size))
     }
-
 }
