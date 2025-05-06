@@ -38,11 +38,12 @@ public struct PayPalWidget: View {
         SDKButton(
             title: "",
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            style: .fill(FillButtonStyle(
-                    backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-                    foregroundColor: .black,
-                    isDisabled: viewModel.viewState.isDisabled
-                )
+            // TODO: - Update once widget themeing implementation is started
+            style: .fill(FillButtonStyle(isDisabled: viewModel.viewState.isDisabled)
+//                         style: .fill(FillButtonStyle(
+//                                 backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
+//                                 foregroundColor: .black,
+//                                 isDisabled: viewModel.viewState.isDisabled
             )
         ) {}
     }
@@ -51,10 +52,12 @@ public struct PayPalWidget: View {
         SDKButton(
             title: "",
             image: Image("pay-pal", bundle: Bundle.module),
-            style: .fill(FillButtonStyle(
-                    backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-                    isDisabled: viewModel.viewState.isDisabled
-                )
+            // TODO: - Update once widget themeing implementation is started
+            style: .fill(FillButtonStyle(isDisabled: viewModel.viewState.isDisabled)
+//            style: .fill(FillButtonStyle(
+//                    backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
+//                    isDisabled: viewModel.viewState.isDisabled
+//                )
             )) {
                 viewModel.handleButtonTap()
             }

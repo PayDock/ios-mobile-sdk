@@ -14,7 +14,7 @@ extension Theme {
     public struct TextAppearance {
         public let text: TextAttributes
         
-        public init(text: TextAttributes = TextAttributes(font: .sdkDefault(size: .body3))) {
+        public init(text: TextAttributes = TextAttributes(font: CustomFont(size: 14.0))) {
             self.text = text
         }
     }

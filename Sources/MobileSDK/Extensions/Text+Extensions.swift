@@ -16,7 +16,7 @@ extension Text {
     
     func applyAttributes(_ attributes: TextAttributes) -> Text {
         self
-            .font(attributes.font)
+            .font(attributes.customFont.font)
             .foregroundColor(attributes.textColor)
             .underline(attributes.isUnderlined, color: attributes.underlineColor)
             .strikethrough(attributes.isStrikethrough, color: attributes.strikethroughColor)

@@ -17,10 +17,10 @@ extension Theme {
         public let placeholder: TextAttributes
         public let error: TextAttributes
         
-        public init(text: TextAttributes = TextAttributes(font: .sdkDefault(size: .body)),
-                    title: TextAttributes = TextAttributes(font: .sdkDefault(size: .body)),
-                    placeholder: TextAttributes = TextAttributes(font: .sdkDefault(size: .body)),
-                    error: TextAttributes = TextAttributes(font: .sdkDefault(size: .caption))) {
+        public init(text: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
+                    title: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
+                    placeholder: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
+                    error: TextAttributes = TextAttributes(font: CustomFont(size: 12))) {
             self.text = text
             self.title = title
             self.placeholder = placeholder

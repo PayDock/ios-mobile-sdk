@@ -26,9 +26,9 @@ enum SDKButtonStyle {
     var textColour: Color {
         switch self {
         case .fill(let style):
-            return style.foregroundColor
+            return style.appearance.colors.text
         case .outline(let style):
-            return style.foregroundColor
+            return style.appearance.colors.text
         }
     }
 }

@@ -13,7 +13,7 @@ extension Theme {
     public struct ButtonFonts {
         public let title: TextAttributes
         
-        public init(title: TextAttributes = TextAttributes(font: .sdkDefault(size: .body))) {
+        public init(title: TextAttributes = TextAttributes(font: CustomFont(size: 16.0))) {
             self.title = title
         }
     }

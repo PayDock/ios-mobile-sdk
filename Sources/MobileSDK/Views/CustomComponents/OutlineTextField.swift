@@ -13,14 +13,16 @@ struct OutlineTextField: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     
     // MARK: Properties
+    
+    @State private var appearance: Theme.TextFieldAppearance
 
-    @State private var borderColor = Color.borderColor
-    @State private var borderWidth: CGFloat = .borderWidth
+    @State private var borderColor = Color.clear
+    @State private var borderWidth: CGFloat = 0.0
 
     @State private var titleBackgroundOpacity = 0.0
     @State private var titleBottomPadding = 0.0
-    @State private var titleColor = Color.placeholderColor
-    @State private var titleFontSize = 16.0 // TODO: - Replace with new theme
+    @State private var titleColor = Color.clear
+    @State private var titleFontSize = 0.0
     @State private var titleVerticalPadding: CGFloat = 0
     @State private var titleLeadingPadding: Double
 
@@ -57,7 +59,8 @@ struct OutlineTextField: View {
     ///   - validationIconEnabled: Whether to enabled the validation icon.
     ///   - textContentType: Content type used for the suggested prefill.
     ///   - onTapGesture: Action to take on tap gesture activaction.
-    public init(text: Binding<String>,
+    public init(appearance: Theme.TextFieldAppearance = Theme.TextFieldAppearance(),
+                text: Binding<String>,
                 title: String,
                 placeholder: String,
                 errorMessage: Binding<String>,
@@ -69,6 +72,7 @@ struct OutlineTextField: View {
                 textContentType: UITextContentType? = nil,
                 onTapGesture: @escaping (() -> Void)
     ) {
+        self.appearance = appearance
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -126,15 +130,18 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
-        .onChange(of: disabled) { _ in
-            
+        .onAppear {
+            titleColor = appearance.colors.placeholder
+            titleFontSize = appearance.fonts.title.customFont.size
+            borderColor = appearance.colors.placeholder
+            borderWidth = appearance.dimensions.borderWidth
         }
     }
 
     private var textFieldView: some View {
         HStack {
             leftImage?
-                .foregroundColor(.placeholderColor)
+                .foregroundColor(appearance.colors.placeholder)
                 .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
             
@@ -148,9 +155,9 @@ struct OutlineTextField: View {
                 }))
                 .disabled(disabled)
                 .frame(height: getTextFieldHeight())
-                .customFont(.body)
-                .foregroundColor(.textColor)
-                .tint(.primaryColor)
+                .font(appearance.fonts.text.customFont.font)
+                .foregroundColor(appearance.colors.text)
+                .tint(appearance.colors.active)
                 .accessibilityLabel(title)
                 .accessibilityHint(getValidMessage())
             
@@ -167,7 +174,7 @@ struct OutlineTextField: View {
     private func placeholderView() -> some View {
         HStack {
             ZStack {
-                Color.backgroundColor
+                appearance.colors.background
                     .opacity(titleBackgroundOpacity)
                 Text(title)
                     .foregroundColor(.white)
@@ -187,9 +194,8 @@ struct OutlineTextField: View {
         HStack {
             VStack {
                 Text(errorMessage)
-                    .customFont(.caption)
-                    .font(.system(size: 10.0))
-                    .foregroundColor(.errorColor)
+                    .font(appearance.fonts.error.customFont.font)
+                    .foregroundColor(appearance.colors.error)
                     .padding(.leading, 16.0)
             }
             Spacer()
@@ -213,10 +219,10 @@ struct OutlineTextField: View {
             switch validationIconState {
             case .valid:
                 Image("tick-circle", bundle: Bundle.module)
-                    .foregroundColor(.successColor)
+                    .foregroundColor(appearance.colors.success)
             case .invalid:
                 Image("exclamation-circle", bundle: Bundle.module)
-                    .foregroundColor(.errorColor)
+                    .foregroundColor(appearance.colors.error)
             case .none: EmptyView()
             }
         }
@@ -235,24 +241,24 @@ private extension OutlineTextField {
 
     func updateBorderColor() {
         guard let valid = valid else {
-            borderColor = editing ? .primaryColor : .borderColor
+            borderColor = editing ? appearance.colors.active : appearance.colors.inactive
             validationIconState = .none
             return
         }
         if !valid {
-            borderColor = .errorColor
+            borderColor = appearance.colors.error
             validationIconState = .invalid
         } else if editing {
-            borderColor = .primaryColor
+            borderColor = appearance.colors.active
             validationIconState = .none
         } else {
-            borderColor = .borderColor
+            borderColor = appearance.colors.placeholder
             validationIconState = text.isEmpty ? .none : .valid
         }
     }
 
     func updateBorderWidth() {
-        borderWidth = editing ? .borderWidth * 2 : .borderWidth
+        borderWidth = editing ? appearance.dimensions.activeBorderWidth : appearance.dimensions.borderWidth
     }
 
     func updateTitle() {
@@ -272,23 +278,23 @@ private extension OutlineTextField {
 
     func updateTitleColor() {
         guard let valid = valid else {
-            titleColor = editing ? .primaryColor : .borderColor
+            titleColor = editing ? appearance.colors.active : appearance.colors.placeholder
             return
         }
         if valid {
-            titleColor = editing ? .primaryColor : .borderColor
+            titleColor = editing ? appearance.colors.active : appearance.colors.placeholder
         } else if text.isEmpty {
-            titleColor = editing ? .errorColor : .placeholderColor
+            titleColor = editing ? appearance.colors.error : appearance.colors.placeholder
         } else {
-            titleColor = .errorColor
+            titleColor = appearance.colors.error
         }
     }
 
     func updateTitleFontSize() {
         if editing || !text.isEmpty {
-            titleFontSize = 12.0
+            titleFontSize = appearance.fonts.error.customFont.size // TODO: - Check if we want to name this one better
         } else {
-            titleFontSize = 16.0
+            titleFontSize = appearance.fonts.title.customFont.size
         }
     }
 

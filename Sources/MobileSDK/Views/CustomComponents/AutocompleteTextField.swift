@@ -9,6 +9,10 @@
 import SwiftUI
 
 struct AutocompleteTextField: View {
+    
+    // MARK: - Dependencies
+    
+    @State var appearance: Theme.SearchDropdownAppearance
 
     // MARK: - OutlineTextField Properties
 
@@ -47,7 +51,9 @@ struct AutocompleteTextField: View {
     ///   - textContentType: Content type used for the suggested prefill.
     ///   - option: Autocomplete popup list of options.
     ///   - onSelection: Returns selected value
-    public init(text: Binding<String>,
+    ///
+    public init(appearance: Theme.SearchDropdownAppearance = Theme.SearchDropdownAppearance(),
+                text: Binding<String>,
                 title: String,
                 placeholder: String,
                 errorMessage: Binding<String>,
@@ -60,6 +66,7 @@ struct AutocompleteTextField: View {
                 textContentType: UITextContentType? = nil,
                 onSelection: @escaping (Int?) -> (),
                 onTapGesture: @escaping () -> Void) {
+        self.appearance = appearance
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -78,6 +85,7 @@ struct AutocompleteTextField: View {
     var body: some View {
         VStack(alignment: .leading) {
             OutlineTextField(
+                appearance: appearance.textField,
                 text: $text,
                 title: title,
                 placeholder: placeholder,
@@ -107,8 +115,8 @@ struct AutocompleteTextField: View {
                     VStack(alignment: .center) {
                         if options.isEmpty {
                             Text("No results")
-                                .customFont(.body)
-                                .foregroundColor(.textColor)
+                                .font(appearance.dropdown.text.listText.text.customFont.font)
+                                .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .accessibilityLabel(Text("Dropdown menu has no results."))
@@ -117,8 +125,8 @@ struct AutocompleteTextField: View {
                             ForEach(filteredOptions, id: \.self) { option in
                                 HStack {
                                     Text(option)
-                                        .customFont(.body)
-                                        .foregroundColor(.textColor)
+                                        .font(appearance.dropdown.text.listText.text.customFont.font)
+                                        .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
                                         .onTapGesture {
@@ -134,7 +142,7 @@ struct AutocompleteTextField: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .foregroundColor(.primaryColor).opacity(0.3)
+                            .foregroundColor(appearance.dropdown.colors.backgroundColor)
                             .shadow(radius: 4)
                     )
                     .opacity(popupOpacity)
@@ -152,7 +160,6 @@ struct AutocompleteTextField: View {
                     }
                 }
             }
-            .background(Color.backgroundColor)
         }
     }
 

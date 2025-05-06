@@ -29,7 +29,8 @@ public struct FlyPayWidget: View {
             title: "Pay with",
             image: Image("flypay", bundle: Bundle.module),
             imageLocation: .right,
-            style: .fill(FillButtonStyle(backgroundColor: Color(red: 0.00, green: 0.48, blue: 0.75)))) {
+            style: .fill(FillButtonStyle())) { // TODO: Update when widgets theming is implemented
+//            style: .fill(FillButtonStyle(backgroundColor: Color(red: 0.00, green: 0.48, blue: 0.75)))) {
                 viewModel.handleButtonTap()
             }
             .accessibilityLabel(Text("Pay with FlyPay"))

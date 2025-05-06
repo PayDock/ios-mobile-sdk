@@ -13,12 +13,9 @@ extension Theme {
     
     public struct DropdownColors {
         public let backgroundColor: Color
-        public let highlightedColor: Color
         
-        public init(backgroundColor: Color = .defaultBackground,
-                    highlightedColor: Color = .defaultBackground) { // TODO: - Not used currently in the component
+        public init(backgroundColor: Color = Color(red: 0.91, green: 0.80, blue: 0.96)) {
             self.backgroundColor = backgroundColor
-            self.highlightedColor = highlightedColor
         }
     }
 }

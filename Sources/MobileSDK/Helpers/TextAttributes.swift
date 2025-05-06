@@ -3,12 +3,13 @@
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 23.04.2025..
+//  Copyright © 2025 Paydock Ltd.
 //
 
 import SwiftUI
 
 public struct TextAttributes {
-    public let font: Font?
+    public let customFont: CustomFont
     public let textColor: Color
     public let isUnderlined: Bool
     public let underlineColor: Color?
@@ -16,14 +17,14 @@ public struct TextAttributes {
     public let strikethroughColor: Color?
     public let isItalic: Bool
     
-    public init(font: Font? = nil,
-         textColor: Color = .defaultText,
-         isUnderlined: Bool = false,
-         underlineColor: Color? = nil,
-         isStrikethrough: Bool = false,
-         strikethroughColor: Color? = nil,
-         isItalic: Bool = false) {
-        self.font = font
+    public init(font: CustomFont = CustomFont(name: "FFF-AcidGrotesk-Normal", size: 14.0),
+                textColor: Color = .defaultText,
+                isUnderlined: Bool = false,
+                underlineColor: Color? = nil,
+                isStrikethrough: Bool = false,
+                strikethroughColor: Color? = nil,
+                isItalic: Bool = false) {
+        self.customFont = font
         self.textColor = textColor
         self.isUnderlined = isUnderlined
         self.underlineColor = underlineColor
