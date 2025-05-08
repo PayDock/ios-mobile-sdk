@@ -13,12 +13,16 @@ enum SDKButtonStyle {
     
     case fill(FillButtonStyle)
     case outline(OutlineButtonStyle)
+    // TODO: - Remove above once all widget themes are updated
+    case custom(CustomButtonStyle)
     
     var isDisabled: Bool {
         switch self {
         case .fill(let style):
             return style.isDisabled
         case .outline(let style):
+            return style.isDisabled
+        case .custom(let style):
             return style.isDisabled
         }
     }
@@ -29,6 +33,19 @@ enum SDKButtonStyle {
             return style.appearance.colors.text
         case .outline(let style):
             return style.appearance.colors.text
+        case .custom(let style):
+            return style.appearance.colors.text
+        }
+    }
+    
+    var loaderColor: Color {
+        switch self {
+        case .fill(let style):
+            return style.appearance.loader.spinnerColor
+        case .outline(let style):
+            return style.appearance.loader.spinnerColor
+        case .custom(let style):
+            return style.appearance.loader.spinnerColor
         }
     }
 }

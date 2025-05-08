@@ -41,7 +41,7 @@ struct ActivityIndicatorModifier: AnimatableModifier {
         let activityIndicator = ActivityIndicator(appearance: appearance, isAnimating: .constant(true), style: .large)
         
         hostingController = UIHostingController(rootView: activityIndicator)
-        hostingController?.view.backgroundColor = UIColor(appearance.color)
+        hostingController?.view.backgroundColor = UIColor(appearance.overlayColor)
         hostingController?.view.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         hostingController?.view.alpha = 0
 

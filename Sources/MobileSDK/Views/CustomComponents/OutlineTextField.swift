@@ -104,8 +104,10 @@ struct OutlineTextField: View {
             }
         }
         .contentShape(Rectangle())
-        .padding(.top, 0)
-        .padding(.bottom, 0)
+        .padding(.top, appearance.dimensions.padding.top)
+        .padding(.leading, appearance.dimensions.padding.leading)
+        .padding(.bottom, appearance.dimensions.padding.bottom)
+        .padding(.trailing, appearance.dimensions.padding.trailing)
         .onTapGesture {
             onTapGesture()
         }
@@ -167,7 +169,7 @@ struct OutlineTextField: View {
             }
         }
         .padding([.leading, .trailing], 16.0)
-        .background(RoundedRectangle(cornerRadius: .textFieldCornerRadius, style: .continuous)
+        .background(RoundedRectangle(cornerRadius: appearance.dimensions.cornerRadius, style: .continuous)
             .stroke(borderColor, lineWidth: borderWidth))
     }
 

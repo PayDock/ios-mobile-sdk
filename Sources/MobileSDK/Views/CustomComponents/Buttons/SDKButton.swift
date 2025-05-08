@@ -60,10 +60,10 @@ struct SDKButton: View {
                 } else {
                     if #available(iOS 18.0, *) {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.textColour))
+                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                     } else {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.textColour))
+                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                             .padding(.trailing, 4)
                     }
                 }
@@ -78,10 +78,10 @@ struct SDKButton: View {
                 } else {
                     if #available(iOS 18.0, *) {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.textColour))
+                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                     } else {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.textColour))
+                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                             .padding(.leading, 4)
                     }
                 }
@@ -94,10 +94,10 @@ struct SDKButton: View {
             if (isLoading) {
                 if #available(iOS 18.0, *) {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: style.textColour))
+                        .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                 } else {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: style.textColour))
+                        .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                         .padding(.trailing, 4)
                 }
             }

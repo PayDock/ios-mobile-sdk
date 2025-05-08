@@ -13,11 +13,14 @@ extension Theme {
     public struct ButtonDimensions {
         public let cornerRadius: CGFloat
         public let borderWidth: CGFloat
+        public let padding: Padding
         
         public init(cornerRadius: CGFloat = .defaultButtonCornerRadius,
-                    borderWidth: CGFloat = .defaultBorderWidth) {
+                    borderWidth: CGFloat = .defaultBorderWidth,
+                    padding: Padding = Padding()) {
             self.cornerRadius = cornerRadius
             self.borderWidth = borderWidth
+            self.padding = padding
         }
     }
 }

@@ -17,6 +17,8 @@ extension Button {
             self.buttonStyle(style)
         case .outline(let style):
             self.buttonStyle(style)
+        case .custom(let style):
+            self.buttonStyle(style)
         }
     }
 }

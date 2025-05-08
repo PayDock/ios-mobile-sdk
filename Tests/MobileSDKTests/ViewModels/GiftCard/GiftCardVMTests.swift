@@ -14,18 +14,22 @@ class GiftCardVMTests: XCTestCase {
     
     var viewModel: GiftCardVM!
     var mockService: CardServiceMock!
+    var viewState: ViewState!
+    var config: GiftCardWidgetConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
-    var completionResult: Result<String, GiftCardError>?
+    var completionResult: Result<GiftCardResult, GiftCardError>?
     var cancellables = Set<AnyCancellable>()
     
     override func setUp() {
         super.setUp()
         mockService = CardServiceMock()
+        viewState = ViewState()
+        config = GiftCardWidgetConfig(accessToken: "")
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
-        viewModel = GiftCardVM(cardService: mockService,
-                               accessToken: "",
-                               storePin: false,
+        viewModel = GiftCardVM(viewState: viewState,
+                               cardService: mockService,
+                               config: config,
                                loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
@@ -41,9 +45,9 @@ class GiftCardVMTests: XCTestCase {
     
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
-        viewModel = GiftCardVM(cardService: mockService,
-                               accessToken: "",
-                               storePin: false,
+        viewModel = GiftCardVM(viewState: viewState,
+                               cardService: mockService,
+                               config: config,
                                loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
@@ -58,9 +62,9 @@ class GiftCardVMTests: XCTestCase {
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
-        viewModel = GiftCardVM(cardService: mockService,
-                               accessToken: "",
-                               storePin: false,
+        viewModel = GiftCardVM(viewState: viewState,
+                               cardService: mockService,
+                               config: config,
                                loadingDelegate: nil) { result in
             self.completionResult = result
         }
@@ -77,9 +81,9 @@ class GiftCardVMTests: XCTestCase {
     
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
-        viewModel = GiftCardVM(cardService: mockService,
-                               accessToken: "",
-                               storePin: false,
+        viewModel = GiftCardVM(viewState: viewState,
+                               cardService: mockService,
+                               config: config,
                                loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
@@ -96,9 +100,9 @@ class GiftCardVMTests: XCTestCase {
     
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
-        viewModel = GiftCardVM(cardService: mockService,
-                               accessToken: "",
-                               storePin: false,
+        viewModel = GiftCardVM(viewState: viewState,
+                               cardService: mockService,
+                               config: config,
                                loadingDelegate: nil) { result in
             self.completionResult = result
         }

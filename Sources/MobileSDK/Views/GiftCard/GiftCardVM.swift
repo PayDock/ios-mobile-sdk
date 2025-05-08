@@ -17,33 +17,32 @@ class GiftCardVM: ObservableObject {
 
     @Published var giftCardFormManager: GiftCardFormManager
     private let cardService: CardService
-    private let accessToken: String
-    private let storePin: Bool
+    private let config: GiftCardWidgetConfig
+    var viewState: ViewState
 
     // MARK: - Handlers
 
-    private let completion: (Result<String, GiftCardError>) -> Void
+    private let completion: (Result<GiftCardResult, GiftCardError>) -> Void
 
     // MARK: - Properties
 
     @Published var isLoading = false
-    @Published var isDisabled = false
     private weak var loadingDelegate: WidgetLoadingDelegate?
-    
+
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
 
-    init(giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
+    init(viewState: ViewState,
+         giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
          cardService: CardService = CardServiceImpl(),
-         accessToken: String,
-         storePin: Bool,
+         config: GiftCardWidgetConfig,
          loadingDelegate: WidgetLoadingDelegate?,
-         completion: @escaping (Result<String, GiftCardError>) -> Void) {
+         completion: @escaping (Result<GiftCardResult, GiftCardError>) -> Void) {
+        self.viewState = viewState
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
-        self.accessToken = accessToken
-        self.storePin = storePin
+        self.config = config
         self.loadingDelegate = loadingDelegate
         self.completion = completion
 
@@ -51,33 +50,35 @@ class GiftCardVM: ObservableObject {
             self?.objectWillChange.send()
         }
     }
-    
-    // MARK: - Requests
 
+    // MARK: - Requests
+    
     func tokeniseGiftCard() {
         Task {
             updateLoadingState(isLoading: true)
             let tokeniseGiftCardReq = TokeniseGiftCardReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 pin: giftCardFormManager.pinText,
-                storePin: storePin)
+                storePin: config.storePin)
 
             do {
-                let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: accessToken)
+                let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: config.accessToken)
                 updateLoadingState(isLoading: false)
-                completion(.success(cardToken))
+                completion(.success(GiftCardResult(token: cardToken)))
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
                 completion(.failure(.errorTokenisingCard(error: errorResponse)))
+
             } catch {
                 updateLoadingState(isLoading: false)
                 completion(.failure(.unknownError))
             }
         }
     }
-    
+
     // MARK: - State Management
-    
+
     func updateLoadingState(isLoading: Bool) {
         if (loadingDelegate != nil) {
             if (isLoading) {
@@ -88,10 +89,10 @@ class GiftCardVM: ObservableObject {
         } else {
             self.isLoading = isLoading
         }
-        self.isDisabled = isLoading
+        viewState.isDisabled = isLoading
     }
-    
+
     func isActionButtonDisabled() -> Bool {
-        return !giftCardFormManager.isFormValid()
+        return !giftCardFormManager.isFormValid() || viewState.isDisabled
     }
 }

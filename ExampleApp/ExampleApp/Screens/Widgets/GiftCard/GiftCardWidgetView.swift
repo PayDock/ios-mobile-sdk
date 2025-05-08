@@ -17,9 +17,9 @@ struct GiftCardWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                GiftCardWidget(storePin: false, accessToken: ProjectEnvironment.shared.getWidgetAccessToken()) { result in
+                GiftCardWidget( config: GiftCardWidgetConfig( accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), storePin: false),  appearance: getAppearance()) { result in
                     switch result {
-                    case .success(let text): self.alertMessage = text
+                    case .success(let giftCardResult): self.alertMessage = giftCardResult.token
                     case .failure(let error): self.alertMessage = error.localizedDescription
                     }
                     showAlert = true
@@ -29,6 +29,13 @@ struct GiftCardWidgetView: View {
                 Text(alertMessage)
             })
         }
+    }
+    
+    private func getAppearance() -> GiftCardWidgetAppearance {
+        // TODO: - For theme testing - pull the data from Style screen once it's implemented and remove test code
+        return GiftCardWidgetAppearance()
+//        let appearance = GiftCardWidgetAppearance(title: .init(text: .init(textColor: .pink)), textField: .init(colors: .init(active: .orange), dimensions: .init(cornerRadius: 20, borderWidth: 5), fonts: .init()), actionButton: .init(colors: .init(background: .blue,text: .purple, border: .red)), toolbarButton: .init())
+//        return appearance
     }
 }
 
