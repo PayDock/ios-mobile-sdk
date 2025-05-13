@@ -12,11 +12,11 @@ import SwiftUI
 extension Theme {
     
     public struct DropdownDimensions {
-        public let padding: Double
+        public let padding: Padding
         public let listSpacing: Double
         
-        public init(padding: Double = 4,
-                    listSpacing: Double = 12) { // Will require component
+        public init(padding: Padding = Padding(),
+                    listSpacing: Double = 8) {
             self.padding = padding
             self.listSpacing = listSpacing
         }

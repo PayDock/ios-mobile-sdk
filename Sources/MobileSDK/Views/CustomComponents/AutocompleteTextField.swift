@@ -128,7 +128,7 @@ struct AutocompleteTextField: View {
                                         .font(appearance.dropdown.text.listText.text.customFont.font)
                                         .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                         .padding(.horizontal, 16)
-                                        .padding(.vertical, 8)
+                                        .padding(.vertical, appearance.dropdown.dimensions.listSpacing)
                                         .onTapGesture {
                                             onSelection(getOptionIndex(option: option))
                                         }
@@ -148,6 +148,7 @@ struct AutocompleteTextField: View {
                     .opacity(popupOpacity)
                     .scaleEffect(popupScale)
                     .frame(width: proxy.size.width + 2)
+                    .frame(minHeight: proxy.size.height + 10 + appearance.dropdown.dimensions.listSpacing * 6)
                     .onAppear {
                         withAnimation(.easeOut(duration: 0.15)) {
                             popupOpacity = 1

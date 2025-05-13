@@ -16,11 +16,10 @@ struct AddressWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                AddressWidget(address: nil) { result in
-                    switch result {
-                    case .success(let address): alertMessage = address.addressLine1
-                    case .failure(let error): alertMessage = error.localizedDescription
-                    }
+                AddressWidget(
+                    config: .init(),
+                    appearance: getAppearance()) { address in
+                    alertMessage = address.addressLine1
                     showAlert = true
                 }
             }
@@ -28,6 +27,18 @@ struct AddressWidgetView: View {
                 Text(alertMessage)
             })
         }
+    }
+    
+    private func getAppearance() -> AddressWidgetAppearance {
+        // TODO: - For theme testing - pull the data from Style screen once it's implemented and remove test code
+        return AddressWidgetAppearance()
+//        let appearance = AddressWidgetAppearance(
+//            title: .init(text: .init(textColor: .red), padding: .init(top: 10, leading: 5, bottom: 40, trailing: 20)),
+//            textfield: .init(colors: .init(), dimensions: .init(padding: .init(top: 50)), fonts: .init()),
+//            primaryButton: .init(colors: .init(background: .blue, border: .pink)),
+//            expandSectionButton: .init(colors: .init(background: .green, border: .black)),
+//            search: .init(dropdown: .init(colors: .init(backgroundColor: .blue), dimensions: .init(padding: 20, listSpacing: 20))))
+//        return appearance
     }
 }
 

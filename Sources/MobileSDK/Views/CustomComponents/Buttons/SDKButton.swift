@@ -15,6 +15,7 @@ struct SDKButton: View {
     private let imageLocation: ImageLocation
     private let isLoading: Bool
     private let style: SDKButtonStyle
+    private let isLeftAligned: Bool
     private let action: () -> Void
 
     init(title: String,
@@ -22,12 +23,14 @@ struct SDKButton: View {
          imageLocation: ImageLocation = .left,
          isLoading: Bool = false,
          style: SDKButtonStyle,
+         isLeftAligned: Bool = false,
          action: @escaping () -> Void) {
         self.title = title
         self.image = image
         self.imageLocation = imageLocation
         self.isLoading = isLoading
         self.style = style
+        self.isLeftAligned = isLeftAligned
         self.action = action
     }
 
@@ -102,6 +105,9 @@ struct SDKButton: View {
                 }
             }
             Text(self.title)
+            if isLeftAligned {
+                Spacer()
+            }
         }
     }
 

@@ -18,6 +18,10 @@ extension View {
         return self.modifier(ScaledFont(size: size.rawValue))
     }
     
+    func customPadding(_ padding: Padding) -> some View {
+        self.modifier(CustomPaddingModifier(padding: padding))
+    }
+    
     @ViewBuilder
     func onConditionalKeyPress(key: KeyEquivalent, action: @escaping () -> Void) -> some View {
         if #available(iOS 17.0, *) {

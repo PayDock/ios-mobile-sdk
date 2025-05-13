@@ -17,6 +17,7 @@ class AddressVM: NSObject, ObservableObject {
 
     var addressFormManager: AddressFormManager
     private let localSearchCompleter: MKLocalSearchCompleter
+    private let config: AddressWidgetConfig
 
     // MARK: - Properties
 
@@ -24,7 +25,7 @@ class AddressVM: NSObject, ObservableObject {
     @Published var isDisabled = false
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
-    let completion: (Result<Address, Error>) -> Void
+    let completion: (Address) -> Void
 
     // MARK: - Custom bindings
 
@@ -41,9 +42,11 @@ class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Initialisation
 
-    init(addressFormManager: AddressFormManager = AddressFormManager(),
+    init(config: AddressWidgetConfig,
+         addressFormManager: AddressFormManager = AddressFormManager(),
          localSearchCompleter: MKLocalSearchCompleter = MKLocalSearchCompleter(),
-         completion: @escaping (Result<Address, Error>) -> Void) {
+         completion: @escaping (Address) -> Void) {
+        self.config = config
         self.addressFormManager = addressFormManager
         self.localSearchCompleter = localSearchCompleter
         self.completion = completion
@@ -121,7 +124,11 @@ class AddressVM: NSObject, ObservableObject {
             postcode: addressFormManager.postcodeText,
             country: addressFormManager.countryText)
 
-        completion(.success(address))
+        completion(address)
+    }
+    
+    func updateAddress() {
+        addressFormManager.updateFormWith(address: config.address)
     }
 }
 

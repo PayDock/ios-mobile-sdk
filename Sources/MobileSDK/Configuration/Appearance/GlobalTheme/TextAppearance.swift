@@ -13,9 +13,12 @@ extension Theme {
     
     public struct TextAppearance {
         public let text: TextAttributes
+        public let padding: Padding
         
-        public init(text: TextAttributes = TextAttributes(font: CustomFont(size: 14.0))) {
+        public init(text: TextAttributes = TextAttributes(),
+                    padding: Padding = Padding()) {
             self.text = text
+            self.padding = padding
         }
     }
 }

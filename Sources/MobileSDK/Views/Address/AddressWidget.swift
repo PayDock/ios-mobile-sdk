@@ -13,20 +13,20 @@ public struct AddressWidget: View {
     @StateObject var viewModel: AddressVM
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
     @FocusState private var isViewFocused: Bool
-
-    @State private var address: Address?
+    @State var appearance: AddressWidgetAppearance
 
     // MARK: - Initialisation
 
-    public init(address: Address? = nil,
-                completion: @escaping (Result<Address, Error>) -> Void) {
-        _viewModel = StateObject(wrappedValue: AddressVM(completion: completion))
-        self.address = address
+    public init(config: AddressWidgetConfig,
+                appearance: AddressWidgetAppearance = AddressWidgetAppearance(),
+                completion: @escaping (Address) -> Void) {
+        _viewModel = StateObject(wrappedValue: AddressVM(config: config, completion: completion))
+        self.appearance = appearance
     }
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: max(max(.spacing - 12, 0), 0)) {
+            VStack(spacing: appearance.verticalSpacing) {
                 nameAndLastNameView
                 autocompleteTextFieldView
 
@@ -44,11 +44,10 @@ public struct AddressWidget: View {
                 saveButton
                 emptyFocusView
             }
-            .padding(.horizontal, .spacing)
+            .padding(.horizontal, appearance.horizontalSpacing)
         }
-        .background(Color.backgroundColor)
         .onAppear {
-            viewModel.addressFormManager.updateFormWith(address: address)
+            viewModel.updateAddress()
         }
         .onTapGesture {
             viewModel.addressFormManager.setEditingTextField(focusedField: nil)
@@ -58,11 +57,11 @@ public struct AddressWidget: View {
     private var nameHeader: some View {
         HStack {
             Text("Name")
-                .customFont(.body)
-                .foregroundColor(.textColor)
+                .font(appearance.title.text.customFont.font)
+                .foregroundColor(appearance.title.text.textColor)
             Spacer()
         }
-        .padding(.bottom, 20)
+        .customPadding(appearance.title.padding)
     }
 
     private var nameAndLastNameView: some View {
@@ -71,6 +70,7 @@ public struct AddressWidget: View {
 
             HStack(spacing: .spacing * 0.75) {
                 OutlineTextField(
+                    appearance: appearance.textfield,
                     text: $viewModel.addressFormManager.firstNameText,
                     title: viewModel.addressFormManager.firstNameTitle,
                     placeholder: viewModel.addressFormManager.firstNamePlaceholder,
@@ -96,6 +96,7 @@ public struct AddressWidget: View {
                 .focused($textFieldInFocus, equals: .firstName)
 
                 OutlineTextField(
+                    appearance: appearance.textfield,
                     text: $viewModel.addressFormManager.lastNameText,
                     title: viewModel.addressFormManager.lastNameTitle,
                     placeholder: viewModel.addressFormManager.lastNamePlaceholder,
@@ -120,20 +121,18 @@ public struct AddressWidget: View {
                 })
                 .focused($textFieldInFocus, equals: .lastName)
             }
-            .padding(.bottom, 20)
         }
     }
 
     private var findAnAddressHeader: some View {
         HStack {
             Text("Find an address")
-                .customFont(.body)
-                .font(.largeTitle)
-                .foregroundColor(.textColor)
+                .font(appearance.title.text.customFont.font)
+                .foregroundColor(appearance.title.text.textColor)
                 .accessibilityAddTraits(.isHeader)
             Spacer()
         }
-        .padding(.bottom, 20)
+        .customPadding(appearance.title.padding)
     }
     
 
@@ -142,6 +141,7 @@ public struct AddressWidget: View {
             findAnAddressHeader
 
             AutocompleteTextField(
+                appearance: appearance.searchDropdown,
                 text: viewModel.addressSearchBinding,
                 title: viewModel.addressFormManager.addressSearchTitle,
                 placeholder: viewModel.addressFormManager.addressSearchPlaceholder,
@@ -184,22 +184,20 @@ public struct AddressWidget: View {
 
     private var manualEntryButton: some View {
         HStack {
-            Button {
-                self.viewModel.addressFormManager.isAddressFormExpanded = true
-            } label: {
-                Text("Or enter address manually")
-                    .customFont(.body3)
-                    .foregroundColor(.primaryColor)
-                    .underline()
-            }
+            SDKButton(
+                title: "Or enter address manually",
+                style: .custom(CustomButtonStyle(appearance: appearance.linkButton)),
+                isLeftAligned: true,
+                action: {
+                    self.viewModel.addressFormManager.isAddressFormExpanded = true
+                })
             Spacer()
         }
-        .padding(.top, 4)
-        .padding(.bottom, 16)
     }
 
     private var addressLine1View: some View {
         OutlineTextField(
+            appearance: appearance.textfield,
             text: $viewModel.addressFormManager.addressLine1Text,
             title: viewModel.addressFormManager.addressLine1Title,
             placeholder: viewModel.addressFormManager.addressLine1Placeholder,
@@ -227,6 +225,7 @@ public struct AddressWidget: View {
 
     private var addressLine2View: some View {
         OutlineTextField(
+            appearance: appearance.textfield,
             text: $viewModel.addressFormManager.addressLine2Text,
             title: viewModel.addressFormManager.addressLine2Title,
             placeholder: viewModel.addressFormManager.addressLine2Placeholder,
@@ -254,6 +253,7 @@ public struct AddressWidget: View {
 
     private var cityView: some View {
         OutlineTextField(
+            appearance: appearance.textfield,
             text: $viewModel.addressFormManager.cityText,
             title: viewModel.addressFormManager.cityTitle,
             placeholder: viewModel.addressFormManager.cityPlaceholder,
@@ -281,6 +281,7 @@ public struct AddressWidget: View {
 
     private var stateView: some View {
         OutlineTextField(
+            appearance: appearance.textfield,
             text: $viewModel.addressFormManager.stateText,
             title: viewModel.addressFormManager.stateTitle,
             placeholder: viewModel.addressFormManager.statePlaceholder,
@@ -308,6 +309,7 @@ public struct AddressWidget: View {
 
     private var postcodeView: some View {
         OutlineTextField(
+            appearance: appearance.textfield,
             text: $viewModel.addressFormManager.postcodeText,
             title: viewModel.addressFormManager.postcodeTitle,
             placeholder: viewModel.addressFormManager.postcodePlaceholder,
@@ -335,6 +337,7 @@ public struct AddressWidget: View {
 
     private var countryView: some View {
         OutlineTextField(
+            appearance: appearance.textfield,
             text: $viewModel.addressFormManager.countryText,
             title: viewModel.addressFormManager.countryTitle,
             placeholder: viewModel.addressFormManager.countryPlaceholder,
@@ -361,11 +364,11 @@ public struct AddressWidget: View {
     }
 
     private var saveButton: some View {
-        SDKButton(title: "Save", style: .fill(FillButtonStyle(isDisabled: viewModel.isDisabled))) {
+        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.primaryButton, isDisabled: viewModel.isDisabled))) {
             viewModel.saveAddress()
         }
-        .padding(.vertical, 16)
-        .customFont(.body)
+        .customPadding(appearance.primaryButton.dimensions.padding)
+        .font(appearance.primaryButton.fonts.title.customFont.font)
     }
     
     private var emptyFocusView: some View {
@@ -384,6 +387,6 @@ public struct AddressWidget: View {
 
 struct AddressView_Previews: PreviewProvider {
     static var previews: some View {
-        AddressWidget(completion: { _ in})
+        AddressWidget(config: .init(), completion: { _ in})
     }
 }

@@ -12,7 +12,7 @@ import SwiftUI
 public struct Theme {
     
     public let textField: TextFieldAppearance
-    public let search: SearchDropdownAppearance
+    public let searchDropdown: SearchDropdownAppearance
     public let actionButton: ButtonAppearance
     public let expandSectionButton: ButtonAppearance
     public let toolbarButton: ButtonAppearance
@@ -23,17 +23,19 @@ public struct Theme {
     public let title: TextAppearance
     
     public init(textField: TextFieldAppearance = TextFieldAppearance(),
-                search: SearchDropdownAppearance = SearchDropdownAppearance(),
+                searchDropdown: SearchDropdownAppearance = SearchDropdownAppearance(),
                 actionButton: ButtonAppearance = ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
-                expandSectionButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .defaultBackground, text: .primary, border: .clear)),
+                expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
+                    colors: .init(background: .defaultBackground, text: .primaryColor, border: .clear),
+                    fonts: .init(title: .init(isUnderlined: true))),
                 toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .primary, border: .clear)),
                 loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),
                 link: TextAppearance = TextAppearance(text: .init(textColor: .defaultPrimary)),
                 description: TextAppearance = TextAppearance(),
-                title: TextAppearance = TextAppearance()) {
+                title: TextAppearance = TextAppearance(text: TextAttributes(font: .init(size: 16.0)), padding: .init(bottom: 20.0))) {
         self.textField = textField
-        self.search = search
+        self.searchDropdown = searchDropdown
         self.actionButton = actionButton
         self.expandSectionButton = expandSectionButton
         self.toolbarButton = toolbarButton

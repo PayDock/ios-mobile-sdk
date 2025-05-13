@@ -13,10 +13,10 @@ extension Theme {
     
     public struct SearchDropdownAppearance {
         public let textField: TextFieldAppearance
-        public let dropdown: Dropdown
+        public let dropdown: DropdownAppearance
         
         public init(textField: TextFieldAppearance = TextFieldAppearance(),
-                    dropdown: Dropdown = Dropdown()) {
+                    dropdown: DropdownAppearance = DropdownAppearance()) {
             self.textField = textField
             self.dropdown = dropdown
         }

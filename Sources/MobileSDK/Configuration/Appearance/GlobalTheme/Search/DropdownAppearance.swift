@@ -11,7 +11,7 @@ import SwiftUI
 
 extension Theme {
     
-    public struct Dropdown {
+    public struct DropdownAppearance {
         public let colors: DropdownColors
         public let dimensions: DropdownDimensions
         public let text: DropdownText
