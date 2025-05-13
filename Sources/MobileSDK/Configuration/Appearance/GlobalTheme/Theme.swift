@@ -18,7 +18,8 @@ public struct Theme {
     public let toolbarButton: ButtonAppearance
     public let loader: OverlayLoaderAppearance
     public let toggle: ToggleAppearance
-    public let link: TextAppearance
+    public let linkText: TextAppearance
+    public let toggleText: TextAppearance
     public let description: TextAppearance
     public let title: TextAppearance
     
@@ -31,7 +32,9 @@ public struct Theme {
                 toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .primary, border: .clear)),
                 loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),
-                link: TextAppearance = TextAppearance(text: .init(textColor: .defaultPrimary)),
+                linkText: Theme.TextAppearance = Theme.TextAppearance(text:
+                        .init(font: .init(size: 14), textColor: .defaultPrimary, isUnderlined: true, underlineColor: .defaultPrimary)),
+                toggleText: TextAppearance = TextAppearance(text: .init(textColor: .defaultText)),
                 description: TextAppearance = TextAppearance(),
                 title: TextAppearance = TextAppearance(text: TextAttributes(font: .init(size: 16.0)), padding: .init(bottom: 20.0))) {
         self.textField = textField
@@ -41,7 +44,8 @@ public struct Theme {
         self.toolbarButton = toolbarButton
         self.loader = loader
         self.toggle = toggle
-        self.link = link
+        self.linkText = linkText
+        self.toggleText = toggleText
         self.description = description
         self.title = title
     }

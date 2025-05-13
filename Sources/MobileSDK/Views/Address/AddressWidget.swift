@@ -59,6 +59,7 @@ public struct AddressWidget: View {
             Text("Name")
                 .font(appearance.title.text.customFont.font)
                 .foregroundColor(appearance.title.text.textColor)
+                .accessibilityAddTraits(.isHeader)
             Spacer()
         }
         .customPadding(appearance.title.padding)
