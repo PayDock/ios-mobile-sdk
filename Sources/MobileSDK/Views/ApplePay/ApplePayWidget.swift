@@ -12,7 +12,8 @@ import PassKit
 public struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
 
-    public init(applePayRequestHandler: @escaping (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void,
+    public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
+                applePayRequestHandler: @escaping (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
             applePayRequestHandler: applePayRequestHandler,
@@ -20,7 +21,7 @@ public struct ApplePayWidget: View {
     }
 
     public var body: some View {
-        ApplePayButton {
+        ApplePayButton(appearance: ApplePayWidgetAppearance()) {
             viewModel.handleButtonTap()
         }
     }

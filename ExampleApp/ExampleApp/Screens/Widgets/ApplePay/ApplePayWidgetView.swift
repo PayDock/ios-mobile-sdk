@@ -25,6 +25,7 @@ struct ApplePayWidgetView: View {
                     case .failure(let error): viewModel.handleError(error: error)
                     }
                 }
+                .frame(height: 50)
                 .padding()
             }
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))

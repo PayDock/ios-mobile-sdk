@@ -9,12 +9,12 @@
 import PassKit
 
 public struct ApplePayWidgetAppearance {
+    public let type: PKPaymentButtonType
     public let style: PKPaymentButtonStyle
-    public let cornerRadius: CGFloat
     
-    init(style: PKPaymentButtonStyle = .automatic,
-         cornerRadius: CGFloat) {
+    public init(type: PKPaymentButtonType = .plain,
+                style: PKPaymentButtonStyle = .automatic) {
+        self.type = type
         self.style = style
-        self.cornerRadius = cornerRadius
     }
 }
