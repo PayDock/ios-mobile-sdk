@@ -9,7 +9,7 @@
 public struct ClickToPayWidgetAppearance {
     public let loader: Theme.OverlayLoaderAppearance
     
-    init(loader: Theme.OverlayLoaderAppearance = Theme.OverlayLoaderAppearance()) {
+    public init(loader: Theme.OverlayLoaderAppearance = Theme.OverlayLoaderAppearance()) {
         self.loader = loader
     }
 }

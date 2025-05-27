@@ -1,5 +1,5 @@
 //
-//  MastercardWidget.swift
+//  ClickToPayWidget.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 10.03.2024..
@@ -14,9 +14,8 @@ public struct ClickToPayWidget: UIViewRepresentable {
 
     // MARK: - Dependencies
 
-    private let serviceId: String
-    private let accessToken: String
-    private let meta: ClickToPayMeta?
+    private let config: ClickToPayWidgetConfig
+    private let appearance: ClickToPayWidgetAppearance
     private let clientSdkUrl = Constants.clientSdkUrlString
     
     // MARK: - Handlers
@@ -25,13 +24,11 @@ public struct ClickToPayWidget: UIViewRepresentable {
 
     // MARK: - Initialization
 
-    public init(serviceId: String,
-                accessToken: String,
-                meta: ClickToPayMeta?,
+    public init(config: ClickToPayWidgetConfig,
+                appearance: ClickToPayWidgetAppearance = ClickToPayWidgetAppearance(),
                 completion: @escaping (Result<ClickToPayResult, ClickToPayError>) -> Void) {
-        self.serviceId = serviceId
-        self.accessToken = accessToken
-        self.meta = meta
+        self.config = config
+        self.appearance = appearance
         self.completion = completion
     }
 
@@ -61,7 +58,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
         webView.uiDelegate = context.coordinator
         
         let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.color = UIColor(appearance.loader.color)
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
@@ -94,7 +91,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
         }
         if !context.coordinator.isLoaded {
             if let url = URL(string: "https://sandbox.src.mastercard.com") {
-                let html = html(serviceId: serviceId, accessToken: accessToken, meta: meta)
+                let html = html(serviceId: config.serviceId, accessToken: config.accessToken, meta: config.meta)
                 webView.loadHTMLString(html, baseURL: url)
             }
         }

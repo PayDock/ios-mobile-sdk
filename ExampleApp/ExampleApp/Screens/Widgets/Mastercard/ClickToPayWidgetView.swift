@@ -21,9 +21,10 @@ struct ClickToPayWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     ClickToPayWidget(
-                                        serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                                        meta: nil,
+                                        config: ClickToPayWidgetConfig(
+                                            serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                                            meta: nil),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):

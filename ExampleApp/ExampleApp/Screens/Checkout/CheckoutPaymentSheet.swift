@@ -136,9 +136,10 @@ struct CheckoutPaymentSheet: View {
                     NavigationStack {
                         VStack {
                             ClickToPayWidget(
-                                serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                                meta: nil) { result in
+                                config: ClickToPayWidgetConfig(
+                                    serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                    accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                                    meta: nil)) { result in
                                     switch result {
                                     case .success(let result):
                                         viewModel.handleMastercardResult(result)
