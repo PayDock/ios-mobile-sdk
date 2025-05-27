@@ -71,7 +71,6 @@ class AfterpayWidgetVM: ObservableObject {
     }
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
-        let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
         let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
         let environment: Environment = {
@@ -80,7 +79,7 @@ class AfterpayWidgetVM: ObservableObject {
             case .sandbox, .staging: return .sandbox
             }
         }()
-        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: environment, options: options)
+        return AfterpaySdkConfig(config: config, environment: environment, options: options)
     }
 
     func getShippingOptions() -> [ShippingOption] {

@@ -107,8 +107,7 @@ struct CheckoutPaymentSheet: View {
                         // Provide shipping update if needed based on the selected shipping option
                         // Check AfterpayWidget example for more details
                         provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
-                    },
-                    buttonWidth: 320) { result in
+                    }) { result in
                         switch result {
                         case .success:
                             viewModel.alertTitle = "Success"

@@ -266,10 +266,9 @@ extension CheckoutPaymentVM {
 extension CheckoutPaymentVM {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
-        let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
         let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
-        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
+        return AfterpaySdkConfig(config: config, environment: .sandbox, options: options)
     }
     
     func getShippingOptions() -> [ShippingOption] {

@@ -34,7 +34,8 @@ public struct FlyPayWidget: View {
                 viewModel.handleButtonTap()
             }
             .accessibilityLabel(Text("Pay with FlyPay"))
-            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        // MARK: - Temporarily disabled until everything from flypay rebranding is merged
+//            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
     }
     
     private var webViewSheetContent: some View {

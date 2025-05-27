@@ -10,18 +10,18 @@ import Foundation
 import Afterpay
 
 public struct AfterpayWidgetAppearance {
-    public let colorPalette: ColorPalette
-    public let loader: Theme.ButtonLoader
+    public let colorScheme: Afterpay.ColorScheme
+    public let loader: Theme.OverlayLoaderAppearance
     public let type: ButtonKind
     public let width: CGFloat
     public let height: CGFloat
     
-    init(colorPalette: ColorPalette = .blackOnMint,
-         loader: Theme.ButtonLoader = Theme.ButtonLoader(),
+    public init(colorScheme: ColorScheme = .static(.blackOnMint),
+         loader: Theme.OverlayLoaderAppearance = Theme.OverlayLoaderAppearance(),
          type: ButtonKind = .buyNow,
-         width: CGFloat,
-         height: CGFloat) {
-        self.colorPalette = colorPalette
+         width: CGFloat = 360,
+         height: CGFloat = 36) {
+        self.colorScheme = colorScheme
         self.loader = loader
         self.type = type
         self.width = width

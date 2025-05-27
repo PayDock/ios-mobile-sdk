@@ -21,8 +21,10 @@ class AfterpayVM: ObservableObject {
 
     let configuration: AfterpaySdkConfig
     private let afterPayToken: (_ afterPayToken: @escaping (String) -> Void) -> Void
+    var viewState: ViewState
     @Published var showWebView = false
     @Published var isLoading = false
+    private weak var loadingDelegate: WidgetLoadingDelegate?
     private var token = ""
     private(set) var afterPayOrderId = ""
 
@@ -35,18 +37,22 @@ class AfterpayVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(configuration: AfterpaySdkConfig,
+    init(viewState: ViewState,
+         configuration: AfterpaySdkConfig,
          afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
          selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
          selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
          walletService: WalletService = WalletServiceImpl(),
+         loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
+        self.viewState = viewState
         self.configuration = configuration
         self.afterPayToken = afterPayToken
         self.selectAddress = selectAddress
         self.selectShippingOption = selectShippingOption
         self.walletService = walletService
         self.completion = completion
+        self.loadingDelegate = loadingDelegate
         self.setupConfig()
     }
 
@@ -171,6 +177,21 @@ class AfterpayVM: ObservableObject {
                 completion(.failure(.unknownError))
             }
         }
+    }
+    
+    // MARK: - State Management
+
+    func updateLoadingState(isLoading: Bool) {
+        if (loadingDelegate != nil) {
+            if (isLoading) {
+                loadingDelegate?.loadingDidStart()
+            } else {
+                loadingDelegate?.loadingDidFinish()
+            }
+        } else {
+            self.isLoading = isLoading
+        }
+        viewState.isDisabled = isLoading
     }
 }
 

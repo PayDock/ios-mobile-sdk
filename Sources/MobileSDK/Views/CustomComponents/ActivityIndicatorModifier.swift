@@ -14,7 +14,7 @@ struct ActivityIndicatorModifier: AnimatableModifier {
     var isLoading: Bool
     @State private var hostingController: UIHostingController<ActivityIndicator>? = nil
 
-    init(appearance: Theme.OverlayLoaderAppearance = Theme.OverlayLoaderAppearance(),
+    init(appearance: Theme.OverlayLoaderAppearance,
          isLoading: Bool) {
         self.appearance = appearance
         self.isLoading = isLoading

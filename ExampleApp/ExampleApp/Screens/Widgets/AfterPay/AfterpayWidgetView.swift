@@ -24,14 +24,14 @@ struct AfterpayWidgetView: View {
                         provideShippingOptions(viewModel.getShippingOptions())
                     }, selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
                         provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
-                    },
-                    buttonWidth: 360.0) { result in
+                    }) { result in
                     switch result {
                     case .success(let chargeData): 
                         viewModel.handleSuccess(chargeData)
                     case .failure(let error): viewModel.handleError(error: error)
                     }
                 }
+                .frame(height: 50)
                 .padding()
             }
             .background(Color(hex: "#EAE0D7"))
