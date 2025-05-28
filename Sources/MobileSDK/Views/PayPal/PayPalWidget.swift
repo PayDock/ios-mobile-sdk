@@ -10,8 +10,10 @@ import SwiftUI
 
 public struct PayPalWidget: View {
     @StateObject private var viewModel: PayPalVM
+    @State var apparance: PayPalWidgetAppearance
 
     public init(viewState: ViewState? = nil,
+                appearance: PayPalWidgetAppearance = PayPalWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
@@ -19,8 +21,8 @@ public struct PayPalWidget: View {
             viewState: viewState ?? ViewState(state: .none),
             payPalToken: payPalToken,
             loadingDelegate: loadingDelegate,
-            completion: completion)
-        )
+            completion: completion))
+        self.apparance = appearance
     }
 
     public var body: some View {
@@ -38,12 +40,7 @@ public struct PayPalWidget: View {
         SDKButton(
             title: "",
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            // TODO: - Update once widget themeing implementation is started
-            style: .fill(FillButtonStyle(isDisabled: viewModel.viewState.isDisabled)
-//                         style: .fill(FillButtonStyle(
-//                                 backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-//                                 foregroundColor: .black,
-//                                 isDisabled: viewModel.viewState.isDisabled
+            style: .fill(FillButtonStyle(appearance: getButtonAppearance(), isDisabled: viewModel.viewState.isDisabled)
             )
         ) {}
     }
@@ -52,16 +49,17 @@ public struct PayPalWidget: View {
         SDKButton(
             title: "",
             image: Image("pay-pal", bundle: Bundle.module),
-            // TODO: - Update once widget themeing implementation is started
-            style: .fill(FillButtonStyle(isDisabled: viewModel.viewState.isDisabled)
-//            style: .fill(FillButtonStyle(
-//                    backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-//                    isDisabled: viewModel.viewState.isDisabled
-//                )
+            style: .fill(FillButtonStyle(appearance: getButtonAppearance(), isDisabled: viewModel.viewState.isDisabled)
             )) {
                 viewModel.handleButtonTap()
             }
             .accessibilityHint("Initiates payment using PayPal.")
+    }
+    
+    private func getButtonAppearance() -> Theme.ButtonAppearance {
+        let colors = Theme.ButtonColors(background: Color(red: 1.0, green: 0.76, blue: 0.30))
+        let appearance = Theme.ButtonAppearance(colors: colors, loader: apparance.loader)
+        return appearance
     }
     
     private var webViewSheetContent: some View {
