@@ -7,12 +7,19 @@
 //
 
 import Foundation
+import SwiftUI
 
 public struct PayPalVaultAppearance {
-    public let loader: Theme.ButtonLoader
     
-    init(loader: Theme.ButtonLoader = Theme.ButtonLoader()) {
-        self.loader = loader
+    public let button: Theme.ButtonAppearance
+    
+    public init(button: Theme.ButtonAppearance = Theme.ButtonAppearance(
+        colors: .init(background: .defaultBackground,
+                      text: .defaultPrimary,
+                      image: .defaultPrimary,
+                      border: .defaultPrimary),
+        loader: .init(spinnerColor: .defaultPrimary))) {
+        self.button = button
     }
 }
 

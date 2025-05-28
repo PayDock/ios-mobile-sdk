@@ -10,17 +10,19 @@ import SwiftUI
 
 public struct PayPalSavePaymentSourceWidget: View {
     @StateObject private var viewModel: PayPalSavePaymentSourceVM
+    @State private var appearance: PayPalVaultAppearance
 
     public init(viewState: ViewState? = nil,
                 config: PayPalVaultConfig,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                appearance: PayPalVaultAppearance = PayPalVaultAppearance(),
                 completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalSavePaymentSourceVM(
             viewState: viewState ?? ViewState(),
             config: config,
             loadingDelegate: loadingDelegate,
-            completion: completion)
-        )
+            completion: completion))
+        self.appearance = appearance
     }
 
     public var body: some View {
@@ -28,11 +30,7 @@ public struct PayPalSavePaymentSourceWidget: View {
             title: viewModel.actionText,
             image: viewModel.getButtonIcon(),
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            style: .outline(OutlineButtonStyle(isDisabled: viewModel.viewState.isDisabled))) {
-//                    style: .outline(OutlineButtonStyle(
-//                        foregroundColor: Color(red: 0.129, green: 0.129, blue: 0.129),
-//                        borderColor: Color(red: 0.129, green: 0.129, blue: 0.129),
-//                        isDisabled: viewModel.viewState.isDisabled))) {
+            style: .custom(CustomButtonStyle(appearance: appearance.button, isDisabled: viewModel.viewState.isDisabled))) {
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)
