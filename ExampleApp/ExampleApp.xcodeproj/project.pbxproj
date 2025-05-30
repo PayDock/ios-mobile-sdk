@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808B3412A7056F100E86C7E /* CardDetailsWidgetView.swift */; };
-		280CD6772C189699004C8788 /* Sandbox-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 280CD6762C189699004C8788 /* Sandbox-Info.plist */; };
-		280CD6792C1896A9004C8788 /* Staging-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 280CD6782C1896A9004C8788 /* Staging-Info.plist */; };
 		280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96312B176ED000BE8C3E /* Standalone3DSWidgetView.swift */; };
 		280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96332B176FD600BE8C3E /* Standalone3DSVM.swift */; };
 		280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */; };
@@ -28,8 +26,6 @@
 		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
 		284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */; };
 		28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */; };
-		2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */; };
-		2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
@@ -63,6 +59,8 @@
 		28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF542D00951E004C0672 /* AccountProfileView.swift */; };
 		28B2FF572D009526004C0672 /* AccountProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF562D009526004C0672 /* AccountProfileVM.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
+		28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */; };
+		28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */; };
 		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
 		28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */; };
 		28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F6D2ACC213F008E827E /* WalletService.swift */; };
@@ -115,8 +113,6 @@
 		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
 		2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultReq.swift; sourceTree = "<group>"; };
 		28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultWidgetVM.swift; sourceTree = "<group>"; };
-		2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyPayWidgetView.swift; sourceTree = "<group>"; };
-		2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyPayWidgetVM.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -156,6 +152,8 @@
 		28B2FF562D009526004C0672 /* AccountProfileVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileVM.swift; sourceTree = "<group>"; };
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
+		28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayWidgetView.swift; sourceTree = "<group>"; };
+		28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayWidgetVM.swift; sourceTree = "<group>"; };
 		28E86F662ACC1361008E827E /* WalletEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEndpoints.swift; sourceTree = "<group>"; };
 		28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeReq.swift; sourceTree = "<group>"; };
 		28E86F6D2ACC213F008E827E /* WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletService.swift; sourceTree = "<group>"; };
@@ -234,7 +232,7 @@
 			children = (
 				28F4E3222B83920600C73065 /* AfterPay */,
 				289B83822B9E381300CEA8B4 /* Mastercard */,
-				2865B22B2B56E4C700EBE2DD /* FlyPay */,
+				2865B22B2B56E4C700EBE2DD /* ColesPay */,
 				2808B3402A7056E300E86C7E /* CardDetails */,
 				28A65CA12A94CE4E002A04CA /* Address */,
 				2867ADD72ACEE53400DB5319 /* ApplePay */,
@@ -285,13 +283,13 @@
 			path = PayPalVault;
 			sourceTree = "<group>";
 		};
-		2865B22B2B56E4C700EBE2DD /* FlyPay */ = {
+		2865B22B2B56E4C700EBE2DD /* ColesPay */ = {
 			isa = PBXGroup;
 			children = (
-				2865B22C2B56E4DF00EBE2DD /* FlyPayWidgetView.swift */,
-				2865B22E2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift */,
+				28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */,
+				28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */,
 			);
-			path = FlyPay;
+			path = ColesPay;
 			sourceTree = "<group>";
 		};
 		2867ADD72ACEE53400DB5319 /* ApplePay */ = {
@@ -601,7 +599,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = "Paydock Ltd.";
 				TargetAttributes = {
 					2889B7D02A558F1800D6C7BE = {
@@ -646,8 +644,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2889B7DD2A558F1A00D6C7BE /* Preview Assets.xcassets in Resources */,
-				280CD6772C189699004C8788 /* Sandbox-Info.plist in Resources */,
-				280CD6792C1896A9004C8788 /* Staging-Info.plist in Resources */,
 				2889B7D92A558F1A00D6C7BE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -675,7 +671,6 @@
 			files = (
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
 				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
-				2865B22D2B56E4DF00EBE2DD /* FlyPayWidgetView.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
 				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
@@ -708,11 +703,12 @@
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
 				28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */,
 				28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */,
+				28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */,
+				28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
-				2865B22F2B56E4EC00EBE2DD /* FlyPayWidgetVM.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
@@ -879,7 +875,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -906,7 +901,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1041,7 +1035,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1068,7 +1061,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1196,7 +1188,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1223,7 +1214,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6742C189640004C8788 /* Sandbox.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1351,7 +1341,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1378,7 +1367,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 280CD6752C189653004C8788 /* Staging.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1615,7 +1603,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1642,7 +1629,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1669,7 +1655,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
@@ -1695,7 +1680,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 28BF0E982B7A87C500ACF513 /* Production.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;

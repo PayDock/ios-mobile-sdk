@@ -130,11 +130,9 @@ class AddressVM: NSObject, ObservableObject {
 extension AddressVM: MKLocalSearchCompleterDelegate {
 
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        Task { @MainActor in
-            mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
-            addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
-            addressFormManager.showAddressSearchPopup = true
-        }
+        mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
+        addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
+        addressFormManager.showAddressSearchPopup = true
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {

@@ -37,6 +37,6 @@ struct PayPalWidgetView: View {
 
 struct PayPalWidgetView_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayWidgetView()
+        PayPalWidgetView()
     }
 }

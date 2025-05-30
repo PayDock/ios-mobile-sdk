@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class Integrated3DSVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
@@ -46,10 +47,8 @@ class Integrated3DSVM: NSObject, ObservableObject {
                 create3dsToken(cardToken: token)
             } catch {
                 alertMessage = "Error tokenising card details!"
-                await MainActor.run {
-                    self.isLoading = false
-                    self.showAlert = true
-                }
+                isLoading = false
+                showAlert = true
             }
         }
     }
@@ -59,18 +58,14 @@ class Integrated3DSVM: NSObject, ObservableObject {
             let req = Integrated3DSReq(amount: "10", currency: "AUD", _3ds: .init(browserDetails: .init()), token: cardToken)
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
-                await MainActor.run {
                     self.isLoading = false
                     self.token3DS = token3DS ?? ""
                     self.showWebView = true
-                }
             } catch {
-                await MainActor.run {
                     self.isLoading = false
                     self.showWebView = false
                     self.alertMessage = "Error tokenising card details!"
                     self.showAlert = true
-                }
             }
         }
     }
@@ -102,7 +97,6 @@ class Integrated3DSVM: NSObject, ObservableObject {
         }
     }
     
-    @MainActor
     func handleFailure(error: Integrated3DSError) {
         showWebView = false
         alertMessage = error.customMessage

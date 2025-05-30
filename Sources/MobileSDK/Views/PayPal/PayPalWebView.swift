@@ -6,7 +6,7 @@
 //  Created by Domagoj Grizelj on 26.10.2023..
 //
 
-import WebKit
+@preconcurrency import WebKit
 import SwiftUI
 
 struct PayPalWebView: UIViewRepresentable {
@@ -103,11 +103,8 @@ struct PayPalWebView: UIViewRepresentable {
                     let parts = String(query).split(separator: "=")
                     partialResult[String(parts[0])] = parts.count > 1 ? String(parts[1]) : ""
                 })
-
-            guard let paymentId = params["token"],
-                  let payerId = params["PayerID"] else { return }
-
-            onApprove(paymentId, payerId)
+            
+            handleRedirect(params: params)
         }
 
         func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
@@ -120,6 +117,20 @@ struct PayPalWebView: UIViewRepresentable {
                 let exceptions = SecTrustCopyExceptions(trust)
                 SecTrustSetExceptions(trust, exceptions)
                 completionHandler(.useCredential, URLCredential(trust: trust))
+            }
+        }
+        
+        // MARK: - Helpers
+        
+        private func handleRedirect(params: [String: String]) {
+            if let opType = params["opType"], opType == "cancel" {
+                onFailure(.transactionCanceled)
+                return
+            }
+
+            if let paymentId = params["token"],
+               let payerId = params["PayerID"] {
+                onApprove(paymentId, payerId)
             }
         }
     }

@@ -17,7 +17,7 @@ class WalletServiceMock: Mockable, WalletService {
         return ""
     }
     
-    func getFlyPayCallback(token: String) async throws -> String {
+    func getColesPayCallback(token: String) async throws -> String {
         return ""
     }
     

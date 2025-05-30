@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 
+@MainActor
 class PayPalWidgetVM: ObservableObject {
 
     // MARK: - Dependencies
@@ -69,9 +70,9 @@ class PayPalWidgetVM: ObservableObject {
         }
     }
 
-    func handleError(error: Error) {
+    func handleError(error: PayPalError) {
         alertTitle = "Error"
-        alertMessage = "\(error.localizedDescription)"
+        alertMessage = "\(error.customMessage)"
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showAlert = true
         }

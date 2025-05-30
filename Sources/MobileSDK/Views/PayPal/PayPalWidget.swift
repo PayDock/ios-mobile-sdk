@@ -25,46 +25,75 @@ public struct PayPalWidget: View {
 
     public var body: some View {
         if (viewModel.isLoading && viewModel.showLoaders) {
-            SDKButton(
-                title: "",
-                isLoading: viewModel.isLoading && viewModel.showLoaders,
-                style: .fill(FillButtonStyle(
-                        backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-                        foregroundColor: .black,
-                        isDisabled: viewModel.viewState.isDisabled
-                    )
-                )
-            ) {}
+            payPalDisabledButton
         } else {
-            SDKButton(
-                title: "",
-                image: Image("pay-pal", bundle: Bundle.module),
-                style: .fill(FillButtonStyle(
-                        backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
-                        isDisabled: viewModel.viewState.isDisabled
-                    )
-                )) {
-                    viewModel.handleButtonTap()
-                }
-                .accessibilityHint("Initiates payment using PayPal.")
-                .sheet(isPresented: $viewModel.showWebView, onDismiss: {
-                    if viewModel.sheetAction == .nothing {
-                        viewModel.handleSheetCancellation()
-                    }
-                }) {
-                    NavigationStack {
-                        if let url = viewModel.payPalUrl {
-                            PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
-                                viewModel.capturePayPalPayment(paymentMethodId: paymentMethodId, payerId: payerId)
-                            }, onFailure: { error in
-                                viewModel.handleWebViewFailure(error)
-                            })
-                            .navigationTitle("Checkout with PayPal")
-                            .navigationBarTitleDisplayMode(.inline)
+            payPalButton
+                .sheet(isPresented: $viewModel.showWebView, content: {
+                    webViewSheetContent
+                })
+        }
+    }
+    
+    private var payPalDisabledButton: some View {
+        SDKButton(
+            title: "",
+            isLoading: viewModel.isLoading && viewModel.showLoaders,
+            style: .fill(FillButtonStyle(
+                    backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
+                    foregroundColor: .black,
+                    isDisabled: viewModel.viewState.isDisabled
+                )
+            )
+        ) {}
+    }
+    
+    private var payPalButton: some View {
+        SDKButton(
+            title: "",
+            image: Image("pay-pal", bundle: Bundle.module),
+            style: .fill(FillButtonStyle(
+                    backgroundColor: Color(red: 1.0, green: 0.76, blue: 0.30),
+                    isDisabled: viewModel.viewState.isDisabled
+                )
+            )) {
+                viewModel.handleButtonTap()
+            }
+            .accessibilityHint("Initiates payment using PayPal.")
+    }
+    
+    private var webViewSheetContent: some View {
+        NavigationStack {
+            if let url = viewModel.payPalUrl {
+                PayPalWebView(url: url, onApprove: { paymentMethodId, payerId in
+                    viewModel.capturePayPalPayment(paymentMethodId: paymentMethodId, payerId: payerId)
+                }, onFailure: { error in
+                    viewModel.handleWebViewFailure(error)
+                })
+                .navigationTitle("Checkout with PayPal")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            viewModel.showCancelConfirmation = true
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.title)
+                                .imageScale(.small)
                         }
                     }
                 }
+            }
         }
+        .interactiveDismiss(canDismissSheet: false) {
+            viewModel.showCancelConfirmation = true
+        }
+        .confirmationDialog("Are you sure you want to cancel?", isPresented: $viewModel.showCancelConfirmation, titleVisibility: .visible, actions: {
+            Button("Yes", role: .destructive) {
+                viewModel.showWebView = false
+                viewModel.handleSheetCancellation()
+            }
+            Button("No", role: .cancel) {}
+        })
     }
 }
 

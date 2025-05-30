@@ -10,6 +10,7 @@ import Foundation
 import MobileSDK
 import Afterpay
 
+@MainActor
 class AfterpayWidgetVM: ObservableObject {
 
     // MARK: - Dependencies

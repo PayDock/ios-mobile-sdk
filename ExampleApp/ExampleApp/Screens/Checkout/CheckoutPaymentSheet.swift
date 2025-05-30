@@ -14,9 +14,8 @@ struct CheckoutPaymentSheet: View {
     @StateObject private var viewModel: CheckoutPaymentVM
     private let onCloseSheet: () -> Void
 
-    init(viewModel: CheckoutPaymentVM = CheckoutPaymentVM(),
-         onCloseSheet: @escaping () -> Void) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(onCloseSheet: @escaping () -> Void) {
+        _viewModel = StateObject(wrappedValue: CheckoutPaymentVM())
         self.onCloseSheet = onCloseSheet
     }
 
@@ -25,135 +24,12 @@ struct CheckoutPaymentSheet: View {
             title()
             selector()
             switch viewModel.selectedMethod {
-            case .card:
-                NavigationStack {
-                    ScrollView {
-                        VStack {
-                            Spacer()
-                                .frame(height: 20.0)
-                            CardDetailsWidget(viewState: viewModel.viewState,
-                                              config: CardDetailsWidgetConfig(
-                                                gatewayId: nil,
-                                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                                                actionText: "Pay",
-                                                showCardTitle: false,
-                                                collectCardholderName: false,
-                                                allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
-                                              ),
-                                              loadingDelegate: viewModel,
-                                              completion: { result in
-                                switch result {
-                                case .success(let result): viewModel.payWithCard(result.token)
-                                case .failure: break
-                                }
-                            })
-                            Spacer()
-                        }
-                    }
-                }
-
-            case .applePay:
-                ApplePayWidget { onApplePayButtonTap in
-                    viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
-                } completion: { result in
-                    switch result {
-                    case .success(let chargeResponse):
-                        viewModel.alertTitle = "Success"
-                        viewModel.alertMessage = chargeResponse.status
-                        viewModel.showAlert = true
-                    
-                    case .failure(let error):
-                        viewModel.alertTitle = "Failure"
-                        viewModel.alertMessage = error.customMessage
-                        viewModel.showAlert = true
-                    }
-                }
-                .padding()
-            case .payPal:
-                PayPalWidget(viewState: viewModel.viewState, loadingDelegate: viewModel) { onPayPalButtonTap in
-                    viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
-                } completion: { result in
-                    switch result {
-                    case .success(let chargeResponse):
-                        viewModel.alertTitle = "Success"
-                        viewModel.alertMessage = chargeResponse.status
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            viewModel.showAlert = true
-                        }
-
-                    case .failure(let error):
-                        viewModel.alertTitle = "Failure"
-                        viewModel.alertMessage = error.customMessage
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            viewModel.showAlert = true
-                        }
-                    }
-                }
-                .frame(height: 48.0)
-                .padding()
-
-            case .afterpay:
-                AfterpayWidget(
-                    configuration: viewModel.getAfterpayConfig(),
-                    afterPayToken: { onAfterpayButtonTap in
-                        viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
-                    }, 
-                    selectAddress: { address, provideShippingOptions in
-                        // Provide shipping options based on user selected address if needed
-                        // Check AfterpayWidget example for more details
-                        provideShippingOptions(viewModel.getShippingOptions())
-                    },
-                    selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
-                        // Provide shipping update if needed based on the selected shipping option
-                        // Check AfterpayWidget example for more details
-                        provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
-                    },
-                    buttonWidth: 320) { result in
-                        switch result {
-                        case .success:
-                            viewModel.alertTitle = "Success"
-                            viewModel.alertMessage = "Charge successful"
-                            viewModel.showAlert = true
-                        case .failure:
-                            viewModel.alertTitle = "Error"
-                            viewModel.alertMessage = "Charge failed"
-                            viewModel.showAlert = true
-                        }
-                    }
-                    .padding()
-
-            case .mastercard:
-                Button("Checkout with Click to Pay") {
-                    viewModel.showMastercardWebView = true
-                }
-                .foregroundStyle(.white)
-                .font(Font.system(size: 16, weight: .semibold))
-                .frame(height: 48)
-                .frame(maxWidth:.infinity)
-                .background(Color.primaryColor)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .padding()
-                .sheet(isPresented: $viewModel.showMastercardWebView, content: {
-                    NavigationStack {
-                        VStack {
-                            ClickToPayWidget(
-                                serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                                meta: nil) { result in
-                                    switch result {
-                                    case .success(let result):
-                                        viewModel.handleMastercardResult(result)
-                                        
-                                    case .failure(let error):
-                                        viewModel.alertMessage = error.localizedDescription
-                                        viewModel.showAlert = true
-                                    }
-                                }
-                        }
-                        .navigationTitle("Checkout with Click to Pay")
-                        .navigationBarTitleDisplayMode(.inline)
-                    }
-                })
+            case .card: cardWidget
+            case .applePay: applePayWidget
+            case .payPal: payPalWidget
+            case .afterpay: afterpayWidget
+            case .mastercard: clickToPayWidget
+            case .colesPay: colesPayWidget
             }
         }
         .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
@@ -187,6 +63,173 @@ struct CheckoutPaymentSheet: View {
             }
         }
     }
+    
+    // MARK: - Widget views
+    
+    private var cardWidget: some View {
+        NavigationStack {
+            ScrollView {
+                VStack {
+                    Spacer()
+                        .frame(height: 20.0)
+                    CardDetailsWidget(viewState: viewModel.viewState,
+                                      config: CardDetailsWidgetConfig(
+                                        gatewayId: nil,
+                                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                                        actionText: "Pay",
+                                        showCardTitle: false,
+                                        collectCardholderName: false,
+                                        allowSaveCard: SaveCardConfig(consentText: "Save payment details", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com"))
+                                      ),
+                                      loadingDelegate: viewModel,
+                                      completion: { result in
+                        switch result {
+                        case .success(let result): viewModel.payWithCard(result.token)
+                        case .failure: break
+                        }
+                    })
+                    Spacer()
+                }
+            }
+        }
+    }
+    
+    private var applePayWidget: some View {
+        ApplePayWidget { onApplePayButtonTap in
+            viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
+        } completion: { result in
+            switch result {
+            case .success(let chargeResponse):
+                viewModel.alertTitle = "Success"
+                viewModel.alertMessage = chargeResponse.status
+                viewModel.showAlert = true
+            
+            case .failure(let error):
+                viewModel.alertTitle = "Failure"
+                viewModel.alertMessage = error.customMessage
+                viewModel.showAlert = true
+            }
+        }
+        .padding()
+    }
+    
+    private var payPalWidget: some View {
+        HStack {
+            PayPalWidget(viewState: viewModel.viewState, loadingDelegate: viewModel) { onPayPalButtonTap in
+                viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
+            } completion: { result in
+                switch result {
+                case .success(let chargeResponse):
+                    viewModel.alertTitle = "Success"
+                    viewModel.alertMessage = chargeResponse.status
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        viewModel.showAlert = true
+                    }
+                    
+                case .failure(let error):
+                    viewModel.alertTitle = "Failure"
+                    viewModel.alertMessage = error.customMessage
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        viewModel.showAlert = true
+                    }
+                }
+            }
+            .frame(height: 48.0)
+            .padding()
+        }
+    }
+    
+    private var afterpayWidget: some View {
+        AfterpayWidget(
+            configuration: viewModel.getAfterpayConfig(),
+            afterPayToken: { onAfterpayButtonTap in
+                viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
+            },
+            selectAddress: { address, provideShippingOptions in
+                // Provide shipping options based on user selected address if needed
+                // Check AfterpayWidget example for more details
+                provideShippingOptions(viewModel.getShippingOptions())
+            },
+            selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
+                // Provide shipping update if needed based on the selected shipping option
+                // Check AfterpayWidget example for more details
+                provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
+            },
+            buttonWidth: 320) { result in
+                switch result {
+                case .success:
+                    viewModel.alertTitle = "Success"
+                    viewModel.alertMessage = "Charge successful"
+                    viewModel.showAlert = true
+                case .failure:
+                    viewModel.alertTitle = "Error"
+                    viewModel.alertMessage = "Charge failed"
+                    viewModel.showAlert = true
+                }
+            }
+            .padding()
+    }
+    
+    private var clickToPayWidget: some View {
+        Button("Checkout with Click to Pay") {
+            viewModel.showMastercardWebView = true
+        }
+        .foregroundStyle(.white)
+        .font(Font.system(size: 16, weight: .semibold))
+        .frame(height: 48)
+        .frame(maxWidth:.infinity)
+        .background(Color.primaryColor)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .padding()
+        .sheet(isPresented: $viewModel.showMastercardWebView, content: {
+            NavigationStack {
+                VStack {
+                    ClickToPayWidget(
+                        serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                        meta: nil) { result in
+                            switch result {
+                            case .success(let result):
+                                viewModel.handleMastercardResult(result)
+                                
+                            case .failure(let error):
+                                viewModel.alertMessage = error.localizedDescription
+                                viewModel.showAlert = true
+                            }
+                        }
+                }
+                .navigationTitle("Checkout with Click to Pay")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        })
+    }
+    
+    private var colesPayWidget: some View {
+        NavigationStack {
+            ScrollView {
+                ColesPayWidget(
+                    viewState: viewModel.viewState,
+                    loadingDelegate: viewModel,
+                    clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "") { onColesPayButtonTap in
+                        viewModel.initializeWalletChargeColesPay(completion: onColesPayButtonTap)
+                } completion: { result in
+                    switch result {
+                    case .success: viewModel.handleSuccess()
+                    case .failure(let error): viewModel.handleError(error: error)
+                    }
+                }
+                .padding()
+            }
+            .alert(viewModel.alertTitle,
+                   isPresented: $viewModel.showAlert,
+                   actions: {},
+                   message: {
+                Text(viewModel.alertMessage)
+            })
+        }
+    }
+        
+    // MARK: - Helpers
 
     private func title() -> some View {
         HStack {
@@ -205,15 +248,24 @@ struct CheckoutPaymentSheet: View {
                 paymentMethodCell(type: .payPal, logo: Image("payPal"))
                 paymentMethodCell(type: .afterpay, logo: Image("afterpay"))
                 paymentMethodCell(type: .mastercard, logo: Image("mastercard"))
+                paymentMethodCell(type: .colesPay, logo: Image("coles-pay"), resizable: true)
             }
             .padding()
         }
         .scrollIndicators(.hidden)
     }
 
-    private func paymentMethodCell(type: CheckoutPaymentVM.PaymentMethod, logo: Image, title: String? = nil) -> some View {
+    private func paymentMethodCell(type: CheckoutPaymentVM.PaymentMethod, logo: Image, resizable: Bool = false, title: String? = nil) -> some View {
         HStack {
-            logo
+            if resizable {
+                logo
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+            } else {
+                logo
+            }
+            
             if let title = title {
                 Text(title)
                     .font(.subheadline)
@@ -231,6 +283,7 @@ struct CheckoutPaymentSheet: View {
             }
         }
     }
+    
 }
 
 struct PaymentMethodSelector_Previews: PreviewProvider {

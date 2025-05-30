@@ -57,13 +57,11 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 *   **`PAY_PAL_GATEWAY_I`:** Your Paydock service ID for the PayPal gateway. This ID is necessary to enable PayPal as a payment method within the sample app.
 *   **`AFTERPAY_GATEWAY_ID`:** Your Paydock service ID for the Afterpay gateway. This ID is required to enable Afterpay as a payment method.
 *   **`FLYPAY_GATEWAY_ID`:** Your Paydock service ID for the Flypay gateway. This ID is required to enable Flypay as a payment method.
+*   **`FLYPAY_CLIENT_ID`:** The client ID provided by Flypay. This ID is required for authenticating and using the Flypay service.
 *   **`MASTERCARD_SERVICE_ID`:** Your Paydock service ID for the ClickToPay gateway. This ID is required to enable ClickToPay as a payment method.
 *   **`INTEGRATED_3DS_GATEWAY_ID`:** Your Paydock service ID for the Integrated 3DS service. This ID is required to enable 3DS check.
 *   **`STANDALONE_3DS_GATEWAY_ID`:** Your Paydock service ID for the Standalone 3DS service. This ID is required to enable 3DS check.
 *   **`MERCHANT_ID`:** Your ApplePay merchant ID. This ID is required to enable ApplePay test payments in sample app.
-
-FLYPAY_GATEWAY_ID = 65c61a19725ad762f1df5246
-
 
 **Example `*.xcconfig`:**
 ```
@@ -79,6 +77,7 @@ STANDALONE_3DS_GATEWAY_ID = your_standalone_3ds_gateway_id
 MASTERCARD_SERVICE_ID = your_gateway_id_click_to_pay
 AFTERPAY_GATEWAY_ID = your_gateway_id_after_pay
 FLYPAY_GATEWAY_ID = your_gateway_id_flypay
+FLYPAY_CLIENT_ID = your_flypay_client_id
 MERCHANT_ID = your_merchant_id
 ```
 

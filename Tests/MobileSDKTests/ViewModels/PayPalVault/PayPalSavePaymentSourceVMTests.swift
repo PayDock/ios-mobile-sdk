@@ -10,6 +10,7 @@ import XCTest
 import Combine
 @testable import MobileSDK
 
+@MainActor
 class PayPalSavePaymentSourceVMTests: XCTestCase {
     
     var viewModel: PayPalSavePaymentSourceVM!

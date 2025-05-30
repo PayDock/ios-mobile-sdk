@@ -21,6 +21,11 @@ struct InitialiseWalletChargeRes: Codable {
 
         struct WalletData: Codable {
             let token: String
+            let charge: ChargeData
+            
+            struct ChargeData: Codable {
+                let _id: String
+            }
         }
     }
 

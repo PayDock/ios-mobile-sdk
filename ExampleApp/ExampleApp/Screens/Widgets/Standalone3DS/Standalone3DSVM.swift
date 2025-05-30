@@ -138,7 +138,6 @@ class Standalone3DSVM: NSObject, ObservableObject {
         }
     }
     
-    @MainActor
     func handleFailure(error: Standalone3DSError) {
         showWebView = false
         alertMessage = error.customMessage

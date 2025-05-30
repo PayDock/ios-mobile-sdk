@@ -10,6 +10,7 @@ import Combine
 import SwiftUI
 import NetworkingLib
 
+@MainActor
 class GiftCardVM: ObservableObject {
 
     // MARK: - Dependencies

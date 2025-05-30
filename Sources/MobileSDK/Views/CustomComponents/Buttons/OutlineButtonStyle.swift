@@ -12,6 +12,7 @@ struct OutlineButtonStyle: ButtonStyle {
 
     var foregroundColor: Color = .primaryColor
     var borderColor: Color = .primaryColor
+    var loaderColor: Color = .textColor
     var isDisabled: Bool = false
 
     func makeBody(configuration: Self.Configuration) -> some View {

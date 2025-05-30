@@ -21,17 +21,68 @@ variables:
   LANG: "en_US.UTF-8"
   GIT_STRATEGY: clone
 
+#before_script:
+#  - gem install bundler
+#  - bundle install
+
 .macos_saas_runners:
   tags:
     - saas-macos-medium-m1
-  image: macos-13-xcode-14
+  image: macos-14-xcode-15
 
-test_exampleApp:
+#runLint:
+#  extends:
+#    - .macos_saas_runners
+#  stage: quality
+#  script:
+#   - fastlane lint
+
+run_ExampleApp_tests:
+  extends:
+    - .macos_saas_runners
   stage: test
   script:
-    - echo "success"
+    - fastlane test
+    - mv fastlane/test_output/report.junit fastlane/test_output/report.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  artifacts:
+    when: always
+    reports:
+      junit: fastlane/test_output/report.xml
+    paths:
+      - fastlane/test_output
+   
+run_MobileSDK_tests:
+  extends:
+    - .macos_saas_runners
+  stage: test
+  script:
+    - fastlane testPackage
+    - mv fastlane/test_output/report.junit fastlane/test_output/report.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  artifacts:
+    when: always
+    reports:
+      junit: fastlane/test_output/report.xml
+    paths:
+      - fastlane/test_output
+    
+pull_bin_file:
+  stage: build
+  # image: 412245956714.dkr.ecr.ap-southeast-2.amazonaws.com/ci:20241212-1584910654
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script: |
+    aws s3 cp s3://pd-app-bin-management-staging-11/bins.zip bin_schema/bins.zip
+    unzip bin_schema/bins.zip -d bin_schema/
+  artifacts:
+    paths:
+      - bin_schema/
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-export_exampleApp:
+copy_bin_file:
   stage: build
   script:
     - cp bin_schema/card-schemes.json ./Sources/MobileSDK/Resources/JSON/card-schemes.json
@@ -39,13 +90,29 @@ export_exampleApp:
   needs: ["pull_bin_file"]
   dependencies:
     - pull_bin_file
-
-pull_bin_file:
-  stage: build
-  image: 412245956714.dkr.ecr.ap-southeast-2.amazonaws.com/ci:20241212-1584910654
-  script: |
-    aws s3 cp s3://pd-app-bin-management-staging-11/bins.zip bin_schema/bins.zip
-    unzip bin_schema/bins.zip -d bin_schema/
-  artifacts:
-    paths:
-      - bin_schema/
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+   
+#buildStaging:
+#  extends:
+#    - .macos_saas_runners
+#  stage: build
+#  script:
+#   - fastlane buildReleaseStaging
+#
+#buildSandbox:
+#  extends:
+#    - .macos_saas_runners
+#  stage: build
+#  script:
+#   - fastlane buildReleaseSandbox
+#
+#export_exampleApp:
+#  stage: build
+#  script:
+#    - cp bin_schema/card-schemes.json ./Sources/MobileSDK/Resources/JSON/card-schemes.json
+#    - echo "success"
+#  needs: ["pull_bin_file"]
+#  dependencies:
+#    - pull_bin_file
+#

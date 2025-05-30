@@ -12,6 +12,7 @@ struct FillButtonStyle: ButtonStyle {
 
     var backgroundColor: Color = .primaryColor
     var foregroundColor: Color = .onPrimaryColor
+    var loaderColor: Color = .textColor
     var isDisabled: Bool = false
 
     func makeBody(configuration: Self.Configuration) -> some View {

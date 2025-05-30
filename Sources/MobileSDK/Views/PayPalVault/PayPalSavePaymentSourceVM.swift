@@ -11,6 +11,7 @@ import NetworkingLib
 import CorePayments
 import PayPalWebPayments
 
+@MainActor
 class PayPalSavePaymentSourceVM: ObservableObject {
 
     // MARK: - Dependencies
@@ -56,7 +57,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     
     // MARK: - PayPal Initialization
     
-    @MainActor
     func initializePayPalSDK() {
         Task {
             guard let clientId = await getClientId(),
@@ -75,7 +75,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
     }
     
-    @MainActor
     func getClientId() async -> String? {
         updateLoadingState(isLoading: true)
         do {
@@ -90,7 +89,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-    @MainActor
     func getSetupTokenData() async -> PayPalVaultSetupTokenRes.SetupTokenData? {
         updateLoadingState(isLoading: true)
         do {
@@ -106,7 +104,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         return nil
     }
     
-    @MainActor
     func createPaymentToken(setupToken: String) async {
         updateLoadingState(isLoading: true)
         do {
@@ -153,20 +150,24 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
 extension PayPalSavePaymentSourceVM: PayPalVaultDelegate {
     
-    func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultResult paypalVaultResult: PayPalWebPayments.PayPalVaultResult) {
-        Task {
+    nonisolated func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultResult paypalVaultResult: PayPalWebPayments.PayPalVaultResult) {
+        Task { @MainActor in
             await createPaymentToken(setupToken: paypalVaultResult.tokenID)
         }
     }
     
-    func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultError vaultError: CorePayments.CoreSDKError) {
-        let errorDescription = vaultError.errorDescription ?? ""
-        completion(.failure(.sdkException(description: errorDescription)))
-        updateLoadingState(isLoading: false)
+    nonisolated func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient, didFinishWithVaultError vaultError: CorePayments.CoreSDKError) {
+        Task { @MainActor in
+            let errorDescription = vaultError.errorDescription ?? ""
+            completion(.failure(.sdkException(description: errorDescription)))
+            updateLoadingState(isLoading: false)
+        }
     }
     
-    func paypalDidCancel(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient) {
-        completion(.failure(.userCancelled))
-        updateLoadingState(isLoading: false)
+    nonisolated func paypalDidCancel(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient) {
+        Task { @MainActor in
+            completion(.failure(.userCancelled))
+            updateLoadingState(isLoading: false)
+        }
     }
 }

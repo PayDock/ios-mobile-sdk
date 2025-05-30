@@ -9,6 +9,7 @@
 import SwiftUI
 import MobileSDK
 
+@MainActor
 class AccountProfileVM: ObservableObject {
     
     private let customersService: CustomersService
@@ -29,7 +30,7 @@ class AccountProfileVM: ObservableObject {
         return config
     }
     
-    @MainActor func handleError(error: PayPalVaultError) {
+    func handleError(error: PayPalVaultError) {
         showAlert(title: "Error", message: "\(error.customMessage)")
     }
     
@@ -38,16 +39,15 @@ class AccountProfileVM: ObservableObject {
             let request = CreateCustomerTokenReq(token: payPalVaultResult.token)
             do {
                 let response = try await customersService.createCustomer(request: request)
-                await showAlert(
+                showAlert(
                     title: "Customer Created",
-                    message: "\(response.resource.data.firstName) \(response.resource.data.lastName)\n\(response.resource.data.email)")
+                    message: "\(response.resource.data.firstName) \(response.resource.data.lastName)\n\(response.resource.data.email ?? "")")
             } catch {
-                await showAlert(title: "Error", message: "Customer creation failed!")
+                showAlert(title: "Error", message: "Customer creation failed!")
             }
         }
     }
     
-    @MainActor
     private func showAlert(title: String, message: String) {
         alertTitle = title
         alertMessage = message

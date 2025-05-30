@@ -1,5 +1,5 @@
 //
-//  FlyPayWebView.swift
+//  ColesPayWebView.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -7,22 +7,22 @@
 //
 
 import SwiftUI
-import WebKit
+@preconcurrency import WebKit
 import AuthenticationServices
 
-struct FlyPayWebView: UIViewRepresentable {
+struct ColesPayWebView: UIViewRepresentable {
 
     typealias OnApprove = () -> Void
-    typealias OnFailure = (FlyPayError) -> Void
+    typealias OnFailure = (ColesPayError) -> Void
 
     private let clientId: String
-    private let flyPayOrderId: String
+    private let colesPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure
 
-    init(clientId: String, flyPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
+    init(clientId: String, colesPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
         self.clientId = clientId
-        self.flyPayOrderId = flyPayOrderId
+        self.colesPayOrderId = colesPayOrderId
         self.onApprove = onApprove
         self.onFailure = onFailure
     }
@@ -39,19 +39,19 @@ struct FlyPayWebView: UIViewRepresentable {
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         if !context.coordinator.isLoaded {
-            guard let urlRequest = getFlyPayUrlRequest() else {
-                onFailure(.flyPayUrlError)
+            guard let urlRequest = getColesPayUrlRequest() else {
+                onFailure(.colesPayUrlError)
                 return
             }
             webView.load(urlRequest)
         }
     }
 
-    private func getFlyPayUrlRequest() -> URLRequest? {
+    private func getColesPayUrlRequest() -> URLRequest? {
         let urlString: String = {
             switch MobileSDK.shared.config?.environment {
-            case .production: return "https://checkout.flypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
-            case .staging, .sandbox: return "https://checkout.sandbox.cxbflypay.com.au/?orderId=\(flyPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
+            case .production: return "https://checkout.colespay.com.au/?orderId=\(colesPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
+            case .staging, .sandbox: return "https://checkout.sandbox.cxbflypay.com.au/?orderId=\(colesPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
             case .none: return ""
             }
         }()
