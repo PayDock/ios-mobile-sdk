@@ -28,8 +28,7 @@ struct Integrated3DSWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     Integrated3DSWidget(
-                                        token: viewModel.token3DS,
-                                        baseURL: viewModel.getBaseUrl(),
+                                        config: .init(token: viewModel.token3DS),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):

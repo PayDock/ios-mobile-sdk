@@ -322,11 +322,6 @@ extension CheckoutPaymentVM {
 
 extension CheckoutPaymentVM {
 
-    func getBaseUrl() -> URL? {
-        let urlString = "https://paydock.com"
-        return URL(string: urlString)
-    }
-
     private func showAlert(title: AlertTitle, message: String) {
         alertTitle = title.rawValue
         alertMessage = message
