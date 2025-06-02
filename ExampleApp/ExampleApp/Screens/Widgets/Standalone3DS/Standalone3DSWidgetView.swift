@@ -28,8 +28,7 @@ struct Standalone3DSWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     Standalone3DSWidget(
-                                        token: viewModel.token3DS,
-                                        baseURL: viewModel.getBaseUrl(),
+                                        config: ThreeDSConfig(token: viewModel.token3DS),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):
