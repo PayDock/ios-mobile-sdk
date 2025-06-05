@@ -208,7 +208,7 @@ struct CheckoutPaymentSheet: View {
                 ColesPayWidget(
                     viewState: viewModel.viewState,
                     loadingDelegate: viewModel,
-                    clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "") { onColesPayButtonTap in
+                    config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "")) { onColesPayButtonTap in
                         viewModel.initializeWalletChargeColesPay(completion: onColesPayButtonTap)
                 } completion: { result in
                     switch result {
