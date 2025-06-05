@@ -24,7 +24,7 @@ struct WidgetsView: View {
         WidgetItem(destination: AnyView(GiftCardWidgetView()), title: "Gift Card", subtitle: "Standalone Gift Card form"),
         WidgetItem(destination: AnyView(Integrated3DSWidgetView()), title: "Integrated 3DS", subtitle: "Integrated 3DS widget"),
         WidgetItem(destination: AnyView(Standalone3DSWidgetView()), title: "Standalone 3DS", subtitle: "Standalone 3DS widget"),
-        WidgetItem(destination: AnyView(FlyPayWidgetView()), title: "FlyPay", subtitle: "Standalone FlyPay widget"),
+        WidgetItem(destination: AnyView(ColesPayWidgetView()), title: "Coles Pay", subtitle: "Standalone Coles Pay widget"),
         WidgetItem(destination: AnyView(AfterpayWidgetView()), title: "Afterpay", subtitle: "Standalone Afterpay widget"),
         WidgetItem(destination: AnyView(ClickToPayWidgetView()), title: "Click to Pay", subtitle: "ClickToPay flow"),
         WidgetItem(destination: AnyView(PayPalVaultWidgetView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout"),

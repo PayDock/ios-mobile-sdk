@@ -1,5 +1,5 @@
 //
-//  FlyPayCallbackRes.swift
+//  ColesPayCallbackRes.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct FlyPayCallbackRes: Codable {
+struct ColesPayCallbackRes: Codable {
     let status: Int
     let resource: Resource
 

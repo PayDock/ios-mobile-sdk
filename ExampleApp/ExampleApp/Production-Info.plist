@@ -12,10 +12,10 @@
 	<string>$(APPLE_PAY_GATEWAY_ID)</string>
 	<key>CONFIGURATION</key>
 	<string>$(CONFIGURATION)</string>
-	<key>FLYPAY_CLIENT_ID</key>
-	<string>$(FLYPAY_CLIENT_ID)</string>
-	<key>FLYPAY_GATEWAY_ID</key>
-	<string>$(FLYPAY_GATEWAY_ID)</string>
+	<key>COLES_PAY_CLIENT_ID</key>
+	<string>$(COLES_PAY_CLIENT_ID)</string>
+	<key>COLES_PAY_GATEWAY_ID</key>
+	<string>$(COLES_PAY_GATEWAY_ID)</string>
 	<key>INTEGRATED_3DS_GATEWAY_ID</key>
 	<string>$(INTEGRATED_3DS_GATEWAY_ID)</string>
 	<key>MASTERCARD_SERVICE_ID</key>
