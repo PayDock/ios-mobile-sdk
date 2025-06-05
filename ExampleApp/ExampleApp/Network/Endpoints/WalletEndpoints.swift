@@ -12,7 +12,7 @@ import NetworkingLib
 enum WalletEndpoints {
 
     case initialiseWalletCharge(initialiseWalletChargeReq: InitialiseWalletChargeReq)
-    case initialiseFlyPayWalletCharge(initialiseWalletChargeReq: InitialiseWalletChargeReq)
+    case initialiseColesPayWalletCharge(initialiseWalletChargeReq: InitialiseWalletChargeReq)
     case cardToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq)
     case integrated3ds(request: Integrated3DSReq)
     case integrated3dsVault(request: Integrated3DSVaultReq)
@@ -20,6 +20,7 @@ enum WalletEndpoints {
     case vaultToken(request: TokeniseCardDetailsReq)
     case convertToVaultToken(request: ConvertToVaultTokenReq)
     case captureCharge(request: CaptureChargeReq)
+    case captureChargeColesPay(chargeId: String)
 
 }
 
@@ -27,19 +28,20 @@ extension WalletEndpoints: Endpoint {
 
     var path: String {
         switch self {
-        case .initialiseWalletCharge, .initialiseFlyPayWalletCharge: return "/v1/charges/wallet"
+        case .initialiseWalletCharge, .initialiseColesPayWalletCharge: return "/v1/charges/wallet"
         case .cardToken: return "/v1/payment_sources/tokens"
         case .integrated3ds, .integrated3dsVault: return "/v1/charges/3ds"
         case .standalone3ds: return "/v1/charges/standalone-3ds"
         case .vaultToken, .convertToVaultToken: return "/v1/vault/payment_sources"
         case .captureCharge: return "/v1/charges"
+        case .captureChargeColesPay(let chargeId): return "/v1/charges/\(chargeId)/capture"
         }
     }
 
     var method: RequestMethod {
         switch self {
         case .initialiseWalletCharge: return .post
-        case .initialiseFlyPayWalletCharge: return .post
+        case .initialiseColesPayWalletCharge: return .post
         case .cardToken: return .post
         case .integrated3ds: return .post
         case .integrated3dsVault: return .post
@@ -47,13 +49,14 @@ extension WalletEndpoints: Endpoint {
         case .vaultToken: return .post
         case .convertToVaultToken: return .post
         case .captureCharge: return .post
+        case .captureChargeColesPay: return .post
         }
     }
 
     var header: [String: String]? {
         let accessToken =  ProjectEnvironment.shared.getApiAccessToken()
         switch self {
-        case .initialiseWalletCharge, .initialiseFlyPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge, .cardToken, .integrated3ds, .integrated3dsVault:
+        case .initialiseWalletCharge, .initialiseColesPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge, .cardToken, .integrated3ds, .integrated3dsVault, .captureChargeColesPay:
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -64,7 +67,7 @@ extension WalletEndpoints: Endpoint {
     var body: Data? {
         switch self {
         case .initialiseWalletCharge(let request): return try? encoder.encode(request)
-        case .initialiseFlyPayWalletCharge(let request): return try? encoder.encode(request)
+        case .initialiseColesPayWalletCharge(let request): return try? encoder.encode(request)
         case .cardToken(let request): return try? encoder.encode(request)
         case .integrated3ds(let request): return try? encoder.encode(request)
         case .integrated3dsVault(let request): return try? encoder.encode(request)
@@ -72,13 +75,15 @@ extension WalletEndpoints: Endpoint {
         case .vaultToken(let request): return try? encoder.encode(request)
         case .convertToVaultToken(let request): return try? encoder.encode(request)
         case .captureCharge(let request): return try? encoder.encode(request)
+        case .captureChargeColesPay: return nil
         }
     }
 
     var parameters: [URLQueryItem] {
         switch self {
         case .initialiseWalletCharge: return [URLQueryItem(name: "capture", value: "true")]
-        case .initialiseFlyPayWalletCharge: return [URLQueryItem(name: "capture", value: "false")]
+        case .initialiseColesPayWalletCharge: return [URLQueryItem(name: "capture", value: "false")]
+        case .captureChargeColesPay: return [URLQueryItem(name: "mobile", value: "true")]
         case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
         }
     }

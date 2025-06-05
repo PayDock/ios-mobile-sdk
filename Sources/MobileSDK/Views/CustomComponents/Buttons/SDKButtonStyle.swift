@@ -13,6 +13,7 @@ enum SDKButtonStyle {
     
     case fill(FillButtonStyle)
     case outline(OutlineButtonStyle)
+    case image(ImageButtonStyle)
     // TODO: - Remove above once all widget themes are updated
     case custom(CustomButtonStyle)
     
@@ -21,6 +22,8 @@ enum SDKButtonStyle {
         case .fill(let style):
             return style.isDisabled
         case .outline(let style):
+            return style.isDisabled
+        case .image(let style):
             return style.isDisabled
         case .custom(let style):
             return style.isDisabled
@@ -33,6 +36,8 @@ enum SDKButtonStyle {
             return style.appearance.colors.text
         case .outline(let style):
             return style.appearance.colors.text
+        case .image(let style):
+            return .clear
         case .custom(let style):
             return style.appearance.colors.text
         }
@@ -43,6 +48,8 @@ enum SDKButtonStyle {
         case .fill(let style):
             return style.appearance.loader.spinnerColor
         case .outline(let style):
+            return style.appearance.loader.spinnerColor
+        case .image(let style):
             return style.appearance.loader.spinnerColor
         case .custom(let style):
             return style.appearance.loader.spinnerColor

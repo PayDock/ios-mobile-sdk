@@ -31,7 +31,7 @@ struct Constants {
         }
 
         switch environment {
-        case .production, .sandbox, .staging: return "g3M/GJUTddzhjBySoIBl4U7M+8j3KgSf1EwPpBIlsHs="
+        case .production, .sandbox, .staging: return "kV0cxZABuhXdMFROcAZwIflgJilKOqxMBcRhzFhZMok="
         }
     }
 

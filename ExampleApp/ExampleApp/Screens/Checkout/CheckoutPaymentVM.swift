@@ -10,6 +10,7 @@ import Foundation
 import MobileSDK
 import Afterpay
 
+@MainActor
 class CheckoutPaymentVM: ObservableObject {
 
     // MARK: - Dependencies
@@ -17,6 +18,7 @@ class CheckoutPaymentVM: ObservableObject {
     private let walletService: WalletService
 
     // MARK: - Properties
+    
     let applePayGatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
     let threeDSGatewayId = ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
@@ -24,6 +26,7 @@ class CheckoutPaymentVM: ObservableObject {
     private var cardToken = ""
     private var vaultToken = ""
     private(set) var token3DS = ""
+    private var colesPayChargeId = ""
 
     @Published var show3dsWebView = false
     @Published var selectedMethod: PaymentMethod = .card
@@ -295,7 +298,7 @@ extension CheckoutPaymentVM {
     
 }
 
-// MARK: - Mastercard SRC
+// MARK: - Mastercard ClickToPay
 
 extension CheckoutPaymentVM {
 
@@ -316,6 +319,77 @@ extension CheckoutPaymentVM {
         }
     }
 
+}
+
+// MARK: - ColesPay
+
+extension CheckoutPaymentVM {
+    
+    func initializeWalletChargeColesPay(completion: @escaping (String) -> Void) {
+        viewState?.setState(.disabled)
+        Task {
+            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "", walletType: nil)
+
+            let customer = InitialiseWalletChargeReq.Customer(
+                firstName: "Wanda",
+                lastName: "Mertz",
+                email: "wanda.mertz@example.com",
+                phone: "+1234567890",
+                paymentSource: paymentSource)
+
+            let metaData = InitialiseWalletChargeReq.MetaData(
+                storeName: "Tom Taylor Ltd.",
+                merchantName: "Tom's store",
+                storeId: "1234556",
+                successUrl: nil,
+                errorUrl: nil)
+            
+            let initializeWalletChargeReq = InitialiseWalletChargeReq(
+                customer: customer,
+                amount: 5,
+                currency: "AUD",
+                reference: "reference1234",
+                description: "Test transaction for Coles Pay",
+                meta: metaData)
+
+            do {
+                let response = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
+                let token = response.token
+                self.colesPayChargeId = response.charge._id
+                DispatchQueue.main.async {
+                    completion(token)
+                    self.viewState?.setState(.none)
+                }
+            } catch {
+                showAlert(title: .error, message: "Error fetching wallet token!")
+                isLoading = false
+                viewState?.setState(.none)
+            }
+        }
+    }
+
+    func handleError(error: ColesPayError) {
+        showAlert(title: .error, message: error.customMessage)
+    }
+
+    func handleSuccess() {
+        captureColesPayCharge()
+    }
+    
+    private func captureColesPayCharge() {
+        isLoading = true
+        Task {
+            do {
+                let res = try await walletService.captureChargeColesPay(chargeId: colesPayChargeId)
+                isLoading = false
+                showAlert(title: .success, message: "Charge successful: \(res.amount) \(res.currency)")
+            } catch {
+                isLoading = false
+                showAlert(title: .error, message: error.localizedDescription)
+            }
+        }
+    }
+    
 }
 
 // MARK: - Helpers
@@ -341,6 +415,7 @@ extension CheckoutPaymentVM {
         case payPal
         case afterpay
         case mastercard
+        case colesPay
     }
 }
 

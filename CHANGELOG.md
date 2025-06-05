@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.1.0] - 2025-05-23
+
+### Added
+
+- Added cancelation confirmation prompt across the widgets
+- Added charge flow for ColesPay widget in the example checkout
+
+### Changed
+
+- Rebranded FlyPay to Coles Pay
+- Gift Card pin validation logic (minimum length 4)
+
+### Fixed
+
+- PayPal redirect cancellation flow from within the web view
+
 ## [3.0.0] - 2025-03-26
 
 ### Added

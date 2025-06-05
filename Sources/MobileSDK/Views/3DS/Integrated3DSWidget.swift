@@ -11,6 +11,7 @@ import SwiftUI
 import AuthenticationServices
 
 public struct Integrated3DSWidget: UIViewRepresentable {
+    
     private let config: ThreeDSConfig
     private let appearance: ThreeDSWidgetAppearance
     private let completion: (Result<Integrated3DSResult, Integrated3DSError>) -> Void

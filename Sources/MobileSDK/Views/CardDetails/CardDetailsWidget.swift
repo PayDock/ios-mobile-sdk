@@ -244,7 +244,6 @@ public struct CardDetailsWidget: View {
             emptyFocusView
         }
         .padding(.horizontal, appearance.horizontalSpacing)
-
     }
 
     private var privacyView: some View {

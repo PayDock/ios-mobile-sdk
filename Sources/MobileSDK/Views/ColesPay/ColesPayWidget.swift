@@ -1,5 +1,5 @@
 //
-//  FlyPayWidget.swift
+//  ColesPayWidget.swift
 //  MobileSDK
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,48 +8,55 @@
 
 import SwiftUI
 
-public struct FlyPayWidget: View {
+public struct ColesPayWidget: View {
 
-    @StateObject private var viewModel: FlyPayVM
+    @StateObject private var viewModel: ColesPayVM
 
-    public init(clientId: String, flyPayToken: @escaping (_ flyPayToken: @escaping (String) -> Void) -> Void,
-                completion: @escaping (Result<Void, FlyPayError>) -> Void) {
-        _viewModel = StateObject(wrappedValue: FlyPayVM(clientId: clientId, flyPayToken: flyPayToken, completion: completion))
+    public init(viewState: ViewState? = nil,
+                loadingDelegate: WidgetLoadingDelegate? = nil,
+                clientId: String,
+                colesPayToken: @escaping (_ colesPayToken: @escaping (String) -> Void) -> Void,
+                completion: @escaping (Result<String, ColesPayError>) -> Void) {
+        _viewModel = StateObject(wrappedValue: ColesPayVM(
+            clientId: clientId,
+            colesPayToken: colesPayToken,
+            viewState: viewState ?? ViewState(state: .none),
+            loadingDelegate: loadingDelegate,
+            completion: completion))
     }
 
     public var body: some View {
-        flyPayButton
+        colesPayButton
             .sheet(isPresented: $viewModel.showWebView, content: {
                 webViewSheetContent
             })
     }
     
-    private var flyPayButton: some View {
+    private var colesPayButton: some View {
         SDKButton(
-            title: "Pay with",
-            image: Image("flypay", bundle: Bundle.module),
-            imageLocation: .right,
-            style: .fill(FillButtonStyle())) { // TODO: Update when widgets theming is implemented
-//            style: .fill(FillButtonStyle(backgroundColor: Color(red: 0.00, green: 0.48, blue: 0.75)))) {
+            title: nil,
+            image: Image((viewModel.isLoading && viewModel.showLoaders) ? "coles-pay-button-blank" : "coles-pay-button", bundle: Bundle.module),
+            imageLocation: .left,
+            isLoading: viewModel.isLoading && viewModel.showLoaders,
+            style: .image(ImageButtonStyle(isDisabled: viewModel.viewState.isDisabled)),
+            scaleToFit: true) {
                 viewModel.handleButtonTap()
             }
-            .accessibilityLabel(Text("Pay with FlyPay"))
-        // MARK: - Temporarily disabled until everything from flypay rebranding is merged
-//            .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+            .accessibilityLabel(Text("Pay with Coles Pay"))
     }
     
     private var webViewSheetContent: some View {
         NavigationStack {
-            FlyPayWebView(
+            ColesPayWebView(
                 clientId: viewModel.clientId ?? "",
-                flyPayOrderId: viewModel.flyPayOrderId,
+                colesPayOrderId: viewModel.colesPayOrderId,
                 onApprove: {
                     viewModel.handleSuccess()
                 },
                 onFailure: { error in
                     viewModel.handleFailure(error: error)
                 })
-            .navigationTitle("Checkout with FlyPay")
+            .navigationTitle("Checkout with Coles Pay")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -76,8 +83,8 @@ public struct FlyPayWidget: View {
     }
 }
 
-struct FlyPayWidget_Previews: PreviewProvider {
+struct ColesPayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        FlyPayWidget(clientId: "", flyPayToken: { _ in }, completion: { _ in })
+        ColesPayWidget(clientId: "", colesPayToken: { _ in }, completion: { _ in })
     }
 }
