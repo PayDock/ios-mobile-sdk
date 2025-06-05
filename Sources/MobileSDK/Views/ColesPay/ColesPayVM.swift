@@ -19,8 +19,8 @@ class ColesPayVM: ObservableObject {
     // MARK: - Properties
 
     private let colesPayToken: (_ colesPayToken: @escaping (String) -> Void) -> Void
-    var colesPayUrl: URL?
-    let clientId: String?
+    private var colesPayUrl: URL?
+    let config: ColesPayConfig
     @Published var showWebView = false
     @Published var isLoading = false
     @Published var showLoaders = true
@@ -36,12 +36,13 @@ class ColesPayVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(clientId: String, colesPayToken: @escaping (_ colesPayToken: @escaping (String) -> Void) -> Void,
+    init(config: ColesPayConfig,
+         colesPayToken: @escaping (_ colesPayToken: @escaping (String) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          viewState: ViewState,
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<String, ColesPayError>) -> Void) {
-        self.clientId = clientId
+        self.config = config
         self.colesPayToken = colesPayToken
         self.walletService = walletService
         self.viewState = viewState

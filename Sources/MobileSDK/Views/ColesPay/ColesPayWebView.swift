@@ -15,7 +15,7 @@ struct ColesPayWebView: UIViewRepresentable {
     typealias OnApprove = () -> Void
     typealias OnFailure = (ColesPayError) -> Void
 
-    private let clientId: String
+    let clientId: String
     private let colesPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure

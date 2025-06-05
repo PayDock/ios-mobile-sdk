@@ -16,7 +16,7 @@ struct ColesPayWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                ColesPayWidget(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "") { onColesPayButtonTap in
+                ColesPayWidget(config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "")) { onColesPayButtonTap in
                     viewModel.initializeWalletCharge(completion: onColesPayButtonTap)
                 } completion: { result in
                     switch result {
