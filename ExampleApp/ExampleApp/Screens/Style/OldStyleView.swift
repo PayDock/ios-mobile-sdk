@@ -1,5 +1,5 @@
 //
-//  StyleView.swift
+//  OldStyleView.swift
 //  ExampleApp
 //
 //  Copyright © 2024 Paydock Ltd.
@@ -8,9 +8,10 @@
 
 import SwiftUI
 
-struct StyleView: View {
+// TODO: - To be removed - used for reference only
+struct OldStyleView: View {
 
-    @StateObject var viewModel = StyleVM()
+    @StateObject var viewModel = OldStyleVM()
     @Environment(\.colorScheme) var colorScheme
 
     init() {
@@ -156,6 +157,6 @@ struct StyleView: View {
 
 struct StyleView_Previews: PreviewProvider {
     static var previews: some View {
-        StyleView()
+        OldStyleView()
     }
 }
