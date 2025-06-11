@@ -41,6 +41,9 @@ enum StyleComponentsEnum {
         switch self {
         case .loader:
             return AnyView(LoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .toggle:
+            return AnyView(ToggleStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+
         default:
             return AnyView(EmptyView())
         }

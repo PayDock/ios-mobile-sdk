@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-public struct Theme: LoaderStylableAppearance {
+public struct Theme: LoaderStylableAppearance, ToggleStylableAppearance {
     
     public var textField: TextFieldAppearance
     public var searchDropdown: SearchDropdownAppearance

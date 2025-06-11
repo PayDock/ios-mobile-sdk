@@ -12,7 +12,7 @@ import SwiftUI
 extension Theme {
     
     public struct ToggleAppearance {
-        public let activeColor: Color
+        public var activeColor: Color
         
         public init(activeColor: Color = .defaultPrimary) {
             self.activeColor = activeColor

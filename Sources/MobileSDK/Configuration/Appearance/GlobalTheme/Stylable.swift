@@ -11,3 +11,7 @@ import Foundation
 public protocol LoaderStylableAppearance {
     var loader: Theme.OverlayLoaderAppearance { get set }
 }
+
+public protocol ToggleStylableAppearance {
+    var toggle: Theme.ToggleAppearance { get set }
+}
