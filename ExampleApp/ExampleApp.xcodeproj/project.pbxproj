@@ -40,6 +40,8 @@
 		287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */; };
 		287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */; };
 		287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39802DF7AA9700F4D771 /* SectionTitleView.swift */; };
+		287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */; };
+		287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
@@ -140,6 +142,8 @@
 		287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderStyleVM.swift; sourceTree = "<group>"; };
 		287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleThemeManager.swift; sourceTree = "<group>"; };
 		287F39802DF7AA9700F4D771 /* SectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTitleView.swift; sourceTree = "<group>"; };
+		287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyleView.swift; sourceTree = "<group>"; };
+		287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyleVM.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7D42A558F1800D6C7BE /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
@@ -352,6 +356,7 @@
 				287F39802DF7AA9700F4D771 /* SectionTitleView.swift */,
 				287F397A2DF76DA700F4D771 /* ColorPickerView.swift */,
 				287F39792DF76C6F00F4D771 /* Loader */,
+				287F39882DF88DFB00F4D771 /* Toggle */,
 			);
 			path = StyleComponents;
 			sourceTree = "<group>";
@@ -363,6 +368,15 @@
 				287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */,
 			);
 			path = Loader;
+			sourceTree = "<group>";
+		};
+		287F39882DF88DFB00F4D771 /* Toggle */ = {
+			isa = PBXGroup;
+			children = (
+				287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */,
+				287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */,
+			);
+			path = Toggle;
 			sourceTree = "<group>";
 		};
 		2889B7C82A558F1800D6C7BE = {
@@ -736,6 +750,7 @@
 				28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				28A81F4D2B14DB040068FE75 /* Integrated3DSVM.swift in Sources */,
+				287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */,
 				28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */,
 				2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
@@ -775,6 +790,7 @@
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
+				287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */,
 				287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */,
 				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,

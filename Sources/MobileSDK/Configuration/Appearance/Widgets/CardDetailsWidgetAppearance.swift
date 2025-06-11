@@ -9,17 +9,17 @@
 import Foundation
 import SwiftUI
 
-public struct CardDetailsWidgetAppearance {
+public struct CardDetailsWidgetAppearance: ToggleStylableAppearance {
 
-    public let verticalSpacing: CGFloat
-    public let horizontalSpacing: CGFloat
-    public let title: Theme.TextAppearance
-    public let textField: Theme.TextFieldAppearance
-    public let actionButton: Theme.ButtonAppearance
-    public let toolbarButton: Theme.ButtonAppearance
-    public let toggle: Theme.ToggleAppearance
-    public let toggleText: Theme.TextAppearance
-    public let linkText: Theme.TextAppearance
+    public var verticalSpacing: CGFloat
+    public var horizontalSpacing: CGFloat
+    public var title: Theme.TextAppearance
+    public var textField: Theme.TextFieldAppearance
+    public var actionButton: Theme.ButtonAppearance
+    public var toolbarButton: Theme.ButtonAppearance
+    public var toggle: Theme.ToggleAppearance
+    public var toggleText: Theme.TextAppearance
+    public var linkText: Theme.TextAppearance
     
     public init(verticalSpacing: CGFloat = 6,
                 horizontalSpacing: CGFloat = 16,
