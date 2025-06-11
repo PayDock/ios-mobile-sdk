@@ -9,7 +9,12 @@
 import Foundation
 import SwiftUI
 
-public struct Theme: LoaderStylableAppearance, ToggleStylableAppearance {
+public struct Theme:
+    LoaderStylableAppearance,
+    ToggleStylableAppearance,
+    ActionButtonStylableAppearance,
+    ExpandSectionButtonStylableAppearance,
+    ToolbarButtonStylableAppearance {
     
     public var textField: TextFieldAppearance
     public var searchDropdown: SearchDropdownAppearance
@@ -29,7 +34,7 @@ public struct Theme: LoaderStylableAppearance, ToggleStylableAppearance {
                 expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
                     colors: .init(background: .defaultBackground, text: .primaryColor, border: .clear),
                     fonts: .init(title: .init(isUnderlined: true))),
-                toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .primary, border: .clear)),
+                toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .primaryColor, border: .clear)),
                 loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),
                 linkText: Theme.TextAppearance = Theme.TextAppearance(text:

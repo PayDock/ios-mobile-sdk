@@ -11,9 +11,9 @@ import Foundation
 extension Theme {
     
     public struct ButtonDimensions {
-        public let cornerRadius: CGFloat
-        public let borderWidth: CGFloat
-        public let padding: Padding
+        public var cornerRadius: CGFloat
+        public var borderWidth: CGFloat
+        public var padding: Padding
         
         public init(cornerRadius: CGFloat = .defaultButtonCornerRadius,
                     borderWidth: CGFloat = .defaultBorderWidth,

@@ -10,8 +10,8 @@ import SwiftUI
 
 public struct CustomFont {
     
-    let name: String
-    let size: CGFloat
+    public var name: String
+    public var size: CGFloat
     
     public init(name: String = "FFF-AcidGrotesk-Normal",
                 size: CGFloat) {

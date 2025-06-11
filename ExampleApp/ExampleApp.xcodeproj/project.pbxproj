@@ -42,6 +42,9 @@
 		287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39802DF7AA9700F4D771 /* SectionTitleView.swift */; };
 		287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */; };
 		287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */; };
+		287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */; };
+		287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */; };
+		287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
@@ -144,6 +147,9 @@
 		287F39802DF7AA9700F4D771 /* SectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTitleView.swift; sourceTree = "<group>"; };
 		287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyleView.swift; sourceTree = "<group>"; };
 		287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyleVM.swift; sourceTree = "<group>"; };
+		287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleView.swift; sourceTree = "<group>"; };
+		287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleVM.swift; sourceTree = "<group>"; };
+		287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimensionsFieldView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7D42A558F1800D6C7BE /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
@@ -355,8 +361,11 @@
 			children = (
 				287F39802DF7AA9700F4D771 /* SectionTitleView.swift */,
 				287F397A2DF76DA700F4D771 /* ColorPickerView.swift */,
+				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
+				287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */,
 				287F39792DF76C6F00F4D771 /* Loader */,
 				287F39882DF88DFB00F4D771 /* Toggle */,
+				287F39972DF8C02100F4D771 /* Button */,
 			);
 			path = StyleComponents;
 			sourceTree = "<group>";
@@ -377,6 +386,15 @@
 				287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */,
 			);
 			path = Toggle;
+			sourceTree = "<group>";
+		};
+		287F39972DF8C02100F4D771 /* Button */ = {
+			isa = PBXGroup;
+			children = (
+				287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */,
+				287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */,
+			);
+			path = Button;
 			sourceTree = "<group>";
 		};
 		2889B7C82A558F1800D6C7BE = {
@@ -470,7 +488,6 @@
 			children = (
 				28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */,
 				282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */,
-				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
 				282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */,
 				2816F7D42B480A8400EEC5C3 /* ActivityIndicatorModifier.swift */,
 				2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */,
@@ -748,6 +765,7 @@
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
 				287F393D2DF259D500F4D771 /* StyleVM.swift in Sources */,
 				28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */,
+				287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				28A81F4D2B14DB040068FE75 /* Integrated3DSVM.swift in Sources */,
 				287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */,
@@ -760,6 +778,7 @@
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				28A81F532B14E13E0068FE75 /* CardTokenRes.swift in Sources */,
 				282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */,
+				287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */,
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
 				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
@@ -795,6 +814,7 @@
 				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
+				287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
 				287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */,

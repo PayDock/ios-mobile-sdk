@@ -12,10 +12,10 @@ import SwiftUI
 extension Theme {
     
     public struct ButtonAppearance {
-        public let colors: ButtonColors
-        public let dimensions: ButtonDimensions
-        public let fonts: ButtonFonts
-        public let loader: ButtonLoader
+        public var colors: ButtonColors
+        public var dimensions: ButtonDimensions
+        public var fonts: ButtonFonts
+        public var loader: ButtonLoader
         
         public init(colors: ButtonColors = ButtonColors(),
                     dimensions: ButtonDimensions = ButtonDimensions(),

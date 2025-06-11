@@ -187,7 +187,7 @@ public struct AddressWidget: View {
         HStack {
             SDKButton(
                 title: "Or enter address manually",
-                style: .custom(CustomButtonStyle(appearance: appearance.linkButton)),
+                style: .custom(CustomButtonStyle(appearance: appearance.expandSectionButton)),
                 isLeftAligned: true,
                 action: {
                     self.viewModel.addressFormManager.isAddressFormExpanded = true
@@ -365,11 +365,11 @@ public struct AddressWidget: View {
     }
 
     private var saveButton: some View {
-        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.primaryButton, isDisabled: viewModel.isDisabled))) {
+        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isDisabled))) {
             viewModel.saveAddress()
         }
-        .customPadding(appearance.primaryButton.dimensions.padding)
-        .font(appearance.primaryButton.fonts.title.customFont.font)
+        .customPadding(appearance.actionButton.dimensions.padding)
+        .font(appearance.actionButton.fonts.title.customFont.font)
     }
     
     private var emptyFocusView: some View {

@@ -9,13 +9,13 @@
 import SwiftUI
 
 public struct TextAttributes {
-    public let customFont: CustomFont
-    public let textColor: Color
-    public let isUnderlined: Bool
-    public let underlineColor: Color?
-    public let isStrikethrough: Bool
-    public let strikethroughColor: Color?
-    public let isItalic: Bool
+    public var customFont: CustomFont
+    public var textColor: Color
+    public var isUnderlined: Bool
+    public var underlineColor: Color?
+    public var isStrikethrough: Bool
+    public var strikethroughColor: Color?
+    public var isItalic: Bool
     
     public init(font: CustomFont = CustomFont(name: "FFF-AcidGrotesk-Normal", size: 14.0),
                 textColor: Color = .defaultText,

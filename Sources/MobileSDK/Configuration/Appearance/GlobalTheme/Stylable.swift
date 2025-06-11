@@ -15,3 +15,15 @@ public protocol LoaderStylableAppearance {
 public protocol ToggleStylableAppearance {
     var toggle: Theme.ToggleAppearance { get set }
 }
+
+public protocol ActionButtonStylableAppearance {
+    var actionButton: Theme.ButtonAppearance { get set }
+}
+
+public protocol ExpandSectionButtonStylableAppearance {
+    var expandSectionButton: Theme.ButtonAppearance { get set }
+}
+
+public protocol ToolbarButtonStylableAppearance {
+    var toolbarButton: Theme.ButtonAppearance { get set }
+}

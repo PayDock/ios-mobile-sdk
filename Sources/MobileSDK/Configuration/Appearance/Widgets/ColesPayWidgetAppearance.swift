@@ -1,5 +1,5 @@
 //
-//  FlyPayWidgetAppearance.swift
+//  ColesPayWidgetAppearance.swift
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 24.04.2025..

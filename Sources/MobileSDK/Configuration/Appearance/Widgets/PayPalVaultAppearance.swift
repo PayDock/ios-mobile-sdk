@@ -9,17 +9,12 @@
 import Foundation
 import SwiftUI
 
-public struct PayPalVaultAppearance {
+public struct PayPalVaultAppearance: ActionButtonStylableAppearance {
     
-    public var button: Theme.ButtonAppearance
+    public var actionButton: Theme.ButtonAppearance
     
-    public init(button: Theme.ButtonAppearance = Theme.ButtonAppearance(
-        colors: .init(background: .defaultBackground,
-                      text: .defaultPrimary,
-                      image: .defaultPrimary,
-                      border: .defaultPrimary),
-        loader: .init(spinnerColor: .defaultPrimary))) {
-            self.button = button
+    public init(button: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton) {
+            self.actionButton = button
         }
 }
 

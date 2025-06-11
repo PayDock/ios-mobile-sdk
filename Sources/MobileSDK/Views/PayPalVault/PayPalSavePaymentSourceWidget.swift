@@ -30,7 +30,8 @@ public struct PayPalSavePaymentSourceWidget: View {
             title: viewModel.actionText,
             image: viewModel.getButtonIcon(),
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            style: .custom(CustomButtonStyle(appearance: appearance.button, isDisabled: viewModel.viewState.isDisabled))) {
+            style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.viewState.isDisabled)),
+            shouldTemplate: true) {
                 viewModel.initializePayPalSDK()
             }
             .customFont(.body)

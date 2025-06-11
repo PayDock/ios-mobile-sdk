@@ -1,0 +1,110 @@
+//
+//  ButtonStyleView.swift
+//  ExampleApp
+//
+//  Created by Domagoj Grizelj on 10.06.2025..
+//  Copyright © 2025 Paydock Ltd. All rights reserved.
+//
+
+import SwiftUI
+import MobileSDK
+
+struct ButtonStyleView<T>: View {
+
+    @StateObject var viewModel: ButtonStyleVM<T>
+    let title: String
+    
+    // MARK: - Initialization
+    
+    init(selectedWidget: WidgetsEnum,
+         stylingDarkMode: Bool,
+         buttonKeyPath: WritableKeyPath<T, Theme.ButtonAppearance>,
+         title: String) {
+        _viewModel = StateObject(wrappedValue: ButtonStyleVM<T>(
+            selectedWidget: selectedWidget,
+            stylingDarkMode: stylingDarkMode,
+            buttonKeyPath: buttonKeyPath))
+        self.title = title
+    }
+    
+    // MARK: - View
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack {
+                    SectionTitleView(title: "Colors")
+                    colorListView
+                    SectionTitleView(title: "Dimensions")
+                    dimensionsListView
+                    SectionTitleView(title: "Fonts")
+                    fontListView
+                }
+                .navigationTitle(title)
+            }
+            .background(Color(hex: "#EAE0D7"))
+        }
+        .foregroundColor(.black)
+    }
+
+    private var colorListView: some View {
+        VStack(spacing: 16) {
+            ColorPickerView(
+                title: "Background color",
+                text: Binding(
+                    get: { viewModel.backgroundColor.toHex() },
+                    set: { viewModel.backgroundColor = Color(hex: $0) }),
+                pickedColor: $viewModel.backgroundColor)
+            
+            ColorPickerView(
+                title: "Text color",
+                text: Binding(
+                    get: { viewModel.textColor.toHex() },
+                    set: { viewModel.textColor = Color(hex: $0) }),
+                pickedColor: $viewModel.textColor)
+            
+            ColorPickerView(
+                title: "Image color",
+                text: Binding(
+                    get: { viewModel.imageColor.toHex() },
+                    set: { viewModel.imageColor = Color(hex: $0) }),
+                pickedColor: $viewModel.imageColor)
+            
+            ColorPickerView(
+                title: "Border color",
+                text: Binding(
+                    get: { viewModel.borderColor.toHex() },
+                    set: { viewModel.borderColor = Color(hex: $0) }),
+                pickedColor: $viewModel.borderColor)
+        }
+    }
+    
+    private var dimensionsListView: some View {
+        VStack (spacing: 16) {
+            DimensionsFieldView(
+                title: "Corner radius",
+                text: Binding(
+                    get: { "\(viewModel.cornerRadius)" },
+                    set: { viewModel.cornerRadius = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Border width",
+                text: Binding(
+                    get: { "\(viewModel.borderWidth)" },
+                    set: { viewModel.borderWidth = CGFloat(Double($0) ?? 0) }))
+        }
+    }
+    
+    private var fontListView: some View {
+        VStack (spacing: 16) {
+            PickerView(
+                entries: viewModel.allFontNames,
+                selected: viewModel.fontName,
+                placeholder: "Select Font",
+                onSelection: { fontName in
+                    viewModel.fontName = fontName
+                })
+        }
+        .padding(.bottom, 16.0)
+    }
+}
