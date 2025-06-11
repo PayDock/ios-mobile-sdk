@@ -9,9 +9,9 @@
 import Foundation
 
 public struct PayPalWidgetAppearance {
-    public let loader: Theme.ButtonLoader
+    public var loader: Theme.ButtonLoader
     
-    public init(loader: Theme.ButtonLoader = Theme.ButtonLoader()) {
+    public init(loader: Theme.ButtonLoader = GlobalTheme.shared.globalTheme.actionButton.loader) {
         self.loader = loader
     }
 }

@@ -12,12 +12,14 @@ import MobileSDK
 struct AfterpayWidgetView: View {
 
     @StateObject private var viewModel = AfterpayWidgetVM()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 AfterpayWidget(
                     configuration: viewModel.getAfterpayConfig(),
+                    appearance: getAppearance(),
                     afterPayToken: { onAfterpayButtonTap in
                         viewModel.initializeWalletCharge(completion: onAfterpayButtonTap)
                     }, selectAddress: { address, provideShippingOptions in
@@ -39,6 +41,11 @@ struct AfterpayWidgetView: View {
                 Text(viewModel.alertMessage)
             })
         }
+    }
+    
+    private func getAppearance() -> AfterpayWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .afterPay, isDarkMode: colorScheme == .dark, as: AfterpayWidgetAppearance.self)
+        return appearance ?? AfterpayWidgetAppearance()
     }
 }
 

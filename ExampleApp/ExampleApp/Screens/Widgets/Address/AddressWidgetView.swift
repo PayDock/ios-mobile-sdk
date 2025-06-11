@@ -12,6 +12,7 @@ import MobileSDK
 struct AddressWidgetView: View {
     @State var showAlert = false
     @State var alertMessage = ""
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -30,15 +31,8 @@ struct AddressWidgetView: View {
     }
     
     private func getAppearance() -> AddressWidgetAppearance {
-        // TODO: - For theme testing - pull the data from Style screen once it's implemented and remove test code
-        return AddressWidgetAppearance()
-//        let appearance = AddressWidgetAppearance(
-//            title: .init(text: .init(textColor: .red), padding: .init(top: 10, leading: 5, bottom: 40, trailing: 20)),
-//            textfield: .init(colors: .init(), dimensions: .init(padding: .init(top: 50)), fonts: .init()),
-//            primaryButton: .init(colors: .init(background: .blue, border: .pink)),
-//            expandSectionButton: .init(colors: .init(background: .green, border: .black)),
-//            search: .init(dropdown: .init(colors: .init(backgroundColor: .blue), dimensions: .init(padding: 20, listSpacing: 20))))
-//        return appearance
+        let appearance = StyleThemeManager.getAppearance(for: .address, isDarkMode: colorScheme == .dark, as: AddressWidgetAppearance.self)
+        return appearance ?? AddressWidgetAppearance()
     }
 }
 

@@ -9,19 +9,19 @@
 import Foundation
 import SwiftUI
 
-public struct Theme {
+public struct Theme: LoaderStylableAppearance {
     
-    public let textField: TextFieldAppearance
-    public let searchDropdown: SearchDropdownAppearance
-    public let actionButton: ButtonAppearance
-    public let expandSectionButton: ButtonAppearance
-    public let toolbarButton: ButtonAppearance
-    public let loader: OverlayLoaderAppearance
-    public let toggle: ToggleAppearance
-    public let linkText: TextAppearance
-    public let toggleText: TextAppearance
-    public let description: TextAppearance
-    public let title: TextAppearance
+    public var textField: TextFieldAppearance
+    public var searchDropdown: SearchDropdownAppearance
+    public var actionButton: ButtonAppearance
+    public var expandSectionButton: ButtonAppearance
+    public var toolbarButton: ButtonAppearance
+    public var loader: OverlayLoaderAppearance
+    public var toggle: ToggleAppearance
+    public var linkText: TextAppearance
+    public var toggleText: TextAppearance
+    public var description: TextAppearance
+    public var title: TextAppearance
     
     public init(textField: TextFieldAppearance = TextFieldAppearance(),
                 searchDropdown: SearchDropdownAppearance = SearchDropdownAppearance(),

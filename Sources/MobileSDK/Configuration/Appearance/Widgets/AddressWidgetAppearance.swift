@@ -21,13 +21,11 @@ public struct AddressWidgetAppearance {
     
     public init(horizontalSpacing: CGFloat = 16.0,
                 verticalSpacing: CGFloat = 8.0,
-                title: Theme.TextAppearance = Theme.TextAppearance(text: TextAttributes(font: .init(size: 16.0)), padding: .init(bottom: 20.0)),
-                textfield: Theme.TextFieldAppearance = Theme.TextFieldAppearance(),
-                primaryButton: Theme.ButtonAppearance = Theme.ButtonAppearance(),
-                linkButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
-                    colors: .init(background: .defaultBackground, text: .primaryColor, border: .clear),
-                    fonts: .init(title: .init(isUnderlined: true))),
-                searchDropdown: Theme.SearchDropdownAppearance = Theme.SearchDropdownAppearance()) {
+                title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
+                textfield: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
+                primaryButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                linkButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.expandSectionButton,
+                searchDropdown: Theme.SearchDropdownAppearance = GlobalTheme.shared.globalTheme.searchDropdown) {
         self.horizontalSpacing = horizontalSpacing
         self.verticalSpacing = verticalSpacing
         self.title = title

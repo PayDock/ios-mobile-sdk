@@ -37,10 +37,13 @@ enum StyleComponentsEnum {
         }
     }
     
-    var destinationView: AnyView {
-        // TODO: - Add destination component by component
+    func destinationView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch self {
-        default: return AnyView(EmptyView())
+        case .loader:
+            return AnyView(LoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        default:
+            return AnyView(EmptyView())
         }
     }
+    
 }

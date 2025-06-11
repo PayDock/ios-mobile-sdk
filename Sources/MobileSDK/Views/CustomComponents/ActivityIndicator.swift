@@ -26,7 +26,7 @@ struct ActivityIndicator: UIViewRepresentable {
 
     func makeUIView(context: UIViewRepresentableContext<ActivityIndicator>) -> UIActivityIndicatorView {
         let activityIndicator = UIActivityIndicatorView(style: style)
-        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.color = UIColor(appearance.color)
         return activityIndicator
     }
 

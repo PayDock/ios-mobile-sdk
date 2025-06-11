@@ -13,6 +13,7 @@ struct GiftCardWidgetView: View {
 
     @State var showAlert = false
     @State var alertMessage = ""
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -32,10 +33,8 @@ struct GiftCardWidgetView: View {
     }
     
     private func getAppearance() -> GiftCardWidgetAppearance {
-        // TODO: - For theme testing - pull the data from Style screen once it's implemented and remove test code
-        return GiftCardWidgetAppearance()
-//        let appearance = GiftCardWidgetAppearance(title: .init(text: .init(textColor: .pink)), textField: .init(colors: .init(active: .orange), dimensions: .init(cornerRadius: 20, borderWidth: 5), fonts: .init()), actionButton: .init(colors: .init(background: .blue,text: .purple, border: .red)), toolbarButton: .init())
-//        return appearance
+        let appearance = StyleThemeManager.getAppearance(for: .paypalVault, isDarkMode: colorScheme == .dark, as: GiftCardWidgetAppearance.self)
+        return appearance ?? GiftCardWidgetAppearance()
     }
 }
 

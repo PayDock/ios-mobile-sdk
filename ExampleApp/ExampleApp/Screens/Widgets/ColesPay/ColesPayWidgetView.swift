@@ -12,11 +12,14 @@ import MobileSDK
 struct ColesPayWidgetView: View {
     
     @StateObject private var viewModel = ColesPayWidgetVM()
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                ColesPayWidget(config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "")) { onColesPayButtonTap in
+                ColesPayWidget(
+                    config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? ""),
+                    appearance: getAppearance()) { onColesPayButtonTap in
                     viewModel.initializeWalletCharge(completion: onColesPayButtonTap)
                 } completion: { result in
                     switch result {
@@ -33,6 +36,11 @@ struct ColesPayWidgetView: View {
                 Text(viewModel.alertMessage)
             })
         }
+    }
+    
+    private func getAppearance() -> ColesPayWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .colesPay, isDarkMode: colorScheme == .dark, as: ColesPayWidgetAppearance.self)
+        return appearance ?? ColesPayWidgetAppearance()
     }
 }
 
