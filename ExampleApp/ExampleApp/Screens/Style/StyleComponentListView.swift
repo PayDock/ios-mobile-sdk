@@ -37,8 +37,10 @@ struct StyleComponentListView: View {
     }
     
     func stylizedNavigationLink(component: StyleComponentsEnum) -> some View {
-        return NavigationLink(destination: component.destinationView) {
-            cell(component: component)
+        return NavigationLink(destination: component.destinationView(
+            selectedWidget: viewModel.selectedWidget,
+            stylingDarkMode: viewModel.stylingDarkMode)) {
+                cell(component: component)
         }
         .listRowSeparatorTint(.black)
         .listSectionSeparator(.hidden, edges: .top)

@@ -23,14 +23,13 @@ public struct CardDetailsWidgetAppearance {
     
     public init(verticalSpacing: CGFloat = 6,
                 horizontalSpacing: CGFloat = 16,
-                title: Theme.TextAppearance = Theme.TextAppearance(text: TextAttributes(font: .init(size: 16.0)), padding: .init(bottom: 20.0)),
-                textField: Theme.TextFieldAppearance = Theme.TextFieldAppearance(),
-                actionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
-                toolbarButton: Theme.ButtonAppearance = Theme.ButtonAppearance(colors: .init(background: .clear, text: .primaryColor, border: .clear)),
-                toggle: Theme.ToggleAppearance = Theme.ToggleAppearance(),
-                toggleText: Theme.TextAppearance = Theme.TextAppearance(text: .init(font: .init(size: 14))),
-                linkText: Theme.TextAppearance = Theme.TextAppearance(text:
-                        .init(font: .init(size: 14), textColor: .defaultPrimary, isUnderlined: true, underlineColor: .defaultPrimary))) {
+                title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
+                textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
+                actionButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                toolbarButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.toolbarButton,
+                toggle: Theme.ToggleAppearance = GlobalTheme.shared.globalTheme.toggle,
+                toggleText: Theme.TextAppearance = GlobalTheme.shared.globalTheme.toggleText,
+                linkText: Theme.TextAppearance = GlobalTheme.shared.globalTheme.linkText) {
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing
         self.title = title

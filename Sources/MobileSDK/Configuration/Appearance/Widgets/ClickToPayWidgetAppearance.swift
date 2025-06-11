@@ -6,10 +6,10 @@
 //  Copyright © 2025 Paydock Ltd.
 //
 
-public struct ClickToPayWidgetAppearance {
-    public let loader: Theme.OverlayLoaderAppearance
+public struct ClickToPayWidgetAppearance: LoaderStylableAppearance {
+    public var loader: Theme.OverlayLoaderAppearance
     
-    public init(loader: Theme.OverlayLoaderAppearance = Theme.OverlayLoaderAppearance()) {
+    public init(loader: Theme.OverlayLoaderAppearance = GlobalTheme.shared.globalTheme.loader) {
         self.loader = loader
     }
 }

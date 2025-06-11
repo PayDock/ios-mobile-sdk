@@ -13,11 +13,12 @@ struct ApplePayWidgetView: View {
 
     @StateObject private var viewModel = ApplePayWidgetVM()
     @State var isSheetPresented = false
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                ApplePayWidget { onApplePayButtonTap in
+                ApplePayWidget(appearance: getAppearance()) { onApplePayButtonTap in
                     viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
                 } completion: { result in
                     switch result {
@@ -34,6 +35,11 @@ struct ApplePayWidgetView: View {
                 Text(viewModel.alertMessage)
             })
         }
+    }
+    
+    private func getAppearance() -> ApplePayWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .applePay, isDarkMode: colorScheme == .dark, as: ApplePayWidgetAppearance.self)
+        return appearance ?? ApplePayWidgetAppearance()
     }
 }
 

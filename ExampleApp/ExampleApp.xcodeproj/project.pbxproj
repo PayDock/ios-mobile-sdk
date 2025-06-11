@@ -35,6 +35,11 @@
 		287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39422DF259ED00F4D771 /* StyleComponentsEnum.swift */; };
 		287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39442DF25A0700F4D771 /* StyleWidgetsEnum.swift */; };
 		287F39492DF25E5600F4D771 /* StyleWidgetItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39482DF25E5200F4D771 /* StyleWidgetItem.swift */; };
+		287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */; };
+		287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397A2DF76DA700F4D771 /* ColorPickerView.swift */; };
+		287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */; };
+		287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */; };
+		287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39802DF7AA9700F4D771 /* SectionTitleView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
@@ -130,6 +135,11 @@
 		287F39422DF259ED00F4D771 /* StyleComponentsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleComponentsEnum.swift; sourceTree = "<group>"; };
 		287F39442DF25A0700F4D771 /* StyleWidgetsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleWidgetsEnum.swift; sourceTree = "<group>"; };
 		287F39482DF25E5200F4D771 /* StyleWidgetItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleWidgetItem.swift; sourceTree = "<group>"; };
+		287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderStyleView.swift; sourceTree = "<group>"; };
+		287F397A2DF76DA700F4D771 /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
+		287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderStyleVM.swift; sourceTree = "<group>"; };
+		287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleThemeManager.swift; sourceTree = "<group>"; };
+		287F39802DF7AA9700F4D771 /* SectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTitleView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7D42A558F1800D6C7BE /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
@@ -226,8 +236,8 @@
 		280EB39B2AFE42920036E575 /* PayPal */ = {
 			isa = PBXGroup;
 			children = (
-				280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */,
 				280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */,
+				280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */,
 			);
 			path = PayPal;
 			sourceTree = "<group>";
@@ -284,6 +294,8 @@
 		282D31612A66B7F600E3ECAD /* Style */ = {
 			isa = PBXGroup;
 			children = (
+				287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */,
+				287F39762DF76C5600F4D771 /* StyleComponents */,
 				287F39372DF259A000F4D771 /* StyleWidgetListView.swift */,
 				287F39392DF259A900F4D771 /* StyleComponentListView.swift */,
 				287F393C2DF259D300F4D771 /* StyleVM.swift */,
@@ -301,8 +313,8 @@
 		283825872CBEB52B005BE050 /* PayPalVault */ = {
 			isa = PBXGroup;
 			children = (
-				28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */,
 				283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */,
+				28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */,
 			);
 			path = PayPalVault;
 			sourceTree = "<group>";
@@ -332,6 +344,25 @@
 				28850E562A559A6D00C39A9D /* WidgetsVM.swift */,
 			);
 			path = WidgetList;
+			sourceTree = "<group>";
+		};
+		287F39762DF76C5600F4D771 /* StyleComponents */ = {
+			isa = PBXGroup;
+			children = (
+				287F39802DF7AA9700F4D771 /* SectionTitleView.swift */,
+				287F397A2DF76DA700F4D771 /* ColorPickerView.swift */,
+				287F39792DF76C6F00F4D771 /* Loader */,
+			);
+			path = StyleComponents;
+			sourceTree = "<group>";
+		};
+		287F39792DF76C6F00F4D771 /* Loader */ = {
+			isa = PBXGroup;
+			children = (
+				287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */,
+				287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */,
+			);
+			path = Loader;
 			sourceTree = "<group>";
 		};
 		2889B7C82A558F1800D6C7BE = {
@@ -693,6 +724,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */,
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
 				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
 				28A3A9C02A6935A8004A8D34 /* OldStyleVM.swift in Sources */,
@@ -718,14 +750,17 @@
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
 				28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
+				287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
 				28AD05F82CF7767800B12FB4 /* CreateCustomerTokenRes.swift in Sources */,
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
+				287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */,
 				282D31662A66B82900E3ECAD /* OldStyleView.swift in Sources */,
+				287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
@@ -740,6 +775,7 @@
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
+				287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */,
 				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,

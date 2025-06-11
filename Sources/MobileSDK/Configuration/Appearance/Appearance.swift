@@ -9,8 +9,11 @@
 import Foundation
 import SwiftUI
 
-/// An object containing visual configuration for whole SDK.
-struct Appearance {
+
+
+public final class Appearance {
+    
+    public static let shared = Appearance()
     
     var colors = Colors(
         primary: Color(.primary),
@@ -25,10 +28,4 @@ struct Appearance {
     var dimensions = Dimensions()
 
     var fontName: String = "FFF-AcidGrotesk-Normal"
-}
-
-// MARK: - Appearance + shared
-
-extension Appearance {
-    static var shared: Appearance = .init()
 }
