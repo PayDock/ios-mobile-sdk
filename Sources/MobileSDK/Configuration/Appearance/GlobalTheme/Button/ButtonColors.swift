@@ -11,11 +11,11 @@ import SwiftUI
 extension Theme {
     
     public struct ButtonColors {
-        public let background: Color
-        public let text: Color
-        public let image: Color
-        public let border: Color
-        public let opacity: Double
+        public var background: Color
+        public var text: Color
+        public var image: Color
+        public var border: Color
+        public var opacity: Double
         
         public init(background: Color = .defaultPrimary,
                     text: Color = .defaultOnPrimary,

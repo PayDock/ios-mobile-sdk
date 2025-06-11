@@ -55,4 +55,17 @@ enum SDKButtonStyle {
             return style.appearance.loader.spinnerColor
         }
     }
+    
+    var imageColor: Color {
+        switch self {
+        case .fill(let style):
+            return style.appearance.colors.image
+        case .outline(let style):
+            return style.appearance.colors.image
+        case .image(let style):
+            return style.appearance.colors.image
+        case .custom(let style):
+            return style.appearance.colors.image
+        }
+    }
 }

@@ -129,7 +129,8 @@ public struct GiftCardWidget: View {
 
         return SDKButton(title: "Add", image: plusIcon,
                          isLoading: viewModel.isLoading,
-                         style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))) {
+                         style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled())),
+                         shouldTemplate: true) {
             viewModel.giftCardFormManager.endEditing()
             viewModel.tokeniseGiftCard()
         }
