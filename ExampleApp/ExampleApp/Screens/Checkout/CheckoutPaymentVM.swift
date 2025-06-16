@@ -380,6 +380,10 @@ extension CheckoutPaymentVM {
         isLoading = true
         Task {
             do {
+                // For Coles Pay - a delay is needed as order is still processing with hook that needs to be fired to finish payment setup
+                // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture". Improvement to add polling of
+                // charge state and when in correct state then finish the charge.
+                try await Task.sleep(for: .seconds(2))
                 let res = try await walletService.captureChargeColesPay(chargeId: colesPayChargeId)
                 isLoading = false
                 showAlert(title: .success, message: "Charge successful: \(res.amount) \(res.currency)")
