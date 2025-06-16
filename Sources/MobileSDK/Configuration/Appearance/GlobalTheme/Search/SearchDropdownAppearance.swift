@@ -12,8 +12,8 @@ import SwiftUI
 extension Theme {
     
     public struct SearchDropdownAppearance {
-        public let textField: TextFieldAppearance
-        public let dropdown: DropdownAppearance
+        public var textField: TextFieldAppearance
+        public var dropdown: DropdownAppearance
         
         public init(textField: TextFieldAppearance = TextFieldAppearance(),
                     dropdown: DropdownAppearance = DropdownAppearance()) {

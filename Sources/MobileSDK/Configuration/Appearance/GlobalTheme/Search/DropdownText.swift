@@ -12,7 +12,7 @@ import SwiftUI
 extension Theme {
     
     public struct DropdownText {
-        public let listText: TextAppearance
+        public var listText: TextAppearance
         
         public init(listText: TextAppearance = TextAppearance()) {
             self.listText = listText

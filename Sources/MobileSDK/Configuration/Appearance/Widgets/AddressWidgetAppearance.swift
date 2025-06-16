@@ -12,7 +12,8 @@ import SwiftUI
 public struct AddressWidgetAppearance:
     ActionButtonStylableAppearance,
     ExpandSectionButtonStylableAppearance,
-    TextFieldStylableAppearance {
+    TextFieldStylableAppearance,
+    DropdownStylableAppearance {
     
     public var horizontalSpacing: CGFloat
     public var verticalSpacing: CGFloat

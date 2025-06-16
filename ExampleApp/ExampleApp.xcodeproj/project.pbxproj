@@ -78,6 +78,8 @@
 		28B2FF572D009526004C0672 /* AccountProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF562D009526004C0672 /* AccountProfileVM.swift */; };
 		28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */; };
 		28D51D4E2DFC70070095CDE5 /* TextFieldStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */; };
+		28D51D512DFF30C00095CDE5 /* DropdownStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */; };
+		28D51D532DFF30C60095CDE5 /* DropdownStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D522DFF30C20095CDE5 /* DropdownStyleVM.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
 		28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */; };
 		28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */; };
@@ -191,6 +193,8 @@
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldStyleView.swift; sourceTree = "<group>"; };
 		28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldStyleVM.swift; sourceTree = "<group>"; };
+		28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownStyleView.swift; sourceTree = "<group>"; };
+		28D51D522DFF30C20095CDE5 /* DropdownStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownStyleVM.swift; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayWidgetView.swift; sourceTree = "<group>"; };
 		28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayWidgetVM.swift; sourceTree = "<group>"; };
@@ -371,6 +375,7 @@
 				287F39882DF88DFB00F4D771 /* Toggle */,
 				287F39972DF8C02100F4D771 /* Button */,
 				28D51D4A2DFC6FE50095CDE5 /* TextField */,
+				28D51D4F2DFF30AB0095CDE5 /* DropDown */,
 			);
 			path = StyleComponents;
 			sourceTree = "<group>";
@@ -550,6 +555,15 @@
 				28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */,
 			);
 			path = TextField;
+			sourceTree = "<group>";
+		};
+		28D51D4F2DFF30AB0095CDE5 /* DropDown */ = {
+			isa = PBXGroup;
+			children = (
+				28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */,
+				28D51D522DFF30C20095CDE5 /* DropdownStyleVM.swift */,
+			);
+			path = DropDown;
 			sourceTree = "<group>";
 		};
 		28E86F592ACC11A2008E827E /* Network */ = {
@@ -788,6 +802,7 @@
 				2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
 				287F393F2DF259E400F4D771 /* StyleDarkModeView.swift in Sources */,
+				28D51D532DFF30C60095CDE5 /* DropdownStyleVM.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
 				28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */,
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
@@ -826,6 +841,7 @@
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
 				287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */,
 				287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */,
+				28D51D512DFF30C00095CDE5 /* DropdownStyleView.swift in Sources */,
 				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
 				28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */,
