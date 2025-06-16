@@ -15,7 +15,8 @@ public struct Theme:
     ActionButtonStylableAppearance,
     ExpandSectionButtonStylableAppearance,
     ToolbarButtonStylableAppearance,
-    TextFieldStylableAppearance {
+    TextFieldStylableAppearance,
+    DropdownStylableAppearance {
     
     public var textField: TextFieldAppearance
     public var searchDropdown: SearchDropdownAppearance

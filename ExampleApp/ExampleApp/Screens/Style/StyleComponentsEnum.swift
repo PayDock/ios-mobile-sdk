@@ -51,6 +51,8 @@ enum StyleComponentsEnum {
             return AnyView(createToolbarButtonView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .textField:
             return AnyView(TextFieldStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .searchDropdown:
+            return AnyView(DropdownStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         default:
             return AnyView(EmptyView())
         }

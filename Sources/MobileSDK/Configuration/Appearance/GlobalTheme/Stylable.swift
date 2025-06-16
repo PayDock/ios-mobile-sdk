@@ -31,3 +31,7 @@ public protocol ToolbarButtonStylableAppearance {
 public protocol TextFieldStylableAppearance {
     var textField: Theme.TextFieldAppearance { get set }
 }
+
+public protocol DropdownStylableAppearance {
+    var searchDropdown: Theme.SearchDropdownAppearance { get set }
+}

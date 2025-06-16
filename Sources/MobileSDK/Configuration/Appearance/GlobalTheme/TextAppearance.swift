@@ -12,8 +12,8 @@ import SwiftUI
 extension Theme {
     
     public struct TextAppearance {
-        public let text: TextAttributes
-        public let padding: Padding
+        public var text: TextAttributes
+        public var padding: Padding
         
         public init(text: TextAttributes = TextAttributes(),
                     padding: Padding = Padding()) {
