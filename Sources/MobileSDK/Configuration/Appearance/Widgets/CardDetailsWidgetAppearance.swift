@@ -9,7 +9,11 @@
 import Foundation
 import SwiftUI
 
-public struct CardDetailsWidgetAppearance: ToggleStylableAppearance, ActionButtonStylableAppearance, ToolbarButtonStylableAppearance {
+public struct CardDetailsWidgetAppearance:
+    ToggleStylableAppearance,
+    ActionButtonStylableAppearance,
+    ToolbarButtonStylableAppearance,
+    TextFieldStylableAppearance {
 
     public var verticalSpacing: CGFloat
     public var horizontalSpacing: CGFloat

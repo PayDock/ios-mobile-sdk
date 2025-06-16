@@ -135,7 +135,7 @@ struct OutlineTextField: View {
         .onAppear {
             titleColor = appearance.colors.placeholder
             titleFontSize = appearance.fonts.title.customFont.size
-            borderColor = appearance.colors.placeholder
+            borderColor = appearance.colors.inactive
             borderWidth = appearance.dimensions.borderWidth
         }
     }
@@ -181,7 +181,7 @@ struct OutlineTextField: View {
                 Text(title)
                     .foregroundColor(.white)
                     .colorMultiply(titleColor)
-                    .animatableFont(size: titleFontSize)
+                    .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.name)
                     .padding([.leading, .trailing], 4.0)
                     .layoutPriority(1)
             }

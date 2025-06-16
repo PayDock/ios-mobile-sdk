@@ -27,3 +27,7 @@ public protocol ExpandSectionButtonStylableAppearance {
 public protocol ToolbarButtonStylableAppearance {
     var toolbarButton: Theme.ButtonAppearance { get set }
 }
+
+public protocol TextFieldStylableAppearance {
+    var textField: Theme.TextFieldAppearance { get set }
+}

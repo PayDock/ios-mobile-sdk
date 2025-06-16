@@ -12,9 +12,9 @@ import SwiftUI
 extension Theme {
     
     public struct TextFieldAppearance {
-        public let colors: TextFieldColors
-        public let dimensions: TextFieldDimensions
-        public let fonts: TextFieldFonts
+        public var colors: TextFieldColors
+        public var dimensions: TextFieldDimensions
+        public var fonts: TextFieldFonts
         
         public init(colors: TextFieldColors = TextFieldColors(),
                     dimensions: TextFieldDimensions = TextFieldDimensions(),
