@@ -12,13 +12,13 @@ import SwiftUI
 extension Theme {
     
     public struct TextFieldColors {
-        public let active: Color
-        public let inactive: Color
-        public let error: Color
-        public let success: Color
-        public let text: Color
-        public let placeholder: Color
-        public let background: Color
+        public var active: Color
+        public var inactive: Color
+        public var error: Color
+        public var success: Color
+        public var text: Color
+        public var placeholder: Color
+        public var background: Color
         
         public init(active: Color = .defaultPrimary,
                     inactive: Color = .defaultBorder,

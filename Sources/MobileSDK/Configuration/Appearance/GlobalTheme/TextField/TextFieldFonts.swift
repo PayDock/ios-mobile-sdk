@@ -12,10 +12,10 @@ import SwiftUI
 extension Theme {
     
     public struct TextFieldFonts {
-        public let text: TextAttributes
-        public let title: TextAttributes
-        public let placeholder: TextAttributes
-        public let error: TextAttributes
+        public var text: TextAttributes
+        public var title: TextAttributes
+        public var placeholder: TextAttributes
+        public var error: TextAttributes
         
         public init(text: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
                     title: TextAttributes = TextAttributes(font: CustomFont(size: 16)),

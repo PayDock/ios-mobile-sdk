@@ -9,12 +9,15 @@
 import Foundation
 import SwiftUI
 
-public struct AddressWidgetAppearance: ActionButtonStylableAppearance, ExpandSectionButtonStylableAppearance {
+public struct AddressWidgetAppearance:
+    ActionButtonStylableAppearance,
+    ExpandSectionButtonStylableAppearance,
+    TextFieldStylableAppearance {
     
     public var horizontalSpacing: CGFloat
     public var verticalSpacing: CGFloat
     public var title: Theme.TextAppearance
-    public var textfield: Theme.TextFieldAppearance
+    public var textField: Theme.TextFieldAppearance
     public var actionButton: Theme.ButtonAppearance
     public var expandSectionButton: Theme.ButtonAppearance
     public var searchDropdown: Theme.SearchDropdownAppearance
@@ -29,7 +32,7 @@ public struct AddressWidgetAppearance: ActionButtonStylableAppearance, ExpandSec
         self.horizontalSpacing = horizontalSpacing
         self.verticalSpacing = verticalSpacing
         self.title = title
-        self.textfield = textfield
+        self.textField = textfield
         self.actionButton = primaryButton
         self.expandSectionButton = linkButton
         self.searchDropdown = searchDropdown

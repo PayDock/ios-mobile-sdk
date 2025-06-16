@@ -71,7 +71,7 @@ public struct AddressWidget: View {
 
             HStack(spacing: .spacing * 0.75) {
                 OutlineTextField(
-                    appearance: appearance.textfield,
+                    appearance: appearance.textField,
                     text: $viewModel.addressFormManager.firstNameText,
                     title: viewModel.addressFormManager.firstNameTitle,
                     placeholder: viewModel.addressFormManager.firstNamePlaceholder,
@@ -97,7 +97,7 @@ public struct AddressWidget: View {
                 .focused($textFieldInFocus, equals: .firstName)
 
                 OutlineTextField(
-                    appearance: appearance.textfield,
+                    appearance: appearance.textField,
                     text: $viewModel.addressFormManager.lastNameText,
                     title: viewModel.addressFormManager.lastNameTitle,
                     placeholder: viewModel.addressFormManager.lastNamePlaceholder,
@@ -198,7 +198,7 @@ public struct AddressWidget: View {
 
     private var addressLine1View: some View {
         OutlineTextField(
-            appearance: appearance.textfield,
+            appearance: appearance.textField,
             text: $viewModel.addressFormManager.addressLine1Text,
             title: viewModel.addressFormManager.addressLine1Title,
             placeholder: viewModel.addressFormManager.addressLine1Placeholder,
@@ -226,7 +226,7 @@ public struct AddressWidget: View {
 
     private var addressLine2View: some View {
         OutlineTextField(
-            appearance: appearance.textfield,
+            appearance: appearance.textField,
             text: $viewModel.addressFormManager.addressLine2Text,
             title: viewModel.addressFormManager.addressLine2Title,
             placeholder: viewModel.addressFormManager.addressLine2Placeholder,
@@ -254,7 +254,7 @@ public struct AddressWidget: View {
 
     private var cityView: some View {
         OutlineTextField(
-            appearance: appearance.textfield,
+            appearance: appearance.textField,
             text: $viewModel.addressFormManager.cityText,
             title: viewModel.addressFormManager.cityTitle,
             placeholder: viewModel.addressFormManager.cityPlaceholder,
@@ -282,7 +282,7 @@ public struct AddressWidget: View {
 
     private var stateView: some View {
         OutlineTextField(
-            appearance: appearance.textfield,
+            appearance: appearance.textField,
             text: $viewModel.addressFormManager.stateText,
             title: viewModel.addressFormManager.stateTitle,
             placeholder: viewModel.addressFormManager.statePlaceholder,
@@ -310,7 +310,7 @@ public struct AddressWidget: View {
 
     private var postcodeView: some View {
         OutlineTextField(
-            appearance: appearance.textfield,
+            appearance: appearance.textField,
             text: $viewModel.addressFormManager.postcodeText,
             title: viewModel.addressFormManager.postcodeTitle,
             placeholder: viewModel.addressFormManager.postcodePlaceholder,
@@ -338,7 +338,7 @@ public struct AddressWidget: View {
 
     private var countryView: some View {
         OutlineTextField(
-            appearance: appearance.textfield,
+            appearance: appearance.textField,
             text: $viewModel.addressFormManager.countryText,
             title: viewModel.addressFormManager.countryTitle,
             placeholder: viewModel.addressFormManager.countryPlaceholder,

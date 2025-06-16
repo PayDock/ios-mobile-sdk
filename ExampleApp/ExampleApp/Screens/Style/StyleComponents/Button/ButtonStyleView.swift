@@ -40,6 +40,7 @@ struct ButtonStyleView<T>: View {
                     SectionTitleView(title: "Fonts")
                     fontListView
                 }
+                .padding(.bottom, 16.0)
                 .navigationTitle(title)
             }
             .background(Color(hex: "#EAE0D7"))
@@ -105,6 +106,5 @@ struct ButtonStyleView<T>: View {
                     viewModel.fontName = fontName
                 })
         }
-        .padding(.bottom, 16.0)
     }
 }

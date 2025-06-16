@@ -18,6 +18,12 @@ struct PickerView: View {
 
     var body: some View {
         VStack {
+            HStack {
+                Text(placeholder)
+                    .padding(.leading, 16)
+                    .padding(.bottom, -4)
+                Spacer()
+            }
             Menu {
                 ForEach(entries, id: \.self) { client in
                     Button(client) {
@@ -34,7 +40,7 @@ struct PickerView: View {
                             .padding(.horizontal, 16)
 
                         HStack {
-                            Text(selected.isEmpty ? placeholder : selected)
+                            Text(selected)
                                 .foregroundColor(.black)
                                 .padding(.leading, 32)
                                 .font(.custom(selected, size: 14))

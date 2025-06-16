@@ -9,7 +9,11 @@
 import Foundation
 import SwiftUI
 
-public struct GiftCardWidgetAppearance: ActionButtonStylableAppearance, ToolbarButtonStylableAppearance {
+public struct GiftCardWidgetAppearance:
+    ActionButtonStylableAppearance,
+    ToolbarButtonStylableAppearance,
+    TextFieldStylableAppearance {
+    
     public var title: Theme.TextAppearance
     public var textField: Theme.TextFieldAppearance
     public var actionButton: Theme.ButtonAppearance
