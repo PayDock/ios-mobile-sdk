@@ -80,7 +80,7 @@ class ColesPayWidgetVM: ObservableObject {
 
     func handleSuccess() {
         alertTitle = "Success"
-        alertMessage = "Coles Pay passed!"
+        alertMessage = "Coles Pay success!"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.showAlert = true
         }
