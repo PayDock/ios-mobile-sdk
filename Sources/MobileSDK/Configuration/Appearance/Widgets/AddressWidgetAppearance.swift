@@ -13,7 +13,8 @@ public struct AddressWidgetAppearance:
     ActionButtonStylableAppearance,
     ExpandSectionButtonStylableAppearance,
     TextFieldStylableAppearance,
-    DropdownStylableAppearance {
+    DropdownStylableAppearance,
+    TitleStylableAppearance {
     
     public var horizontalSpacing: CGFloat
     public var verticalSpacing: CGFloat

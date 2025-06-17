@@ -35,3 +35,19 @@ public protocol TextFieldStylableAppearance {
 public protocol DropdownStylableAppearance {
     var searchDropdown: Theme.SearchDropdownAppearance { get set }
 }
+
+public protocol TitleStylableAppearance {
+    var title: Theme.TextAppearance { get set }
+}
+
+public protocol ToggleTextStylableAppearance {
+    var toggleText: Theme.TextAppearance { get set }
+}
+
+public protocol DescriptionStylableAppearance {
+    var description: Theme.TextAppearance { get set }
+}
+
+public protocol LinkTextStylableAppearance {
+    var linkText: Theme.TextAppearance { get set }
+}

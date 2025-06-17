@@ -45,7 +45,7 @@ public struct CardDetailsWidget: View {
                         .accessibilityAddTraits(.isHeader)
                     Spacer()
                 }
-                .padding(.bottom, 14)
+                .customPadding(appearance.title.padding)
             }
             
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
@@ -251,11 +251,15 @@ public struct CardDetailsWidget: View {
             VStack(alignment: .leading) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
                     .applyAttributes(appearance.toggleText.text)
+                    .customPadding(appearance.toggleText.padding)
+
                 let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
                 let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                 let link = "[\(text)](\(url))"
                 Text(.init(link))
+                
                     .applyAttributes(appearance.linkText.text)
+                    .customPadding(appearance.linkText.padding)
                     .accentColor(appearance.linkText.text.textColor)
                     .disabled(viewModel.viewState.isDisabled)
                     .frame(minHeight: 24.0)

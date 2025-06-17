@@ -13,7 +13,10 @@ public struct CardDetailsWidgetAppearance:
     ToggleStylableAppearance,
     ActionButtonStylableAppearance,
     ToolbarButtonStylableAppearance,
-    TextFieldStylableAppearance {
+    TextFieldStylableAppearance,
+    TitleStylableAppearance,
+    LinkTextStylableAppearance,
+    ToggleTextStylableAppearance {
 
     public var verticalSpacing: CGFloat
     public var horizontalSpacing: CGFloat

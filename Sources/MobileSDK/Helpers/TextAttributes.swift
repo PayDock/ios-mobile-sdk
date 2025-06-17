@@ -12,17 +12,17 @@ public struct TextAttributes {
     public var customFont: CustomFont
     public var textColor: Color
     public var isUnderlined: Bool
-    public var underlineColor: Color?
+    public var underlineColor: Color
     public var isStrikethrough: Bool
-    public var strikethroughColor: Color?
+    public var strikethroughColor: Color
     public var isItalic: Bool
     
     public init(font: CustomFont = CustomFont(name: "FFF-AcidGrotesk-Normal", size: 14.0),
                 textColor: Color = .defaultText,
                 isUnderlined: Bool = false,
-                underlineColor: Color? = nil,
+                underlineColor: Color = .clear,
                 isStrikethrough: Bool = false,
-                strikethroughColor: Color? = nil,
+                strikethroughColor: Color = .clear,
                 isItalic: Bool = false) {
         self.customFont = font
         self.textColor = textColor
