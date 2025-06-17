@@ -21,14 +21,15 @@ class ButtonStyleVM<T>: ObservableObject {
     // MARK: - Variables
     
     private var appearance: T?
+    @Published var showResetConfirmation = false
     
-    @Published var backgroundColor: Color { didSet { updateAppearance() }}
-    @Published var textColor: Color { didSet { updateAppearance() }}
-    @Published var imageColor: Color { didSet { updateAppearance() }}
-    @Published var borderColor: Color { didSet { updateAppearance() }}
-    @Published var cornerRadius: CGFloat { didSet { updateAppearance() }}
-    @Published var borderWidth: CGFloat { didSet { updateAppearance() }}
-    @Published var fontName: String { didSet { updateAppearance() }}
+    @Published var backgroundColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var textColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var imageColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var borderColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var cornerRadius: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var borderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var fontName: String = "" { didSet { updateAppearance() }}
     
     // MARK: - Initialization
     
@@ -39,7 +40,10 @@ class ButtonStyleVM<T>: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.buttonKeyPath = buttonKeyPath
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
-        
+        syncUIToAppearance()
+    }
+    
+    private func syncUIToAppearance() {
         let buttonAppearance = appearance?[keyPath: buttonKeyPath]
         self.backgroundColor = buttonAppearance?.colors.background ?? .clear
         self.textColor = buttonAppearance?.colors.text ?? .clear
@@ -63,5 +67,12 @@ class ButtonStyleVM<T>: ObservableObject {
         
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+    }
+    
+    func resetAppearance() {
+        StyleThemeManager.resetAppearance(for: selectedWidget, isDarkMode: stylingDarkMode)
+        self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
+
+        syncUIToAppearance()
     }
 }

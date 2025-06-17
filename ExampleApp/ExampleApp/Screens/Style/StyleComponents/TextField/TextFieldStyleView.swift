@@ -34,6 +34,9 @@ struct TextFieldStyleView: View {
                     paddingListView
                     SectionTitleView(title: "Fonts")
                     fontListView
+                    ResetStyleButton {
+                        viewModel.showResetConfirmation = true
+                    }
                 }
                 .padding(.bottom, 16.0)
                 .navigationTitle("Text Field")
@@ -41,6 +44,9 @@ struct TextFieldStyleView: View {
             .background(Color(hex: "#EAE0D7"))
         }
         .foregroundColor(.black)
+        .resetConfirmationAlert(isPresented: $viewModel.showResetConfirmation) {
+            viewModel.resetAppearance()
+        }
     }
 
     private var colorListView: some View {
@@ -150,7 +156,7 @@ struct TextFieldStyleView: View {
         VStack (spacing: 16) {
             PickerView(
                 entries: viewModel.allFontNames,
-                selected: viewModel.textFont,
+                selected: $viewModel.textFont,
                 placeholder: "Text font",
                 onSelection: { fontName in
                     viewModel.textFont = fontName
@@ -158,7 +164,7 @@ struct TextFieldStyleView: View {
             
             PickerView(
                 entries: viewModel.allFontNames,
-                selected: viewModel.titleFont,
+                selected: $viewModel.titleFont,
                 placeholder: "Title font",
                 onSelection: { fontName in
                     viewModel.titleFont = fontName
@@ -166,7 +172,7 @@ struct TextFieldStyleView: View {
             
             PickerView(
                 entries: viewModel.allFontNames,
-                selected: viewModel.placeholderFont,
+                selected: $viewModel.placeholderFont,
                 placeholder: "Placeholder font",
                 onSelection: { fontName in
                     viewModel.placeholderFont = fontName
@@ -174,7 +180,7 @@ struct TextFieldStyleView: View {
             
             PickerView(
                 entries: viewModel.allFontNames,
-                selected: viewModel.errorFont,
+                selected: $viewModel.errorFont,
                 placeholder: "Error font",
                 onSelection: { fontName in
                     viewModel.errorFont = fontName

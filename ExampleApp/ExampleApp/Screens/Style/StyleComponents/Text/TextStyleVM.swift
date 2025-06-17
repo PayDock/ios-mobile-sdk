@@ -21,20 +21,21 @@ class TextStyleVM<T>: ObservableObject {
     // MARK: - Variables
     
     private var appearance: T?
+    @Published var showResetConfirmation = false
     
     // Colors
-    @Published var textColor: Color { didSet { updateAppearance() }}
-    @Published var underlineColor: Color { didSet { updateAppearance() }}
-    @Published var strikethroughColor: Color { didSet { updateAppearance() }}
+    @Published var textColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var underlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var strikethroughColor: Color = .clear { didSet { updateAppearance() }}
         
     // Dimensions
-    @Published var topPadding: CGFloat { didSet { updateAppearance() }}
-    @Published var leadingPadding: CGFloat { didSet { updateAppearance() }}
-    @Published var bottomPadding: CGFloat { didSet { updateAppearance() }}
-    @Published var trailingPadding: CGFloat { didSet { updateAppearance() }}
+    @Published var topPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var leadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var bottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var trailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
     
     // Fonts
-    @Published var fontName: String { didSet { updateAppearance() }}
+    @Published var fontName: String = "" { didSet { updateAppearance() }}
     
     // MARK: - Initialization
     
@@ -45,7 +46,10 @@ class TextStyleVM<T>: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.textKeyPath = textKeyPath
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
-        
+        syncUIToAppearance()
+    }
+    
+    private func syncUIToAppearance() {
         let textAppearance = appearance?[keyPath: textKeyPath]
         
         self.textColor = textAppearance?.text.textColor ?? .clear
@@ -76,5 +80,12 @@ class TextStyleVM<T>: ObservableObject {
         
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+    }
+    
+    func resetAppearance() {
+        StyleThemeManager.resetAppearance(for: selectedWidget, isDarkMode: stylingDarkMode)
+        self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
+
+        syncUIToAppearance()
     }
 }

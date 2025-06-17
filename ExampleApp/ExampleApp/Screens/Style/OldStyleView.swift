@@ -28,7 +28,7 @@ struct OldStyleView: View {
                     divider
 
                     sectionTitle("Font")
-                    PickerView(entries: viewModel.allFontNames, selected: viewModel.fontName, placeholder: "Select Font", onSelection: { fontName in
+                    PickerView(entries: viewModel.allFontNames, selected: $viewModel.fontName, placeholder: "Select Font", onSelection: { fontName in
                         viewModel.fontName = fontName
 
                     })
