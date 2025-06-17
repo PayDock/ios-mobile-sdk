@@ -34,6 +34,16 @@ class StyleThemeManager {
             }
         }
     }
+    
+    static func resetAppearance(for widget: WidgetsEnum, isDarkMode: Bool) {
+        if isDarkMode {
+            darkAppearances[widget] = nil
+        } else {
+            lightAppearances[widget] = nil
+        }
+        
+        createDefaultAppearanceIfNeeded(for: widget, isDarkMode: isDarkMode)
+    }
 
     static func createDefaultAppearanceIfNeeded(for widget: WidgetsEnum, isDarkMode: Bool) {
         let dict = isDarkMode ? darkAppearances : lightAppearances

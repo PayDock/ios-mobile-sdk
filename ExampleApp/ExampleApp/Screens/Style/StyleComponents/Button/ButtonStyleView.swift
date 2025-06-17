@@ -39,6 +39,9 @@ struct ButtonStyleView<T>: View {
                     dimensionsListView
                     SectionTitleView(title: "Fonts")
                     fontListView
+                    ResetStyleButton {
+                        viewModel.showResetConfirmation = true
+                    }
                 }
                 .padding(.bottom, 16.0)
                 .navigationTitle(title)
@@ -46,6 +49,9 @@ struct ButtonStyleView<T>: View {
             .background(Color(hex: "#EAE0D7"))
         }
         .foregroundColor(.black)
+        .resetConfirmationAlert(isPresented: $viewModel.showResetConfirmation) {
+            viewModel.resetAppearance()
+        }
     }
 
     private var colorListView: some View {
@@ -100,11 +106,15 @@ struct ButtonStyleView<T>: View {
         VStack (spacing: 16) {
             PickerView(
                 entries: viewModel.allFontNames,
-                selected: viewModel.fontName,
+                selected: $viewModel.fontName,
                 placeholder: "Select Font",
                 onSelection: { fontName in
                     viewModel.fontName = fontName
                 })
         }
     }
+}
+
+#Preview {
+    ButtonStyleView<Theme>(selectedWidget: .all, stylingDarkMode: false, buttonKeyPath: \.actionButton, title: "Title")
 }

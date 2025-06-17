@@ -20,30 +20,31 @@ class TextFieldStyleVM: ObservableObject {
     // MARK: - Variables
     
     private var appearance: TextFieldStylableAppearance?
+    @Published var showResetConfirmation = false
 
     // Colors
-    @Published var activeColor: Color { didSet { updateAppearance() }}
-    @Published var inactiveColor: Color { didSet { updateAppearance() }}
-    @Published var errorColor: Color { didSet { updateAppearance() }}
-    @Published var successColor: Color { didSet { updateAppearance() }}
-    @Published var textColor: Color { didSet { updateAppearance() }}
-    @Published var placeholderColor: Color { didSet { updateAppearance() }}
-    @Published var backgroundColor: Color { didSet { updateAppearance() }}
+    @Published var activeColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var inactiveColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var errorColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var successColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var textColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var placeholderColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var backgroundColor: Color = .clear { didSet { updateAppearance() }}
     
     // Dimensions
-    @Published var cornerRadius: CGFloat { didSet { updateAppearance() }}
-    @Published var borderWidth: CGFloat { didSet { updateAppearance() }}
-    @Published var activeBorderWidth: CGFloat { didSet { updateAppearance() }}
-    @Published var topPadding: CGFloat { didSet { updateAppearance() }}
-    @Published var leadingPadding: CGFloat { didSet { updateAppearance() }}
-    @Published var bottomPadding: CGFloat { didSet { updateAppearance() }}
-    @Published var trailingPadding: CGFloat { didSet { updateAppearance() }}
+    @Published var cornerRadius: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var borderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var activeBorderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var topPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var leadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var bottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var trailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
     
     // Fonts
-    @Published var textFont: String { didSet { updateAppearance() }}
-    @Published var titleFont: String { didSet { updateAppearance() }}
-    @Published var placeholderFont: String { didSet { updateAppearance() }}
-    @Published var errorFont: String { didSet { updateAppearance() }}
+    @Published var textFont: String = "" { didSet { updateAppearance() }}
+    @Published var titleFont: String = "" { didSet { updateAppearance() }}
+    @Published var placeholderFont: String = "" { didSet { updateAppearance() }}
+    @Published var errorFont: String = "" { didSet { updateAppearance() }}
     
     // MARK: - Initialization
     
@@ -52,7 +53,10 @@ class TextFieldStyleVM: ObservableObject {
         self.selectedWidget = selectedWidget
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: TextFieldStylableAppearance.self)
-        
+        syncUIToAppearance()
+    }
+    
+    private func syncUIToAppearance() {
         self.activeColor = appearance?.textField.colors.active ?? .clear
         self.inactiveColor = appearance?.textField.colors.inactive ?? .clear
         self.errorColor = appearance?.textField.colors.error ?? .clear
@@ -76,27 +80,36 @@ class TextFieldStyleVM: ObservableObject {
     }
     
     private func updateAppearance() {
-        appearance?.textField.colors.active = activeColor
-        appearance?.textField.colors.inactive = inactiveColor
-        appearance?.textField.colors.error = errorColor
-        appearance?.textField.colors.success = successColor
-        appearance?.textField.colors.text = textColor
-        appearance?.textField.colors.placeholder = placeholderColor
-        appearance?.textField.colors.background = backgroundColor
+        guard var appearance = appearance else { return }
+
+        appearance.textField.colors.active = activeColor
+        appearance.textField.colors.inactive = inactiveColor
+        appearance.textField.colors.error = errorColor
+        appearance.textField.colors.success = successColor
+        appearance.textField.colors.text = textColor
+        appearance.textField.colors.placeholder = placeholderColor
+        appearance.textField.colors.background = backgroundColor
         
-        appearance?.textField.dimensions.cornerRadius = cornerRadius
-        appearance?.textField.dimensions.borderWidth = borderWidth
-        appearance?.textField.dimensions.activeBorderWidth = activeBorderWidth
-        appearance?.textField.dimensions.padding.top = topPadding
-        appearance?.textField.dimensions.padding.leading = leadingPadding
-        appearance?.textField.dimensions.padding.bottom = bottomPadding
-        appearance?.textField.dimensions.padding.trailing = trailingPadding
+        appearance.textField.dimensions.cornerRadius = cornerRadius
+        appearance.textField.dimensions.borderWidth = borderWidth
+        appearance.textField.dimensions.activeBorderWidth = activeBorderWidth
+        appearance.textField.dimensions.padding.top = topPadding
+        appearance.textField.dimensions.padding.leading = leadingPadding
+        appearance.textField.dimensions.padding.bottom = bottomPadding
+        appearance.textField.dimensions.padding.trailing = trailingPadding
         
-        appearance?.textField.fonts.text.customFont.name = textFont
-        appearance?.textField.fonts.title.customFont.name = titleFont
-        appearance?.textField.fonts.placeholder.customFont.name = placeholderFont
-        appearance?.textField.fonts.error.customFont.name = errorFont
+        appearance.textField.fonts.text.customFont.name = textFont
+        appearance.textField.fonts.title.customFont.name = titleFont
+        appearance.textField.fonts.placeholder.customFont.name = placeholderFont
+        appearance.textField.fonts.error.customFont.name = errorFont
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+    }
+    
+    func resetAppearance() {
+        StyleThemeManager.resetAppearance(for: selectedWidget, isDarkMode: stylingDarkMode)
+        self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: TextFieldStylableAppearance.self)
+        
+        syncUIToAppearance()
     }
 }

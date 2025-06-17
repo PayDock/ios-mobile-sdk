@@ -11,7 +11,7 @@ import SwiftUI
 struct PickerView: View {
 
     @State var entries: [String]
-    @State var selected: String
+    @Binding var selected: String
     @State var placeholder: String
 
     var onSelection: (String) -> Void
@@ -57,6 +57,6 @@ struct PickerView: View {
 
 struct PickerView_Previews: PreviewProvider {
     static var previews: some View {
-        PickerView(entries: ["Font 1, Font 2"], selected: "", placeholder: "Select something", onSelection: {_ in })
+        PickerView(entries: ["Font 1, Font 2"], selected: .constant("Font"), placeholder: "Select something", onSelection: {_ in })
     }
 }

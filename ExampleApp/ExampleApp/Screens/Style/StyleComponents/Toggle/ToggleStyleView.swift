@@ -28,12 +28,18 @@ struct ToggleStyleView: View {
                 VStack {
                     SectionTitleView(title: "Colors")
                     colorListView
+                    ResetStyleButton {
+                        viewModel.showResetConfirmation = true
+                    }
                 }
                 .navigationTitle("Toggle")
             }
             .background(Color(hex: "#EAE0D7"))
         }
         .foregroundColor(.black)
+        .resetConfirmationAlert(isPresented: $viewModel.showResetConfirmation) {
+            viewModel.resetAppearance()
+        }
     }
 
     private var colorListView: some View {
