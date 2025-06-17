@@ -25,16 +25,6 @@ struct Constants {
         }
     }
 
-    static var sslPublicKeyHash: String {
-        guard let environment = MobileSDK.shared.config?.environment else {
-            fatalError("Missing configuration!")
-        }
-
-        switch environment {
-        case .production, .sandbox, .staging: return "kV0cxZABuhXdMFROcAZwIflgJilKOqxMBcRhzFhZMok="
-        }
-    }
-
     // MARK: - Client SDK
 
     static var clientSdkUrlString: String {
