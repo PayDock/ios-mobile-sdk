@@ -18,8 +18,8 @@ extension Text {
         self
             .font(attributes.customFont.font)
             .foregroundColor(attributes.textColor)
-            .underline(attributes.isUnderlined, color: attributes.underlineColor)
-            .strikethrough(attributes.isStrikethrough, color: attributes.strikethroughColor)
+            .underline(attributes.underlineColor != .clear, color: attributes.underlineColor)
+            .strikethrough(attributes.strikethroughColor != .clear, color: attributes.strikethroughColor)
             .italic(attributes.isItalic)
     }
 }

@@ -53,12 +53,18 @@ enum StyleComponentsEnum {
             return AnyView(TextFieldStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .searchDropdown:
             return AnyView(DropdownStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        default:
-            return AnyView(EmptyView())
+        case .title:
+            return AnyView(createTitleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .linkText:
+            return AnyView(createLinkTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .toggleText:
+            return AnyView(createToggleTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .description:
+            return AnyView(createDescriptionView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         }
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Button Helper Methods
     
     private func createActionButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
@@ -140,4 +146,89 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
+    
+    // MARK: - Text Helper Methods
+
+    private func createTitleView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
+        switch selectedWidget {
+        case .all:
+            return AnyView(TextStyleView<Theme>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.title,
+                title: title))
+        case .card:
+            return AnyView(TextStyleView<CardDetailsWidgetAppearance>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.title,
+                title: title))
+        case .address:
+            return AnyView(TextStyleView<AddressWidgetAppearance>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.title,
+                title: title))
+        case .giftCard:
+            return AnyView(TextStyleView<GiftCardWidgetAppearance>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.title,
+                title: title))
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+    
+    private func createLinkTextView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
+        switch selectedWidget {
+        case .all:
+            return AnyView(TextStyleView<Theme>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.linkText,
+                title: title))
+        case .card:
+            return AnyView(TextStyleView<CardDetailsWidgetAppearance>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.linkText,
+                title: title))
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+    
+    private func createToggleTextView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
+        switch selectedWidget {
+        case .all:
+            return AnyView(TextStyleView<Theme>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.toggleText,
+                title: title))
+        case .card:
+            return AnyView(TextStyleView<CardDetailsWidgetAppearance>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.toggleText,
+                title: title))
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+    
+    private func createDescriptionView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
+        switch selectedWidget {
+        case .all:
+            return AnyView(TextStyleView<Theme>(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                textKeyPath: \.description,
+                title: title))
+        default:
+            return AnyView(EmptyView())
+        }
+    }
+
 }

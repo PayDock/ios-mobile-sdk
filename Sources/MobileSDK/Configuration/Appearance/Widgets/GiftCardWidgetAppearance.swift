@@ -12,7 +12,8 @@ import SwiftUI
 public struct GiftCardWidgetAppearance:
     ActionButtonStylableAppearance,
     ToolbarButtonStylableAppearance,
-    TextFieldStylableAppearance {
+    TextFieldStylableAppearance,
+    TitleStylableAppearance {
     
     public var title: Theme.TextAppearance
     public var textField: Theme.TextFieldAppearance
