@@ -66,15 +66,20 @@ extension CheckoutPaymentVM {
     }
 
     /// Initializes wallet charge when paying through ApplePay
-    func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) {
         Task {
             do {
+                isLoading = true
                 let request = createWalletChargeRequest(gatewayId: applePayGatewayId, walletType: "apple")
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
-                let applePayRequest = self.getApplePayRequest(walletToken: token)
-                completion(applePayRequest)
+                let applePayRequestResult = self.getApplePayRequestResult(walletToken: token)
+                completion(.success(ApplePayRequestResult(request: applePayRequestResult.request, token: applePayRequestResult.token)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                showAlert(title: .error, message: "Error fetching wallet token!")
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
@@ -118,7 +123,7 @@ extension CheckoutPaymentVM {
     }
 
     /// Helper method that creates ApplePay request
-    private func getApplePayRequest(walletToken: String) -> ApplePayRequest {
+    private func getApplePayRequestResult(walletToken: String) -> ApplePayRequestResult {
         let paymentRequest = MobileSDK.createApplePayRequest(
             amount: 5.50,
             amountLabel: "Amount",
@@ -126,11 +131,7 @@ extension CheckoutPaymentVM {
             currencyCode: "AUD",
             merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
 
-        let applePayRequest = ApplePayRequest(
-            token: walletToken,
-            request: paymentRequest)
-
-        return applePayRequest
+        return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
 
     /// Helper method that creates Wallet Charge request
