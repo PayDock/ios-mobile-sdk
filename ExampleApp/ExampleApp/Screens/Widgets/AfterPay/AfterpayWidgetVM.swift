@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import Afterpay
+import NetworkingLib
 
 @MainActor
 class AfterpayWidgetVM: ObservableObject {
@@ -29,7 +30,7 @@ class AfterpayWidgetVM: ObservableObject {
         self.walletService = walletService
     }
 
-    func initializeWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
 
@@ -54,18 +55,16 @@ class AfterpayWidgetVM: ObservableObject {
                 reference: UUID().uuidString,
                 description: "Test transaction for Afterpay",
                 meta: metaData)
-
+            
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
+                let token = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq).token
                 DispatchQueue.main.async {
-                    completion(token)
+                    completion(.success(.init(token: token)))
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                alertTitle = "Error"
-                alertMessage = "Error fetching wallet token!"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.showAlert = true
-                }
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }

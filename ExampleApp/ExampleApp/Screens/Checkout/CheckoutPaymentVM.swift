@@ -80,7 +80,7 @@ extension CheckoutPaymentVM {
     }
 
     /// Initializes wallet charge when paying through Afterpay
-    func initializeAfterpayWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeAfterpayWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
 
@@ -105,14 +105,14 @@ extension CheckoutPaymentVM {
                 reference: UUID().uuidString,
                 description: "Test transaction for Afterpay",
                 meta: metaData)
-
+            
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
-                DispatchQueue.main.async {
-                    completion(token)
-                }
+                completion(.success(.init(token: token)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                print("ERROR: Error fetching wallet token!")
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }

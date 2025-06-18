@@ -15,6 +15,7 @@ public enum AfterpayError: Error {
     case errorCapturingCharge(error: ErrorRes)
     case errorCancelingTransaction(error: ErrorRes)
     case transactionCanceled
+    case initialisingWalletToken(reason: String)
     case unknownError
 
     public var customMessage: String {
@@ -23,6 +24,7 @@ public enum AfterpayError: Error {
         case .errorCapturingCharge: return "Unable to complete the charge"
         case .errorCancelingTransaction: return "Unable to cancel transaction"
         case .transactionCanceled: return "Afterpay transaction was canceled."
+        case .initialisingWalletToken(let reason): return reason
         case .unknownError: return "Unknown error"
         }
     }

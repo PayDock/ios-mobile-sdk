@@ -20,8 +20,8 @@ struct AfterpayWidgetView: View {
                 AfterpayWidget(
                     configuration: viewModel.getAfterpayConfig(),
                     appearance: getAppearance(),
-                    afterPayToken: { onAfterpayButtonTap in
-                        viewModel.initializeWalletCharge(completion: onAfterpayButtonTap)
+                    tokenRequest: { tokenResult in
+                        viewModel.initializeWalletCharge(completion: tokenResult)
                     }, selectAddress: { address, provideShippingOptions in
                         provideShippingOptions(viewModel.getShippingOptions())
                     }, selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
