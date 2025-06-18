@@ -20,12 +20,12 @@ struct ColesPayWidgetView: View {
                 ColesPayWidget(
                     config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? ""),
                     appearance: getAppearance()) { onColesPayButtonTap in
-                    viewModel.initializeWalletCharge(completion: onColesPayButtonTap)
-                } completion: { result in
-                    switch result {
-                    case .success: viewModel.handleSuccess()
-                    case .failure(let error): viewModel.handleError(error: error)
-                    }
+                        viewModel.initializeWalletCharge(completion: onColesPayButtonTap)
+                    } completion: { result in
+                        switch result {
+                        case .success: viewModel.handleSuccess()
+                        case .failure(let error): viewModel.handleError(error: error)
+                        }
                 }
                 .padding()
             }

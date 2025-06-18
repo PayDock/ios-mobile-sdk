@@ -18,7 +18,7 @@ class ColesPayVM: ObservableObject {
 
     // MARK: - Properties
 
-    private let colesPayToken: (_ colesPayToken: @escaping (String) -> Void) -> Void
+    private let tokenRequest: (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void
     private var colesPayUrl: URL?
     let config: ColesPayConfig
     @Published var showWebView = false
@@ -37,13 +37,13 @@ class ColesPayVM: ObservableObject {
     // MARK: - Initialisation
 
     init(config: ColesPayConfig,
-         colesPayToken: @escaping (_ colesPayToken: @escaping (String) -> Void) -> Void,
+         tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          viewState: ViewState,
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<String, ColesPayError>) -> Void) {
         self.config = config
-        self.colesPayToken = colesPayToken
+        self.tokenRequest = tokenRequest
         self.walletService = walletService
         self.viewState = viewState
         self.loadingDelegate = loadingDelegate
@@ -78,9 +78,17 @@ class ColesPayVM: ObservableObject {
 
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
-        colesPayToken { token in
-            self.token = token
-            self.getColesPayURL(token: token)
+        tokenRequest { [weak self] result in
+            switch result {
+            case .success(let response):
+                self?.token = response.token
+                self?.getColesPayURL(token: response.token)
+            
+            case .failure(let failure):
+                self?.updateLoadingState(isLoading: false)
+                self?.showWebView = false
+                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+            }
         }
     }
 

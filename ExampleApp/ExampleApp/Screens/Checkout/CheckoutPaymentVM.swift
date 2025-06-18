@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import Afterpay
+import NetworkingLib
 
 @MainActor
 class CheckoutPaymentVM: ObservableObject {
@@ -325,18 +326,18 @@ extension CheckoutPaymentVM {
 
 extension CheckoutPaymentVM {
     
-    func initializeWalletChargeColesPay(completion: @escaping (String) -> Void) {
+    func initializeWalletChargeColesPay(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         viewState?.setState(.disabled)
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "", walletType: nil)
-
+            
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Wanda",
                 lastName: "Mertz",
                 email: "wanda.mertz@example.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
-
+            
             let metaData = InitialiseWalletChargeReq.MetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
@@ -351,18 +352,20 @@ extension CheckoutPaymentVM {
                 reference: "reference1234",
                 description: "Test transaction for Coles Pay",
                 meta: metaData)
-
+            
             do {
                 let response = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 let token = response.token
                 self.colesPayChargeId = response.charge._id
                 DispatchQueue.main.async {
-                    completion(token)
+                    completion(.success(WalletTokenResult(token: token)))
                     self.viewState?.setState(.none)
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+                viewState?.setState(.none)
             } catch {
-                showAlert(title: .error, message: "Error fetching wallet token!")
-                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: nil)))
                 viewState?.setState(.none)
             }
         }

@@ -17,11 +17,11 @@ public struct ColesPayWidget: View {
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 config: ColesPayConfig,
                 appearance: ColesPayWidgetAppearance = ColesPayWidgetAppearance(),
-                colesPayToken: @escaping (_ colesPayToken: @escaping (String) -> Void) -> Void,
+                tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 completion: @escaping (Result<String, ColesPayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ColesPayVM(
             config: config,
-            colesPayToken: colesPayToken,
+            tokenRequest: tokenRequest,
             viewState: viewState ?? ViewState(state: .none),
             loadingDelegate: loadingDelegate,
             completion: completion))
@@ -88,6 +88,6 @@ public struct ColesPayWidget: View {
 
 struct ColesPayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        ColesPayWidget(config: .init(clientId: ""), colesPayToken: { _ in }, completion: { _ in })
+        ColesPayWidget(config: .init(clientId: "")) { _ in } completion: { _ in }
     }
 }
