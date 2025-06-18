@@ -18,8 +18,8 @@ class PayPalVM: ObservableObject {
 
     // MARK: - Properties
 
-    private let payPalToken: (_ payPalToken: @escaping (String) -> Void) -> Void
-    
+    private let tokenRequest: (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void
+
     @Published var showWebView = false
     @Published var isLoading = false
     @Published var showLoaders = true
@@ -36,12 +36,12 @@ class PayPalVM: ObservableObject {
     // MARK: - Initialisation
 
     init(viewState: ViewState,
-         payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
+         tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self.viewState = viewState
-        self.payPalToken = payPalToken
+        self.tokenRequest = tokenRequest
         self.walletService = walletService
         self.loadingDelegate = loadingDelegate
         self.completion = completion
@@ -100,9 +100,17 @@ class PayPalVM: ObservableObject {
 
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
-        payPalToken { token in
-            self.token = token
-            self.getPayPalURL(token: token)
+        tokenRequest { [weak self] result in
+            switch result {
+            case .success(let response):
+                self?.token = response.token
+                self?.getPayPalURL(token: response.token)
+            
+            case .failure(let failure):
+                self?.updateLoadingState(isLoading: false)
+                self?.showWebView = false
+                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+            }
         }
     }
 

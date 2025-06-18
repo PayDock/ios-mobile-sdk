@@ -25,7 +25,7 @@ class PayPalVMTests: XCTestCase {
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
-        viewModel = PayPalVM(viewState: viewState, payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
@@ -47,7 +47,7 @@ class PayPalVMTests: XCTestCase {
     }
     
     func testInitialisationWithOptionsStateDisabled() {
-        viewModel = PayPalVM(viewState: ViewState(state: .disabled), payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: ViewState(state: .disabled), tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
@@ -61,7 +61,7 @@ class PayPalVMTests: XCTestCase {
     }
     
     func testInitialisationWithoutDelegateShowLoader() {
-        viewModel = PayPalVM(viewState: ViewState(state: .disabled), payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: ViewState(state: .disabled), tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: nil) { result in
             self.completionResult = result
@@ -72,7 +72,7 @@ class PayPalVMTests: XCTestCase {
     
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
-        viewModel = PayPalVM(viewState: viewState, payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
@@ -88,7 +88,7 @@ class PayPalVMTests: XCTestCase {
     }
     
     func testUpdateLoadingStateToTrueWithoutDelegate() {
-        viewModel = PayPalVM(viewState: viewState, payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: nil) { result in
             self.completionResult = result
@@ -107,7 +107,7 @@ class PayPalVMTests: XCTestCase {
     
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
-        viewModel = PayPalVM(viewState: viewState, payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
@@ -126,7 +126,7 @@ class PayPalVMTests: XCTestCase {
     
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
-        viewModel = PayPalVM(viewState: viewState, payPalToken: { payPalToken in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
             
         }, walletService: mockService, loadingDelegate: nil) { result in
             self.completionResult = result

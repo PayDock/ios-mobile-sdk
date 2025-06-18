@@ -15,11 +15,11 @@ public struct PayPalWidget: View {
     public init(viewState: ViewState? = nil,
                 appearance: PayPalWidgetAppearance = PayPalWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
-                payPalToken: @escaping (_ payPalToken: @escaping (String) -> Void) -> Void,
+                tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalVM(
             viewState: viewState ?? ViewState(state: .none),
-            payPalToken: payPalToken,
+            tokenRequest: tokenRequest,
             loadingDelegate: loadingDelegate,
             completion: completion))
         self.apparance = appearance
@@ -100,6 +100,6 @@ public struct PayPalWidget: View {
 
 struct PayPalWidget_Previews: PreviewProvider {
     static var previews: some View {
-        PayPalWidget(loadingDelegate: nil, payPalToken: { _ in }, completion: { _ in })
+        PayPalWidget(loadingDelegate: nil)  { _ in } completion: { _ in }
     }
 }

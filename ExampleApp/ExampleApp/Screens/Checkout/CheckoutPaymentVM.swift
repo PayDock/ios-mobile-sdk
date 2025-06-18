@@ -51,14 +51,16 @@ class CheckoutPaymentVM: ObservableObject {
 
 extension CheckoutPaymentVM {
     /// Initializes wallet charge when paying through PayPal
-    func initializeWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             do {
                 let request = createWalletChargeRequest(gatewayId: payPalGatewayId, walletType: nil)
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
-                completion(token)
+                completion(.success(.init(token: token)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                showAlert(title: .error, message: "Error fetching wallet token!")
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
