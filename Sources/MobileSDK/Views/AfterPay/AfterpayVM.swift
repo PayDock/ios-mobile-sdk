@@ -20,7 +20,7 @@ class AfterpayVM: ObservableObject {
     // MARK: - Properties
 
     let configuration: AfterpaySdkConfig
-    private let afterPayToken: (_ afterPayToken: @escaping (String) -> Void) -> Void
+    private let tokenRequest: (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void
     var viewState: ViewState
     @Published var showWebView = false
     @Published var isLoading = false
@@ -39,7 +39,7 @@ class AfterpayVM: ObservableObject {
 
     init(viewState: ViewState,
          configuration: AfterpaySdkConfig,
-         afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
+         tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
          selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
          selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
          walletService: WalletService = WalletServiceImpl(),
@@ -47,7 +47,7 @@ class AfterpayVM: ObservableObject {
          completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
         self.viewState = viewState
         self.configuration = configuration
-        self.afterPayToken = afterPayToken
+        self.tokenRequest = tokenRequest
         self.selectAddress = selectAddress
         self.selectShippingOption = selectShippingOption
         self.walletService = walletService
@@ -154,10 +154,18 @@ class AfterpayVM: ObservableObject {
     }
 
     func handleButtonTap() {
-        isLoading = true
-        afterPayToken { token in
-            self.token = token
-            self.getAfterpayURL(token: token)
+        updateLoadingState(isLoading: true)
+        tokenRequest { [weak self] result in
+            switch result {
+            case .success(let response):
+                self?.token = response.token
+                self?.getAfterpayURL(token: response.token)
+            
+            case .failure(let failure):
+                self?.updateLoadingState(isLoading: false)
+                self?.showWebView = false
+                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+            }
         }
     }
 

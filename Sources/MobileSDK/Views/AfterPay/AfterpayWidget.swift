@@ -18,7 +18,7 @@ public struct AfterpayWidget: View {
                 configuration: AfterpaySdkConfig,
                 appearance: AfterpayWidgetAppearance = AfterpayWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
-                afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
+                tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
                 selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
                 completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
@@ -26,7 +26,7 @@ public struct AfterpayWidget: View {
             wrappedValue: AfterpayVM(
                 viewState: viewState ?? ViewState(state: .none),
                 configuration: configuration,
-                afterPayToken: afterPayToken,
+                tokenRequest: tokenRequest,
                 selectAddress: selectAddress,
                 selectShippingOption: selectShippingOption,
                 loadingDelegate: loadingDelegate,
@@ -51,10 +51,14 @@ struct AfterpayWidget_Previews: PreviewProvider {
             configuration: .init(
                 config: .init(maximumAmount: "100.0", currency: "AUD"),
                 environment: .sandbox,
-                options: .init()),
-            afterPayToken: { _ in },
-            selectAddress: { address, provideShippingOptions in },
-            selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in },
-            completion: { _ in })
+                options: .init())) { _ in
+                    
+                } selectAddress: { address, provideShippingOptions in
+                    
+                } selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
+                    
+                } completion: { _ in
+                    
+                }
     }
 }

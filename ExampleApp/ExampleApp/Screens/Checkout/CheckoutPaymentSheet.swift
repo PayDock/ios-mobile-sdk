@@ -137,8 +137,8 @@ struct CheckoutPaymentSheet: View {
     private var afterpayWidget: some View {
         AfterpayWidget(
             configuration: viewModel.getAfterpayConfig(),
-            afterPayToken: { onAfterpayButtonTap in
-                viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
+            tokenRequest: { tokenResult in
+                viewModel.initializeAfterpayWalletCharge(completion: tokenResult)
             },
             selectAddress: { address, provideShippingOptions in
                 // Provide shipping options based on user selected address if needed
