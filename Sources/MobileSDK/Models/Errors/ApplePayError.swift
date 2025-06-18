@@ -16,6 +16,7 @@ public enum ApplePayError: Error {
     case errorCompletingPayment(error: ErrorRes)
     case userCanceledPayment
     case unableToPresentPaymentSheet
+    case creatingPaymentRequest(reason: String)
     case unknownError
 
     public var customMessage: String {
@@ -25,6 +26,7 @@ public enum ApplePayError: Error {
         case .errorCompletingPayment: return "Payment failed"
         case .userCanceledPayment: return "User has canceled the payment"
         case .unableToPresentPaymentSheet: return "Unable to present ApplePay sheet - check the provided Merchant ID"
+        case .creatingPaymentRequest(let reason): return reason
         case .unknownError: return "Unknown error"
         }
     }

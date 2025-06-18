@@ -109,6 +109,7 @@ struct CheckoutPaymentSheet: View {
                 viewModel.showAlert = true
             }
         }
+        .frame(height: 50.0)
         .padding()
     }
     
