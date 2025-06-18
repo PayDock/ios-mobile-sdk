@@ -208,14 +208,14 @@ struct CheckoutPaymentSheet: View {
                 ColesPayWidget(
                     viewState: viewModel.viewState,
                     loadingDelegate: viewModel,
-                    config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "")) { onColesPayButtonTap in
-                        viewModel.initializeWalletChargeColesPay(completion: onColesPayButtonTap)
-                } completion: { result in
-                    switch result {
-                    case .success: viewModel.handleSuccess()
-                    case .failure(let error): viewModel.handleError(error: error)
+                    config: .init(clientId:  ProjectEnvironment.shared.getColesPayClientId() ?? "")) { tokenResult in
+                        viewModel.initializeWalletChargeColesPay(completion: tokenResult)
+                    } completion: { result in
+                        switch result {
+                        case .success: viewModel.handleSuccess()
+                        case .failure(let error): viewModel.handleError(error: error)
+                        }
                     }
-                }
                 .padding()
             }
             .alert(viewModel.alertTitle,

@@ -15,6 +15,7 @@ public enum ColesPayError: Error {
     case colesPayUrlError
     case webViewFailed(error: NSError)
     case transactionCanceled
+    case initialisingWalletToken(reason: String)
     case unknownError
 
     public var customMessage: String {
@@ -23,6 +24,7 @@ public enum ColesPayError: Error {
         case .colesPayUrlError: return "Failure trying to generate Coles Pay URL"
         case .webViewFailed: return "Coles Pay WebView widget has failed"
         case .transactionCanceled: return "Coles Pay transaction was canceled."
+        case .initialisingWalletToken(let reason): return reason
         case .unknownError: return "Unknown error"
         }
     }
