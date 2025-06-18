@@ -36,7 +36,7 @@ enum SDKButtonStyle {
             return style.appearance.colors.text
         case .outline(let style):
             return style.appearance.colors.text
-        case .image(let style):
+        case .image:
             return .clear
         case .custom(let style):
             return style.appearance.colors.text

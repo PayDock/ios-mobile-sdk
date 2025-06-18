@@ -11,7 +11,7 @@ import SwiftUI
 
 public extension Font {
     
-    public static func sdkDefault(size: Fonts.Size) -> Font {
+    static func sdkDefault(size: Fonts.Size) -> Font {
         return .custom(Appearance.shared.fontName, size: size.rawValue)
     }
 }

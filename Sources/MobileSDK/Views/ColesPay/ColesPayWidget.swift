@@ -51,7 +51,7 @@ public struct ColesPayWidget: View {
     private var webViewSheetContent: some View {
         NavigationStack {
             ColesPayWebView(
-                clientId: viewModel.config.clientId ?? "",
+                clientId: viewModel.config.clientId,
                 colesPayOrderId: viewModel.colesPayOrderId,
                 onApprove: {
                     viewModel.handleSuccess()
