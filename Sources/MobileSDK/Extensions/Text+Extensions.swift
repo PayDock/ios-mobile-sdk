@@ -9,10 +9,6 @@
 import SwiftUI
 
 extension Text {
-
-    func customFont(_ size: Fonts.Size) -> Text {
-        font(.custom(Appearance.shared.fontName, size: size.rawValue))
-    }
     
     func applyAttributes(_ attributes: TextAttributes) -> Text {
         self
