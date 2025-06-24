@@ -31,7 +31,7 @@ public struct GiftCardWidget: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                VStack(spacing: max(max(.spacing - 10, 0), 0)) {
+                VStack(spacing: max(max(.defaultSpacing - 10, 0), 0)) {
                     HStack {
                         cardNumberTextField
                         pinTextField
@@ -40,7 +40,7 @@ public struct GiftCardWidget: View {
                     emptyFocusView
                 }
             }
-            .padding(max(16, .spacing))
+            .padding(max(16, .defaultSpacing))
         }
     }
     

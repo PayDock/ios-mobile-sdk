@@ -69,7 +69,7 @@ public struct AddressWidget: View {
         VStack(spacing: 0) {
             nameHeader
 
-            HStack(spacing: .spacing * 0.75) {
+            HStack(spacing: .defaultSpacing * 0.75) {
                 OutlineTextField(
                     appearance: appearance.textField,
                     text: $viewModel.addressFormManager.firstNameText,

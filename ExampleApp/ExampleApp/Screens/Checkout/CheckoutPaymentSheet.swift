@@ -173,7 +173,7 @@ struct CheckoutPaymentSheet: View {
         .font(Font.system(size: 16, weight: .semibold))
         .frame(height: 48)
         .frame(maxWidth:.infinity)
-        .background(Color.primaryColor)
+        .background(Color.defaultPrimary)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding()
         .sheet(isPresented: $viewModel.showMastercardWebView, content: {
@@ -264,13 +264,13 @@ struct CheckoutPaymentSheet: View {
             if let title = title {
                 Text(title)
                     .font(.subheadline)
-                    .foregroundColor(.textColor)
+                    .foregroundColor(.defaultText)
             }
         }
         .frame(width: 90, height: 49)
         .overlay(
             RoundedRectangle(cornerRadius: 4)
-                .stroke( type == viewModel.selectedMethod ? Color.primaryColor : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
+                .stroke( type == viewModel.selectedMethod ? Color.defaultPrimary : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
         )
         .onTapGesture {
             withAnimation {

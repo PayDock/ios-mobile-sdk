@@ -17,7 +17,6 @@
 		2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
 		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
-		282D31662A66B82900E3ECAD /* OldStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31652A66B82900E3ECAD /* OldStyleView.swift */; };
 		282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */; };
 		282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */; };
 		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
@@ -58,7 +57,6 @@
 		289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */; };
 		289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289D76C02B45FABA002601BB /* CaptureChargeReq.swift */; };
 		28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */; };
-		28A3A9C02A6935A8004A8D34 /* OldStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9BF2A6935A8004A8D34 /* OldStyleVM.swift */; };
 		28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C32A696341004A8D34 /* View+Extensions.swift */; };
 		28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */; };
 		28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C72A697647004A8D34 /* Color+Extensions.swift */; };
@@ -130,7 +128,6 @@
 		2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
-		282D31652A66B82900E3ECAD /* OldStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldStyleView.swift; sourceTree = "<group>"; };
 		282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentSheet.swift; sourceTree = "<group>"; };
 		282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
@@ -176,7 +173,6 @@
 		289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayWidgetVM.swift; sourceTree = "<group>"; };
 		289D76C02B45FABA002601BB /* CaptureChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq.swift; sourceTree = "<group>"; };
 		28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVaultTokenReq.swift; sourceTree = "<group>"; };
-		28A3A9BF2A6935A8004A8D34 /* OldStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldStyleVM.swift; sourceTree = "<group>"; };
 		28A3A9C32A696341004A8D34 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusablePadding.swift; sourceTree = "<group>"; };
 		28A3A9C72A697647004A8D34 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
@@ -330,8 +326,6 @@
 				287F39422DF259ED00F4D771 /* StyleComponentsEnum.swift */,
 				287F39442DF25A0700F4D771 /* StyleWidgetsEnum.swift */,
 				287F39482DF25E5200F4D771 /* StyleWidgetItem.swift */,
-				282D31652A66B82900E3ECAD /* OldStyleView.swift */,
-				28A3A9BF2A6935A8004A8D34 /* OldStyleVM.swift */,
 			);
 			path = Style;
 			sourceTree = "<group>";
@@ -806,7 +800,6 @@
 				287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */,
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
 				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
-				28A3A9C02A6935A8004A8D34 /* OldStyleVM.swift in Sources */,
 				287F39492DF25E5600F4D771 /* StyleWidgetItem.swift in Sources */,
 				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
@@ -845,7 +838,6 @@
 				287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */,
-				282D31662A66B82900E3ECAD /* OldStyleView.swift in Sources */,
 				287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,

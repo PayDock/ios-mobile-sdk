@@ -38,9 +38,9 @@ public struct Theme:
                 searchDropdown: SearchDropdownAppearance = SearchDropdownAppearance(),
                 actionButton: ButtonAppearance = ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
                 expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
-                    colors: .init(background: .defaultBackground, text: .primaryColor, border: .clear),
+                    colors: .init(background: .defaultBackground, text: .defaultPrimary, border: .clear),
                     fonts: .init(title: .init(isUnderlined: true))),
-                toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .primaryColor, border: .clear)),
+                toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .defaultPrimary, border: .clear)),
                 loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),
                 linkText: Theme.TextAppearance = Theme.TextAppearance(text:

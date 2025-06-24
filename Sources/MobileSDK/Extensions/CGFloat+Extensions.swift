@@ -14,9 +14,4 @@ extension CGFloat {
     public static var defaultTextFieldCornerRadius: CGFloat = 4.0
     public static var defaultBorderWidth: CGFloat = 1.0
     public static var defaultSpacing: CGFloat = 16.0
-
-    public static var buttonCornerRadius: CGFloat { Appearance.shared.dimensions.buttonCornerRadius }
-    public static var textFieldCornerRadius: CGFloat { Appearance.shared.dimensions.textFieldCornerRadius }
-    public static var borderWidth: CGFloat { Appearance.shared.dimensions.borderWidth }
-    public static var spacing: CGFloat { Appearance.shared.dimensions.spacing }
 }
