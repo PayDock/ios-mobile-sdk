@@ -43,7 +43,7 @@ struct LoaderStyleView: View {
     }
 
     private var colorListView: some View {
-        VStack {
+        VStack(spacing: 16) {
             ColorPickerView(
                 title: "Loader",
                 text: Binding(

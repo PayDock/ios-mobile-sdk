@@ -26,15 +26,15 @@ enum WidgetsEnum {
     var title: String {
         switch self {
         case .all: return "All widgets"
-        case .card: return "Card"
+        case .card: return "Card Details"
         case .address: return "Address"
         case .giftCard: return "Gift card"
         case .paypal: return "PayPal"
         case .paypalVault: return "PayPal Vault"
         case .colesPay: return "Coles Pay"
-        case .afterPay: return "AfterPay"
-        case .clickToPay: return "ClickToPay"
-        case .applePay: return "ApplePay"
+        case .afterPay: return "Afterpay"
+        case .clickToPay: return "Click To Pay"
+        case .applePay: return "Apple Pay"
         case .integrated3ds: return "Integrated 3DS"
         case .standalone3ds: return "Standalone 3DS"
         }

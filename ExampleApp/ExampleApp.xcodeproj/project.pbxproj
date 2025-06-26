@@ -57,6 +57,15 @@
 		289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */; };
 		289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289D76C02B45FABA002601BB /* CaptureChargeReq.swift */; };
 		28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */; };
+		28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB3E2E0AE5B700A94753 /* ApplePayStyleView.swift */; };
+		28A2DB412E0AE5C100A94753 /* ApplePayStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB402E0AE5BE00A94753 /* ApplePayStyleVM.swift */; };
+		28A2DB442E0AF67500A94753 /* AfterpayStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB432E0AF66D00A94753 /* AfterpayStyleView.swift */; };
+		28A2DB462E0AF68300A94753 /* AfterpayStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB452E0AF67D00A94753 /* AfterpayStyleVM.swift */; };
+		28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB472E0B2EA500A94753 /* SubsectionTitleView.swift */; };
+		28A2DB4B2E0B3E5E00A94753 /* SpacingsStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB4A2E0B3E5A00A94753 /* SpacingsStyleView.swift */; };
+		28A2DB4D2E0B3E6600A94753 /* SpacingsStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB4C2E0B3E6200A94753 /* SpacingsStyleVM.swift */; };
+		28A2DB512E0B54C600A94753 /* ButtonLoaderStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB502E0B54C200A94753 /* ButtonLoaderStyleView.swift */; };
+		28A2DB532E0B556900A94753 /* ButtonLoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB522E0B54C900A94753 /* ButtonLoaderStyleVM.swift */; };
 		28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C32A696341004A8D34 /* View+Extensions.swift */; };
 		28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */; };
 		28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C72A697647004A8D34 /* Color+Extensions.swift */; };
@@ -173,6 +182,15 @@
 		289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayWidgetVM.swift; sourceTree = "<group>"; };
 		289D76C02B45FABA002601BB /* CaptureChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq.swift; sourceTree = "<group>"; };
 		28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVaultTokenReq.swift; sourceTree = "<group>"; };
+		28A2DB3E2E0AE5B700A94753 /* ApplePayStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayStyleView.swift; sourceTree = "<group>"; };
+		28A2DB402E0AE5BE00A94753 /* ApplePayStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayStyleVM.swift; sourceTree = "<group>"; };
+		28A2DB432E0AF66D00A94753 /* AfterpayStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayStyleView.swift; sourceTree = "<group>"; };
+		28A2DB452E0AF67D00A94753 /* AfterpayStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayStyleVM.swift; sourceTree = "<group>"; };
+		28A2DB472E0B2EA500A94753 /* SubsectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsectionTitleView.swift; sourceTree = "<group>"; };
+		28A2DB4A2E0B3E5A00A94753 /* SpacingsStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingsStyleView.swift; sourceTree = "<group>"; };
+		28A2DB4C2E0B3E6200A94753 /* SpacingsStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingsStyleVM.swift; sourceTree = "<group>"; };
+		28A2DB502E0B54C200A94753 /* ButtonLoaderStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonLoaderStyleView.swift; sourceTree = "<group>"; };
+		28A2DB522E0B54C900A94753 /* ButtonLoaderStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonLoaderStyleVM.swift; sourceTree = "<group>"; };
 		28A3A9C32A696341004A8D34 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusablePadding.swift; sourceTree = "<group>"; };
 		28A3A9C72A697647004A8D34 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
@@ -370,6 +388,7 @@
 			isa = PBXGroup;
 			children = (
 				287F39802DF7AA9700F4D771 /* SectionTitleView.swift */,
+				28A2DB472E0B2EA500A94753 /* SubsectionTitleView.swift */,
 				287F397A2DF76DA700F4D771 /* ColorPickerView.swift */,
 				28D8BA602E006AB900EDD422 /* ResetStyleButton.swift */,
 				28D8BA622E00706400EDD422 /* ResetConfirmationModifier.swift */,
@@ -381,6 +400,10 @@
 				28D51D4A2DFC6FE50095CDE5 /* TextField */,
 				28D51D4F2DFF30AB0095CDE5 /* DropDown */,
 				28D51D542DFF61800095CDE5 /* Text */,
+				28A2DB3D2E0AE5AD00A94753 /* ApplePay */,
+				28A2DB422E0AF56000A94753 /* Afterpay */,
+				28A2DB492E0B3E4B00A94753 /* Spacings */,
+				28A2DB4F2E0B54A900A94753 /* ButtonLoader */,
 			);
 			path = StyleComponents;
 			sourceTree = "<group>";
@@ -496,6 +519,42 @@
 				289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */,
 			);
 			path = Mastercard;
+			sourceTree = "<group>";
+		};
+		28A2DB3D2E0AE5AD00A94753 /* ApplePay */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB3E2E0AE5B700A94753 /* ApplePayStyleView.swift */,
+				28A2DB402E0AE5BE00A94753 /* ApplePayStyleVM.swift */,
+			);
+			path = ApplePay;
+			sourceTree = "<group>";
+		};
+		28A2DB422E0AF56000A94753 /* Afterpay */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB432E0AF66D00A94753 /* AfterpayStyleView.swift */,
+				28A2DB452E0AF67D00A94753 /* AfterpayStyleVM.swift */,
+			);
+			path = Afterpay;
+			sourceTree = "<group>";
+		};
+		28A2DB492E0B3E4B00A94753 /* Spacings */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB4A2E0B3E5A00A94753 /* SpacingsStyleView.swift */,
+				28A2DB4C2E0B3E6200A94753 /* SpacingsStyleVM.swift */,
+			);
+			path = Spacings;
+			sourceTree = "<group>";
+		};
+		28A2DB4F2E0B54A900A94753 /* ButtonLoader */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB502E0B54C200A94753 /* ButtonLoaderStyleView.swift */,
+				28A2DB522E0B54C900A94753 /* ButtonLoaderStyleVM.swift */,
+			);
+			path = ButtonLoader;
 			sourceTree = "<group>";
 		};
 		28A3A9C12A6962C2004A8D34 /* CustomViews */ = {
@@ -802,6 +861,7 @@
 				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
 				287F39492DF25E5600F4D771 /* StyleWidgetItem.swift in Sources */,
 				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
+				28A2DB462E0AF68300A94753 /* AfterpayStyleVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
 				28D51D4E2DFC70070095CDE5 /* TextFieldStyleVM.swift in Sources */,
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
@@ -825,8 +885,10 @@
 				287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */,
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
 				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
+				28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
 				28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */,
+				28A2DB4D2E0B3E6600A94753 /* SpacingsStyleVM.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
@@ -850,6 +912,8 @@
 				28D8BA632E00706900EDD422 /* ResetConfirmationModifier.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
+				28A2DB442E0AF67500A94753 /* AfterpayStyleView.swift in Sources */,
+				28A2DB4B2E0B3E5E00A94753 /* SpacingsStyleView.swift in Sources */,
 				287F39412DF259EA00F4D771 /* StyleDarkModeButton.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
@@ -857,6 +921,8 @@
 				287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */,
 				287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */,
 				28D51D512DFF30C00095CDE5 /* DropdownStyleView.swift in Sources */,
+				28A2DB412E0AE5C100A94753 /* ApplePayStyleVM.swift in Sources */,
+				28A2DB532E0B556900A94753 /* ButtonLoaderStyleVM.swift in Sources */,
 				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
 				28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */,
@@ -865,10 +931,12 @@
 				287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
+				28A2DB512E0B54C600A94753 /* ButtonLoaderStyleView.swift in Sources */,
 				287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */,
 				28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */,
 				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
 				287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */,
+				28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */,
 				283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,

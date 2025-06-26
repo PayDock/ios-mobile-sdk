@@ -31,8 +31,8 @@ public struct GiftCardWidget: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                VStack(spacing: max(max(.defaultSpacing - 10, 0), 0)) {
-                    HStack {
+                VStack(spacing: appearance.verticalSpacing) {
+                    HStack(spacing: appearance.horizontalSpacing) {
                         cardNumberTextField
                         pinTextField
                     }
@@ -40,7 +40,7 @@ public struct GiftCardWidget: View {
                     emptyFocusView
                 }
             }
-            .padding(max(16, .defaultSpacing))
+            .padding(16.0)
         }
     }
     
@@ -82,7 +82,6 @@ public struct GiftCardWidget: View {
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
         })
         .focused($textFieldInFocus, equals: .cardNumber)
-        .frame(width: UIScreen.main.bounds.width * 0.65)
     }
     
     private var pinTextField: some View {
@@ -122,6 +121,7 @@ public struct GiftCardWidget: View {
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
         })
         .focused($textFieldInFocus, equals: .pin)
+        .frame(width: UIScreen.main.bounds.width * 0.25)
     }
     
     private var primaryButton: some View {

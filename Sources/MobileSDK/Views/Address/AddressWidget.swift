@@ -27,24 +27,26 @@ public struct AddressWidget: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: appearance.verticalSpacing) {
-                nameAndLastNameView
-                autocompleteTextFieldView
-
-                if viewModel.addressFormManager.isAddressFormExpanded {
-                    addressLine1View
-                    addressLine2View
-                    cityView
-                    stateView
-                    postcodeView
-                    countryView
-                } else {
-                    manualEntryButton
+                VStack(spacing: 8.0) {
+                    nameAndLastNameView
+                    autocompleteTextFieldView
+                    
+                    if viewModel.addressFormManager.isAddressFormExpanded {
+                        addressLine1View
+                        addressLine2View
+                        cityView
+                        stateView
+                        postcodeView
+                        countryView
+                    } else {
+                        manualEntryButton
+                    }
                 }
 
                 saveButton
                 emptyFocusView
             }
-            .padding(.horizontal, appearance.horizontalSpacing)
+            .padding(.horizontal, 16.0)
         }
         .onAppear {
             viewModel.updateAddress()
@@ -69,7 +71,7 @@ public struct AddressWidget: View {
         VStack(spacing: 0) {
             nameHeader
 
-            HStack(spacing: .defaultSpacing * 0.75) {
+            HStack(spacing: appearance.horizontalSpacing) {
                 OutlineTextField(
                     appearance: appearance.textField,
                     text: $viewModel.addressFormManager.firstNameText,

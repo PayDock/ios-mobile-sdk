@@ -25,15 +25,15 @@ class StyleVM: ObservableObject {
     
     func getComponentsForWidget(_ widget: WidgetsEnum) -> [StyleComponentsEnum] {
         switch widget {
-        case .all: return [.textField, .searchDropdown, .actionButton, .expandSectionButton, .toolbarButton, .loader, .toggle, .linkText, .toggleText, .description, .title]
-        case .card: return [.textField, .title, .actionButton, .toolbarButton, .toggle, .toggleText, .linkText]
-        case .giftCard: return [.textField, .title, .actionButton, .toolbarButton]
-        case .address: return [.textField, .title, .actionButton, .expandSectionButton, .searchDropdown]
-        case .applePay: return [] // TODO: - Nothing we can customize from UI - best to remove from the list
-        case .paypal: return [.actionButton]
+        case .all: return [.actionButton, .expandSectionButton, .linkText, .loader, .searchDropdown, .textField, .title, .toggle, .toggleText, .toolbarButton]
+        case .card: return [.actionButton, .linkText, .spacings, .textField, .title, .toggle, .toggleText, .toolbarButton]
+        case .giftCard: return [.actionButton, .spacings, .textField, .title, .toolbarButton]
+        case .address: return [.actionButton, .expandSectionButton, .searchDropdown, .spacings, .textField, .title]
+        case .applePay: return [.applePay]
+        case .paypal: return [.buttonLoader]
         case .paypalVault: return [.actionButton]
         case .colesPay: return [.loader]
-        case .afterPay: return [.loader]
+        case .afterPay: return [.afterpay, .loader]
         case .clickToPay: return [.loader]
         case .integrated3ds: return [.loader]
         case .standalone3ds: return [.loader]

@@ -27,6 +27,7 @@ class ButtonStyleVM<T>: ObservableObject {
     @Published var textColor: Color = .clear { didSet { updateAppearance() }}
     @Published var imageColor: Color = .clear { didSet { updateAppearance() }}
     @Published var borderColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var loaderColor: Color = .clear { didSet { updateAppearance() }}
     @Published var cornerRadius: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var borderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var fontName: String = "" { didSet { updateAppearance() }}
@@ -49,6 +50,7 @@ class ButtonStyleVM<T>: ObservableObject {
         self.textColor = buttonAppearance?.colors.text ?? .clear
         self.imageColor = buttonAppearance?.colors.text ?? .clear
         self.borderColor = buttonAppearance?.colors.border ?? .clear
+        self.loaderColor = buttonAppearance?.loader.spinnerColor ?? .clear
         self.cornerRadius = buttonAppearance?.dimensions.cornerRadius ?? 0
         self.borderWidth = buttonAppearance?.dimensions.borderWidth ?? 0
         self.fontName = buttonAppearance?.fonts.title.customFont.name ?? ""
@@ -61,6 +63,7 @@ class ButtonStyleVM<T>: ObservableObject {
         appearance[keyPath: buttonKeyPath].colors.text = textColor
         appearance[keyPath: buttonKeyPath].colors.image = imageColor
         appearance[keyPath: buttonKeyPath].colors.border = borderColor
+        appearance[keyPath: buttonKeyPath].loader.spinnerColor = loaderColor
         appearance[keyPath: buttonKeyPath].dimensions.cornerRadius = cornerRadius
         appearance[keyPath: buttonKeyPath].dimensions.borderWidth = borderWidth
         appearance[keyPath: buttonKeyPath].fonts.title.customFont.name = fontName
