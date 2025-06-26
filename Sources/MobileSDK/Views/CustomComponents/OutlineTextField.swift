@@ -158,6 +158,9 @@ struct OutlineTextField: View {
                 .disabled(disabled)
                 .frame(height: getTextFieldHeight())
                 .font(appearance.fonts.text.customFont.font)
+                .underline(appearance.fonts.text.isUnderlined, color: appearance.fonts.text.underlineColor)
+                .strikethrough(appearance.fonts.text.isStrikethrough, color: appearance.fonts.text.strikethroughColor)
+                .italic(appearance.fonts.text.isItalic)
                 .foregroundColor(appearance.colors.text)
                 .tint(appearance.colors.active)
                 .accessibilityLabel(title)
@@ -181,6 +184,9 @@ struct OutlineTextField: View {
                 Text(title)
                     .foregroundColor(.white)
                     .colorMultiply(titleColor)
+                    .strikethrough(appearance.fonts.title.isStrikethrough, color: appearance.fonts.title.strikethroughColor)
+                    .underline(appearance.fonts.title.isUnderlined, color: appearance.fonts.title.underlineColor)
+                    .italic(appearance.fonts.title.isItalic)
                     .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.name)
                     .padding([.leading, .trailing], 4.0)
                     .layoutPriority(1)
@@ -294,7 +300,7 @@ private extension OutlineTextField {
 
     func updateTitleFontSize() {
         if editing || !text.isEmpty {
-            titleFontSize = appearance.fonts.error.customFont.size // TODO: - Check if we want to name this one better
+            titleFontSize = appearance.fonts.title.customFont.size / 1.4
         } else {
             titleFontSize = appearance.fonts.title.customFont.size
         }

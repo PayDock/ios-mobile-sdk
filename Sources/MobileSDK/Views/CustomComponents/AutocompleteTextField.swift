@@ -125,6 +125,7 @@ struct AutocompleteTextField: View {
                             ForEach(filteredOptions, id: \.self) { option in
                                 HStack {
                                     Text(option)
+                                        .applyAttributes(appearance.dropdown.text.listText.text)
                                         .font(appearance.dropdown.text.listText.text.customFont.font)
                                         .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                         .padding(.horizontal, 16)
