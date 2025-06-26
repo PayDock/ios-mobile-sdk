@@ -12,12 +12,12 @@ class StyleVM: ObservableObject {
     
     // MARK: - Properties
     
-    let selectedWidget: WidgetsEnum
+    var selectedWidget: WidgetsEnum
     @Published var stylingDarkMode = false
     
     // MARK: - Initialization
     
-    init(selectedWidget: WidgetsEnum) {
+    init(selectedWidget: WidgetsEnum = .all) {
         self.selectedWidget = selectedWidget
     }
     
