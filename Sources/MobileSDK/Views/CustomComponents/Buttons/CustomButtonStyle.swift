@@ -32,8 +32,8 @@ struct CustomButtonStyle: ButtonStyle {
             .foregroundColor(currentForegroundColor)
             .background(isDisabled || configuration.isPressed ? appearance.colors.background.opacity(0.8) : appearance.colors.background)
             .cornerRadius(appearance.dimensions.cornerRadius)
-            .underline(appearance.fonts.title.isUnderlined)
-            .strikethrough(appearance.fonts.title.isStrikethrough)
+            .underline(appearance.fonts.title.isUnderlined, color: appearance.fonts.title.underlineColor)
+            .strikethrough(appearance.fonts.title.isStrikethrough, color: appearance.fonts.title.strikethroughColor)
             .italic(appearance.fonts.title.isItalic)
             .overlay(
                 RoundedRectangle(cornerRadius: appearance.dimensions.cornerRadius)

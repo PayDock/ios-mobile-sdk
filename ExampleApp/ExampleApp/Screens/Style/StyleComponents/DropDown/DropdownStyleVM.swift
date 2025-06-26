@@ -35,9 +35,16 @@ class DropdownStyleVM: ObservableObject {
     @Published var dropdownBottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var dropdownTrailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
     
+    // Dropdown Dimensions
+    
+    @Published var dropdownListSpacing: CGFloat = 0.0 { didSet { updateAppearance() }}
+    
     // Dropdown Fonts
     
+    @Published var dropdownUnderlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var dropdownStrikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var dropdownListFont: String = "" { didSet { updateAppearance() }}
+    @Published var dropdownFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
     
     // MARK: - Textfield
     // Textfield Colors
@@ -60,10 +67,25 @@ class DropdownStyleVM: ObservableObject {
     @Published var textFieldTrailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
     
     // Textfield Fonts
+    @Published var textUnderlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var textStrikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var textFont: String = "" { didSet { updateAppearance() }}
+    @Published var textFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
+    
+    @Published var titleUnderlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var titleStrikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var titleFont: String = "" { didSet { updateAppearance() }}
+    @Published var titleFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
+    
+    @Published var placeholderUnderlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var placeholderStrikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var placeholderFont: String = "" { didSet { updateAppearance() }}
+    @Published var placeholderFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
+    
+    @Published var errorUnderlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var errorStrikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var errorFont: String = "" { didSet { updateAppearance() }}
+    @Published var errorFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
 
 
     // MARK: - Initialization
@@ -86,7 +108,12 @@ class DropdownStyleVM: ObservableObject {
         self.dropdownBottomPadding = appearance?.searchDropdown.dropdown.dimensions.padding.bottom ?? 0
         self.dropdownTrailingPadding = appearance?.searchDropdown.dropdown.dimensions.padding.trailing ?? 0
         
+        self.dropdownListSpacing = appearance?.searchDropdown.dropdown.dimensions.listSpacing ?? 0
+        
+        self.dropdownUnderlineColor = appearance?.searchDropdown.dropdown.text.listText.text.underlineColor ?? .clear
+        self.dropdownStrikethroughColor = appearance?.searchDropdown.dropdown.text.listText.text.strikethroughColor ?? .clear
         self.dropdownListFont = appearance?.searchDropdown.dropdown.text.listText.text.customFont.name ?? ""
+        self.dropdownFontSize = appearance?.searchDropdown.dropdown.text.listText.text.customFont.size ?? 0
         
         // TextField
         self.activeColor = appearance?.searchDropdown.textField.colors.active ?? .clear
@@ -106,10 +133,25 @@ class DropdownStyleVM: ObservableObject {
         self.textFieldBottomPadding = appearance?.searchDropdown.textField.dimensions.padding.bottom ?? 0
         self.textFieldTrailingPadding = appearance?.searchDropdown.textField.dimensions.padding.trailing ?? 0
         
+        self.textUnderlineColor = appearance?.searchDropdown.textField.fonts.text.underlineColor ?? .clear
+        self.textStrikethroughColor = appearance?.searchDropdown.textField.fonts.text.strikethroughColor ?? .clear
         self.textFont = appearance?.searchDropdown.textField.fonts.text.customFont.name ?? ""
+        self.textFontSize = appearance?.searchDropdown.textField.fonts.text.customFont.size ?? 0.0
+        
+        self.titleUnderlineColor = appearance?.searchDropdown.textField.fonts.title.underlineColor ?? .clear
+        self.titleStrikethroughColor = appearance?.searchDropdown.textField.fonts.title.strikethroughColor ?? .clear
         self.titleFont = appearance?.searchDropdown.textField.fonts.title.customFont.name ?? ""
+        self.titleFontSize = appearance?.searchDropdown.textField.fonts.title.customFont.size ?? 0.0
+        
+        self.placeholderUnderlineColor = appearance?.searchDropdown.textField.fonts.placeholder.underlineColor ?? .clear
+        self.placeholderStrikethroughColor = appearance?.searchDropdown.textField.fonts.placeholder.strikethroughColor ?? .clear
         self.placeholderFont = appearance?.searchDropdown.textField.fonts.placeholder.customFont.name ?? ""
+        self.placeholderFontSize = appearance?.searchDropdown.textField.fonts.placeholder.customFont.size ?? 0.0
+        
+        self.errorUnderlineColor = appearance?.searchDropdown.textField.fonts.error.underlineColor ?? .clear
+        self.errorStrikethroughColor = appearance?.searchDropdown.textField.fonts.error.strikethroughColor ?? .clear
         self.errorFont = appearance?.searchDropdown.textField.fonts.error.customFont.name ?? ""
+        self.errorFontSize = appearance?.searchDropdown.textField.fonts.error.customFont.size ?? 0.0
     }
     
     private func updateAppearance() {
@@ -123,7 +165,12 @@ class DropdownStyleVM: ObservableObject {
         appearance.searchDropdown.dropdown.dimensions.padding.bottom = dropdownBottomPadding
         appearance.searchDropdown.dropdown.dimensions.padding.trailing = dropdownTrailingPadding
         
+        appearance.searchDropdown.dropdown.dimensions.listSpacing = dropdownListSpacing
+        
+        appearance.searchDropdown.dropdown.text.listText.text.underlineColor = dropdownUnderlineColor
+        appearance.searchDropdown.dropdown.text.listText.text.strikethroughColor = dropdownStrikethroughColor
         appearance.searchDropdown.dropdown.text.listText.text.customFont.name = dropdownListFont
+        appearance.searchDropdown.dropdown.text.listText.text.customFont.size = dropdownFontSize
         
         // TextField
         appearance.searchDropdown.textField.colors.active = activeColor
@@ -143,10 +190,25 @@ class DropdownStyleVM: ObservableObject {
         appearance.searchDropdown.textField.dimensions.padding.bottom = textFieldBottomPadding
         appearance.searchDropdown.textField.dimensions.padding.trailing = textFieldTrailingPadding
         
+        appearance.searchDropdown.textField.fonts.text.underlineColor = textUnderlineColor
+        appearance.searchDropdown.textField.fonts.text.strikethroughColor = textStrikethroughColor
         appearance.searchDropdown.textField.fonts.text.customFont.name = textFont
+        appearance.searchDropdown.textField.fonts.text.customFont.size = textFontSize
+
+        appearance.searchDropdown.textField.fonts.title.underlineColor = titleUnderlineColor
+        appearance.searchDropdown.textField.fonts.title.strikethroughColor = titleStrikethroughColor
         appearance.searchDropdown.textField.fonts.title.customFont.name = titleFont
+        appearance.searchDropdown.textField.fonts.title.customFont.size = titleFontSize
+        
+        appearance.searchDropdown.textField.fonts.placeholder.underlineColor = placeholderUnderlineColor
+        appearance.searchDropdown.textField.fonts.placeholder.strikethroughColor = placeholderStrikethroughColor
         appearance.searchDropdown.textField.fonts.placeholder.customFont.name = placeholderFont
+        appearance.searchDropdown.textField.fonts.placeholder.customFont.size = placeholderFontSize
+        
+        appearance.searchDropdown.textField.fonts.error.underlineColor = errorUnderlineColor
+        appearance.searchDropdown.textField.fonts.error.strikethroughColor = errorStrikethroughColor
         appearance.searchDropdown.textField.fonts.error.customFont.name = errorFont
+        appearance.searchDropdown.textField.fonts.error.customFont.size = errorFontSize
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
     }

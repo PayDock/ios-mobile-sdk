@@ -37,7 +37,7 @@ public struct Theme:
                 actionButton: ButtonAppearance = ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
                 expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
                     colors: .init(background: .defaultBackground, text: .defaultPrimary, border: .clear),
-                    fonts: .init(title: .init(isUnderlined: true))),
+                    fonts: .init(title: .init(isUnderlined: true, underlineColor: .defaultPrimary))),
                 toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .defaultPrimary, border: .clear)),
                 loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),

@@ -25,34 +25,38 @@ public struct AddressWidget: View {
     }
 
     public var body: some View {
-        ScrollView {
-            VStack(spacing: appearance.verticalSpacing) {
-                VStack(spacing: 8.0) {
-                    nameAndLastNameView
-                    autocompleteTextFieldView
-                    
-                    if viewModel.addressFormManager.isAddressFormExpanded {
-                        addressLine1View
-                        addressLine2View
-                        cityView
-                        stateView
-                        postcodeView
-                        countryView
-                    } else {
-                        manualEntryButton
+        ZStack {
+            ScrollView {
+                VStack(spacing: appearance.verticalSpacing) {
+                    VStack(spacing: 8.0) {
+                        nameAndLastNameView
+                        autocompleteTextFieldView
+                            .zIndex(100)
+                            .padding(.bottom, viewModel.addressFormManager.showAddressSearchPopup ? 120 : 0)
+                        if viewModel.addressFormManager.isAddressFormExpanded {
+                            addressLine1View
+                            addressLine2View
+                            cityView
+                            stateView
+                            postcodeView
+                            countryView
+                        } else {
+                            manualEntryButton
+                        }
                     }
-                }
 
-                saveButton
-                emptyFocusView
+                    saveButton
+                    emptyFocusView
+                }
+                .animation(.easeInOut, value: viewModel.addressFormManager.showAddressSearchPopup)
+                .padding(.horizontal, 16.0)
             }
-            .padding(.horizontal, 16.0)
-        }
-        .onAppear {
-            viewModel.updateAddress()
-        }
-        .onTapGesture {
-            viewModel.addressFormManager.setEditingTextField(focusedField: nil)
+            .onAppear {
+                viewModel.updateAddress()
+            }
+            .onTapGesture {
+                viewModel.addressFormManager.setEditingTextField(focusedField: nil)
+            }
         }
     }
 
@@ -182,7 +186,6 @@ public struct AddressWidget: View {
             .focused($textFieldInFocus, equals: .searchAddress)
             .padding(.bottom, 6)
         }
-        .zIndex(1)
     }
 
     private var manualEntryButton: some View {

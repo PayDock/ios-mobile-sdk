@@ -19,9 +19,9 @@ public struct TextAttributes {
     
     public init(font: CustomFont = CustomFont(name: "FFF-AcidGrotesk-Normal", size: 14.0),
                 textColor: Color = .defaultText,
-                isUnderlined: Bool = false,
+                isUnderlined: Bool = true,
                 underlineColor: Color = .clear,
-                isStrikethrough: Bool = false,
+                isStrikethrough: Bool = true,
                 strikethroughColor: Color = .clear,
                 isItalic: Bool = false) {
         self.customFont = font

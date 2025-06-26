@@ -28,9 +28,18 @@ class ButtonStyleVM<T>: ObservableObject {
     @Published var imageColor: Color = .clear { didSet { updateAppearance() }}
     @Published var borderColor: Color = .clear { didSet { updateAppearance() }}
     @Published var loaderColor: Color = .clear { didSet { updateAppearance() }}
+    
     @Published var cornerRadius: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var borderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var topPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var leadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var bottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var trailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    
+    @Published var underlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var strikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var fontName: String = "" { didSet { updateAppearance() }}
+    @Published var fontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
     
     // MARK: - Initialization
     
@@ -51,9 +60,18 @@ class ButtonStyleVM<T>: ObservableObject {
         self.imageColor = buttonAppearance?.colors.text ?? .clear
         self.borderColor = buttonAppearance?.colors.border ?? .clear
         self.loaderColor = buttonAppearance?.loader.spinnerColor ?? .clear
+        
         self.cornerRadius = buttonAppearance?.dimensions.cornerRadius ?? 0
         self.borderWidth = buttonAppearance?.dimensions.borderWidth ?? 0
+        self.topPadding = buttonAppearance?.dimensions.padding.top ?? 0
+        self.leadingPadding = buttonAppearance?.dimensions.padding.leading ?? 0
+        self.bottomPadding = buttonAppearance?.dimensions.padding.bottom ?? 0
+        self.trailingPadding = buttonAppearance?.dimensions.padding.trailing ?? 0
+        
+        self.underlineColor = buttonAppearance?.fonts.title.underlineColor ?? .clear
+        self.strikethroughColor = buttonAppearance?.fonts.title.strikethroughColor ?? .clear
         self.fontName = buttonAppearance?.fonts.title.customFont.name ?? ""
+        self.fontSize = buttonAppearance?.fonts.title.customFont.size ?? 0
     }
     
     private func updateAppearance() {
@@ -64,9 +82,18 @@ class ButtonStyleVM<T>: ObservableObject {
         appearance[keyPath: buttonKeyPath].colors.image = imageColor
         appearance[keyPath: buttonKeyPath].colors.border = borderColor
         appearance[keyPath: buttonKeyPath].loader.spinnerColor = loaderColor
+        
         appearance[keyPath: buttonKeyPath].dimensions.cornerRadius = cornerRadius
         appearance[keyPath: buttonKeyPath].dimensions.borderWidth = borderWidth
+        appearance[keyPath: buttonKeyPath].dimensions.padding.top = topPadding
+        appearance[keyPath: buttonKeyPath].dimensions.padding.leading = leadingPadding
+        appearance[keyPath: buttonKeyPath].dimensions.padding.bottom = bottomPadding
+        appearance[keyPath: buttonKeyPath].dimensions.padding.trailing = trailingPadding
+        
+        appearance[keyPath: buttonKeyPath].fonts.title.underlineColor = underlineColor
+        appearance[keyPath: buttonKeyPath].fonts.title.strikethroughColor = strikethroughColor
         appearance[keyPath: buttonKeyPath].fonts.title.customFont.name = fontName
+        appearance[keyPath: buttonKeyPath].fonts.title.customFont.size = fontSize
         
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)

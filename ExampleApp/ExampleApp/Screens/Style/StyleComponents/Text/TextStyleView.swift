@@ -117,6 +117,12 @@ struct TextStyleView<T>: View {
                 onSelection: { fontName in
                     viewModel.fontName = fontName
                 })
+            
+            DimensionsFieldView(
+                title: "Font size",
+                text: Binding(
+                    get: { "\(viewModel.fontSize)" },
+                    set: { viewModel.fontSize = CGFloat(Double($0) ?? 0) }))
         }
     }
 }

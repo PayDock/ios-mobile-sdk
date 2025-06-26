@@ -36,6 +36,7 @@ class TextStyleVM<T>: ObservableObject {
     
     // Fonts
     @Published var fontName: String = "" { didSet { updateAppearance() }}
+    @Published var fontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
     
     // MARK: - Initialization
     
@@ -62,6 +63,7 @@ class TextStyleVM<T>: ObservableObject {
         self.trailingPadding = textAppearance?.padding.trailing ?? 0
         
         self.fontName = textAppearance?.text.customFont.name ?? ""
+        self.fontSize = textAppearance?.text.customFont.size ?? 0
     }
     
     private func updateAppearance() {
@@ -77,7 +79,8 @@ class TextStyleVM<T>: ObservableObject {
         appearance[keyPath: textKeyPath].padding.trailing = trailingPadding
         
         appearance[keyPath: textKeyPath].text.customFont.name = fontName
-        
+        appearance[keyPath: textKeyPath].text.customFont.size = fontSize
+
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
     }

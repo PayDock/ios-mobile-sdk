@@ -106,18 +106,62 @@ struct ButtonStyleView<T>: View {
                 text: Binding(
                     get: { "\(viewModel.borderWidth)" },
                     set: { viewModel.borderWidth = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Top padding",
+                text: Binding(
+                    get: { "\(viewModel.topPadding)" },
+                    set: { viewModel.topPadding = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Leading padding",
+                text: Binding(
+                    get: { "\(viewModel.leadingPadding)" },
+                    set: { viewModel.leadingPadding = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Bottom padding",
+                text: Binding(
+                    get: { "\(viewModel.bottomPadding)" },
+                    set: { viewModel.bottomPadding = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Trailing padding",
+                text: Binding(
+                    get: { "\(viewModel.trailingPadding)" },
+                    set: { viewModel.trailingPadding = CGFloat(Double($0) ?? 0) }))
         }
     }
     
     private var fontListView: some View {
         VStack (spacing: 16) {
+            ColorPickerView(
+                title: "Underline color",
+                text: Binding(
+                    get: { viewModel.underlineColor.toHex() },
+                    set: { viewModel.underlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.underlineColor)
+            
+            ColorPickerView(
+                title: "Strikethrough color",
+                text: Binding(
+                    get: { viewModel.strikethroughColor.toHex() },
+                    set: { viewModel.strikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.strikethroughColor)
+            
             PickerView(
                 entries: viewModel.allFontNames,
                 selected: $viewModel.fontName,
-                placeholder: "Select Font",
+                placeholder: "Select font",
                 onSelection: { fontName in
                     viewModel.fontName = fontName
                 })
+            
+            DimensionsFieldView(
+                title: "Font size",
+                text: Binding(
+                    get: { "\(viewModel.fontSize)" },
+                    set: { viewModel.fontSize = CGFloat(Double($0) ?? 0) }))
         }
     }
 }

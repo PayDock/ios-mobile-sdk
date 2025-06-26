@@ -29,6 +29,8 @@ struct DropdownStyleView: View {
                     SectionTitleView(title: "Dropdown")
                     SubsectionTitleView(title: "Colors")
                     dropdownColorListView
+                    SubsectionTitleView(title: "Dimensions")
+                    dropdownSpacingListView
                     SubsectionTitleView(title: "Padding")
                     dropdownPaddingListView
                     SubsectionTitleView(title: "Fonts")
@@ -106,8 +108,32 @@ struct DropdownStyleView: View {
         }
     }
     
+    private var dropdownSpacingListView: some View {
+        VStack (spacing: 16) {
+            DimensionsFieldView(
+                title: "List Spacing",
+                text: Binding(
+                    get: { "\(viewModel.dropdownListSpacing)" },
+                    set: { viewModel.dropdownListSpacing = CGFloat(Double($0) ?? 0) }))
+        }
+    }
+    
     private var dropdownFontListView: some View {
         VStack (spacing: 16) {
+            ColorPickerView(
+                title: "Underline color",
+                text: Binding(
+                    get: { viewModel.dropdownUnderlineColor.toHex() },
+                    set: { viewModel.dropdownUnderlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.dropdownUnderlineColor)
+            
+            ColorPickerView(
+                title: "Strikethrough color",
+                text: Binding(
+                    get: { viewModel.dropdownStrikethroughColor.toHex() },
+                    set: { viewModel.dropdownStrikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.dropdownStrikethroughColor)
+            
             PickerView(
                 entries: viewModel.allFontNames,
                 selected: $viewModel.dropdownListFont,
@@ -115,6 +141,12 @@ struct DropdownStyleView: View {
                 onSelection: { fontName in
                     viewModel.dropdownListFont = fontName
                 })
+            
+            DimensionsFieldView(
+                title: "Font size",
+                text: Binding(
+                    get: { "\(viewModel.dropdownFontSize)" },
+                    set: { viewModel.dropdownFontSize = CGFloat(Double($0) ?? 0) }))
         }
     }
     
@@ -225,6 +257,22 @@ struct DropdownStyleView: View {
     
     private var textFieldFontListView: some View {
         VStack (spacing: 16) {
+            // Text
+            SubsectionTitleView(title: "Text")
+            ColorPickerView(
+                title: "Text underline color",
+                text: Binding(
+                    get: { viewModel.textUnderlineColor.toHex() },
+                    set: { viewModel.textUnderlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.textUnderlineColor)
+            
+            ColorPickerView(
+                title: "Text strikethrough color",
+                text: Binding(
+                    get: { viewModel.textStrikethroughColor.toHex() },
+                    set: { viewModel.textStrikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.textStrikethroughColor)
+            
             PickerView(
                 entries: viewModel.allFontNames,
                 selected: $viewModel.textFont,
@@ -232,6 +280,29 @@ struct DropdownStyleView: View {
                 onSelection: { fontName in
                     viewModel.textFont = fontName
                 })
+            
+            DimensionsFieldView(
+                title: "Text font size",
+                text: Binding(
+                    get: { "\(viewModel.textFontSize)" },
+                    set: { viewModel.textFontSize = CGFloat(Double($0) ?? 0) }))
+            
+            // MARK: - Title
+            SubsectionTitleView(title: "Title")
+            
+            ColorPickerView(
+                title: "Title underline color",
+                text: Binding(
+                    get: { viewModel.titleUnderlineColor.toHex() },
+                    set: { viewModel.titleUnderlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.titleUnderlineColor)
+            
+            ColorPickerView(
+                title: "Title strikethrough color",
+                text: Binding(
+                    get: { viewModel.titleStrikethroughColor.toHex() },
+                    set: { viewModel.titleStrikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.titleStrikethroughColor)
             
             PickerView(
                 entries: viewModel.allFontNames,
@@ -241,6 +312,29 @@ struct DropdownStyleView: View {
                     viewModel.titleFont = fontName
                 })
             
+            DimensionsFieldView(
+                title: "Title font size",
+                text: Binding(
+                    get: { "\(viewModel.titleFontSize)" },
+                    set: { viewModel.titleFontSize = CGFloat(Double($0) ?? 0) }))
+            
+            // MARK: - Placeholder
+            
+            SubsectionTitleView(title: "Placeholder")
+            ColorPickerView(
+                title: "Placeholder underline color",
+                text: Binding(
+                    get: { viewModel.placeholderUnderlineColor.toHex() },
+                    set: { viewModel.placeholderUnderlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.placeholderUnderlineColor)
+            
+            ColorPickerView(
+                title: "Placeholder strikethrough color",
+                text: Binding(
+                    get: { viewModel.placeholderStrikethroughColor.toHex() },
+                    set: { viewModel.placeholderStrikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.placeholderStrikethroughColor)
+            
             PickerView(
                 entries: viewModel.allFontNames,
                 selected: $viewModel.placeholderFont,
@@ -249,6 +343,29 @@ struct DropdownStyleView: View {
                     viewModel.placeholderFont = fontName
                 })
             
+            DimensionsFieldView(
+                title: "Placeholder font size",
+                text: Binding(
+                    get: { "\(viewModel.placeholderFontSize)" },
+                    set: { viewModel.placeholderFontSize = CGFloat(Double($0) ?? 0) }))
+            
+            // MARK: - Error
+            
+            SubsectionTitleView(title: "Error")
+            ColorPickerView(
+                title: "Error underline color",
+                text: Binding(
+                    get: { viewModel.errorUnderlineColor.toHex() },
+                    set: { viewModel.errorUnderlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.errorUnderlineColor)
+            
+            ColorPickerView(
+                title: "Error strikethrough color",
+                text: Binding(
+                    get: { viewModel.errorStrikethroughColor.toHex() },
+                    set: { viewModel.errorStrikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.errorStrikethroughColor)
+            
             PickerView(
                 entries: viewModel.allFontNames,
                 selected: $viewModel.errorFont,
@@ -256,6 +373,12 @@ struct DropdownStyleView: View {
                 onSelection: { fontName in
                     viewModel.errorFont = fontName
                 })
+            
+            DimensionsFieldView(
+                title: "Error font size",
+                text: Binding(
+                    get: { "\(viewModel.errorFontSize)" },
+                    set: { viewModel.errorFontSize = CGFloat(Double($0) ?? 0) }))
         }
     }
 }
