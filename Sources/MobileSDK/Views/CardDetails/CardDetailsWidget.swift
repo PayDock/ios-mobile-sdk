@@ -36,7 +36,7 @@ public struct CardDetailsWidget: View {
     // MARK: - View protocol properties
     
     public var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: appearance.verticalSpacing) {
             if viewModel.config.showCardTitle {
                 HStack {
                     Text("Card information")
@@ -63,7 +63,7 @@ public struct CardDetailsWidget: View {
                 .padding(.bottom, 16)
             }
 
-            VStack(spacing: appearance.verticalSpacing) {
+            VStack(spacing: 8) {
                 if viewModel.config.collectCardholderName {
                     OutlineTextField(
                         appearance: appearance.textField,
@@ -226,9 +226,10 @@ public struct CardDetailsWidget: View {
                         viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: newValue)
                     }
                 }
-                if viewModel.config.allowSaveCard != nil {
-                    privacyView
-                }
+            }
+            
+            if viewModel.config.allowSaveCard != nil {
+                privacyView
             }
             
             SDKButton(title: viewModel.config.actionText,

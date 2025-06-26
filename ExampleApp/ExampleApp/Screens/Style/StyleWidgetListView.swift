@@ -78,6 +78,7 @@ struct StyleWidgetListView: View {
         HStack {
             HStack {
                 icon
+                    .frame(width: 24.0, height: 24.0)
                 Text(title)
                     .font(.title2)
                     .padding(.vertical, 6)

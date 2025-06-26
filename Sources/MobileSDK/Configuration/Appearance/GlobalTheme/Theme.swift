@@ -18,7 +18,6 @@ public struct Theme:
     TextFieldStylableAppearance,
     DropdownStylableAppearance,
     TitleStylableAppearance,
-    DescriptionStylableAppearance,
     LinkTextStylableAppearance,
     ToggleTextStylableAppearance {
     
@@ -31,7 +30,6 @@ public struct Theme:
     public var toggle: ToggleAppearance
     public var linkText: TextAppearance
     public var toggleText: TextAppearance
-    public var description: TextAppearance
     public var title: TextAppearance
     
     public init(textField: TextFieldAppearance = TextFieldAppearance(),
@@ -57,7 +55,6 @@ public struct Theme:
         self.toggle = toggle
         self.linkText = linkText
         self.toggleText = toggleText
-        self.description = description
         self.title = title
     }
 }

@@ -22,7 +22,25 @@ class DropdownStyleVM: ObservableObject {
     private var appearance: DropdownStylableAppearance?
     @Published var showResetConfirmation = false
 
-    // Colors
+    // MARK: - Dropdown
+    // Dropdown Colors
+    
+    @Published var dropdownBackgroundColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var dropdownListColor: Color = .clear { didSet { updateAppearance() }}
+    
+    // Dropdown Padding
+    
+    @Published var dropdownTopPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var dropdownLeadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var dropdownBottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var dropdownTrailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    
+    // Dropdown Fonts
+    
+    @Published var dropdownListFont: String = "" { didSet { updateAppearance() }}
+    
+    // MARK: - Textfield
+    // Textfield Colors
     @Published var activeColor: Color = .clear { didSet { updateAppearance() }}
     @Published var inactiveColor: Color = .clear { didSet { updateAppearance() }}
     @Published var errorColor: Color = .clear { didSet { updateAppearance() }}
@@ -30,24 +48,23 @@ class DropdownStyleVM: ObservableObject {
     @Published var textColor: Color = .clear { didSet { updateAppearance() }}
     @Published var placeholderColor: Color = .clear { didSet { updateAppearance() }}
     @Published var backgroundColor: Color = .clear { didSet { updateAppearance() }}
-    @Published var dropdownBackgroundColor: Color = .clear { didSet { updateAppearance() }}
-    @Published var dropdownListColor: Color = .clear { didSet { updateAppearance() }}
+
     
-    // Dimensions
+    // Textfield Dimensions
     @Published var cornerRadius: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var borderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var activeBorderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
-    @Published var topPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
-    @Published var leadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
-    @Published var bottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
-    @Published var trailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var textFieldTopPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var textFieldLeadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var textFieldBottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var textFieldTrailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
     
-    // Fonts
+    // Textfield Fonts
     @Published var textFont: String = "" { didSet { updateAppearance() }}
     @Published var titleFont: String = "" { didSet { updateAppearance() }}
     @Published var placeholderFont: String = "" { didSet { updateAppearance() }}
     @Published var errorFont: String = "" { didSet { updateAppearance() }}
-    @Published var dropdownListFont: String = "" { didSet { updateAppearance() }}
+
 
     // MARK: - Initialization
     
@@ -60,6 +77,18 @@ class DropdownStyleVM: ObservableObject {
     }
     
     private func syncUIToAppearance() {
+        // Dropdown
+        self.dropdownBackgroundColor = appearance?.searchDropdown.dropdown.colors.backgroundColor ?? .clear
+        self.dropdownListColor = appearance?.searchDropdown.dropdown.text.listText.text.textColor ?? .clear
+        
+        self.dropdownTopPadding = appearance?.searchDropdown.dropdown.dimensions.padding.top ?? 0
+        self.dropdownLeadingPadding = appearance?.searchDropdown.dropdown.dimensions.padding.leading ?? 0
+        self.dropdownBottomPadding = appearance?.searchDropdown.dropdown.dimensions.padding.bottom ?? 0
+        self.dropdownTrailingPadding = appearance?.searchDropdown.dropdown.dimensions.padding.trailing ?? 0
+        
+        self.dropdownListFont = appearance?.searchDropdown.dropdown.text.listText.text.customFont.name ?? ""
+        
+        // TextField
         self.activeColor = appearance?.searchDropdown.textField.colors.active ?? .clear
         self.inactiveColor = appearance?.searchDropdown.textField.colors.inactive ?? .clear
         self.errorColor = appearance?.searchDropdown.textField.colors.error ?? .clear
@@ -67,27 +96,36 @@ class DropdownStyleVM: ObservableObject {
         self.textColor = appearance?.searchDropdown.textField.colors.text ?? .clear
         self.placeholderColor = appearance?.searchDropdown.textField.colors.placeholder ?? .clear
         self.backgroundColor = appearance?.searchDropdown.textField.colors.background ?? .clear
-        self.dropdownBackgroundColor = appearance?.searchDropdown.dropdown.colors.backgroundColor ?? .clear
-        self.dropdownListColor = appearance?.searchDropdown.dropdown.text.listText.text.textColor ?? .clear
         
         self.cornerRadius = appearance?.searchDropdown.textField.dimensions.cornerRadius ?? 0
         self.borderWidth = appearance?.searchDropdown.textField.dimensions.borderWidth ?? 0
         self.activeBorderWidth = appearance?.searchDropdown.textField.dimensions.activeBorderWidth ?? 0
-        self.topPadding = appearance?.searchDropdown.textField.dimensions.padding.top ?? 0
-        self.leadingPadding = appearance?.searchDropdown.textField.dimensions.padding.leading ?? 0
-        self.bottomPadding = appearance?.searchDropdown.textField.dimensions.padding.bottom ?? 0
-        self.trailingPadding = appearance?.searchDropdown.textField.dimensions.padding.trailing ?? 0
+        
+        self.textFieldTopPadding = appearance?.searchDropdown.textField.dimensions.padding.top ?? 0
+        self.textFieldLeadingPadding = appearance?.searchDropdown.textField.dimensions.padding.leading ?? 0
+        self.textFieldBottomPadding = appearance?.searchDropdown.textField.dimensions.padding.bottom ?? 0
+        self.textFieldTrailingPadding = appearance?.searchDropdown.textField.dimensions.padding.trailing ?? 0
         
         self.textFont = appearance?.searchDropdown.textField.fonts.text.customFont.name ?? ""
         self.titleFont = appearance?.searchDropdown.textField.fonts.title.customFont.name ?? ""
         self.placeholderFont = appearance?.searchDropdown.textField.fonts.placeholder.customFont.name ?? ""
         self.errorFont = appearance?.searchDropdown.textField.fonts.error.customFont.name ?? ""
-        self.dropdownListFont = appearance?.searchDropdown.dropdown.text.listText.text.customFont.name ?? ""
     }
     
     private func updateAppearance() {
         guard var appearance = appearance else { return }
+        // Dropdown
+        appearance.searchDropdown.dropdown.colors.backgroundColor = dropdownBackgroundColor
+        appearance.searchDropdown.dropdown.text.listText.text.textColor = dropdownListColor
         
+        appearance.searchDropdown.dropdown.dimensions.padding.top = dropdownTopPadding
+        appearance.searchDropdown.dropdown.dimensions.padding.leading = dropdownLeadingPadding
+        appearance.searchDropdown.dropdown.dimensions.padding.bottom = dropdownBottomPadding
+        appearance.searchDropdown.dropdown.dimensions.padding.trailing = dropdownTrailingPadding
+        
+        appearance.searchDropdown.dropdown.text.listText.text.customFont.name = dropdownListFont
+        
+        // TextField
         appearance.searchDropdown.textField.colors.active = activeColor
         appearance.searchDropdown.textField.colors.inactive = inactiveColor
         appearance.searchDropdown.textField.colors.error = errorColor
@@ -95,22 +133,20 @@ class DropdownStyleVM: ObservableObject {
         appearance.searchDropdown.textField.colors.text = textColor
         appearance.searchDropdown.textField.colors.placeholder = placeholderColor
         appearance.searchDropdown.textField.colors.background = backgroundColor
-        appearance.searchDropdown.dropdown.colors.backgroundColor = dropdownBackgroundColor
-        appearance.searchDropdown.dropdown.text.listText.text.textColor = dropdownListColor
         
         appearance.searchDropdown.textField.dimensions.cornerRadius = cornerRadius
         appearance.searchDropdown.textField.dimensions.borderWidth = borderWidth
         appearance.searchDropdown.textField.dimensions.activeBorderWidth = activeBorderWidth
-        appearance.searchDropdown.textField.dimensions.padding.top = topPadding
-        appearance.searchDropdown.textField.dimensions.padding.leading = leadingPadding
-        appearance.searchDropdown.textField.dimensions.padding.bottom = bottomPadding
-        appearance.searchDropdown.textField.dimensions.padding.trailing = trailingPadding
+        
+        appearance.searchDropdown.textField.dimensions.padding.top = textFieldTopPadding
+        appearance.searchDropdown.textField.dimensions.padding.leading = textFieldLeadingPadding
+        appearance.searchDropdown.textField.dimensions.padding.bottom = textFieldBottomPadding
+        appearance.searchDropdown.textField.dimensions.padding.trailing = textFieldTrailingPadding
         
         appearance.searchDropdown.textField.fonts.text.customFont.name = textFont
         appearance.searchDropdown.textField.fonts.title.customFont.name = titleFont
         appearance.searchDropdown.textField.fonts.placeholder.customFont.name = placeholderFont
         appearance.searchDropdown.textField.fonts.error.customFont.name = errorFont
-        appearance.searchDropdown.dropdown.text.listText.text.customFont.name = dropdownListFont
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
     }

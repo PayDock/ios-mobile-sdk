@@ -18,7 +18,8 @@ struct GiftCardWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                GiftCardWidget( config: GiftCardWidgetConfig( accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), storePin: false),  appearance: getAppearance()) { result in
+                GiftCardWidget(config: GiftCardWidgetConfig(accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), storePin: false),
+                               appearance: getAppearance()) { result in
                     switch result {
                     case .success(let giftCardResult): self.alertMessage = giftCardResult.token
                     case .failure(let error): self.alertMessage = error.localizedDescription
@@ -33,7 +34,7 @@ struct GiftCardWidgetView: View {
     }
     
     private func getAppearance() -> GiftCardWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .paypalVault, isDarkMode: colorScheme == .dark, as: GiftCardWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .giftCard, isDarkMode: colorScheme == .dark, as: GiftCardWidgetAppearance.self)
         return appearance ?? GiftCardWidgetAppearance()
     }
 }

@@ -44,10 +44,15 @@ public protocol ToggleTextStylableAppearance {
     var toggleText: Theme.TextAppearance { get set }
 }
 
-public protocol DescriptionStylableAppearance {
-    var description: Theme.TextAppearance { get set }
-}
-
 public protocol LinkTextStylableAppearance {
     var linkText: Theme.TextAppearance { get set }
+}
+
+public protocol SpacingStylableAppearance {
+    var horizontalSpacing: CGFloat { get set }
+    var verticalSpacing: CGFloat { get set }
+}
+
+public protocol ActionButtonLoaderStylableAppearance {
+    var loader: Theme.ButtonLoader { get set }
 }

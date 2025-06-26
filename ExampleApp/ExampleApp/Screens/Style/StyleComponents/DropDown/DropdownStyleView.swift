@@ -26,14 +26,23 @@ struct DropdownStyleView: View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    SectionTitleView(title: "Colors")
-                    colorListView
-                    SectionTitleView(title: "Dimensions")
-                    dimensionsListView
-                    SectionTitleView(title: "Padding")
-                    paddingListView
-                    SectionTitleView(title: "Fonts")
-                    fontListView
+                    SectionTitleView(title: "Dropdown")
+                    SubsectionTitleView(title: "Colors")
+                    dropdownColorListView
+                    SubsectionTitleView(title: "Padding")
+                    dropdownPaddingListView
+                    SubsectionTitleView(title: "Fonts")
+                    dropdownFontListView
+                    
+                    SectionTitleView(title: "TextField")
+                    SubsectionTitleView(title: "Colors")
+                    textFieldColorListView
+                    SubsectionTitleView(title: "Dimensions")
+                    textFieldDimensionsListView
+                    SubsectionTitleView(title: "Padding")
+                    textFieldPaddingListView
+                    SubsectionTitleView(title: "Fonts")
+                    textFieldFontListView
                     ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
@@ -48,8 +57,70 @@ struct DropdownStyleView: View {
             viewModel.resetAppearance()
         }
     }
+    
+    // Dropdown
+    
+    private var dropdownColorListView: some View {
+        VStack (spacing: 16) {
+            ColorPickerView(
+                title: "Dropdown background color",
+                text: Binding(
+                    get: { viewModel.dropdownBackgroundColor.toHex() },
+                    set: { viewModel.dropdownBackgroundColor = Color(hex: $0) }),
+                pickedColor: $viewModel.dropdownBackgroundColor)
+            
+            ColorPickerView(
+                title: "Dropdown list color",
+                text: Binding(
+                    get: { viewModel.dropdownListColor.toHex() },
+                    set: { viewModel.dropdownListColor = Color(hex: $0) }),
+                pickedColor: $viewModel.dropdownListColor)
+        }
+    }
+    
+    private var dropdownPaddingListView: some View {
+        VStack (spacing: 16) {
+            DimensionsFieldView(
+                title: "Top padding",
+                text: Binding(
+                    get: { "\(viewModel.dropdownTopPadding)" },
+                    set: { viewModel.dropdownTopPadding = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Leading padding",
+                text: Binding(
+                    get: { "\(viewModel.dropdownLeadingPadding)" },
+                    set: { viewModel.dropdownLeadingPadding = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Bottom padding",
+                text: Binding(
+                    get: { "\(viewModel.dropdownBottomPadding)" },
+                    set: { viewModel.dropdownBottomPadding = CGFloat(Double($0) ?? 0) }))
+            
+            DimensionsFieldView(
+                title: "Trailing padding",
+                text: Binding(
+                    get: { "\(viewModel.dropdownTrailingPadding)" },
+                    set: { viewModel.dropdownTrailingPadding = CGFloat(Double($0) ?? 0) }))
+        }
+    }
+    
+    private var dropdownFontListView: some View {
+        VStack (spacing: 16) {
+            PickerView(
+                entries: viewModel.allFontNames,
+                selected: $viewModel.dropdownListFont,
+                placeholder: "Dropdown list font",
+                onSelection: { fontName in
+                    viewModel.dropdownListFont = fontName
+                })
+        }
+    }
+    
+    // TextField
 
-    private var colorListView: some View {
+    private var textFieldColorListView: some View {
         VStack (spacing: 16) {
             ColorPickerView(
                 title: "Active color",
@@ -99,24 +170,10 @@ struct DropdownStyleView: View {
                     get: { viewModel.backgroundColor.toHex() },
                     set: { viewModel.backgroundColor = Color(hex: $0) }),
                 pickedColor: $viewModel.backgroundColor)
-            
-            ColorPickerView(
-                title: "Dropdown background color",
-                text: Binding(
-                    get: { viewModel.dropdownBackgroundColor.toHex() },
-                    set: { viewModel.dropdownBackgroundColor = Color(hex: $0) }),
-                pickedColor: $viewModel.dropdownBackgroundColor)
-            
-            ColorPickerView(
-                title: "Dropdown list color",
-                text: Binding(
-                    get: { viewModel.dropdownListColor.toHex() },
-                    set: { viewModel.dropdownListColor = Color(hex: $0) }),
-                pickedColor: $viewModel.dropdownListColor)
         }
     }
     
-    private var dimensionsListView: some View {
+    private var textFieldDimensionsListView: some View {
         VStack {
             DimensionsFieldView(
                 title: "Corner radius",
@@ -138,35 +195,35 @@ struct DropdownStyleView: View {
         }
     }
     
-    private var paddingListView: some View {
+    private var textFieldPaddingListView: some View {
         VStack (spacing: 16) {
             DimensionsFieldView(
                 title: "Top padding",
                 text: Binding(
-                    get: { "\(viewModel.topPadding)" },
-                    set: { viewModel.topPadding = CGFloat(Double($0) ?? 0) }))
+                    get: { "\(viewModel.textFieldTopPadding)" },
+                    set: { viewModel.textFieldTopPadding = CGFloat(Double($0) ?? 0) }))
             
             DimensionsFieldView(
                 title: "Leading padding",
                 text: Binding(
-                    get: { "\(viewModel.leadingPadding)" },
-                    set: { viewModel.leadingPadding = CGFloat(Double($0) ?? 0) }))
+                    get: { "\(viewModel.textFieldLeadingPadding)" },
+                    set: { viewModel.textFieldLeadingPadding = CGFloat(Double($0) ?? 0) }))
             
             DimensionsFieldView(
                 title: "Bottom padding",
                 text: Binding(
-                    get: { "\(viewModel.bottomPadding)" },
-                    set: { viewModel.bottomPadding = CGFloat(Double($0) ?? 0) }))
+                    get: { "\(viewModel.textFieldBottomPadding)" },
+                    set: { viewModel.textFieldBottomPadding = CGFloat(Double($0) ?? 0) }))
             
             DimensionsFieldView(
                 title: "Trailing padding",
                 text: Binding(
-                    get: { "\(viewModel.trailingPadding)" },
-                    set: { viewModel.trailingPadding = CGFloat(Double($0) ?? 0) }))
+                    get: { "\(viewModel.textFieldTrailingPadding)" },
+                    set: { viewModel.textFieldTrailingPadding = CGFloat(Double($0) ?? 0) }))
         }
     }
     
-    private var fontListView: some View {
+    private var textFieldFontListView: some View {
         VStack (spacing: 16) {
             PickerView(
                 entries: viewModel.allFontNames,
@@ -198,14 +255,6 @@ struct DropdownStyleView: View {
                 placeholder: "Error font",
                 onSelection: { fontName in
                     viewModel.errorFont = fontName
-                })
-            
-            PickerView(
-                entries: viewModel.allFontNames,
-                selected: $viewModel.dropdownListFont,
-                placeholder: "Dropdown list font",
-                onSelection: { fontName in
-                    viewModel.dropdownListFont = fontName
                 })
         }
     }

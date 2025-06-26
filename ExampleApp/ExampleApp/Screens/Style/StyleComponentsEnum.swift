@@ -18,22 +18,28 @@ enum StyleComponentsEnum {
     case toggle
     case linkText
     case toggleText
-    case description
     case title
+    case applePay
+    case afterpay
+    case spacings
+    case buttonLoader
     
     var title: String {
         switch self {
         case .textField: return "Text Field"
         case .searchDropdown: return "Search Dropdown"
         case .actionButton: return "Action Button"
-        case .expandSectionButton: return "Expand Button"
+        case .expandSectionButton: return "Link Button"
         case .toolbarButton: return "Toolbar Button"
         case .loader: return "Loader"
         case .toggle: return "Toggle"
         case .linkText: return "Link Text"
         case .toggleText: return "Toggle Text"
-        case .description: return "Description"
         case .title: return "Title"
+        case .applePay: return "Apple Pay Button"
+        case .afterpay: return "Afterpay Button"
+        case .spacings: return "Spacings"
+        case .buttonLoader: return "Button Loader"
         }
     }
     
@@ -59,8 +65,14 @@ enum StyleComponentsEnum {
             return AnyView(createLinkTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .toggleText:
             return AnyView(createToggleTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .description:
-            return AnyView(createDescriptionView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .applePay:
+            return AnyView(ApplePayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .afterpay:
+            return AnyView(AfterpayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .spacings:
+            return AnyView(SpacingsStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .buttonLoader:
+            return AnyView(ButtonLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         }
     }
     
@@ -217,18 +229,4 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
-    private func createDescriptionView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
-        switch selectedWidget {
-        case .all:
-            return AnyView(TextStyleView<Theme>(
-                selectedWidget: selectedWidget,
-                stylingDarkMode: stylingDarkMode,
-                textKeyPath: \.description,
-                title: title))
-        default:
-            return AnyView(EmptyView())
-        }
-    }
-
 }

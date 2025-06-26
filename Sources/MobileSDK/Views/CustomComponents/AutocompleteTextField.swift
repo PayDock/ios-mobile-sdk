@@ -138,7 +138,7 @@ struct AutocompleteTextField: View {
                             }
                         }
                     }
-                    .padding(.vertical, 4)
+                    .customPadding(appearance.dropdown.dimensions.padding)
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 4)

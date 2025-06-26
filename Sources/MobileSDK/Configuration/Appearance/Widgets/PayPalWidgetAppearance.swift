@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct PayPalWidgetAppearance {
+public struct PayPalWidgetAppearance: ActionButtonLoaderStylableAppearance {
     public var loader: Theme.ButtonLoader
     
     public init(loader: Theme.ButtonLoader = GlobalTheme.shared.globalTheme.actionButton.loader) {

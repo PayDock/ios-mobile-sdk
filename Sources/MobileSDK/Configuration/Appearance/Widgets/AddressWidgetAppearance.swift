@@ -14,7 +14,8 @@ public struct AddressWidgetAppearance:
     ExpandSectionButtonStylableAppearance,
     TextFieldStylableAppearance,
     DropdownStylableAppearance,
-    TitleStylableAppearance {
+    TitleStylableAppearance,
+    SpacingStylableAppearance {
     
     public var horizontalSpacing: CGFloat
     public var verticalSpacing: CGFloat

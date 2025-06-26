@@ -83,6 +83,13 @@ struct ButtonStyleView<T>: View {
                     get: { viewModel.borderColor.toHex() },
                     set: { viewModel.borderColor = Color(hex: $0) }),
                 pickedColor: $viewModel.borderColor)
+            
+            ColorPickerView(
+                title: "Loader color",
+                text: Binding(
+                    get: { viewModel.loaderColor.toHex() },
+                    set: { viewModel.loaderColor = Color(hex: $0) }),
+                pickedColor: $viewModel.loaderColor)
         }
     }
     
