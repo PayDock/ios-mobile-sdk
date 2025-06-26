@@ -25,20 +25,8 @@ struct StyleDarkModeView: View {
                     viewModel.stylingDarkMode = true
                 }
             }
-            (
             Text("These styles apply to the widget screen based on your phone's dark or light mode settings. ")
-            +
-            Text("Settings")
-                .underline()
-                .foregroundColor(.defaultPrimary)
-            )
-            .font(.caption)
-            .onTapGesture {
-                if let url = URL(string: UIApplication.openSettingsURLString),
-                   UIApplication.shared.canOpenURL(url) {
-                    UIApplication.shared.open(url)
-                }
-            }
+                .font(.caption)
             
         }
         .background(Color(hex: "#EAE0D7"))

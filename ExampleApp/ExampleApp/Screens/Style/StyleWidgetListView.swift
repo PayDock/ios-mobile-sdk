@@ -9,8 +9,9 @@
 import SwiftUI
 
 struct StyleWidgetListView: View {
+    
+    @StateObject var viewModel: StyleVM = StyleVM()
 
-    @StateObject private var viewModel = WidgetsVM()
     let widgetItems: [StyleWidgetItem] = {
         let allWidgets = StyleWidgetItem(widget: .all)
         
@@ -46,9 +47,15 @@ struct StyleWidgetListView: View {
                     Text("Customise the look and feel of the widgets on the Widget tab")
                         .font(.caption)
                     
+                    StyleDarkModeView()
+                        .environmentObject(viewModel)
+                        .listRowBackground(Color(hex: "#EAE0D7"))
+                        .listRowSeparatorTint(.clear)
+                    
                     Text("Select Widget")
                         .font(.title3)
                         .padding(.vertical, 16)
+
                 }
                 .listRowSeparatorTint(.clear)
                 .listRowBackground(Color(hex: "#EAE0D7"))
@@ -66,7 +73,7 @@ struct StyleWidgetListView: View {
     }
 
     func stylizedNavigationLink(item: StyleWidgetItem, destination: some View) -> some View {
-        return NavigationLink(destination: destination) {
+        return NavigationLink(destination: destination.environmentObject(viewModel)) {
             cell(icon: item.widget.icon, title: item.widget.title)
         }
         .listRowSeparatorTint(.black)

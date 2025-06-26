@@ -10,35 +10,30 @@ import SwiftUI
 
 struct StyleComponentListView: View {
     
-    @StateObject var viewModel: StyleVM
-    
-    init(selectedWidget: WidgetsEnum) {
-        _viewModel = StateObject(wrappedValue: StyleVM(selectedWidget: selectedWidget))
-    }
+    @EnvironmentObject var viewModel: StyleVM
+    let selectedWidget: WidgetsEnum
     
     var body: some View {
         NavigationStack {
             List {
-                StyleDarkModeView()
-                    .environmentObject(viewModel)
-                    .listRowBackground(Color(hex: "#EAE0D7"))
-                    .listRowSeparatorTint(.clear)
-
-                ForEach(viewModel.getComponentsForWidget(viewModel.selectedWidget), id: \.self) { component in
+                ForEach(viewModel.getComponentsForWidget(selectedWidget), id: \.self) { component in
                     stylizedNavigationLink(component: component)
                 }
             }
             .listStyle(.plain)
             .background(Color(hex: "#EAE0D7"))
         }
-        .navigationTitle(viewModel.selectedWidget.title)
+        .navigationTitle(selectedWidget.title)
         .foregroundColor(.black)
         .background(Color(hex: "#EAE0D7"))
+        .onAppear {
+            viewModel.selectedWidget = selectedWidget
+        }
     }
     
     func stylizedNavigationLink(component: StyleComponentsEnum) -> some View {
         return NavigationLink(destination: component.destinationView(
-            selectedWidget: viewModel.selectedWidget,
+            selectedWidget: selectedWidget,
             stylingDarkMode: viewModel.stylingDarkMode)) {
                 cell(component: component)
         }
