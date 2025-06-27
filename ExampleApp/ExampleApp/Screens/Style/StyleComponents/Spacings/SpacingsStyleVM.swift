@@ -23,6 +23,9 @@ class SpacingsStyleVM: ObservableObject {
     @Published var horizontalSpacing: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var verticalSpacing: CGFloat = 0.0 { didSet { updateAppearance() }}
     
+    @Published var hasChanges = false
+
+    
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -31,6 +34,7 @@ class SpacingsStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: SpacingStylableAppearance.self)
         syncUIToAppearance()
+        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -45,6 +49,8 @@ class SpacingsStyleVM: ObservableObject {
         appearance.verticalSpacing = verticalSpacing
         
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+        
+        hasChanges = true
     }
     
     func resetAppearance() {
@@ -52,5 +58,6 @@ class SpacingsStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: SpacingStylableAppearance.self)
         
         syncUIToAppearance()
+        hasChanges = false
     }
 }

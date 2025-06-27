@@ -34,7 +34,7 @@ struct TextFieldStyleView: View {
                     paddingListView
                     SectionTitleView(title: "Fonts")
                     fontListView
-                    ResetStyleButton {
+                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
                         viewModel.showResetConfirmation = true
                     }
                 }

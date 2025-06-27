@@ -22,6 +22,8 @@ class ButtonLoaderStyleVM: ObservableObject {
     @Published var showResetConfirmation = false
     @Published var loaderColor: Color = .clear { didSet { updateAppearance() }}
     
+    @Published var hasChanges = false
+    
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -30,6 +32,7 @@ class ButtonLoaderStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: ActionButtonLoaderStylableAppearance.self)
         syncUIToAppearance()
+        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -41,6 +44,8 @@ class ButtonLoaderStyleVM: ObservableObject {
         
         appearance.loader.spinnerColor = loaderColor
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+        
+        hasChanges = true
     }
     
     func resetAppearance() {
@@ -48,5 +53,6 @@ class ButtonLoaderStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: ActionButtonLoaderStylableAppearance.self)
         
         syncUIToAppearance()
+        hasChanges = false
     }
 }

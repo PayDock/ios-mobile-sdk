@@ -11,13 +11,18 @@ import SwiftUI
 struct ResetStyleButton: View {
     
     let action: () -> Void
+    let isDisabled: Bool
+    
+    init(isDisabled: Bool, action: @escaping () -> Void) {
+        self.action = action
+        self.isDisabled = isDisabled
+    }
     
     var body: some View {
         Button {
             action()
         } label: {
             Text("Reset to defaults")
-                .foregroundColor(.black)
         }
         .frame(height: 50.0)
         .frame(maxWidth: .infinity)
@@ -27,9 +32,13 @@ struct ResetStyleButton: View {
         )
         .padding(.top, 16.0)
         .padding()
+        .opacity(isDisabled ? 0.5 : 1.0)
+        .disabled(isDisabled)
     }
 }
 
 #Preview {
-    ResetStyleButton(action: {})
+    VStack {
+        ResetStyleButton(isDisabled: true, action: {})
+    }
 }

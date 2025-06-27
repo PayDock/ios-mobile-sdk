@@ -50,7 +50,7 @@ enum SDKButtonStyle {
         case .outline(let style):
             return style.appearance.loader.spinnerColor
         case .image(let style):
-            return style.appearance.loader.spinnerColor
+            return style.appearance.spinnerColor
         case .custom(let style):
             return style.appearance.loader.spinnerColor
         }
@@ -62,8 +62,8 @@ enum SDKButtonStyle {
             return style.appearance.colors.image
         case .outline(let style):
             return style.appearance.colors.image
-        case .image(let style):
-            return style.appearance.colors.image
+        case .image:
+            return .clear // It's a background button only - no image contained
         case .custom(let style):
             return style.appearance.colors.image
         }

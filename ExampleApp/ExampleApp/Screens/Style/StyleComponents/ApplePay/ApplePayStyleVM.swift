@@ -90,6 +90,8 @@ class ApplePayStyleVM: ObservableObject {
             }
         }
     }
+    
+    @Published var hasChanges = false
 
     // MARK: - Initialization
     
@@ -99,6 +101,7 @@ class ApplePayStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: ApplePayWidgetAppearance.self)
         syncUIToAppearance()
+        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -121,6 +124,8 @@ class ApplePayStyleVM: ObservableObject {
         appearance.style = buttonStyle
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+        
+        hasChanges = true
     }
     
     func resetAppearance() {
@@ -128,5 +133,6 @@ class ApplePayStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: ApplePayWidgetAppearance.self)
         
         syncUIToAppearance()
+        hasChanges = false
     }
 }

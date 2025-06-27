@@ -27,7 +27,7 @@ struct SpacingsStyleView: View {
             ScrollView {
                 VStack {
                     spacingsListView
-                    ResetStyleButton {
+                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
                         viewModel.showResetConfirmation = true
                     }
                 }

@@ -41,7 +41,7 @@ public struct ColesPayWidget: View {
             image: Image((viewModel.isLoading && viewModel.showLoaders) ? "coles-pay-button-blank" : "coles-pay-button", bundle: Bundle.module),
             imageLocation: .left,
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            style: .image(ImageButtonStyle(isDisabled: viewModel.viewState.isDisabled)),
+            style: .image(ImageButtonStyle(appearance: appearance.loader, isDisabled: viewModel.viewState.isDisabled)),
             scaleToFit: true) {
                 viewModel.handleButtonTap()
             }
