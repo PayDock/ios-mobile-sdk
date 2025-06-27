@@ -41,6 +41,8 @@ class ButtonStyleVM<T>: ObservableObject {
     @Published var fontName: String = "" { didSet { updateAppearance() }}
     @Published var fontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
     
+    @Published var hasChanges = false
+    
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -51,6 +53,7 @@ class ButtonStyleVM<T>: ObservableObject {
         self.buttonKeyPath = buttonKeyPath
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
         syncUIToAppearance()
+        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -97,6 +100,8 @@ class ButtonStyleVM<T>: ObservableObject {
         
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+        
+        hasChanges = true
     }
     
     func resetAppearance() {
@@ -104,5 +109,6 @@ class ButtonStyleVM<T>: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
 
         syncUIToAppearance()
+        hasChanges = false
     }
 }

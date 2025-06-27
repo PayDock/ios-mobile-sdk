@@ -32,7 +32,7 @@ class StyleVM: ObservableObject {
         case .applePay: return [.applePay]
         case .paypal: return [.buttonLoader]
         case .paypalVault: return [.actionButton]
-        case .colesPay: return [.loader]
+        case .colesPay: return [.buttonLoader]
         case .afterPay: return [.afterpay, .loader]
         case .clickToPay: return [.loader]
         case .integrated3ds: return [.loader]

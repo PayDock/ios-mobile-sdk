@@ -8,10 +8,10 @@
 
 import Foundation
 
-public struct ColesPayWidgetAppearance: LoaderStylableAppearance {
-    public var loader: Theme.OverlayLoaderAppearance
+public struct ColesPayWidgetAppearance: ActionButtonLoaderStylableAppearance {
+    public var loader: Theme.ButtonLoader
     
-    public init(loader: Theme.OverlayLoaderAppearance = GlobalTheme.shared.globalTheme.loader) {
+    public init(loader: Theme.ButtonLoader = GlobalTheme.shared.globalTheme.actionButton.loader) {
         self.loader = loader
     }
 }

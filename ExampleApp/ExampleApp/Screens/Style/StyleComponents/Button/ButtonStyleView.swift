@@ -39,7 +39,7 @@ struct ButtonStyleView<T>: View {
                     dimensionsListView
                     SectionTitleView(title: "Fonts")
                     fontListView
-                    ResetStyleButton {
+                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
                         viewModel.showResetConfirmation = true
                     }
                 }

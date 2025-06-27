@@ -28,7 +28,7 @@ struct AfterpayStyleView: View {
                 VStack {
                     SectionTitleView(title: "Style")
                     stylePickersView
-                    ResetStyleButton {
+                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
                         viewModel.showResetConfirmation = true
                     }
                 }

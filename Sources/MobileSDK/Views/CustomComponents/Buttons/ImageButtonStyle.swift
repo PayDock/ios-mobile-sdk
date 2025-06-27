@@ -10,10 +10,10 @@ import SwiftUI
 
 struct ImageButtonStyle: ButtonStyle {
 
-    let appearance: Theme.ButtonAppearance
+    let appearance: Theme.ButtonLoader
     var isDisabled: Bool = false
 
-    init(appearance: Theme.ButtonAppearance = Theme.ButtonAppearance(),
+    init(appearance: Theme.ButtonLoader = Theme.ButtonLoader(),
          isDisabled: Bool = false) {
         self.appearance = appearance
         self.isDisabled = isDisabled
