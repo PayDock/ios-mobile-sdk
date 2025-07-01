@@ -44,7 +44,7 @@ struct AfterpayWidgetView: View {
     }
     
     private func getAppearance() -> AfterpayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .afterPay, isDarkMode: colorScheme == .dark, as: AfterpayWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .afterPay, isDarkMode: colorScheme == .dark, as: AfterpayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? AfterpayWidgetAppearance()
     }
 }

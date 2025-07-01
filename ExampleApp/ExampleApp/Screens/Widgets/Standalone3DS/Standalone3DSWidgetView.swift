@@ -62,7 +62,7 @@ struct Standalone3DSWidgetView: View {
     }
     
     private func getAppearance() -> ThreeDSWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .standalone3ds, isDarkMode: colorScheme == .dark, as: ThreeDSWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .standalone3ds, isDarkMode: colorScheme == .dark, as: ThreeDSWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? ThreeDSWidgetAppearance()
     }
 }

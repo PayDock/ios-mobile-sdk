@@ -51,7 +51,7 @@ struct ClickToPayWidgetView: View {
     }
     
     private func getAppearance() -> ClickToPayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .clickToPay, isDarkMode: colorScheme == .dark, as: ClickToPayWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .clickToPay, isDarkMode: colorScheme == .dark, as: ClickToPayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? ClickToPayWidgetAppearance()
     }
 }

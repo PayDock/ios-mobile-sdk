@@ -36,7 +36,7 @@ struct PayPalWidgetView: View {
     }
     
     private func getAppearance() -> PayPalWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .paypal, isDarkMode: colorScheme == .dark, as: PayPalWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .paypal, isDarkMode: colorScheme == .dark, as: PayPalWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? PayPalWidgetAppearance()
     }
 }

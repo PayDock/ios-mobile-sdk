@@ -51,9 +51,6 @@ public struct ClickToPayWidget: UIViewRepresentable {
         
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.contentMode = .scaleToFill
-        if #available(iOS 16.4, *) {
-            webView.isInspectable = true
-        }
         webView.navigationDelegate = context.coordinator
         webView.uiDelegate = context.coordinator
         
@@ -62,12 +59,21 @@ public struct ClickToPayWidget: UIViewRepresentable {
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
+        activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
         context.coordinator.activityIndicator = activityIndicator
         
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
         
         // Set up constraints for webView
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            activityIndicator.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            activityIndicator.topAnchor.constraint(equalTo: containerView.topAnchor),
+            activityIndicator.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
+        
         webView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             webView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
@@ -75,6 +81,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
             webView.topAnchor.constraint(equalTo: containerView.topAnchor),
             webView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
+        
         
         // Set up constraints for activityIndicator to be centered
         NSLayoutConstraint.activate([

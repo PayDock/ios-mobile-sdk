@@ -47,7 +47,7 @@ struct CardDetailsWidgetView: View {
     }
     
     private func getAppearance() -> CardDetailsWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .card, isDarkMode: colorScheme == .dark, as: CardDetailsWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .card, isDarkMode: colorScheme == .dark, as: CardDetailsWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? CardDetailsWidgetAppearance()
     }
 }
