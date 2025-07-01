@@ -13,8 +13,12 @@ public struct PayPalVaultAppearance: ActionButtonStylableAppearance {
     
     public var actionButton: Theme.ButtonAppearance
     
-    public init(button: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton) {
-            self.actionButton = button
+    public init(button: Theme.ButtonAppearance =
+        .init(
+            colors: .init(background: .clear, text: .defaultPrimary, image: .defaultPrimary, border: .defaultPrimary),
+            dimensions: GlobalTheme.shared.globalTheme.actionButton.dimensions,
+            fonts: GlobalTheme.shared.globalTheme.actionButton.fonts)) {
+                self.actionButton = button
         }
 }
 

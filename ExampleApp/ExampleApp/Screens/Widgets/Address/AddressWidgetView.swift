@@ -31,7 +31,7 @@ struct AddressWidgetView: View {
     }
     
     private func getAppearance() -> AddressWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .address, isDarkMode: colorScheme == .dark, as: AddressWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .address, isDarkMode: colorScheme == .dark, as: AddressWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? AddressWidgetAppearance()
     }
 }

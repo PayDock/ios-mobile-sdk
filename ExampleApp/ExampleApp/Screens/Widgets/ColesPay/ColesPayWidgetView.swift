@@ -39,7 +39,7 @@ struct ColesPayWidgetView: View {
     }
     
     private func getAppearance() -> ColesPayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .colesPay, isDarkMode: colorScheme == .dark, as: ColesPayWidgetAppearance.self)
+        let appearance = StyleThemeManager.getAppearance(for: .colesPay, isDarkMode: colorScheme == .dark, as: ColesPayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
         return appearance ?? ColesPayWidgetAppearance()
     }
 }

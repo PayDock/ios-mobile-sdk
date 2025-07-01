@@ -14,8 +14,11 @@ class StyleThemeManager {
     private static var lightAppearances: [WidgetsEnum: Any] = [.all : Theme()]
     private static var darkAppearances: [WidgetsEnum: Any] = [.all : Theme()]
 
-    static func getAppearance<T>(for widget: WidgetsEnum, isDarkMode: Bool, as type: T.Type) -> T? {
-        createDefaultAppearanceIfNeeded(for: widget, isDarkMode: isDarkMode)
+    static func getAppearance<T>(for widget: WidgetsEnum, isDarkMode: Bool, as type: T.Type, shouldCreateDefaultIfNeeded: Bool = true) -> T? {
+        
+        if shouldCreateDefaultIfNeeded {
+            createDefaultAppearanceIfNeeded(for: widget, isDarkMode: isDarkMode)
+        }
         
         let dict = isDarkMode ? darkAppearances : lightAppearances
         return dict[widget] as? T
