@@ -61,8 +61,6 @@ class TextFieldStyleVM: ObservableObject {
     @Published var errorFont: String = "" { didSet { updateAppearance() }}
     @Published var errorFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
     
-    @Published var hasChanges = false
-
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -71,7 +69,6 @@ class TextFieldStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: TextFieldStylableAppearance.self)
         syncUIToAppearance()
-        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -152,8 +149,6 @@ class TextFieldStyleVM: ObservableObject {
         appearance.textField.fonts.error.customFont.size = errorFontSize
         
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
-        
-        hasChanges = true
     }
     
     func resetAppearance() {
@@ -161,6 +156,5 @@ class TextFieldStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: TextFieldStylableAppearance.self)
         
         syncUIToAppearance()
-        hasChanges = false
     }
 }

@@ -11,11 +11,9 @@ import SwiftUI
 struct ResetStyleButton: View {
     
     let action: () -> Void
-    let isDisabled: Bool
     
-    init(isDisabled: Bool, action: @escaping () -> Void) {
+    init(action: @escaping () -> Void) {
         self.action = action
-        self.isDisabled = isDisabled
     }
     
     var body: some View {
@@ -32,13 +30,11 @@ struct ResetStyleButton: View {
         )
         .padding(.top, 16.0)
         .padding()
-        .opacity(isDisabled ? 0.5 : 1.0)
-        .disabled(isDisabled)
     }
 }
 
 #Preview {
     VStack {
-        ResetStyleButton(isDisabled: true, action: {})
+        ResetStyleButton(action: {})
     }
 }
