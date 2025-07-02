@@ -17,7 +17,8 @@ public struct PayPalVaultAppearance: ActionButtonStylableAppearance {
         .init(
             colors: .init(background: .clear, text: .defaultPrimary, image: .defaultPrimary, border: .defaultPrimary),
             dimensions: GlobalTheme.shared.globalTheme.actionButton.dimensions,
-            fonts: GlobalTheme.shared.globalTheme.actionButton.fonts)) {
+            fonts: GlobalTheme.shared.globalTheme.actionButton.fonts,
+            loader: .init(spinnerColor: .defaultPrimary))) {
                 self.actionButton = button
         }
 }

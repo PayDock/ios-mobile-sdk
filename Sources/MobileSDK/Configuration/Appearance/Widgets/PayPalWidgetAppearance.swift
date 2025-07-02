@@ -11,7 +11,7 @@ import Foundation
 public struct PayPalWidgetAppearance: ActionButtonLoaderStylableAppearance {
     public var loader: Theme.ButtonLoader
     
-    public init(loader: Theme.ButtonLoader = GlobalTheme.shared.globalTheme.actionButton.loader) {
+    public init(loader: Theme.ButtonLoader = .init(spinnerColor: .black)) {
         self.loader = loader
     }
 }
