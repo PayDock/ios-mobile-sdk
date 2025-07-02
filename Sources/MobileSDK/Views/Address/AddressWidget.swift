@@ -54,9 +54,6 @@ public struct AddressWidget: View {
             .onAppear {
                 viewModel.updateAddress()
             }
-            .onTapGesture {
-                viewModel.addressFormManager.setEditingTextField(focusedField: nil)
-            }
         }
     }
 

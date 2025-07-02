@@ -11,6 +11,7 @@ import SwiftUI
 import MapKit
 import Combine
 
+@MainActor
 class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
@@ -76,7 +77,6 @@ class AddressVM: NSObject, ObservableObject {
         addressFormManager.isAddressFormExpanded = true
         addressFormManager.addressSearchText = ""
         addressFormManager.showAddressSearchPopup = false
-        addressFormManager.setEditingTextField(focusedField: nil)
 
         addressSearchSuggestions = [""]
         reverseGeoForOptionAt(index: index)
@@ -113,6 +113,8 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Logic
 
     func saveAddress() {
+        addressFormManager.setEditingTextField(focusedField: nil)
+
         addressFormManager.validateAllTextFields()
         let address = Address(
             firstName: addressFormManager.firstNameText,
@@ -139,7 +141,9 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
         addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
-        addressFormManager.showAddressSearchPopup = true
+        if addressFormManager.currentTextField == .searchAddress {
+            addressFormManager.showAddressSearchPopup = true
+        }
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
