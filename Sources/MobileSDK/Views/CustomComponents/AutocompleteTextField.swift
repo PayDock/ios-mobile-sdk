@@ -114,12 +114,14 @@ struct AutocompleteTextField: View {
                         .frame(height: 50)
                     VStack(alignment: .center) {
                         if options.isEmpty {
+                            Spacer()
                             Text("No results")
                                 .font(appearance.dropdown.text.listText.text.customFont.font)
                                 .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .accessibilityLabel(Text("Dropdown menu has no results."))
+                            Spacer()
                         } else {
                             let filteredOptions = options.prefix(3)
                             ForEach(filteredOptions, id: \.self) { option in
@@ -138,6 +140,7 @@ struct AutocompleteTextField: View {
                                 }
                             }
                         }
+                        Spacer()
                     }
                     .customPadding(appearance.dropdown.dimensions.padding)
                     .frame(maxWidth: .infinity)

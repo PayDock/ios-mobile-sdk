@@ -73,7 +73,7 @@ class AddressFormManager: ObservableObject {
     @Published var postcodeText = ""
     @Published var countryText = ""
 
-    private var currentTextField: AddressFocusable?
+    private(set) var currentTextField: AddressFocusable?
     @Published var showAddressSearchPopup = false
     @Published var isAddressFormExpanded = false
 
@@ -81,6 +81,12 @@ class AddressFormManager: ObservableObject {
 
     func setEditingTextField(focusedField: AddressFocusable?) {
         validateTextField(currentTextField)
+        
+        // Hide address search popup when moving away from search address field
+        if currentTextField == .searchAddress && focusedField != .searchAddress {
+            showAddressSearchPopup = false
+        }
+        
         currentTextField = focusedField
 
         editingFirstName = focusedField == .firstName
