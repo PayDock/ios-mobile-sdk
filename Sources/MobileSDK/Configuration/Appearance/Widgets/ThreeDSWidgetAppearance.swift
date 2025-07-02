@@ -10,7 +10,9 @@ public struct ThreeDSWidgetAppearance: LoaderStylableAppearance {
     
     public var loader: Theme.OverlayLoaderAppearance
     
-    public init(loader: Theme.OverlayLoaderAppearance = GlobalTheme.shared.globalTheme.loader) {
-        self.loader = loader
+    public init(loader: Theme.OverlayLoaderAppearance = .init(
+        color: GlobalTheme.shared.globalTheme.loader.color,
+        overlayColor: .clear)) {
+            self.loader = loader
     }
 }

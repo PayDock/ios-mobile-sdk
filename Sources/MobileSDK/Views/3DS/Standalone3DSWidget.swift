@@ -45,6 +45,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         
         let activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.color = UIColor(appearance.loader.color)
+        activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
@@ -52,6 +53,15 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
+        
+        // Set up constraints for activity indicator
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            activityIndicator.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            activityIndicator.topAnchor.constraint(equalTo: containerView.topAnchor),
+            activityIndicator.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
         
         // Set up constraints for webView
         webView.translatesAutoresizingMaskIntoConstraints = false
