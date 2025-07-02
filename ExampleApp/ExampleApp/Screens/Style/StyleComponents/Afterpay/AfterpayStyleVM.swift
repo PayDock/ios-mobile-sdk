@@ -69,8 +69,6 @@ class AfterpayStyleVM: ObservableObject {
         }
     }
     
-    @Published var hasChanges = false
-
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -79,7 +77,6 @@ class AfterpayStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: AfterpayWidgetAppearance.self)
         syncUIToAppearance()
-        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -111,8 +108,6 @@ class AfterpayStyleVM: ObservableObject {
         appearance.type = buttonType
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
-        
-        hasChanges = true
     }
     
     func resetAppearance() {
@@ -120,6 +115,5 @@ class AfterpayStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: AfterpayWidgetAppearance.self)
         
         syncUIToAppearance()
-        hasChanges = false
     }
 }

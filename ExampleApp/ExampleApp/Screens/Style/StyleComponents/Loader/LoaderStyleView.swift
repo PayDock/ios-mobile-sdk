@@ -28,7 +28,7 @@ struct LoaderStyleView: View {
                 VStack {
                     SectionTitleView(title: "Colors")
                     colorListView
-                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
+                    ResetStyleButton() {
                         viewModel.showResetConfirmation = true
                     }
                 }

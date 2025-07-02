@@ -45,7 +45,7 @@ struct DropdownStyleView: View {
                     textFieldPaddingListView
                     SubsectionTitleView(title: "Fonts")
                     textFieldFontListView
-                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
+                    ResetStyleButton() {
                         viewModel.showResetConfirmation = true
                     }
                 }

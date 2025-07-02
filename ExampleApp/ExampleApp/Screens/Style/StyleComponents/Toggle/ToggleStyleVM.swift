@@ -21,9 +21,7 @@ class ToggleStyleVM: ObservableObject {
     private var appearance: ToggleStylableAppearance?
     @Published var showResetConfirmation = false
     @Published var activeColor: Color = .clear { didSet { updateAppearance() }}
-    
-    @Published var hasChanges = false
-    
+        
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -32,7 +30,6 @@ class ToggleStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: ToggleStylableAppearance.self)
         syncUIToAppearance()
-        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -42,8 +39,6 @@ class ToggleStyleVM: ObservableObject {
     private func updateAppearance() {
         appearance?.toggle.activeColor = activeColor
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
-        
-        hasChanges = true
     }
     
     func resetAppearance() {
@@ -51,6 +46,5 @@ class ToggleStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: ToggleStylableAppearance.self)
         
         syncUIToAppearance()
-        hasChanges = false
     }
 }

@@ -27,7 +27,7 @@ struct ApplePayStyleView: View {
                 VStack {
                     SectionTitleView(title: "Style")
                     pickerListView
-                    ResetStyleButton(isDisabled: !viewModel.hasChanges) {
+                    ResetStyleButton() {
                         viewModel.showResetConfirmation = true
                     }
                 }

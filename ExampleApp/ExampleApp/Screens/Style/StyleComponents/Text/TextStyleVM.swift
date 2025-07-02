@@ -37,9 +37,7 @@ class TextStyleVM<T>: ObservableObject {
     // Fonts
     @Published var fontName: String = "" { didSet { updateAppearance() }}
     @Published var fontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
-    
-    @Published var hasChanges = false
-    
+        
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -50,7 +48,6 @@ class TextStyleVM<T>: ObservableObject {
         self.textKeyPath = textKeyPath
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
         syncUIToAppearance()
-        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -86,8 +83,6 @@ class TextStyleVM<T>: ObservableObject {
 
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
-        
-        hasChanges = true
     }
     
     func resetAppearance() {
@@ -95,6 +90,5 @@ class TextStyleVM<T>: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: T.self)
 
         syncUIToAppearance()
-        hasChanges = false
     }
 }

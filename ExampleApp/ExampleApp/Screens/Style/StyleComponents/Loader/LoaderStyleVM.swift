@@ -23,9 +23,7 @@ class LoaderStyleVM: ObservableObject {
     @Published var showResetConfirmation = false
     @Published var loaderColor: Color = .clear { didSet { updateAppearance() }}
     @Published var loaderOverlayColor: Color = .clear { didSet { updateAppearance() }}
-    
-    @Published var hasChanges = false
-    
+        
     // MARK: - Initialization
     
     init(selectedWidget: WidgetsEnum,
@@ -34,7 +32,6 @@ class LoaderStyleVM: ObservableObject {
         self.stylingDarkMode = stylingDarkMode
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: LoaderStylableAppearance.self)
         syncUIToAppearance()
-        hasChanges = false
     }
     
     private func syncUIToAppearance() {
@@ -48,8 +45,6 @@ class LoaderStyleVM: ObservableObject {
         appearance.loader.color = loaderColor
         appearance.loader.overlayColor = loaderOverlayColor
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
-        
-        hasChanges = true
     }
     
     func resetAppearance() {
@@ -57,6 +52,5 @@ class LoaderStyleVM: ObservableObject {
         self.appearance = StyleThemeManager.getAppearance(for: selectedWidget, isDarkMode: stylingDarkMode, as: LoaderStylableAppearance.self)
         
         syncUIToAppearance()
-        hasChanges = false
     }
 }
