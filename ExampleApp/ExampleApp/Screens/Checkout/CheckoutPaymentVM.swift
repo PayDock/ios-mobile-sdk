@@ -262,6 +262,7 @@ extension CheckoutPaymentVM {
                 await MainActor.run {
                     isLoading = false
                     viewState?.setState(.none)
+                    showAlert(title: .error, message: "Error creating a charge!")
                 }
             }
         }
