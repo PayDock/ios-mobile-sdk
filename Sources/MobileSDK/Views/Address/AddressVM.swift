@@ -67,7 +67,10 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Address Search
 
     func searchAddress(_ searchableText: String) {
-        guard searchableText.isEmpty == false else { return }
+        guard searchableText.isEmpty == false else {
+            addressFormManager.showAddressSearchPopup = false
+            return
+        }
         localSearchCompleter.queryFragment = searchableText
     }
 
@@ -114,6 +117,8 @@ class AddressVM: NSObject, ObservableObject {
 
     func saveAddress() {
         addressFormManager.setEditingTextField(focusedField: nil)
+        addressFormManager.endEditing()
+        addressFormManager.addressSearchText = ""
 
         addressFormManager.validateAllTextFields()
         let address = Address(
@@ -141,7 +146,7 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
         addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
-        if addressFormManager.currentTextField == .searchAddress {
+        if addressFormManager.currentTextField == .searchAddress  && !addressFormManager.addressSearchText.isEmpty {
             addressFormManager.showAddressSearchPopup = true
         }
     }
