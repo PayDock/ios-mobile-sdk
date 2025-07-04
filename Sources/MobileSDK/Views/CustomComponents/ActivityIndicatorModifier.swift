@@ -9,10 +9,14 @@
 import SwiftUI
 
 struct ActivityIndicatorModifier: AnimatableModifier {
+    
+    private let appearance: Theme.OverlayLoaderAppearance
     var isLoading: Bool
     @State private var hostingController: UIHostingController<ActivityIndicator>? = nil
 
-    init(isLoading: Bool) {
+    init(appearance: Theme.OverlayLoaderAppearance,
+         isLoading: Bool) {
+        self.appearance = appearance
         self.isLoading = isLoading
     }
 
@@ -34,10 +38,10 @@ struct ActivityIndicatorModifier: AnimatableModifier {
     }
 
     func showIndicator() {
-        let activityIndicator = ActivityIndicator(isAnimating: .constant(true), style: .large)
+        let activityIndicator = ActivityIndicator(appearance: appearance, isAnimating: .constant(true), style: .large)
         
         hostingController = UIHostingController(rootView: activityIndicator)
-        hostingController?.view.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+        hostingController?.view.backgroundColor = UIColor(appearance.overlayColor)
         hostingController?.view.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         hostingController?.view.alpha = 0
 

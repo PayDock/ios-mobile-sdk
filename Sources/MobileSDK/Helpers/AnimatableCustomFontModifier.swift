@@ -16,10 +16,10 @@ struct AnimatableCustomFontModifier: AnimatableModifier {
     }
 
     var size: CGFloat
+    var fontName: String
 
     func body(content: Content) -> some View {
         content
-            .font(Font.custom(Appearance.shared.fontName, size: size))
+            .font(Font.custom(fontName, size: size))
     }
-
 }

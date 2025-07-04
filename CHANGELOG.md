@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.0.0] - 2025-07-04
+
+### Added
+
+- New customisations for all Widgets with `Appearance` added to all Widget contracts
+
+### Changed
+
+- `config` parameter standardised to all Widget contracts
+- Handling of token callback results for Wallets now within SDK processing
+- Coles Pay redirects to success without showing success landing page
+
+### Fixed
+
+- Address Widget popup will now disappear when search text is removed
+
 ## [3.1.0] - 2025-05-23
 
 ### Added

@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import NetworkingLib
 
 @MainActor
 class ColesPayWidgetVM: ObservableObject {
@@ -28,8 +29,7 @@ class ColesPayWidgetVM: ObservableObject {
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
     }
-
-    func initializeWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "", walletType: nil)
 
@@ -58,14 +58,12 @@ class ColesPayWidgetVM: ObservableObject {
             do {
                 let token = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq).token
                 DispatchQueue.main.async {
-                    completion(token)
+                    completion(.success(.init(token: token)))
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                alertTitle = "Error"
-                alertMessage = "Error fetching wallet token!"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.showAlert = true
-                }
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
@@ -80,7 +78,7 @@ class ColesPayWidgetVM: ObservableObject {
 
     func handleSuccess() {
         alertTitle = "Success"
-        alertMessage = "Coles Pay passed!"
+        alertMessage = "Coles Pay success!"
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.showAlert = true
         }

@@ -11,18 +11,21 @@ import SwiftUI
 public struct ColesPayWidget: View {
 
     @StateObject private var viewModel: ColesPayVM
+    @State var appearance: ColesPayWidgetAppearance
 
     public init(viewState: ViewState? = nil,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
-                clientId: String,
-                colesPayToken: @escaping (_ colesPayToken: @escaping (String) -> Void) -> Void,
+                config: ColesPayConfig,
+                appearance: ColesPayWidgetAppearance = ColesPayWidgetAppearance(),
+                tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 completion: @escaping (Result<String, ColesPayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ColesPayVM(
-            clientId: clientId,
-            colesPayToken: colesPayToken,
+            config: config,
+            tokenRequest: tokenRequest,
             viewState: viewState ?? ViewState(state: .none),
             loadingDelegate: loadingDelegate,
             completion: completion))
+        self.appearance = appearance
     }
 
     public var body: some View {
@@ -38,7 +41,7 @@ public struct ColesPayWidget: View {
             image: Image((viewModel.isLoading && viewModel.showLoaders) ? "coles-pay-button-blank" : "coles-pay-button", bundle: Bundle.module),
             imageLocation: .left,
             isLoading: viewModel.isLoading && viewModel.showLoaders,
-            style: .image(ImageButtonStyle(isDisabled: viewModel.viewState.isDisabled, loaderColor: .white)),
+            style: .image(ImageButtonStyle(appearance: appearance.loader, isDisabled: viewModel.viewState.isDisabled)),
             scaleToFit: true) {
                 viewModel.handleButtonTap()
             }
@@ -48,7 +51,7 @@ public struct ColesPayWidget: View {
     private var webViewSheetContent: some View {
         NavigationStack {
             ColesPayWebView(
-                clientId: viewModel.clientId ?? "",
+                clientId: viewModel.config.clientId,
                 colesPayOrderId: viewModel.colesPayOrderId,
                 onApprove: {
                     viewModel.handleSuccess()
@@ -85,6 +88,6 @@ public struct ColesPayWidget: View {
 
 struct ColesPayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        ColesPayWidget(clientId: "", colesPayToken: { _ in }, completion: { _ in })
+        ColesPayWidget(config: .init(clientId: "")) { _ in } completion: { _ in }
     }
 }

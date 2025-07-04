@@ -10,29 +10,34 @@ import SwiftUI
 import PassKit
 
 struct ApplePayButton: View {
-    var action: () -> Void
+    @State var appearance: ApplePayWidgetAppearance
+    private let action: () -> Void
+    
+    init(appearance: ApplePayWidgetAppearance,
+         action: @escaping () -> Void) {
+        self.appearance = appearance
+        self.action = action
+    }
 
     var body: some View {
-        Representable(action: action)
-            .frame(minWidth: 100, maxWidth: 400)
-            .frame(height: 50)
-            .frame(maxWidth: .infinity)
+        Representable(appearance: appearance, action: action)
     }
 }
 
 struct ApplePayButton_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayButton(action: {})
+        ApplePayButton(appearance: ApplePayWidgetAppearance(), action: {})
             .previewLayout(.sizeThatFits)
     }
 }
 
 extension ApplePayButton {
     struct Representable: UIViewRepresentable {
+        var appearance: ApplePayWidgetAppearance
         var action: () -> Void
 
         func makeCoordinator() -> Coordinator {
-            Coordinator(action: action)
+            Coordinator(appearance: appearance, action: action)
         }
 
         func makeUIView(context: Context) -> some UIView {
@@ -45,13 +50,16 @@ extension ApplePayButton {
     }
 
     class Coordinator: NSObject {
+        var appearance: ApplePayWidgetAppearance
         var action: () -> Void
-        var button = PKPaymentButton(paymentButtonType: .plain, paymentButtonStyle: .automatic)
+        var button: PKPaymentButton
 
-        init(action: @escaping () -> Void) {
+        init(appearance: ApplePayWidgetAppearance, action: @escaping () -> Void) {
+            self.appearance = appearance
             self.action = action
+            self.button = PKPaymentButton(paymentButtonType: appearance.type, paymentButtonStyle: appearance.style)
             super.init()
-
+            
             setup()
         }
 

@@ -11,13 +11,19 @@ import SwiftUI
 struct PickerView: View {
 
     @State var entries: [String]
-    @State var selected: String
+    @Binding var selected: String
     @State var placeholder: String
 
     var onSelection: (String) -> Void
 
     var body: some View {
         VStack {
+            HStack {
+                Text(placeholder)
+                    .padding(.leading, 16)
+                    .padding(.bottom, -4)
+                Spacer()
+            }
             Menu {
                 ForEach(entries, id: \.self) { client in
                     Button(client) {
@@ -34,7 +40,7 @@ struct PickerView: View {
                             .padding(.horizontal, 16)
 
                         HStack {
-                            Text(selected.isEmpty ? placeholder : selected)
+                            Text(selected)
                                 .foregroundColor(.black)
                                 .padding(.leading, 32)
                                 .font(.custom(selected, size: 14))
@@ -51,6 +57,6 @@ struct PickerView: View {
 
 struct PickerView_Previews: PreviewProvider {
     static var previews: some View {
-        PickerView(entries: ["Font 1, Font 2"], selected: "", placeholder: "Select something", onSelection: {_ in })
+        PickerView(entries: ["Font 1, Font 2"], selected: .constant("Font"), placeholder: "Select something", onSelection: {_ in })
     }
 }

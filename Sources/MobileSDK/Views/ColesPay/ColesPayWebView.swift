@@ -15,10 +15,38 @@ struct ColesPayWebView: UIViewRepresentable {
     typealias OnApprove = () -> Void
     typealias OnFailure = (ColesPayError) -> Void
 
-    private let clientId: String
+    let clientId: String
     private let colesPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure
+    
+    /**
+     Javascript to intercept push, replace and pop states in the window to identify window location changes.
+     */
+    private let historyAPIScript = """
+         ;(function() {
+           var pushState = history.pushState;
+           var replaceState = history.replaceState;
+
+           history.pushState = function() {
+             pushState.apply(history, arguments);
+             window.dispatchEvent(new Event('locationchange'));
+           };
+
+           history.replaceState = function() {
+             replaceState.apply(history, arguments);
+             window.dispatchEvent(new Event('locationchange'));
+           };
+
+           window.addEventListener('popstate', function() {
+             window.dispatchEvent(new Event('locationchange'))
+           });
+         })();
+
+         window.addEventListener('locationchange', function(){
+           webkit.messageHandlers.PayDockMobileSDK.postMessage(window.location.href)
+         })
+    """
 
     init(clientId: String, colesPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
         self.clientId = clientId
@@ -31,6 +59,7 @@ struct ColesPayWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = WKWebsiteDataStore.default()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
+        configuration.userContentController.addUserScript(WKUserScript(source: historyAPIScript, injectionTime: .atDocumentStart, forMainFrameOnly: false))
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
@@ -105,7 +134,13 @@ struct ColesPayWebView: UIViewRepresentable {
             }
         }
 
-        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) { }
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            guard let messageString = message.body as? String else { return }
+            
+            if messageString.contains("/payment-confirmed") {
+                onApprove()
+            }
+        }
 
         func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(true)

@@ -13,13 +13,15 @@ struct GiftCardWidgetView: View {
 
     @State var showAlert = false
     @State var alertMessage = ""
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                GiftCardWidget(storePin: false, accessToken: ProjectEnvironment.shared.getWidgetAccessToken()) { result in
+                GiftCardWidget(config: GiftCardWidgetConfig(accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), storePin: false),
+                               appearance: getAppearance()) { result in
                     switch result {
-                    case .success(let text): self.alertMessage = text
+                    case .success(let giftCardResult): self.alertMessage = giftCardResult.token
                     case .failure(let error): self.alertMessage = error.localizedDescription
                     }
                     showAlert = true
@@ -29,6 +31,11 @@ struct GiftCardWidgetView: View {
                 Text(alertMessage)
             })
         }
+    }
+    
+    private func getAppearance() -> GiftCardWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .giftCard, isDarkMode: colorScheme == .dark, as: GiftCardWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? GiftCardWidgetAppearance()
     }
 }
 

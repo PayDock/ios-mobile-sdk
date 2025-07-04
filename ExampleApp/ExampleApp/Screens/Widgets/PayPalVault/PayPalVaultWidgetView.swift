@@ -12,18 +12,21 @@ import MobileSDK
 struct PayPalVaultWidgetView: View {
     
     @StateObject private var viewModel = PayPalVaultWidgetVM()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                PayPalSavePaymentSourceWidget(config: viewModel.getConfig()) { result in
-                    switch result {
-                    case let .success(payPalVaultResult):
-                        viewModel.handleSuccess(result: payPalVaultResult)
-                    case let .failure(error):
-                        viewModel.handleError(error: error)
+                PayPalSavePaymentSourceWidget(
+                    config: viewModel.getConfig(),
+                    appearance: getAppearance()) { result in
+                        switch result {
+                        case let .success(payPalVaultResult):
+                            viewModel.handleSuccess(result: payPalVaultResult)
+                        case let .failure(error):
+                            viewModel.handleError(error: error)
+                        }
                     }
-                }
                 .padding()
             }
             .background(.white)
@@ -32,6 +35,11 @@ struct PayPalVaultWidgetView: View {
             })
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         }
+    }
+    
+    private func getAppearance() -> PayPalVaultAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .paypalVault, isDarkMode: colorScheme == .dark, as: PayPalVaultAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? PayPalVaultAppearance()
     }
 }
 

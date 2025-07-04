@@ -142,7 +142,7 @@ class Integrated3DSTests: XCTestCase {
         XCTAssertNotNil(decodedToken?.charge3dsId)
         XCTAssert(decodedToken?.format == .url || decodedToken?.format == .html)
         
-        _ = Integrated3DSWidget(token: validToken, baseURL: nil) { result in
+        _ = Integrated3DSWidget(config: .init(token: validToken)) { result in
             if case let .failure(error) = result {
                 switch error {
                 case .invalidToken: XCTFail("Token is correct - it should not fail!")
@@ -157,7 +157,7 @@ class Integrated3DSTests: XCTestCase {
         let invalidToken = "invalidBase64Token"
         let expectation = self.expectation(description: "Completion should be called with invalidToken error")
         
-        _ = Integrated3DSWidget(token: invalidToken, baseURL: nil) { result in
+        _ = Integrated3DSWidget(config: .init(token: invalidToken)) { result in
             if case let .failure(error) = result {
                 switch error {
                 case .invalidToken: expectation.fulfill()
@@ -179,7 +179,7 @@ class Integrated3DSTests: XCTestCase {
         XCTAssertNil(decodedToken?.charge3dsId)
         XCTAssertFalse(decodedToken?.format == .url || decodedToken?.format == .html)
         
-        _ = Integrated3DSWidget(token: wrongToken, baseURL: nil) { result in
+        _ = Integrated3DSWidget(config: .init(token: wrongToken)) { result in
             if case let .failure(error) = result {
                 switch error {
                 case .invalidToken: expectation.fulfill()

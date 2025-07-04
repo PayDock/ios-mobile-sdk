@@ -30,7 +30,7 @@ struct MainView: View {
                 }
                 .tag(1)
 
-            StyleView()
+            StyleWidgetListView()
                 .tabItem {
                     Label("Style", image: selection == 2 ? "paintbucket-active" : "paintbucket")
                 }

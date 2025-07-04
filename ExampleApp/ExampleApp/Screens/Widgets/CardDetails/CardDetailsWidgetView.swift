@@ -13,6 +13,7 @@ struct CardDetailsWidgetView: View {
     @State var isSheetPresented = false
     @State var showAlert = false
     @State var alertMessage = ""
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -27,6 +28,7 @@ struct CardDetailsWidgetView: View {
                             enableValidation: true
                         )
                     ),
+                    appearance: getAppearance(),
                     completion: { result in
                         switch result {
                         case .success(let result): alertMessage = result.token
@@ -42,6 +44,11 @@ struct CardDetailsWidgetView: View {
         .alert("Card Details", isPresented: $showAlert, actions: {}, message: {
             Text(alertMessage)
         })
+    }
+    
+    private func getAppearance() -> CardDetailsWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .card, isDarkMode: colorScheme == .dark, as: CardDetailsWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? CardDetailsWidgetAppearance()
     }
 }
 

@@ -9,8 +9,13 @@
 import SwiftUI
 
 extension Text {
-
-    func customFont(_ size: Fonts.Size) -> Text {
-        font(.custom(Appearance.shared.fontName, size: size.rawValue))
+    
+    func applyAttributes(_ attributes: TextAttributes) -> Text {
+        self
+            .font(attributes.customFont.font)
+            .foregroundColor(attributes.textColor)
+            .underline(attributes.underlineColor != .clear, color: attributes.underlineColor)
+            .strikethrough(attributes.strikethroughColor != .clear, color: attributes.strikethroughColor)
+            .italic(attributes.isItalic)
     }
 }

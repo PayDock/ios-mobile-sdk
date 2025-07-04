@@ -28,23 +28,29 @@ class ApplePayVM: NSObject, ObservableObject {
     // MARK: - Handlers
 
     private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
-    private let applePayRequestHandler: (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void
+    private let createPaymentRequest: (_ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void
 
     // MARK: - Initialisation
 
-    init(applePayRequestHandler: @escaping (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void,
+    init(createPaymentRequest: @escaping (_ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
-        self.applePayRequestHandler = applePayRequestHandler
+        self.createPaymentRequest = createPaymentRequest
         self.walletService = walletService
         self.completion = completion
     }
 
     func handleButtonTap() {
         error = nil
-        applePayRequestHandler { applePayRequest in
-            self.applePayRequest = applePayRequest
-            self.startPayment()
+        createPaymentRequest { [weak self] result in
+            switch result {
+            case .success(let response):
+                self?.applePayRequest = ApplePayRequest(token: response.token, request: response.request)
+                self?.startPayment()
+            
+            case .failure(let failure):
+                self?.completion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+            }
         }
     }
 

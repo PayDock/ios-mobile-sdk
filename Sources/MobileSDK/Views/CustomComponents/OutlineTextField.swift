@@ -13,14 +13,16 @@ struct OutlineTextField: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     
     // MARK: Properties
+    
+    @State private var appearance: Theme.TextFieldAppearance
 
-    @State private var borderColor = Color.borderColor
-    @State private var borderWidth: CGFloat = .borderWidth
+    @State private var borderColor = Color.clear
+    @State private var borderWidth: CGFloat = 0.0
 
     @State private var titleBackgroundOpacity = 0.0
     @State private var titleBottomPadding = 0.0
-    @State private var titleColor = Color.placeholderColor
-    @State private var titleFontSize = 16.0
+    @State private var titleColor = Color.clear
+    @State private var titleFontSize = 0.0
     @State private var titleVerticalPadding: CGFloat = 0
     @State private var titleLeadingPadding: Double
 
@@ -57,7 +59,8 @@ struct OutlineTextField: View {
     ///   - validationIconEnabled: Whether to enabled the validation icon.
     ///   - textContentType: Content type used for the suggested prefill.
     ///   - onTapGesture: Action to take on tap gesture activaction.
-    public init(text: Binding<String>,
+    public init(appearance: Theme.TextFieldAppearance = Theme.TextFieldAppearance(),
+                text: Binding<String>,
                 title: String,
                 placeholder: String,
                 errorMessage: Binding<String>,
@@ -69,6 +72,7 @@ struct OutlineTextField: View {
                 textContentType: UITextContentType? = nil,
                 onTapGesture: @escaping (() -> Void)
     ) {
+        self.appearance = appearance
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -100,8 +104,10 @@ struct OutlineTextField: View {
             }
         }
         .contentShape(Rectangle())
-        .padding(.top, 0)
-        .padding(.bottom, 0)
+        .padding(.top, appearance.dimensions.padding.top)
+        .padding(.leading, appearance.dimensions.padding.leading)
+        .padding(.bottom, appearance.dimensions.padding.bottom)
+        .padding(.trailing, appearance.dimensions.padding.trailing)
         .onTapGesture {
             onTapGesture()
         }
@@ -126,15 +132,18 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
-        .onChange(of: disabled) { _ in
-            
+        .onAppear {
+            titleColor = appearance.colors.placeholder
+            titleFontSize = appearance.fonts.title.customFont.size
+            borderColor = appearance.colors.inactive
+            borderWidth = appearance.dimensions.borderWidth
         }
     }
 
     private var textFieldView: some View {
         HStack {
             leftImage?
-                .foregroundColor(.placeholderColor)
+                .foregroundColor(appearance.colors.placeholder)
                 .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
             
@@ -148,9 +157,12 @@ struct OutlineTextField: View {
                 }))
                 .disabled(disabled)
                 .frame(height: getTextFieldHeight())
-                .customFont(.body)
-                .foregroundColor(.textColor)
-                .tint(.primaryColor)
+                .font(appearance.fonts.text.customFont.font)
+                .underline(appearance.fonts.text.isUnderlined, color: appearance.fonts.text.underlineColor)
+                .strikethrough(appearance.fonts.text.isStrikethrough, color: appearance.fonts.text.strikethroughColor)
+                .italic(appearance.fonts.text.isItalic)
+                .foregroundColor(appearance.colors.text)
+                .tint(appearance.colors.active)
                 .accessibilityLabel(title)
                 .accessibilityHint(getValidMessage())
             
@@ -160,19 +172,22 @@ struct OutlineTextField: View {
             }
         }
         .padding([.leading, .trailing], 16.0)
-        .background(RoundedRectangle(cornerRadius: .textFieldCornerRadius, style: .continuous)
+        .background(RoundedRectangle(cornerRadius: appearance.dimensions.cornerRadius, style: .continuous)
             .stroke(borderColor, lineWidth: borderWidth))
     }
 
     private func placeholderView() -> some View {
         HStack {
             ZStack {
-                Color.backgroundColor
+                appearance.colors.background
                     .opacity(titleBackgroundOpacity)
                 Text(title)
                     .foregroundColor(.white)
                     .colorMultiply(titleColor)
-                    .animatableFont(size: titleFontSize)
+                    .strikethrough(appearance.fonts.title.isStrikethrough, color: appearance.fonts.title.strikethroughColor)
+                    .underline(appearance.fonts.title.isUnderlined, color: appearance.fonts.title.underlineColor)
+                    .italic(appearance.fonts.title.isItalic)
+                    .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.name)
                     .padding([.leading, .trailing], 4.0)
                     .layoutPriority(1)
             }
@@ -187,9 +202,8 @@ struct OutlineTextField: View {
         HStack {
             VStack {
                 Text(errorMessage)
-                    .customFont(.caption)
-                    .font(.system(size: 10.0))
-                    .foregroundColor(.errorColor)
+                    .font(appearance.fonts.error.customFont.font)
+                    .foregroundColor(appearance.colors.error)
                     .padding(.leading, 16.0)
             }
             Spacer()
@@ -213,10 +227,10 @@ struct OutlineTextField: View {
             switch validationIconState {
             case .valid:
                 Image("tick-circle", bundle: Bundle.module)
-                    .foregroundColor(.successColor)
+                    .foregroundColor(appearance.colors.success)
             case .invalid:
                 Image("exclamation-circle", bundle: Bundle.module)
-                    .foregroundColor(.errorColor)
+                    .foregroundColor(appearance.colors.error)
             case .none: EmptyView()
             }
         }
@@ -235,24 +249,24 @@ private extension OutlineTextField {
 
     func updateBorderColor() {
         guard let valid = valid else {
-            borderColor = editing ? .primaryColor : .borderColor
+            borderColor = editing ? appearance.colors.active : appearance.colors.inactive
             validationIconState = .none
             return
         }
         if !valid {
-            borderColor = .errorColor
+            borderColor = appearance.colors.error
             validationIconState = .invalid
         } else if editing {
-            borderColor = .primaryColor
+            borderColor = appearance.colors.active
             validationIconState = .none
         } else {
-            borderColor = .borderColor
+            borderColor = appearance.colors.placeholder
             validationIconState = text.isEmpty ? .none : .valid
         }
     }
 
     func updateBorderWidth() {
-        borderWidth = editing ? .borderWidth * 2 : .borderWidth
+        borderWidth = editing ? appearance.dimensions.activeBorderWidth : appearance.dimensions.borderWidth
     }
 
     func updateTitle() {
@@ -272,23 +286,23 @@ private extension OutlineTextField {
 
     func updateTitleColor() {
         guard let valid = valid else {
-            titleColor = editing ? .primaryColor : .borderColor
+            titleColor = editing ? appearance.colors.active : appearance.colors.placeholder
             return
         }
         if valid {
-            titleColor = editing ? .primaryColor : .borderColor
+            titleColor = editing ? appearance.colors.active : appearance.colors.placeholder
         } else if text.isEmpty {
-            titleColor = editing ? .errorColor : .placeholderColor
+            titleColor = editing ? appearance.colors.error : appearance.colors.placeholder
         } else {
-            titleColor = .errorColor
+            titleColor = appearance.colors.error
         }
     }
 
     func updateTitleFontSize() {
         if editing || !text.isEmpty {
-            titleFontSize = 12.0
+            titleFontSize = appearance.fonts.title.customFont.size / 1.4
         } else {
-            titleFontSize = 16.0
+            titleFontSize = appearance.fonts.title.customFont.size
         }
     }
 

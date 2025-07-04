@@ -14,6 +14,7 @@ public struct CardDetailsWidget: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject var viewModel: CardDetailsVM
+    @State var appearance: CardDetailsWidgetAppearance
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
     @FocusState private var isViewFocused: Bool
 
@@ -21,6 +22,7 @@ public struct CardDetailsWidget: View {
 
     public init(viewState: ViewState? = nil,
                 config: CardDetailsWidgetConfig,
+                appearance: CardDetailsWidgetAppearance = CardDetailsWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
@@ -28,21 +30,22 @@ public struct CardDetailsWidget: View {
             config: config,
             loadingDelegate: loadingDelegate,
             completion: completion))
+        self.appearance = appearance
     }
 
     // MARK: - View protocol properties
     
     public var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: appearance.verticalSpacing) {
             if viewModel.config.showCardTitle {
                 HStack {
                     Text("Card information")
-                        .customFont(.body)
-                        .foregroundColor(.textColor)
+                        .font(appearance.title.text.customFont.font)
+                        .foregroundColor(appearance.title.text.textColor)
                         .accessibilityAddTraits(.isHeader)
                     Spacer()
                 }
-                .padding(.bottom, 14)
+                .customPadding(appearance.title.padding)
             }
             
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
@@ -57,12 +60,13 @@ public struct CardDetailsWidget: View {
                 .accessibilityElement()
                 .accessibilityLabel("Supported card schemes: \(supportedSchemes.map(\.voiceoverName).joined(separator: ", "))")
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, .spacing)
+                .padding(.bottom, 16)
             }
 
-            VStack(spacing: max(max(.spacing - 10, 0), 0)) {
+            VStack(spacing: 8) {
                 if viewModel.config.collectCardholderName {
                     OutlineTextField(
+                        appearance: appearance.textField,
                         text: $viewModel.cardDetailsFormManager.cardholderNameText,
                         title: viewModel.cardDetailsFormManager.cardholderNameTitle,
                         placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
@@ -91,6 +95,7 @@ public struct CardDetailsWidget: View {
                 }
 
                 OutlineTextField(
+                    appearance: appearance.textField,
                     text: $viewModel.cardDetailsFormManager.cardNumberText,
                     title: viewModel.cardDetailsFormManager.cardNumberTitle,
                     placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
@@ -117,8 +122,8 @@ public struct CardDetailsWidget: View {
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
                             } label: {
                                 Text("Next")
-                                    .customFont(.body)
-                                    .foregroundColor(.primaryColor)
+                                    .font(appearance.toolbarButton.fonts.title.customFont.font)
+                                    .foregroundColor(appearance.toolbarButton.colors.text)
                             }
                         }
                     }
@@ -133,10 +138,11 @@ public struct CardDetailsWidget: View {
                 }
 
                 let layout = shouldAlignVertically() ?
-                    AnyLayout(VStackLayout(spacing: max(max(.spacing - 10, 0), 0))) :
-                    AnyLayout(HStackLayout(alignment: .top, spacing: .spacing))
+                AnyLayout(VStackLayout(spacing: appearance.verticalSpacing)) :
+                AnyLayout(HStackLayout(alignment: .top, spacing: appearance.horizontalSpacing))
                 layout {
                     OutlineTextField(
+                        appearance: appearance.textField,
                         text: $viewModel.cardDetailsFormManager.expiryDateText,
                         title: viewModel.cardDetailsFormManager.expiryDateTitle,
                         placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
@@ -162,8 +168,8 @@ public struct CardDetailsWidget: View {
                                     viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                                 } label: {
                                     Text("Next")
-                                        .customFont(.body)
-                                        .foregroundColor(.primaryColor)
+                                        .font(appearance.toolbarButton.fonts.title.customFont.font)
+                                        .foregroundColor(appearance.toolbarButton.colors.text)
                                 }
                             }
                         }
@@ -178,6 +184,7 @@ public struct CardDetailsWidget: View {
                     }
 
                     OutlineTextField(
+                        appearance: appearance.textField,
                         text: $viewModel.cardDetailsFormManager.securityCodeText,
                         title: viewModel.cardDetailsFormManager.securityCodeTitle,
                         placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
@@ -203,8 +210,8 @@ public struct CardDetailsWidget: View {
                                     viewModel.cardDetailsFormManager.endEditing()
                                 } label: {
                                     Text("Done")
-                                        .customFont(.body)
-                                        .foregroundColor(.primaryColor)
+                                        .font(appearance.toolbarButton.fonts.title.customFont.font)
+                                        .foregroundColor(appearance.toolbarButton.colors.text)
                                 }
                             }
                         }
@@ -219,43 +226,42 @@ public struct CardDetailsWidget: View {
                         viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: newValue)
                     }
                 }
-                if viewModel.config.allowSaveCard != nil {
-                    privacyView
-                }
+            }
+            
+            if viewModel.config.allowSaveCard != nil {
+                privacyView
             }
             
             SDKButton(title: viewModel.config.actionText,
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
-                      style: .fill(FillButtonStyle(isDisabled: viewModel.isActionButtonDisabled()))
+                      style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))
             ) {
                 textFieldInFocus = nil
                 viewModel.cardDetailsFormManager.endEditing()
                 viewModel.tokeniseCardDetails()
             }
-            .padding(.bottom, 16)
-            .padding(.top, .spacing)
-            .customFont(.body)
+            .customPadding(appearance.actionButton.dimensions.padding)
             
             emptyFocusView
         }
-        .padding(.horizontal, max(16, .spacing))
-        .background(Color.backgroundColor)
-
+        .padding(.horizontal, appearance.horizontalSpacing)
     }
 
     private var privacyView: some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
-                    .customFont(.body3)
-                    .foregroundColor(.textColor)
+                    .applyAttributes(appearance.toggleText.text)
+                    .customPadding(appearance.toggleText.padding)
+
                 let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
                 let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                 let link = "[\(text)](\(url))"
                 Text(.init(link))
-                    .customFont(.body3)
-                    .underline()
-                    .accentColor(.primaryColor)
+                
+                    .applyAttributes(appearance.linkText.text)
+                    .customPadding(appearance.linkText.padding)
+                    .accentColor(appearance.linkText.text.textColor)
                     .disabled(viewModel.viewState.isDisabled)
                     .frame(minHeight: 24.0)
                     .contentShape(Rectangle())
@@ -266,7 +272,7 @@ public struct CardDetailsWidget: View {
             }
             Spacer()
             Toggle(isOn: $viewModel.policyAccepted) {}
-                .tint(.primaryColor)
+                .tint(appearance.toggle.activeColor)
                 .frame(width: 64, height: 44)
                 .disabled(viewModel.viewState.isDisabled)
                 .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")

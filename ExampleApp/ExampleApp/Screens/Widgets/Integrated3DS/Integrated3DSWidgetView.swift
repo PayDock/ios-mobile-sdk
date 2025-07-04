@@ -13,6 +13,7 @@ import MobileSDK
 struct Integrated3DSWidgetView: View {
 
     @StateObject private var viewModel = Integrated3DSVM()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -28,8 +29,8 @@ struct Integrated3DSWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     Integrated3DSWidget(
-                                        token: viewModel.token3DS,
-                                        baseURL: viewModel.getBaseUrl(),
+                                        config: .init(token: viewModel.token3DS),
+                                        appearance: getAppearance(),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):
@@ -58,6 +59,11 @@ struct Integrated3DSWidgetView: View {
         .onAppear {
             viewModel.tokeniseCardDetails()
         }
+    }
+    
+    private func getAppearance() -> ThreeDSWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .integrated3ds, isDarkMode: colorScheme == .dark, as: ThreeDSWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ThreeDSWidgetAppearance()
     }
 }
 

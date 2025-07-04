@@ -10,27 +10,14 @@ import Afterpay
 import Foundation
 
 public struct AfterpaySdkConfig {
-    public var buttonTheme: ButtonTheme
     public var config: AfterpayConfiguration
     public var environment: Environment
     public var options: CheckoutOptions
 
-    public init(buttonTheme: ButtonTheme, config: AfterpayConfiguration, environment: Environment, options: CheckoutOptions) {
-        self.buttonTheme = buttonTheme
+    public init(config: AfterpayConfiguration, environment: Environment, options: CheckoutOptions) {
         self.config = config
         self.environment = environment
         self.options = options
-    }
-
-    public struct ButtonTheme {
-        public var buttonType: ButtonKind
-        public var colorScheme: ColorScheme
-
-        public init(buttonType: ButtonKind = .buyNow, 
-                    colorScheme: ColorScheme = .static(.blackOnMint)) {
-            self.buttonType = buttonType
-            self.colorScheme = colorScheme
-        }
     }
 
     public struct CheckoutOptions {

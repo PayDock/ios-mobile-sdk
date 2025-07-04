@@ -14,6 +14,7 @@ struct Standalone3DSWidgetView: View {
 
     @StateObject private var viewModel = Standalone3DSVM()
     @State var isSheetPresented = false
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationStack {
@@ -28,8 +29,8 @@ struct Standalone3DSWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     Standalone3DSWidget(
-                                        token: viewModel.token3DS,
-                                        baseURL: viewModel.getBaseUrl(),
+                                        config: ThreeDSConfig(token: viewModel.token3DS),
+                                        appearance: getAppearance(),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):
@@ -58,6 +59,11 @@ struct Standalone3DSWidgetView: View {
         .onAppear {
             viewModel.getValutToken()
         }
+    }
+    
+    private func getAppearance() -> ThreeDSWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .standalone3ds, isDarkMode: colorScheme == .dark, as: ThreeDSWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ThreeDSWidgetAppearance()
     }
 }
 

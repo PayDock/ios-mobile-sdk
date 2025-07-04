@@ -69,11 +69,6 @@ class Integrated3DSVM: NSObject, ObservableObject {
             }
         }
     }
-
-    func getBaseUrl() -> URL? {
-        let urlString = "https://paydock.com"
-        return URL(string: urlString)
-    }
     
     func handle3dsEvent(_ event: Integrated3DSResult) {
         switch event.event {

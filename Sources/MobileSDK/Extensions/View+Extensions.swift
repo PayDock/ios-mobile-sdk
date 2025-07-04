@@ -10,12 +10,12 @@ import SwiftUI
 
 extension View {
 
-    func animatableFont(size: CGFloat) -> some View {
-      modifier(AnimatableCustomFontModifier(size: size))
+    func animatableFont(size: CGFloat, fontName: String) -> some View {
+      modifier(AnimatableCustomFontModifier(size: size, fontName: fontName))
     }
-
-    func customFont(_ size: Fonts.Size) -> some View {
-        return self.modifier(ScaledFont(size: size.rawValue))
+    
+    func customPadding(_ padding: Padding) -> some View {
+        self.modifier(CustomPaddingModifier(padding: padding))
     }
     
     @ViewBuilder

@@ -25,16 +25,6 @@ struct Constants {
         }
     }
 
-    static var sslPublicKeyHash: String {
-        guard let environment = MobileSDK.shared.config?.environment else {
-            fatalError("Missing configuration!")
-        }
-
-        switch environment {
-        case .production, .sandbox, .staging: return "kV0cxZABuhXdMFROcAZwIflgJilKOqxMBcRhzFhZMok="
-        }
-    }
-
     // MARK: - Client SDK
 
     static var clientSdkUrlString: String {
@@ -53,8 +43,9 @@ struct Constants {
         }
 
         switch environment {
-        case .production: return "v1.117.0"
-        case .sandbox, .staging: return "v1.117.0"
+        case .production: return "v1.125.0"
+        case .sandbox: return "v1.125.0"
+        case .staging: return "v1.125.0-beta"
         }
     }
 

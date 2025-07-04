@@ -8,9 +8,9 @@
 
 import SwiftUI
 
-struct Fonts {
+public struct Fonts {
 
-    enum Size: CGFloat {
+    public enum Size: CGFloat {
         case title = 36
         case title2 = 30
         case title3 = 21

@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import NetworkingLib
 
 @MainActor
 class ApplePayWidgetVM: NSObject, ObservableObject {
@@ -30,7 +31,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
         super.init()
     }
 
-    func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: ProjectEnvironment.shared.getApplePayGatewayId() ?? "", walletType: "apple")
 
@@ -55,26 +56,24 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 description: "Test purchase",
                 meta: metaData)
-
+            
             do {
                 isLoading = true
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
-                DispatchQueue.main.async {
-                    let applePayRequest = self.getApplePayRequest(walletToken: token)
-                    completion(applePayRequest)
-                }
+                let applePayRequestResult = self.getApplePayRequestResult(walletToken: token)
+                completion(.success(applePayRequestResult))
+                
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
                 isLoading = false
-                alertTitle = "Error"
-                alertMessage = "Error fetching wallet token!"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.showAlert = true
-                }
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
 
-    func getApplePayRequest(walletToken: String) -> ApplePayRequest {
+    func getApplePayRequestResult(walletToken: String) -> ApplePayRequestResult {
         let paymentRequest = MobileSDK.createApplePayRequest(
             amount: 10,
             amountLabel: "Amount",
@@ -82,11 +81,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             currencyCode: "AUD",
             merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
 
-        let applePayRequest = ApplePayRequest(
-            token: walletToken,
-            request: paymentRequest)
-
-        return applePayRequest
+        return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
 
     func handleError(error: ApplePayError) {

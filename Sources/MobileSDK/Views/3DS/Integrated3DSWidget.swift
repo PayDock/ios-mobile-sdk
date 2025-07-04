@@ -11,22 +11,24 @@ import SwiftUI
 import AuthenticationServices
 
 public struct Integrated3DSWidget: UIViewRepresentable {
-    private let token: String
-    private let baseUrl: URL?
+    
+    private let config: ThreeDSConfig
+    private let appearance: ThreeDSWidgetAppearance
     private let completion: (Result<Integrated3DSResult, Integrated3DSError>) -> Void
     private let base64Decoder: Base64Decoder = Base64Decoder()
 
-    public init(token: String, baseURL: URL?,
+    public init(config: ThreeDSConfig,
+                appearance: ThreeDSWidgetAppearance = ThreeDSWidgetAppearance(),
                 completion: @escaping (Result<Integrated3DSResult, Integrated3DSError>) -> Void) {
-        self.token = token
-        self.baseUrl = baseURL
+        self.config = config
+        self.appearance = appearance
         self.completion = completion
         
         validateToken()
     }
     
     private func validateToken() {
-        guard let decodedToken = base64Decoder.decodeBase64(token, to: Decoded3DSToken.self),
+        guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
               decodedToken.format == .html || decodedToken.format == .url else {
             completion(.failure(.invalidToken))
             return
@@ -43,14 +45,25 @@ public struct Integrated3DSWidget: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         
         let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.color = UIColor(appearance.loader.color)
+        activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
+        activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
         context.coordinator.activityIndicator = activityIndicator
         
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
+        
+        // Set up constraints for activity indicator
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            activityIndicator.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            activityIndicator.topAnchor.constraint(equalTo: containerView.topAnchor),
+            activityIndicator.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
         
         // Set up constraints for webView
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -75,8 +88,8 @@ public struct Integrated3DSWidget: UIViewRepresentable {
             return
         }
         if !context.coordinator.isLoaded {
-            let html = Integrated3DSWidget.html(token)
-            webView.loadHTMLString(html, baseURL: baseUrl)
+            let html = Integrated3DSWidget.html(config.token)
+            webView.loadHTMLString(html, baseURL: URL(string: "https://paydock.com"))
         }
     }
 
