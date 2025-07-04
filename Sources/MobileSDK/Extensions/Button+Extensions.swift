@@ -19,6 +19,8 @@ extension Button {
             self.buttonStyle(style)
         case .image(let style):
             self.buttonStyle(style)
+        case .custom(let style):
+            self.buttonStyle(style)
         }
     }
 }

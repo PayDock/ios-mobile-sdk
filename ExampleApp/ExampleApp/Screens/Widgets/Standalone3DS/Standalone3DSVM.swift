@@ -101,11 +101,6 @@ class Standalone3DSVM: NSObject, ObservableObject {
         }
     }
 
-    func getBaseUrl() -> URL? {
-        let urlString = "https://paydock.com"
-        return URL(string: urlString)
-    }
-
     func handle3dsEvent(_ event: Standalone3DSResult) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             switch event.event {

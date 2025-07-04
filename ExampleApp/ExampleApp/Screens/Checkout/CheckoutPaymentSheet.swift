@@ -44,8 +44,7 @@ struct CheckoutPaymentSheet: View {
             NavigationStack {
                 VStack {
                     Integrated3DSWidget(
-                        token: viewModel.token3DS,
-                        baseURL: viewModel.getBaseUrl(),
+                        config: .init(token: viewModel.token3DS),
                         completion: { result in
                             switch result {
                             case .success(let result):
@@ -110,6 +109,7 @@ struct CheckoutPaymentSheet: View {
                 viewModel.showAlert = true
             }
         }
+        .frame(height: 50.0)
         .padding()
     }
     
@@ -122,16 +122,12 @@ struct CheckoutPaymentSheet: View {
                 case .success(let chargeResponse):
                     viewModel.alertTitle = "Success"
                     viewModel.alertMessage = chargeResponse.status
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        viewModel.showAlert = true
-                    }
+                    viewModel.showAlert = true
                     
                 case .failure(let error):
                     viewModel.alertTitle = "Failure"
                     viewModel.alertMessage = error.customMessage
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        viewModel.showAlert = true
-                    }
+                    viewModel.showAlert = true
                 }
             }
             .frame(height: 48.0)
@@ -142,8 +138,8 @@ struct CheckoutPaymentSheet: View {
     private var afterpayWidget: some View {
         AfterpayWidget(
             configuration: viewModel.getAfterpayConfig(),
-            afterPayToken: { onAfterpayButtonTap in
-                viewModel.initializeAfterpayWalletCharge(completion: onAfterpayButtonTap)
+            tokenRequest: { tokenResult in
+                viewModel.initializeAfterpayWalletCharge(completion: tokenResult)
             },
             selectAddress: { address, provideShippingOptions in
                 // Provide shipping options based on user selected address if needed
@@ -154,8 +150,7 @@ struct CheckoutPaymentSheet: View {
                 // Provide shipping update if needed based on the selected shipping option
                 // Check AfterpayWidget example for more details
                 provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
-            },
-            buttonWidth: 320) { result in
+            }) { result in
                 switch result {
                 case .success:
                     viewModel.alertTitle = "Success"
@@ -178,25 +173,25 @@ struct CheckoutPaymentSheet: View {
         .font(Font.system(size: 16, weight: .semibold))
         .frame(height: 48)
         .frame(maxWidth:.infinity)
-        .background(Color.primaryColor)
+        .background(Color.defaultPrimary)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding()
         .sheet(isPresented: $viewModel.showMastercardWebView, content: {
             NavigationStack {
                 VStack {
                     ClickToPayWidget(
-                        serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                        meta: nil) { result in
-                            switch result {
-                            case .success(let result):
-                                viewModel.handleMastercardResult(result)
-                                
-                            case .failure(let error):
-                                viewModel.alertMessage = error.localizedDescription
-                                viewModel.showAlert = true
+                        config: .init(
+                            serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), meta: nil)) { result in
+                                switch result {
+                                case .success(let result):
+                                    viewModel.handleMastercardResult(result)
+                                    
+                                case .failure(let error):
+                                    viewModel.alertMessage = error.localizedDescription
+                                    viewModel.showAlert = true
+                                }
                             }
-                        }
                 }
                 .navigationTitle("Checkout with Click to Pay")
                 .navigationBarTitleDisplayMode(.inline)
@@ -210,14 +205,14 @@ struct CheckoutPaymentSheet: View {
                 ColesPayWidget(
                     viewState: viewModel.viewState,
                     loadingDelegate: viewModel,
-                    clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "") { onColesPayButtonTap in
-                        viewModel.initializeWalletChargeColesPay(completion: onColesPayButtonTap)
-                } completion: { result in
-                    switch result {
-                    case .success: viewModel.handleSuccess()
-                    case .failure(let error): viewModel.handleError(error: error)
+                    config: .init(clientId:  ProjectEnvironment.shared.getColesPayClientId() ?? "")) { tokenResult in
+                        viewModel.initializeWalletChargeColesPay(completion: tokenResult)
+                    } completion: { result in
+                        switch result {
+                        case .success: viewModel.handleSuccess()
+                        case .failure(let error): viewModel.handleError(error: error)
+                        }
                     }
-                }
                 .padding()
             }
             .alert(viewModel.alertTitle,
@@ -269,13 +264,13 @@ struct CheckoutPaymentSheet: View {
             if let title = title {
                 Text(title)
                     .font(.subheadline)
-                    .foregroundColor(.textColor)
+                    .foregroundColor(.defaultText)
             }
         }
         .frame(width: 90, height: 49)
         .overlay(
             RoundedRectangle(cornerRadius: 4)
-                .stroke( type == viewModel.selectedMethod ? Color.primaryColor : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
+                .stroke( type == viewModel.selectedMethod ? Color.defaultPrimary : .black, lineWidth: type == viewModel.selectedMethod ? 2 : 1/3)
         )
         .onTapGesture {
             withAnimation {

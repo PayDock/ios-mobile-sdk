@@ -10,13 +10,23 @@ import SwiftUI
 
 struct ActivityIndicator: UIViewRepresentable {
 
+    private let appearance: Theme.OverlayLoaderAppearance
     @Binding var isAnimating: Bool
-
     let style: UIActivityIndicatorView.Style
+    
+    // MARK: - Initialization
+    
+    init(appearance: Theme.OverlayLoaderAppearance,
+         isAnimating: Binding<Bool>,
+         style: UIActivityIndicatorView.Style) {
+        self.appearance = appearance
+        self._isAnimating = isAnimating
+        self.style = style
+    }
 
     func makeUIView(context: UIViewRepresentableContext<ActivityIndicator>) -> UIActivityIndicatorView {
         let activityIndicator = UIActivityIndicatorView(style: style)
-        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.color = UIColor(appearance.color)
         return activityIndicator
     }
 

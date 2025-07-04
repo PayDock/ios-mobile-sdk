@@ -12,6 +12,7 @@ import MobileSDK
 struct ClickToPayWidgetView: View {
 
     @StateObject private var viewModel = ClickToPayWidgetVM()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -21,9 +22,11 @@ struct ClickToPayWidgetView: View {
                             NavigationStack {
                                 VStack {
                                     ClickToPayWidget(
-                                        serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
-                                        accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                                        meta: nil,
+                                        config: ClickToPayWidgetConfig(
+                                            serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                                            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+                                            meta: nil),
+                                        appearance: getAppearance(),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):
@@ -45,6 +48,11 @@ struct ClickToPayWidgetView: View {
         .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: { }, message: {
             Text(viewModel.alertMessage)
         })
+    }
+    
+    private func getAppearance() -> ClickToPayWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .clickToPay, isDarkMode: colorScheme == .dark, as: ClickToPayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ClickToPayWidgetAppearance()
     }
 }
 

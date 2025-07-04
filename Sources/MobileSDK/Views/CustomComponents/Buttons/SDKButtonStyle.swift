@@ -14,6 +14,8 @@ enum SDKButtonStyle {
     case fill(FillButtonStyle)
     case outline(OutlineButtonStyle)
     case image(ImageButtonStyle)
+    // TODO: - Remove above once all widget themes are updated
+    case custom(CustomButtonStyle)
     
     var isDisabled: Bool {
         switch self {
@@ -23,28 +25,47 @@ enum SDKButtonStyle {
             return style.isDisabled
         case .image(let style):
             return style.isDisabled
+        case .custom(let style):
+            return style.isDisabled
         }
     }
     
     var textColour: Color {
         switch self {
         case .fill(let style):
-            return style.foregroundColor
+            return style.appearance.colors.text
         case .outline(let style):
-            return style.foregroundColor
-        case .image(let style):
+            return style.appearance.colors.text
+        case .image:
             return .clear
+        case .custom(let style):
+            return style.appearance.colors.text
         }
     }
     
     var loaderColor: Color {
         switch self {
         case .fill(let style):
-            return style.loaderColor
+            return style.appearance.loader.spinnerColor
         case .outline(let style):
-            return style.loaderColor
+            return style.appearance.loader.spinnerColor
         case .image(let style):
-            return style.loaderColor
+            return style.appearance.spinnerColor
+        case .custom(let style):
+            return style.appearance.loader.spinnerColor
+        }
+    }
+    
+    var imageColor: Color {
+        switch self {
+        case .fill(let style):
+            return style.appearance.colors.image
+        case .outline(let style):
+            return style.appearance.colors.image
+        case .image:
+            return .clear // It's a background button only - no image contained
+        case .custom(let style):
+            return style.appearance.colors.image
         }
     }
 }

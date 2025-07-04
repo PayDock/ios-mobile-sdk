@@ -11,12 +11,14 @@ import SwiftUI
 import MapKit
 import Combine
 
+@MainActor
 class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
 
     var addressFormManager: AddressFormManager
     private let localSearchCompleter: MKLocalSearchCompleter
+    private let config: AddressWidgetConfig
 
     // MARK: - Properties
 
@@ -24,7 +26,7 @@ class AddressVM: NSObject, ObservableObject {
     @Published var isDisabled = false
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
-    let completion: (Result<Address, Error>) -> Void
+    let completion: (Address) -> Void
 
     // MARK: - Custom bindings
 
@@ -41,9 +43,11 @@ class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Initialisation
 
-    init(addressFormManager: AddressFormManager = AddressFormManager(),
+    init(config: AddressWidgetConfig,
+         addressFormManager: AddressFormManager = AddressFormManager(),
          localSearchCompleter: MKLocalSearchCompleter = MKLocalSearchCompleter(),
-         completion: @escaping (Result<Address, Error>) -> Void) {
+         completion: @escaping (Address) -> Void) {
+        self.config = config
         self.addressFormManager = addressFormManager
         self.localSearchCompleter = localSearchCompleter
         self.completion = completion
@@ -63,7 +67,10 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Address Search
 
     func searchAddress(_ searchableText: String) {
-        guard searchableText.isEmpty == false else { return }
+        guard searchableText.isEmpty == false else {
+            addressFormManager.showAddressSearchPopup = false
+            return
+        }
         localSearchCompleter.queryFragment = searchableText
     }
 
@@ -73,7 +80,6 @@ class AddressVM: NSObject, ObservableObject {
         addressFormManager.isAddressFormExpanded = true
         addressFormManager.addressSearchText = ""
         addressFormManager.showAddressSearchPopup = false
-        addressFormManager.setEditingTextField(focusedField: nil)
 
         addressSearchSuggestions = [""]
         reverseGeoForOptionAt(index: index)
@@ -110,6 +116,10 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Logic
 
     func saveAddress() {
+        addressFormManager.setEditingTextField(focusedField: nil)
+        addressFormManager.endEditing()
+        addressFormManager.addressSearchText = ""
+
         addressFormManager.validateAllTextFields()
         let address = Address(
             firstName: addressFormManager.firstNameText,
@@ -121,7 +131,11 @@ class AddressVM: NSObject, ObservableObject {
             postcode: addressFormManager.postcodeText,
             country: addressFormManager.countryText)
 
-        completion(.success(address))
+        completion(address)
+    }
+    
+    func updateAddress() {
+        addressFormManager.updateFormWith(address: config.address)
     }
 }
 
@@ -132,7 +146,9 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
         addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
-        addressFormManager.showAddressSearchPopup = true
+        if addressFormManager.currentTextField == .searchAddress  && !addressFormManager.addressSearchText.isEmpty {
+            addressFormManager.showAddressSearchPopup = true
+        }
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {

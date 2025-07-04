@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import Afterpay
+import NetworkingLib
 
 @MainActor
 class CheckoutPaymentVM: ObservableObject {
@@ -50,34 +51,41 @@ class CheckoutPaymentVM: ObservableObject {
 
 extension CheckoutPaymentVM {
     /// Initializes wallet charge when paying through PayPal
-    func initializeWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             do {
                 let request = createWalletChargeRequest(gatewayId: payPalGatewayId, walletType: nil)
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
-                completion(token)
+                completion(.success(.init(token: token)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                showAlert(title: .error, message: "Error fetching wallet token!")
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
 
     /// Initializes wallet charge when paying through ApplePay
-    func initializeWalletCharge(completion: @escaping (ApplePayRequest) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) {
         Task {
             do {
+                isLoading = true
                 let request = createWalletChargeRequest(gatewayId: applePayGatewayId, walletType: "apple")
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: request)
-                let applePayRequest = self.getApplePayRequest(walletToken: token)
-                completion(applePayRequest)
+                let applePayRequestResult = self.getApplePayRequestResult(walletToken: token)
+                completion(.success(ApplePayRequestResult(request: applePayRequestResult.request, token: applePayRequestResult.token)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                showAlert(title: .error, message: "Error fetching wallet token!")
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
 
     /// Initializes wallet charge when paying through Afterpay
-    func initializeAfterpayWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeAfterpayWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
 
@@ -102,20 +110,20 @@ extension CheckoutPaymentVM {
                 reference: UUID().uuidString,
                 description: "Test transaction for Afterpay",
                 meta: metaData)
-
+            
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
-                DispatchQueue.main.async {
-                    completion(token)
-                }
+                completion(.success(.init(token: token)))
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                print("ERROR: Error fetching wallet token!")
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
 
     /// Helper method that creates ApplePay request
-    private func getApplePayRequest(walletToken: String) -> ApplePayRequest {
+    private func getApplePayRequestResult(walletToken: String) -> ApplePayRequestResult {
         let paymentRequest = MobileSDK.createApplePayRequest(
             amount: 5.50,
             amountLabel: "Amount",
@@ -123,11 +131,7 @@ extension CheckoutPaymentVM {
             currencyCode: "AUD",
             merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
 
-        let applePayRequest = ApplePayRequest(
-            token: walletToken,
-            request: paymentRequest)
-
-        return applePayRequest
+        return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
 
     /// Helper method that creates Wallet Charge request
@@ -258,6 +262,7 @@ extension CheckoutPaymentVM {
                 await MainActor.run {
                     isLoading = false
                     viewState?.setState(.none)
+                    showAlert(title: .error, message: "Error creating a charge!")
                 }
             }
         }
@@ -269,10 +274,9 @@ extension CheckoutPaymentVM {
 extension CheckoutPaymentVM {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
-        let theme = AfterpaySdkConfig.ButtonTheme(buttonType: .payNow, colorScheme: .static(.blackOnMint))
         let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
-        return AfterpaySdkConfig(buttonTheme: theme, config: config, environment: .sandbox, options: options)
+        return AfterpaySdkConfig(config: config, environment: .sandbox, options: options)
     }
     
     func getShippingOptions() -> [ShippingOption] {
@@ -326,18 +330,18 @@ extension CheckoutPaymentVM {
 
 extension CheckoutPaymentVM {
     
-    func initializeWalletChargeColesPay(completion: @escaping (String) -> Void) {
+    func initializeWalletChargeColesPay(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         viewState?.setState(.disabled)
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "", walletType: nil)
-
+            
             let customer = InitialiseWalletChargeReq.Customer(
                 firstName: "Wanda",
                 lastName: "Mertz",
                 email: "wanda.mertz@example.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
-
+            
             let metaData = InitialiseWalletChargeReq.MetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
@@ -352,18 +356,20 @@ extension CheckoutPaymentVM {
                 reference: "reference1234",
                 description: "Test transaction for Coles Pay",
                 meta: metaData)
-
+            
             do {
                 let response = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 let token = response.token
                 self.colesPayChargeId = response.charge._id
                 DispatchQueue.main.async {
-                    completion(token)
+                    completion(.success(WalletTokenResult(token: token)))
                     self.viewState?.setState(.none)
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+                viewState?.setState(.none)
             } catch {
-                showAlert(title: .error, message: "Error fetching wallet token!")
-                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: nil)))
                 viewState?.setState(.none)
             }
         }
@@ -381,6 +387,10 @@ extension CheckoutPaymentVM {
         isLoading = true
         Task {
             do {
+                // For Coles Pay - a delay is needed as order is still processing with hook that needs to be fired to finish payment setup
+                // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture". Improvement to add polling of
+                // charge state and when in correct state then finish the charge.
+                try await Task.sleep(for: .seconds(2))
                 let res = try await walletService.captureChargeColesPay(chargeId: colesPayChargeId)
                 isLoading = false
                 showAlert(title: .success, message: "Charge successful: \(res.amount) \(res.currency)")
@@ -396,11 +406,6 @@ extension CheckoutPaymentVM {
 // MARK: - Helpers
 
 extension CheckoutPaymentVM {
-
-    func getBaseUrl() -> URL? {
-        let urlString = "https://paydock.com"
-        return URL(string: urlString)
-    }
 
     private func showAlert(title: AlertTitle, message: String) {
         alertTitle = title.rawValue

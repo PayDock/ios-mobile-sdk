@@ -10,38 +10,38 @@ import SwiftUI
 import Afterpay
 
 public struct AfterpayWidget: View {
+    
     @StateObject private var viewModel: AfterpayVM
-    @State var buttonWidth: CGFloat
+    @State var appearance: AfterpayWidgetAppearance
 
-    public init(configuration: AfterpaySdkConfig,
-                afterPayToken: @escaping (_ afterPayToken: @escaping (String) -> Void) -> Void,
+    public init(viewState: ViewState? = nil,
+                configuration: AfterpaySdkConfig,
+                appearance: AfterpayWidgetAppearance = AfterpayWidgetAppearance(),
+                loadingDelegate: WidgetLoadingDelegate? = nil,
+                tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
                 selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
-                buttonWidth: CGFloat,
                 completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
         _viewModel = StateObject(
             wrappedValue: AfterpayVM(
+                viewState: viewState ?? ViewState(state: .none),
                 configuration: configuration,
-                afterPayToken: afterPayToken,
+                tokenRequest: tokenRequest,
                 selectAddress: selectAddress,
                 selectShippingOption: selectShippingOption,
+                loadingDelegate: loadingDelegate,
                 completion: completion))
-        self.buttonWidth = buttonWidth
+        self.appearance = appearance
     }
 
     public var body: some View {
-        HStack {
-            Spacer()
-            AfterpayPaymentButton(
-                width: buttonWidth,
-                config: viewModel.configuration.buttonTheme,
-                action: {
-                    viewModel.handleButtonTap()
+        AfterpayPaymentButton(
+            colorScheme: appearance.colorScheme,
+            type: appearance.type,
+            action: {
+                viewModel.handleButtonTap()
             })
-            .frame(width: buttonWidth, height: buttonWidth * 0.15)
-            Spacer()
-        }
-        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+        .modifier(ActivityIndicatorModifier(appearance: appearance.loader, isLoading: viewModel.isLoading))
     }
 }
 
@@ -49,14 +49,16 @@ struct AfterpayWidget_Previews: PreviewProvider {
     static var previews: some View {
         AfterpayWidget(
             configuration: .init(
-                buttonTheme: .init(),
                 config: .init(maximumAmount: "100.0", currency: "AUD"),
                 environment: .sandbox,
-                options: .init()),
-            afterPayToken: { _ in },
-            selectAddress: { address, provideShippingOptions in },
-            selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in },
-            buttonWidth: 320,
-            completion: { _ in })
+                options: .init())) { _ in
+                    
+                } selectAddress: { address, provideShippingOptions in
+                    
+                } selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
+                    
+                } completion: { _ in
+                    
+                }
     }
 }

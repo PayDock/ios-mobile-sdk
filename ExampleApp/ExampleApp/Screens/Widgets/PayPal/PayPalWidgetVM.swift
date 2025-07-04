@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import NetworkingLib
 
 @MainActor
 class PayPalWidgetVM: ObservableObject {
@@ -29,7 +30,7 @@ class PayPalWidgetVM: ObservableObject {
         self.walletService = walletService
     }
 
-    func initializeWalletCharge(completion: @escaping (String) -> Void) {
+    func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "", walletType: nil)
 
@@ -54,18 +55,16 @@ class PayPalWidgetVM: ObservableObject {
                 reference: UUID().uuidString,
                 description: "Test transaction for PayPal",
                 meta: metaData)
-
+            
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
-                    completion(token)
+                    completion(.success(.init(token: token)))
                 }
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch {
-                alertTitle = "Error"
-                alertMessage = "Error fetching wallet token!"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.showAlert = true
-                }
+                completion(.failure(.initialisingWalletToken(reason: nil)))
             }
         }
     }
@@ -73,17 +72,13 @@ class PayPalWidgetVM: ObservableObject {
     func handleError(error: PayPalError) {
         alertTitle = "Error"
         alertMessage = "\(error.customMessage)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showAlert = true
-        }
+        showAlert = true
     }
 
     func handleSuccess(charge: ChargeResponse) {
         alertTitle = "Success"
         alertMessage = "\(charge.amount) \(charge.currency) charged!"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showAlert = true
-        }
+        showAlert = true
     }
 }
 

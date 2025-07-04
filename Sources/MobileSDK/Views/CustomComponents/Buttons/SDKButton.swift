@@ -16,6 +16,8 @@ struct SDKButton: View {
     private let isLoading: Bool
     private let style: SDKButtonStyle
     private let scaleToFit: Bool
+    private let isLeftAligned: Bool
+    private let shouldTemplate: Bool
     private let action: () -> Void
 
     init(title: String?,
@@ -24,6 +26,8 @@ struct SDKButton: View {
          isLoading: Bool = false,
          style: SDKButtonStyle,
          scaleToFit: Bool = false,
+         isLeftAligned: Bool = false,
+         shouldTemplate: Bool = false,
          action: @escaping () -> Void) {
         self.title = title
         self.image = image
@@ -31,6 +35,8 @@ struct SDKButton: View {
         self.isLoading = isLoading
         self.style = style
         self.scaleToFit = scaleToFit
+        self.isLeftAligned = isLeftAligned
+        self.shouldTemplate = shouldTemplate
         self.action = action
     }
 
@@ -41,8 +47,11 @@ struct SDKButton: View {
                     ZStack {
                         image?
                             .resizable()
+                            .renderingMode(shouldTemplate ? .template : .original)
                             .scaledToFit()
+                            .foregroundColor(style.imageColor)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .opacity(style.isDisabled ? 0.3 : 1.0)
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                             .opacity(isLoading ? 1.0 : 0.0)
@@ -68,9 +77,12 @@ struct SDKButton: View {
                 if (!isLoading) {
                     image?
                         .resizable()
+                        .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
+                        .foregroundColor(style.imageColor)
                         .frame(maxHeight: scaleToFit ? .infinity : 20)
                         .font(.system(size: 32, weight: .light))
+                        .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
                     if #available(iOS 18.0, *) {
                         ProgressView()
@@ -86,9 +98,12 @@ struct SDKButton: View {
                 Text(self.title ?? "")
                 if (!isLoading) {
                     image?.resizable()
+                        .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
+                        .foregroundColor(style.imageColor)
                         .frame(maxHeight: 20)
                         .font(.system(size: 32, weight: .light))
+                        .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
                     if #available(iOS 18.0, *) {
                         ProgressView()
@@ -116,6 +131,9 @@ struct SDKButton: View {
                 }
             }
             Text(self.title ?? "")
+            if isLeftAligned {
+                Spacer()
+            }
         }
     }
 

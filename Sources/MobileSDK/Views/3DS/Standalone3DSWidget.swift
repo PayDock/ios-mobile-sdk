@@ -3,6 +3,7 @@
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 23.02.2025..
+//  Copyright © 2025 Paydock Ltd.
 //
 
 import SwiftUI
@@ -10,22 +11,23 @@ import SwiftUI
 import AuthenticationServices
 
 public struct Standalone3DSWidget: UIViewRepresentable {
-    private let token: String
-    private let baseUrl: URL?
+    private let config: ThreeDSConfig
+    private let appearance: ThreeDSWidgetAppearance
     private let base64Decoder: Base64Decoder = Base64Decoder()
     private let completion: (Result<Standalone3DSResult, Standalone3DSError>) -> Void
 
-    public init(token: String, baseURL: URL?,
+    public init(config: ThreeDSConfig,
+                appearance: ThreeDSWidgetAppearance = ThreeDSWidgetAppearance(),
                 completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void) {
-        self.token = token
-        self.baseUrl = baseURL
+        self.config = config
+        self.appearance = appearance
         self.completion = completion
         
         validateToken()
     }
     
     private func validateToken() {
-        guard let decodedToken = base64Decoder.decodeBase64(token, to: Decoded3DSToken.self),
+        guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
               decodedToken.format == .standalone3ds else {
             completion(.failure(.invalidToken))
             return
@@ -42,7 +44,8 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         
         let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.color = UIColor(Color.primaryColor)
+        activityIndicator.color = UIColor(appearance.loader.color)
+        activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
@@ -50,6 +53,15 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
+        
+        // Set up constraints for activity indicator
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            activityIndicator.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            activityIndicator.topAnchor.constraint(equalTo: containerView.topAnchor),
+            activityIndicator.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
         
         // Set up constraints for webView
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -74,8 +86,8 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             return
         }
         if !context.coordinator.isLoaded {
-            let html = Standalone3DSWidget.html(token)
-            webView.loadHTMLString(html, baseURL: baseUrl)
+            let html = Standalone3DSWidget.html(config.token)
+            webView.loadHTMLString(html, baseURL: URL(string: "https://paydock.com"))
         }
     }
 

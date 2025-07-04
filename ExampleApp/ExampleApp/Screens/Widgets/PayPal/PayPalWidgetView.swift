@@ -12,11 +12,12 @@ import MobileSDK
 struct PayPalWidgetView: View {
 
     @StateObject private var viewModel = PayPalWidgetVM()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                PayPalWidget { onPayPalButtonTap in
+                PayPalWidget(appearance: getAppearance()) { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
                     switch result {
@@ -32,6 +33,11 @@ struct PayPalWidgetView: View {
             })
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         }
+    }
+    
+    private func getAppearance() -> PayPalWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(for: .paypal, isDarkMode: colorScheme == .dark, as: PayPalWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        return appearance ?? PayPalWidgetAppearance()
     }
 }
 

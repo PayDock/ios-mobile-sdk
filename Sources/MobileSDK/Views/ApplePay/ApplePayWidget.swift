@@ -11,24 +11,26 @@ import PassKit
 
 public struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
+    @State var appearance: ApplePayWidgetAppearance
 
-    public init(applePayRequestHandler: @escaping (_ applePayRequest: @escaping (ApplePayRequest) -> Void) -> Void,
+    public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
+                createPaymentRequest: @escaping (_ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
-            applePayRequestHandler: applePayRequestHandler,
+            createPaymentRequest: createPaymentRequest,
             completion: completion))
+        self.appearance = appearance
     }
 
     public var body: some View {
-        ApplePayButton {
+        ApplePayButton(appearance: appearance) {
             viewModel.handleButtonTap()
         }
     }
-
 }
 
 struct ApplePayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayWidget(applePayRequestHandler: { _ in }, completion: { _ in })
+        ApplePayWidget(createPaymentRequest: { _ in }, completion: { _ in })
     }
 }

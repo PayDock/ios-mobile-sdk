@@ -9,6 +9,10 @@
 import SwiftUI
 
 struct AutocompleteTextField: View {
+    
+    // MARK: - Dependencies
+    
+    @State var appearance: Theme.SearchDropdownAppearance
 
     // MARK: - OutlineTextField Properties
 
@@ -47,7 +51,9 @@ struct AutocompleteTextField: View {
     ///   - textContentType: Content type used for the suggested prefill.
     ///   - option: Autocomplete popup list of options.
     ///   - onSelection: Returns selected value
-    public init(text: Binding<String>,
+    ///
+    public init(appearance: Theme.SearchDropdownAppearance = Theme.SearchDropdownAppearance(),
+                text: Binding<String>,
                 title: String,
                 placeholder: String,
                 errorMessage: Binding<String>,
@@ -60,6 +66,7 @@ struct AutocompleteTextField: View {
                 textContentType: UITextContentType? = nil,
                 onSelection: @escaping (Int?) -> (),
                 onTapGesture: @escaping () -> Void) {
+        self.appearance = appearance
         self._text = text
         self.title = title
         self.placeholder = placeholder
@@ -78,6 +85,7 @@ struct AutocompleteTextField: View {
     var body: some View {
         VStack(alignment: .leading) {
             OutlineTextField(
+                appearance: appearance.textField,
                 text: $text,
                 title: title,
                 placeholder: placeholder,
@@ -106,21 +114,24 @@ struct AutocompleteTextField: View {
                         .frame(height: 50)
                     VStack(alignment: .center) {
                         if options.isEmpty {
+                            Spacer()
                             Text("No results")
-                                .customFont(.body)
-                                .foregroundColor(.textColor)
+                                .font(appearance.dropdown.text.listText.text.customFont.font)
+                                .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .accessibilityLabel(Text("Dropdown menu has no results."))
+                            Spacer()
                         } else {
                             let filteredOptions = options.prefix(3)
                             ForEach(filteredOptions, id: \.self) { option in
                                 HStack {
                                     Text(option)
-                                        .customFont(.body)
-                                        .foregroundColor(.textColor)
+                                        .applyAttributes(appearance.dropdown.text.listText.text)
+                                        .font(appearance.dropdown.text.listText.text.customFont.font)
+                                        .foregroundColor(appearance.dropdown.text.listText.text.textColor)
                                         .padding(.horizontal, 16)
-                                        .padding(.vertical, 8)
+                                        .padding(.vertical, appearance.dropdown.dimensions.listSpacing)
                                         .onTapGesture {
                                             onSelection(getOptionIndex(option: option))
                                         }
@@ -129,17 +140,19 @@ struct AutocompleteTextField: View {
                                 }
                             }
                         }
+                        Spacer()
                     }
-                    .padding(.vertical, 4)
+                    .customPadding(appearance.dropdown.dimensions.padding)
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .foregroundColor(.primaryColor).opacity(0.3)
+                            .foregroundColor(appearance.dropdown.colors.backgroundColor)
                             .shadow(radius: 4)
                     )
                     .opacity(popupOpacity)
                     .scaleEffect(popupScale)
                     .frame(width: proxy.size.width + 2)
+                    .frame(minHeight: proxy.size.height + 10 + appearance.dropdown.dimensions.listSpacing * 6)
                     .onAppear {
                         withAnimation(.easeOut(duration: 0.15)) {
                             popupOpacity = 1
@@ -152,7 +165,6 @@ struct AutocompleteTextField: View {
                     }
                 }
             }
-            .background(Color.backgroundColor)
         }
     }
 

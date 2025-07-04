@@ -17,7 +17,6 @@
 		2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
 		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
-		282D31662A66B82900E3ECAD /* StyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31652A66B82900E3ECAD /* StyleView.swift */; };
 		282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */; };
 		282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */; };
 		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
@@ -27,6 +26,24 @@
 		284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */; };
 		28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
+		287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39372DF259A000F4D771 /* StyleWidgetListView.swift */; };
+		287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39392DF259A900F4D771 /* StyleComponentListView.swift */; };
+		287F393D2DF259D500F4D771 /* StyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F393C2DF259D300F4D771 /* StyleVM.swift */; };
+		287F393F2DF259E400F4D771 /* StyleDarkModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F393E2DF259DE00F4D771 /* StyleDarkModeView.swift */; };
+		287F39412DF259EA00F4D771 /* StyleDarkModeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39402DF259E700F4D771 /* StyleDarkModeButton.swift */; };
+		287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39422DF259ED00F4D771 /* StyleComponentsEnum.swift */; };
+		287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39442DF25A0700F4D771 /* StyleWidgetsEnum.swift */; };
+		287F39492DF25E5600F4D771 /* StyleWidgetItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39482DF25E5200F4D771 /* StyleWidgetItem.swift */; };
+		287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */; };
+		287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397A2DF76DA700F4D771 /* ColorPickerView.swift */; };
+		287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */; };
+		287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */; };
+		287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39802DF7AA9700F4D771 /* SectionTitleView.swift */; };
+		287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */; };
+		287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */; };
+		287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */; };
+		287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */; };
+		287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
@@ -40,7 +57,15 @@
 		289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */; };
 		289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289D76C02B45FABA002601BB /* CaptureChargeReq.swift */; };
 		28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */; };
-		28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */; };
+		28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB3E2E0AE5B700A94753 /* ApplePayStyleView.swift */; };
+		28A2DB412E0AE5C100A94753 /* ApplePayStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB402E0AE5BE00A94753 /* ApplePayStyleVM.swift */; };
+		28A2DB442E0AF67500A94753 /* AfterpayStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB432E0AF66D00A94753 /* AfterpayStyleView.swift */; };
+		28A2DB462E0AF68300A94753 /* AfterpayStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB452E0AF67D00A94753 /* AfterpayStyleVM.swift */; };
+		28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB472E0B2EA500A94753 /* SubsectionTitleView.swift */; };
+		28A2DB4B2E0B3E5E00A94753 /* SpacingsStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB4A2E0B3E5A00A94753 /* SpacingsStyleView.swift */; };
+		28A2DB4D2E0B3E6600A94753 /* SpacingsStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB4C2E0B3E6200A94753 /* SpacingsStyleVM.swift */; };
+		28A2DB512E0B54C600A94753 /* ButtonLoaderStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB502E0B54C200A94753 /* ButtonLoaderStyleView.swift */; };
+		28A2DB532E0B556900A94753 /* ButtonLoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A2DB522E0B54C900A94753 /* ButtonLoaderStyleVM.swift */; };
 		28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C32A696341004A8D34 /* View+Extensions.swift */; };
 		28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */; };
 		28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3A9C72A697647004A8D34 /* Color+Extensions.swift */; };
@@ -58,7 +83,15 @@
 		28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */; };
 		28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF542D00951E004C0672 /* AccountProfileView.swift */; };
 		28B2FF572D009526004C0672 /* AccountProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF562D009526004C0672 /* AccountProfileVM.swift */; };
+		28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */; };
+		28D51D4E2DFC70070095CDE5 /* TextFieldStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */; };
+		28D51D512DFF30C00095CDE5 /* DropdownStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */; };
+		28D51D532DFF30C60095CDE5 /* DropdownStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D522DFF30C20095CDE5 /* DropdownStyleVM.swift */; };
+		28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D552DFF61900095CDE5 /* TextStyleView.swift */; };
+		28D51D582DFF619D0095CDE5 /* TextStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D572DFF61990095CDE5 /* TextStyleVM.swift */; };
 		28D541F82A6FF0690041BAE0 /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D541F72A6FF0690041BAE0 /* PickerView.swift */; };
+		28D8BA612E006ABE00EDD422 /* ResetStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D8BA602E006AB900EDD422 /* ResetStyleButton.swift */; };
+		28D8BA632E00706900EDD422 /* ResetConfirmationModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D8BA622E00706400EDD422 /* ResetConfirmationModifier.swift */; };
 		28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */; };
 		28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */; };
 		28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E86F662ACC1361008E827E /* WalletEndpoints.swift */; };
@@ -104,7 +137,6 @@
 		2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
-		282D31652A66B82900E3ECAD /* StyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleView.swift; sourceTree = "<group>"; };
 		282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentSheet.swift; sourceTree = "<group>"; };
 		282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
@@ -114,6 +146,24 @@
 		2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultReq.swift; sourceTree = "<group>"; };
 		28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultWidgetVM.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
+		287F39372DF259A000F4D771 /* StyleWidgetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleWidgetListView.swift; sourceTree = "<group>"; };
+		287F39392DF259A900F4D771 /* StyleComponentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleComponentListView.swift; sourceTree = "<group>"; };
+		287F393C2DF259D300F4D771 /* StyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleVM.swift; sourceTree = "<group>"; };
+		287F393E2DF259DE00F4D771 /* StyleDarkModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleDarkModeView.swift; sourceTree = "<group>"; };
+		287F39402DF259E700F4D771 /* StyleDarkModeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleDarkModeButton.swift; sourceTree = "<group>"; };
+		287F39422DF259ED00F4D771 /* StyleComponentsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleComponentsEnum.swift; sourceTree = "<group>"; };
+		287F39442DF25A0700F4D771 /* StyleWidgetsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleWidgetsEnum.swift; sourceTree = "<group>"; };
+		287F39482DF25E5200F4D771 /* StyleWidgetItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleWidgetItem.swift; sourceTree = "<group>"; };
+		287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderStyleView.swift; sourceTree = "<group>"; };
+		287F397A2DF76DA700F4D771 /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
+		287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderStyleVM.swift; sourceTree = "<group>"; };
+		287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleThemeManager.swift; sourceTree = "<group>"; };
+		287F39802DF7AA9700F4D771 /* SectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionTitleView.swift; sourceTree = "<group>"; };
+		287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyleView.swift; sourceTree = "<group>"; };
+		287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyleVM.swift; sourceTree = "<group>"; };
+		287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleView.swift; sourceTree = "<group>"; };
+		287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleVM.swift; sourceTree = "<group>"; };
+		287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimensionsFieldView.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7D42A558F1800D6C7BE /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
@@ -132,7 +182,15 @@
 		289B83852B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayWidgetVM.swift; sourceTree = "<group>"; };
 		289D76C02B45FABA002601BB /* CaptureChargeReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq.swift; sourceTree = "<group>"; };
 		28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVaultTokenReq.swift; sourceTree = "<group>"; };
-		28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleVM.swift; sourceTree = "<group>"; };
+		28A2DB3E2E0AE5B700A94753 /* ApplePayStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayStyleView.swift; sourceTree = "<group>"; };
+		28A2DB402E0AE5BE00A94753 /* ApplePayStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayStyleVM.swift; sourceTree = "<group>"; };
+		28A2DB432E0AF66D00A94753 /* AfterpayStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayStyleView.swift; sourceTree = "<group>"; };
+		28A2DB452E0AF67D00A94753 /* AfterpayStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayStyleVM.swift; sourceTree = "<group>"; };
+		28A2DB472E0B2EA500A94753 /* SubsectionTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsectionTitleView.swift; sourceTree = "<group>"; };
+		28A2DB4A2E0B3E5A00A94753 /* SpacingsStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingsStyleView.swift; sourceTree = "<group>"; };
+		28A2DB4C2E0B3E6200A94753 /* SpacingsStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacingsStyleVM.swift; sourceTree = "<group>"; };
+		28A2DB502E0B54C200A94753 /* ButtonLoaderStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonLoaderStyleView.swift; sourceTree = "<group>"; };
+		28A2DB522E0B54C900A94753 /* ButtonLoaderStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonLoaderStyleVM.swift; sourceTree = "<group>"; };
 		28A3A9C32A696341004A8D34 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusablePadding.swift; sourceTree = "<group>"; };
 		28A3A9C72A697647004A8D34 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
@@ -151,7 +209,15 @@
 		28B2FF542D00951E004C0672 /* AccountProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileView.swift; sourceTree = "<group>"; };
 		28B2FF562D009526004C0672 /* AccountProfileVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileVM.swift; sourceTree = "<group>"; };
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
+		28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldStyleView.swift; sourceTree = "<group>"; };
+		28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldStyleVM.swift; sourceTree = "<group>"; };
+		28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownStyleView.swift; sourceTree = "<group>"; };
+		28D51D522DFF30C20095CDE5 /* DropdownStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropdownStyleVM.swift; sourceTree = "<group>"; };
+		28D51D552DFF61900095CDE5 /* TextStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyleView.swift; sourceTree = "<group>"; };
+		28D51D572DFF61990095CDE5 /* TextStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyleVM.swift; sourceTree = "<group>"; };
 		28D541F72A6FF0690041BAE0 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
+		28D8BA602E006AB900EDD422 /* ResetStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetStyleButton.swift; sourceTree = "<group>"; };
+		28D8BA622E00706400EDD422 /* ResetConfirmationModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetConfirmationModifier.swift; sourceTree = "<group>"; };
 		28E34C662DD4D7D800A356A0 /* ColesPayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayWidgetView.swift; sourceTree = "<group>"; };
 		28E34C672DD4D7D800A356A0 /* ColesPayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayWidgetVM.swift; sourceTree = "<group>"; };
 		28E86F662ACC1361008E827E /* WalletEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEndpoints.swift; sourceTree = "<group>"; };
@@ -210,8 +276,8 @@
 		280EB39B2AFE42920036E575 /* PayPal */ = {
 			isa = PBXGroup;
 			children = (
-				280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */,
 				280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */,
+				280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */,
 			);
 			path = PayPal;
 			sourceTree = "<group>";
@@ -268,8 +334,16 @@
 		282D31612A66B7F600E3ECAD /* Style */ = {
 			isa = PBXGroup;
 			children = (
-				282D31652A66B82900E3ECAD /* StyleView.swift */,
-				28A3A9BF2A6935A8004A8D34 /* StyleVM.swift */,
+				287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */,
+				287F39762DF76C5600F4D771 /* StyleComponents */,
+				287F39372DF259A000F4D771 /* StyleWidgetListView.swift */,
+				287F39392DF259A900F4D771 /* StyleComponentListView.swift */,
+				287F393C2DF259D300F4D771 /* StyleVM.swift */,
+				287F393E2DF259DE00F4D771 /* StyleDarkModeView.swift */,
+				287F39402DF259E700F4D771 /* StyleDarkModeButton.swift */,
+				287F39422DF259ED00F4D771 /* StyleComponentsEnum.swift */,
+				287F39442DF25A0700F4D771 /* StyleWidgetsEnum.swift */,
+				287F39482DF25E5200F4D771 /* StyleWidgetItem.swift */,
 			);
 			path = Style;
 			sourceTree = "<group>";
@@ -277,8 +351,8 @@
 		283825872CBEB52B005BE050 /* PayPalVault */ = {
 			isa = PBXGroup;
 			children = (
-				28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */,
 				283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */,
+				28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */,
 			);
 			path = PayPalVault;
 			sourceTree = "<group>";
@@ -308,6 +382,57 @@
 				28850E562A559A6D00C39A9D /* WidgetsVM.swift */,
 			);
 			path = WidgetList;
+			sourceTree = "<group>";
+		};
+		287F39762DF76C5600F4D771 /* StyleComponents */ = {
+			isa = PBXGroup;
+			children = (
+				287F39802DF7AA9700F4D771 /* SectionTitleView.swift */,
+				28A2DB472E0B2EA500A94753 /* SubsectionTitleView.swift */,
+				287F397A2DF76DA700F4D771 /* ColorPickerView.swift */,
+				28D8BA602E006AB900EDD422 /* ResetStyleButton.swift */,
+				28D8BA622E00706400EDD422 /* ResetConfirmationModifier.swift */,
+				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
+				287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */,
+				287F39792DF76C6F00F4D771 /* Loader */,
+				287F39882DF88DFB00F4D771 /* Toggle */,
+				287F39972DF8C02100F4D771 /* Button */,
+				28D51D4A2DFC6FE50095CDE5 /* TextField */,
+				28D51D4F2DFF30AB0095CDE5 /* DropDown */,
+				28D51D542DFF61800095CDE5 /* Text */,
+				28A2DB3D2E0AE5AD00A94753 /* ApplePay */,
+				28A2DB422E0AF56000A94753 /* Afterpay */,
+				28A2DB492E0B3E4B00A94753 /* Spacings */,
+				28A2DB4F2E0B54A900A94753 /* ButtonLoader */,
+			);
+			path = StyleComponents;
+			sourceTree = "<group>";
+		};
+		287F39792DF76C6F00F4D771 /* Loader */ = {
+			isa = PBXGroup;
+			children = (
+				287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */,
+				287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */,
+			);
+			path = Loader;
+			sourceTree = "<group>";
+		};
+		287F39882DF88DFB00F4D771 /* Toggle */ = {
+			isa = PBXGroup;
+			children = (
+				287F39892DF88DFF00F4D771 /* ToggleStyleView.swift */,
+				287F398B2DF88E1800F4D771 /* ToggleStyleVM.swift */,
+			);
+			path = Toggle;
+			sourceTree = "<group>";
+		};
+		287F39972DF8C02100F4D771 /* Button */ = {
+			isa = PBXGroup;
+			children = (
+				287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */,
+				287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */,
+			);
+			path = Button;
 			sourceTree = "<group>";
 		};
 		2889B7C82A558F1800D6C7BE = {
@@ -396,12 +521,47 @@
 			path = Mastercard;
 			sourceTree = "<group>";
 		};
+		28A2DB3D2E0AE5AD00A94753 /* ApplePay */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB3E2E0AE5B700A94753 /* ApplePayStyleView.swift */,
+				28A2DB402E0AE5BE00A94753 /* ApplePayStyleVM.swift */,
+			);
+			path = ApplePay;
+			sourceTree = "<group>";
+		};
+		28A2DB422E0AF56000A94753 /* Afterpay */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB432E0AF66D00A94753 /* AfterpayStyleView.swift */,
+				28A2DB452E0AF67D00A94753 /* AfterpayStyleVM.swift */,
+			);
+			path = Afterpay;
+			sourceTree = "<group>";
+		};
+		28A2DB492E0B3E4B00A94753 /* Spacings */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB4A2E0B3E5A00A94753 /* SpacingsStyleView.swift */,
+				28A2DB4C2E0B3E6200A94753 /* SpacingsStyleVM.swift */,
+			);
+			path = Spacings;
+			sourceTree = "<group>";
+		};
+		28A2DB4F2E0B54A900A94753 /* ButtonLoader */ = {
+			isa = PBXGroup;
+			children = (
+				28A2DB502E0B54C200A94753 /* ButtonLoaderStyleView.swift */,
+				28A2DB522E0B54C900A94753 /* ButtonLoaderStyleVM.swift */,
+			);
+			path = ButtonLoader;
+			sourceTree = "<group>";
+		};
 		28A3A9C12A6962C2004A8D34 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
 				28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */,
 				282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */,
-				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
 				282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */,
 				2816F7D42B480A8400EEC5C3 /* ActivityIndicatorModifier.swift */,
 				2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */,
@@ -450,6 +610,33 @@
 				28B2FF542D00951E004C0672 /* AccountProfileView.swift */,
 			);
 			path = AccountProfile;
+			sourceTree = "<group>";
+		};
+		28D51D4A2DFC6FE50095CDE5 /* TextField */ = {
+			isa = PBXGroup;
+			children = (
+				28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */,
+				28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */,
+			);
+			path = TextField;
+			sourceTree = "<group>";
+		};
+		28D51D4F2DFF30AB0095CDE5 /* DropDown */ = {
+			isa = PBXGroup;
+			children = (
+				28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */,
+				28D51D522DFF30C20095CDE5 /* DropdownStyleVM.swift */,
+			);
+			path = DropDown;
+			sourceTree = "<group>";
+		};
+		28D51D542DFF61800095CDE5 /* Text */ = {
+			isa = PBXGroup;
+			children = (
+				28D51D552DFF61900095CDE5 /* TextStyleView.swift */,
+				28D51D572DFF61990095CDE5 /* TextStyleVM.swift */,
+			);
+			path = Text;
 			sourceTree = "<group>";
 		};
 		28E86F592ACC11A2008E827E /* Network */ = {
@@ -669,35 +856,51 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				287F39812DF7AA9C00F4D771 /* SectionTitleView.swift in Sources */,
 				28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */,
 				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
-				28A3A9C02A6935A8004A8D34 /* StyleVM.swift in Sources */,
+				287F39492DF25E5600F4D771 /* StyleWidgetItem.swift in Sources */,
 				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
+				28A2DB462E0AF68300A94753 /* AfterpayStyleVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
+				28D51D4E2DFC70070095CDE5 /* TextFieldStyleVM.swift in Sources */,
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
+				287F393D2DF259D500F4D771 /* StyleVM.swift in Sources */,
 				28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */,
+				287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				28A81F4D2B14DB040068FE75 /* Integrated3DSVM.swift in Sources */,
+				287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */,
 				28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */,
 				2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
+				287F393F2DF259E400F4D771 /* StyleDarkModeView.swift in Sources */,
+				28D51D532DFF30C60095CDE5 /* DropdownStyleVM.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
 				28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */,
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
+				28D8BA612E006ABE00EDD422 /* ResetStyleButton.swift in Sources */,
 				28A81F532B14E13E0068FE75 /* CardTokenRes.swift in Sources */,
 				282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */,
+				287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */,
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
 				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
+				28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
 				28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */,
+				28A2DB4D2E0B3E6600A94753 /* SpacingsStyleVM.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
+				287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
 				28AD05F82CF7767800B12FB4 /* CreateCustomerTokenRes.swift in Sources */,
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
+				28D51D582DFF619D0095CDE5 /* TextStyleVM.swift in Sources */,
+				287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
-				282D31662A66B82900E3ECAD /* StyleView.swift in Sources */,
+				287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */,
+				287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
@@ -706,17 +909,34 @@
 				28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */,
 				28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
+				28D8BA632E00706900EDD422 /* ResetConfirmationModifier.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
+				28A2DB442E0AF67500A94753 /* AfterpayStyleView.swift in Sources */,
+				28A2DB4B2E0B3E5E00A94753 /* SpacingsStyleView.swift in Sources */,
+				287F39412DF259EA00F4D771 /* StyleDarkModeButton.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
+				287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */,
+				287F397B2DF76DAD00F4D771 /* ColorPickerView.swift in Sources */,
+				28D51D512DFF30C00095CDE5 /* DropdownStyleView.swift in Sources */,
+				28A2DB412E0AE5C100A94753 /* ApplePayStyleVM.swift in Sources */,
+				28A2DB532E0B556900A94753 /* ButtonLoaderStyleVM.swift in Sources */,
+				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */,
+				28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */,
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
+				28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */,
+				287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
+				28A2DB512E0B54C600A94753 /* ButtonLoaderStyleView.swift in Sources */,
+				287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */,
 				28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */,
 				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
+				287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */,
+				28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */,
 				283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
