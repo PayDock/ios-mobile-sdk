@@ -177,13 +177,19 @@ class CardDetailsFormManager: ObservableObject {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
 
-        } else if !cardholderNameText.isEmpty {
+        } else if !cardholderNameText.isEmpty && isValidName(cardholderNameText) {
             cardHolderNameValid = true
             cardholderNameError = ""
+            
         } else {
             cardHolderNameValid = false
             cardholderNameError = "Invalid name"
         }
+    }
+    
+    func isValidName(_ name: String) -> Bool {
+        let regex = "^[\\p{L}]+([\\p{L}'-]*\\s?[\\p{L}'-]+)*$"
+        return name.range(of: regex, options: .regularExpression) != nil
     }
     
     // MARK: - Validate card number
