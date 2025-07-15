@@ -58,7 +58,7 @@ public struct CardDetailsWidget: View {
                     }
                 }
                 .accessibilityElement()
-                .accessibilityLabel("Supported card schemes: \(supportedSchemes.map(\.voiceoverName).joined(separator: ", "))")
+                .accessibilityLabel("Supported card schemes: \(CardScheme.sortedArray(from: supportedSchemes).map(\.voiceoverName).joined(separator: ", "))")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 16)
             }
