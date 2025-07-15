@@ -215,12 +215,6 @@ struct CheckoutPaymentSheet: View {
                     }
                 .padding()
             }
-            .alert(viewModel.alertTitle,
-                   isPresented: $viewModel.showAlert,
-                   actions: {},
-                   message: {
-                Text(viewModel.alertMessage)
-            })
         }
     }
         
