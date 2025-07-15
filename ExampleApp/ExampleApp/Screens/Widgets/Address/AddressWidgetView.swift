@@ -16,17 +16,15 @@ struct AddressWidgetView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                AddressWidget(
-                    config: .init(),
-                    appearance: getAppearance()) { address in
+            AddressWidget(
+                config: .init(),
+                appearance: getAppearance()) { address in
                     alertMessage = address.addressLine1
                     showAlert = true
                 }
-            }
-            .alert("Address", isPresented: $showAlert, actions: {}, message: {
-                Text(alertMessage)
-            })
+                .alert("Address", isPresented: $showAlert, actions: {}, message: {
+                    Text(alertMessage)
+                })
         }
     }
     
