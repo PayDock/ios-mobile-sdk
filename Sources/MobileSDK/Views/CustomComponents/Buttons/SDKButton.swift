@@ -67,6 +67,7 @@ struct SDKButton: View {
             }
             .myStyle(style)
             .disabled(style.isDisabled)
+            .accessibilityLabel(isLoading ? "Loading" : title ?? "")
         }
         .frame(maxWidth:.infinity, minHeight: 48)
     }
