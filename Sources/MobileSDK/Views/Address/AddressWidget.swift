@@ -235,6 +235,7 @@ public struct AddressWidget: View {
                 action: {
                     self.viewModel.addressFormManager.isAddressFormExpanded = true
                 })
+            .accessibilityHint("Saves address information.")
             Spacer()
         }
     }

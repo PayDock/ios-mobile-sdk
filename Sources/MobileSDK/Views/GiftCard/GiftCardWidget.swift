@@ -37,6 +37,7 @@ public struct GiftCardWidget: View {
                         pinTextField
                     }
                     primaryButton
+                        .accessibilityHint("Saves a gift card.")
                     emptyFocusView
                 }
             }
