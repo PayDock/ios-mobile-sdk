@@ -241,6 +241,7 @@ public struct CardDetailsWidget: View {
                 viewModel.tokeniseCardDetails()
             }
             .customPadding(appearance.actionButton.dimensions.padding)
+            .accessibilityHint("Submits card details information.")
             
             emptyFocusView
         }

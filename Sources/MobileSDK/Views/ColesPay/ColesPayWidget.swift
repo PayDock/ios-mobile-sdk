@@ -45,7 +45,7 @@ public struct ColesPayWidget: View {
             scaleToFit: true) {
                 viewModel.handleButtonTap()
             }
-            .accessibilityLabel(Text("Pay with Coles Pay"))
+            .accessibilityHint("Initiates payment using Coles Pay.")
     }
     
     private var webViewSheetContent: some View {
