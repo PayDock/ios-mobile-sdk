@@ -64,6 +64,9 @@ class CardDetailsFormManager: ObservableObject {
             if !cardNumberText.isEmpty {
                 self.validateTextField(.cardNumber)
             }
+            if !securityCodeText.isEmpty {
+                self.validateTextField(.securityCode)
+            }
         }
     }
     var expiryDateText = "" {
