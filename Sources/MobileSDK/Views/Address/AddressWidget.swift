@@ -415,7 +415,7 @@ public struct AddressWidget: View {
     }
 
     private var saveButton: some View {
-        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isDisabled))) {
+        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))) {
             viewModel.saveAddress()
         }
         .customPadding(appearance.actionButton.dimensions.padding)

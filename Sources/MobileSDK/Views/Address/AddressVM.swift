@@ -23,7 +23,7 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Properties
 
     @Published var addressSearchSuggestions: Array<String> = [""]
-    @Published var isDisabled = false
+    @Published var isDisabled = false // not used currently as there's no need for ViewState
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
     let completion: (Address) -> Void
@@ -136,6 +136,12 @@ class AddressVM: NSObject, ObservableObject {
     
     func updateAddress() {
         addressFormManager.updateFormWith(address: config.address)
+    }
+    
+    // MARK: - Validation
+    
+    func isActionButtonDisabled() -> Bool {
+        return !addressFormManager.isFormValid()
     }
 }
 
