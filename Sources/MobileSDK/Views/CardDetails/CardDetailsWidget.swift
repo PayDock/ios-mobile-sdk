@@ -75,18 +75,17 @@ public struct CardDetailsWidget: View {
                         valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
                         disabled: $viewModel.viewState.isDisabled,
                         textContentType: getCreditCardName(),
+                        returnKeyType: .next,
                         onTapGesture: {
                             if (!viewModel.viewState.isDisabled) {
                                 self.textFieldInFocus = .cardholderName
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
                             }
+                        }, onSubmit: {
+                            textFieldInFocus = .cardNumber
+                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                         }
                     )
-                    .submitLabel(.next)
-                    .onSubmit {
-                        textFieldInFocus = .cardNumber
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-                    }
                     .onConditionalKeyPress(key: .tab, action: {
                         textFieldInFocus = .cardNumber
                         viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
@@ -105,37 +104,30 @@ public struct CardDetailsWidget: View {
                     valid: $viewModel.cardDetailsFormManager.cardNumberValid,
                     disabled: $viewModel.viewState.isDisabled,
                     textContentType: .creditCardNumber,
+                    keyboardType: .numberPad,
                     onTapGesture: {
                         if (!viewModel.viewState.isDisabled) {
                             self.textFieldInFocus = .cardNumber
                             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                         }
+                    },
+                    onTextChange: { text, cursorPosition in
+                        return viewModel.cardDetailsFormManager.formatCardNumber(updatedText: text, cursorPosition: cursorPosition)
                     }
                 )
-                .keyboardType(.numberPad)
-                .toolbar {
-                    if textFieldInFocus == .cardNumber {
-                        ToolbarItemGroup(placement: .keyboard) {
-                            Spacer()
-                            Button {
-                                textFieldInFocus = .expiryDate
-                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-                            } label: {
-                                Text("Next")
-                                    .font(appearance.toolbarButton.fonts.title.customFont.font)
-                                    .foregroundColor(appearance.toolbarButton.colors.text)
-                            }
-                        }
-                    }
+                .customToolbar(
+                    buttonTitle: "Next",
+                    font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+                    textColor: UIColor(appearance.toolbarButton.colors.text)
+                ) {
+                    textFieldInFocus = .expiryDate
+                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
                 }
                 .onConditionalKeyPress(key: .tab, action: {
                     textFieldInFocus = .expiryDate
                     viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
                 })
                 .focused($textFieldInFocus, equals: .cardNumber)
-                .onChange(of: viewModel.cardDetailsFormManager.cardNumberText) { newValue in
-                    viewModel.cardDetailsFormManager.formatCardNumber(updatedText: newValue)
-                }
 
                 let layout = shouldAlignVertically() ?
                 AnyLayout(VStackLayout(spacing: appearance.verticalSpacing)) :
@@ -159,20 +151,13 @@ public struct CardDetailsWidget: View {
                         }
                     )
                     .keyboardType(.numberPad)
-                    .toolbar {
-                        if textFieldInFocus == .expiryDate {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                Spacer()
-                                Button {
-                                    textFieldInFocus = .securityCode
-                                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-                                } label: {
-                                    Text("Next")
-                                        .font(appearance.toolbarButton.fonts.title.customFont.font)
-                                        .foregroundColor(appearance.toolbarButton.colors.text)
-                                }
-                            }
-                        }
+                    .customToolbar(
+                        buttonTitle: "Next",
+                        font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+                        textColor: UIColor(appearance.toolbarButton.colors.text)
+                    ) {
+                        textFieldInFocus = .securityCode
+                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                     }
                     .onConditionalKeyPress(key: .tab, action: {
                         textFieldInFocus = .securityCode
@@ -201,20 +186,13 @@ public struct CardDetailsWidget: View {
                         }
                     )
                     .keyboardType(.numberPad)
-                    .toolbar {
-                        if textFieldInFocus == .securityCode {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                Spacer()
-                                Button {
-                                    textFieldInFocus = nil
-                                    viewModel.cardDetailsFormManager.endEditing()
-                                } label: {
-                                    Text("Done")
-                                        .font(appearance.toolbarButton.fonts.title.customFont.font)
-                                        .foregroundColor(appearance.toolbarButton.colors.text)
-                                }
-                            }
-                        }
+                    .customToolbar(
+                        buttonTitle: "Done",
+                        font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+                        textColor: UIColor(appearance.toolbarButton.colors.text)
+                    ) {
+                        textFieldInFocus = nil
+                        viewModel.cardDetailsFormManager.endEditing()
                     }
                     .onConditionalKeyPress(key: .tab, action: {
                         let collectCardholderName = viewModel.config.collectCardholderName
