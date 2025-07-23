@@ -298,8 +298,10 @@ class CardDetailsFormManager: ObservableObject {
 
     // MARK: - Formatting
 
-    func formatCardNumber(updatedText: String) {
-        cardNumberText = cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
+    func formatCardNumber(updatedText: String, cursorPosition: Int) -> Int {
+        let result = cardDetailsFormatter.formatCardNumber(updatedText: updatedText, cursorPosition: cursorPosition)
+        cardNumberText = result.formattedText
+        return result.newCursorPosition
     }
 
     func formatExpiryDate(updatedText: String) {

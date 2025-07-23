@@ -56,27 +56,20 @@ public struct GiftCardWidget: View {
             editing: $viewModel.giftCardFormManager.editingCardNumber,
             valid: $viewModel.giftCardFormManager.cardNumberValid,
             disabled: $viewModel.viewState.isDisabled,
+            keyboardType: .numberPad,
             onTapGesture: {
                 if (!viewModel.viewState.isDisabled) {
                     self.textFieldInFocus = .cardNumber
                     viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
                 }
             })
-        .keyboardType(.numberPad)
-        .toolbar {
-            if textFieldInFocus == .cardNumber {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button {
-                        textFieldInFocus = .pin
-                        viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
-                    } label: {
-                        Text("Next")
-                            .font(appearance.toolbarButton.fonts.title.customFont.font)
-                            .foregroundColor(appearance.toolbarButton.colors.text)
-                    }
-                }
-            }
+        .customToolbar(
+            buttonTitle: "Next",
+            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(appearance.toolbarButton.colors.text)
+        ) {
+            textFieldInFocus = .pin
+            viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
         }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .pin
@@ -95,27 +88,24 @@ public struct GiftCardWidget: View {
             editing: $viewModel.giftCardFormManager.editingPin,
             valid: $viewModel.giftCardFormManager.pinValid,
             disabled: $viewModel.viewState.isDisabled,
+            keyboardType: .numberPad,
             onTapGesture: {
                 if (!viewModel.viewState.isDisabled) {
                     self.textFieldInFocus = .pin
                     viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
                 }
             })
-        .keyboardType(.numberPad)
-        .toolbar {
-            if textFieldInFocus == .pin {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button {
-                        textFieldInFocus = nil
-                        viewModel.giftCardFormManager.endEditing()
-                    } label: {
-                        Text("Done")
-                            .font(appearance.toolbarButton.fonts.title.customFont.font)
-                            .foregroundColor(appearance.toolbarButton.colors.text)
-                    }
-                }
-            }
+        .customToolbar(
+            buttonTitle: "Done",
+            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(appearance.toolbarButton.colors.text)
+        ) {
+            textFieldInFocus = nil
+            viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
+        }
+        .onSubmit {
+            textFieldInFocus = nil
+            viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
         }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .cardNumber

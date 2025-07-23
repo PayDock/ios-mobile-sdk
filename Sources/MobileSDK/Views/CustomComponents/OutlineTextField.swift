@@ -43,7 +43,11 @@ struct OutlineTextField: View {
     private let placeholder: String
     private let validationIconEnabled: Bool
     private let textContentType: UITextContentType?
+    private let returnKeyType: UIReturnKeyType
     private let onTapGesture: () -> Void
+    private let onTextChange: ((String, Int) -> Int)?
+    private let onSubmit: (() -> Void)?
+    private let keyboardType: UIKeyboardType
 
     // MARK: - Initialization
 
@@ -58,7 +62,11 @@ struct OutlineTextField: View {
     ///   - disabled: Whether the field is in a disabled state.
     ///   - validationIconEnabled: Whether to enabled the validation icon.
     ///   - textContentType: Content type used for the suggested prefill.
+    ///   - keyboardType: Keyboard type for the text field.
+    ///   - returnKeyType: Return key type for the text field.
     ///   - onTapGesture: Action to take on tap gesture activaction.
+    ///   - onTextChange: Custom text change handler that returns new cursor position.
+    ///   - onSubmit: Action to take when return key is pressed.
     public init(appearance: Theme.TextFieldAppearance = Theme.TextFieldAppearance(),
                 text: Binding<String>,
                 title: String,
@@ -70,7 +78,11 @@ struct OutlineTextField: View {
                 disabled: Binding<Bool>,
                 validationIconEnabled: Bool = true,
                 textContentType: UITextContentType? = nil,
-                onTapGesture: @escaping (() -> Void)
+                keyboardType: UIKeyboardType = .default,
+                returnKeyType: UIReturnKeyType = .default,
+                onTapGesture: @escaping (() -> Void),
+                onTextChange: ((String, Int) -> Int)? = nil,
+                onSubmit: (() -> Void)? = nil
     ) {
         self.appearance = appearance
         self._text = text
@@ -83,7 +95,11 @@ struct OutlineTextField: View {
         self._disabled = disabled
         self.validationIconEnabled = validationIconEnabled
         self.textContentType = textContentType
+        self.keyboardType = keyboardType
+        self.returnKeyType = returnKeyType
         self.onTapGesture = onTapGesture
+        self.onTextChange = onTextChange
+        self.onSubmit = onSubmit
 
         titleLeadingPadding = (leftImage != nil) ? 52 : 12
     }
@@ -147,24 +163,35 @@ struct OutlineTextField: View {
                 .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
             
-            TextField(editing ? placeholder : "", text: $text)
-                .textContentType(textContentType)
-                .simultaneousGesture(TapGesture().onEnded({ _ in
-                    onTapGesture()
-                }))
-                .simultaneousGesture(LongPressGesture().onEnded({ _ in
-                    onTapGesture()
-                }))
-                .disabled(disabled)
-                .frame(height: getTextFieldHeight())
-                .font(appearance.fonts.text.customFont.font)
-                .underline(appearance.fonts.text.isUnderlined, color: appearance.fonts.text.underlineColor)
-                .strikethrough(appearance.fonts.text.isStrikethrough, color: appearance.fonts.text.strikethroughColor)
-                .italic(appearance.fonts.text.isItalic)
-                .foregroundColor(appearance.colors.text)
-                .tint(appearance.colors.active)
-                .accessibilityLabel(title)
-                .accessibilityHint(getValidMessage())
+            
+            CursorPositionTextField(
+                text: $text,
+                placeholder: editing ? placeholder : "",
+                keyboardType: keyboardType,
+                textContentType: textContentType,
+                returnKeyType: returnKeyType,
+                font: UIFont(name: appearance.fonts.text.customFont.name, size: appearance.fonts.text.customFont.size),
+                textColor: UIColor(appearance.colors.text),
+                tintColor: UIColor(appearance.colors.active),
+                isUnderlined: appearance.fonts.text.isUnderlined,
+                underlineColor: UIColor(appearance.fonts.text.underlineColor),
+                isStrikethrough: appearance.fonts.text.isStrikethrough,
+                strikethroughColor: UIColor(appearance.fonts.text.strikethroughColor),
+                isItalic: appearance.fonts.text.isItalic,
+                onEditingChanged: { isEditing in
+                    editing = isEditing
+                },
+                onCommit: {},
+                onSubmit: onSubmit,
+                onTextChange: onTextChange
+            )
+            .simultaneousGesture(TapGesture().onEnded({ _ in
+                onTapGesture()
+            }))
+            .frame(height: getTextFieldHeight())
+            .disabled(disabled)
+            .accessibilityLabel(title)
+            .accessibilityHint(getValidMessage())
             
             if validationIconEnabled {
                 validationIconView
@@ -319,10 +346,6 @@ private extension OutlineTextField {
         }
     }
 
-    enum Field {
-        case textField
-    }
-
     enum ValidationIconState {
         case valid
         case invalid
@@ -391,7 +414,8 @@ struct OutlineTextField_Previews: PreviewProvider {
             editing: .constant(false),
             valid: .constant(false),
             disabled: .constant(false),
-            onTapGesture: {}
+            onTapGesture: {},
+            onSubmit: {}
         )
     }
 }

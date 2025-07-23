@@ -9,7 +9,7 @@
 import Foundation
 
 class CardDetailsFormatter {
-
+    
     func formatCardNumber(updatedText: String) -> String {
         var groomed = ""
         for c in updatedText {
@@ -26,6 +26,36 @@ class CardDetailsFormatter {
             }
         }
         return groomed
+    }
+
+    func formatCardNumber(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
+        var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        
+        for c in updatedText {
+            if c == " " && (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19)  {
+                groomed.append(c)
+            } else if c.isASCII && c.isNumber {
+                if (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19) {
+                    groomed.append(" ")
+                    // If cursor was at or after this position, adjust it
+                    if originalIndex < cursorPosition {
+                        newCursorPosition += 1
+                    }
+                }
+                groomed.append(c)
+            }
+            originalIndex += 1
+            if groomed.count == 23 {
+                break
+            }
+        }
+        
+        // Ensure cursor position doesn't exceed the formatted text length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+        
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
     func formatExpiryDate(updatedText: String) -> String {

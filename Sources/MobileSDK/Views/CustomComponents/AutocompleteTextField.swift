@@ -24,6 +24,10 @@ struct AutocompleteTextField: View {
     private let title: String
     private let placeholder: String
     private let onTapGesture: () -> Void
+    private let returnKeyType: UIReturnKeyType
+    private let onTextChange: ((String, Int) -> Int)?
+    private let onSubmit: (() -> Void)?
+    private let keyboardType: UIKeyboardType
 
     // MARK: - AutocompleteTextField Properties
 
@@ -65,7 +69,11 @@ struct AutocompleteTextField: View {
                 options: Binding<Array<String>>,
                 textContentType: UITextContentType? = nil,
                 onSelection: @escaping (Int?) -> (),
-                onTapGesture: @escaping () -> Void) {
+                onTapGesture: @escaping () -> Void,
+                keyboardType: UIKeyboardType = .default,
+                returnKeyType: UIReturnKeyType = .default,
+                onTextChange: ((String, Int) -> Int)? = nil,
+                onSubmit: (() -> Void)? = nil) {
         self.appearance = appearance
         self._text = text
         self.title = title
@@ -79,7 +87,11 @@ struct AutocompleteTextField: View {
         self._options = options
         self.textContentType = textContentType
         self.onSelection = onSelection
+        self.keyboardType = keyboardType
+        self.returnKeyType = returnKeyType
         self.onTapGesture = onTapGesture
+        self.onTextChange = onTextChange
+        self.onSubmit = onSubmit
     }
 
     var body: some View {
@@ -95,7 +107,11 @@ struct AutocompleteTextField: View {
                 disabled: $disabled,
                 validationIconEnabled: false,
                 textContentType: textContentType,
-                onTapGesture: onTapGesture
+                keyboardType: keyboardType,
+                returnKeyType: returnKeyType,
+                onTapGesture: onTapGesture,
+                onTextChange: onTextChange,
+                onSubmit: onSubmit
             )
             .overlay(content: {
                 autocompletePopup
