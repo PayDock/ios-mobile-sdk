@@ -22,8 +22,8 @@ public enum CardScheme: String, CaseIterable {
     var voiceoverName: String {
         switch self {
         case .amex: return "American Express"
-        case .ausbc: return "Australian Commonwealth Bank"
-        case .diners: return "Diners"
+        case .ausbc: return "Australian Bank Card"
+        case .diners: return "Diners Club"
         case .discover: return "Discover"
         case .japcb: return "JCB"
         case .mastercard: return "Mastercard"
