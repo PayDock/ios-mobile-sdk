@@ -23,6 +23,7 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Properties
 
     @Published var addressSearchSuggestions: Array<String> = [""]
+    @Published var countrySearchSuggestions: Array<String> = [""]
     @Published var isDisabled = false // not used currently as there's no need for ViewState
     var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
     var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
@@ -37,6 +38,18 @@ class AddressVM: NSObject, ObservableObject {
             }, set: {
                 self.addressFormManager.addressSearchText = $0
                 self.searchAddress($0)
+            }
+        )
+    }
+    
+    var countrySearchBinding: Binding<String> {
+        Binding(
+            get: {
+                self.addressFormManager.countrySearchText
+            }, set: {
+                self.addressFormManager.countrySearchText = $0
+                self.addressFormManager.countryText = $0
+                self.searchCountry($0)
             }
         )
     }
@@ -108,9 +121,41 @@ class AddressVM: NSObject, ObservableObject {
 
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
                     self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
+                    self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
                 }
             }
         }
+    }
+    
+    // MARK: - Country search
+    
+    func searchCountry(_ searchableText: String) {
+        guard !searchableText.isEmpty else {
+            addressFormManager.showCountrySearchPopup = false
+            countrySearchSuggestions = [""]
+            return
+        }
+        
+        let filteredCountries = addressFormManager.getCountryList().filter { country in
+            country.lowercased().contains(searchableText.lowercased())
+        }
+        
+        countrySearchSuggestions = Array(filteredCountries.prefix(4))
+        
+        if addressFormManager.currentTextField == .country && !addressFormManager.countrySearchText.isEmpty {
+            addressFormManager.showCountrySearchPopup = true
+        }
+    }
+    
+    func handleTapOnCountryOptionAt(index: Int?) {
+        guard let index = index, index < countrySearchSuggestions.count else { return }
+        
+        let selectedCountry = countrySearchSuggestions[index]
+        addressFormManager.countrySearchText = selectedCountry
+        addressFormManager.countryText = selectedCountry
+        addressFormManager.showCountrySearchPopup = false
+        countrySearchSuggestions = [""]
+        
     }
 
     // MARK: - Logic

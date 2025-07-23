@@ -34,7 +34,7 @@ public struct AddressWidget: View {
                             nameAndLastNameView
                             autocompleteTextFieldView
                                 .zIndex(100)
-                                .padding(.bottom, viewModel.addressFormManager.showAddressSearchPopup ? 120 : 0)
+                                .padding(.bottom, viewModel.addressFormManager.showAddressSearchPopup ? 140 : 0)
                             if viewModel.addressFormManager.isAddressFormExpanded {
                                 addressLine1View
                                 addressLine2View
@@ -42,6 +42,8 @@ public struct AddressWidget: View {
                                 stateView
                                 postcodeView
                                 countryView
+                                    .zIndex(100)
+                                    .padding(.bottom, viewModel.addressFormManager.showCountrySearchPopup ? 140 : 0)
                             } else {
                                 manualEntryButton
                             }
@@ -52,6 +54,7 @@ public struct AddressWidget: View {
                         emptyFocusView
                     }
                     .animation(.easeInOut, value: viewModel.addressFormManager.showAddressSearchPopup)
+                    .animation(.easeInOut, value: viewModel.addressFormManager.showCountrySearchPopup)
                     .padding(.horizontal, 16.0)
                     .padding(.bottom, keyboardHeight > 0 ? keyboardHeight + 20 : 0)
                 }
@@ -380,17 +383,22 @@ public struct AddressWidget: View {
     }
 
     private var countryView: some View {
-        OutlineTextField(
-            appearance: appearance.textField,
-            text: $viewModel.addressFormManager.countryText,
+        AutocompleteTextField(
+            appearance: appearance.searchDropdown,
+            text: viewModel.countrySearchBinding,
             title: viewModel.addressFormManager.countryTitle,
             placeholder: viewModel.addressFormManager.countryPlaceholder,
             errorMessage: $viewModel.addressFormManager.countryError,
             editing: $viewModel.addressFormManager.editingCountry,
             valid: $viewModel.addressFormManager.countryValid,
+            showPopup: $viewModel.addressFormManager.showCountrySearchPopup,
             disabled: $viewModel.isDisabled,
+            validationIconEnabled: true,
+            options: $viewModel.countrySearchSuggestions,
             textContentType: .countryName,
-            returnKeyType: .done,
+            onSelection: {
+                viewModel.handleTapOnCountryOptionAt(index: $0)
+            },
             onTapGesture: {
                 self.textFieldInFocus = .country
                 viewModel.addressFormManager.setEditingTextField(focusedField: .country)

@@ -24,6 +24,7 @@ struct AutocompleteTextField: View {
     private let title: String
     private let placeholder: String
     private let onTapGesture: () -> Void
+    private let validationIconEnabled: Bool
     private let returnKeyType: UIReturnKeyType
     private let onTextChange: ((String, Int) -> Int)?
     private let onSubmit: (() -> Void)?
@@ -66,6 +67,7 @@ struct AutocompleteTextField: View {
                 valid: Binding<Bool?>,
                 showPopup: Binding<Bool>,
                 disabled: Binding<Bool>,
+                validationIconEnabled: Bool = false,
                 options: Binding<Array<String>>,
                 textContentType: UITextContentType? = nil,
                 onSelection: @escaping (Int?) -> (),
@@ -84,6 +86,7 @@ struct AutocompleteTextField: View {
         self._valid = valid
         self._showPopup = showPopup
         self._disabled = disabled
+        self.validationIconEnabled = validationIconEnabled
         self._options = options
         self.textContentType = textContentType
         self.onSelection = onSelection
@@ -105,7 +108,7 @@ struct AutocompleteTextField: View {
                 editing: $editing,
                 valid: $valid,
                 disabled: $disabled,
-                validationIconEnabled: false,
+                validationIconEnabled: validationIconEnabled,
                 textContentType: textContentType,
                 keyboardType: keyboardType,
                 returnKeyType: returnKeyType,
@@ -115,11 +118,10 @@ struct AutocompleteTextField: View {
             )
             .overlay(content: {
                 autocompletePopup
-                    .offset(x: -1, y: 52)
+                    .offset(x: -1, y: 72)
                     .accessibilityElement(children: .contain)
             })
         }
-        .frame(height: 48)
     }
 
     private var autocompletePopup: some View {
