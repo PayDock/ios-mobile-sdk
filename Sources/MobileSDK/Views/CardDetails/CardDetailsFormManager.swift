@@ -20,6 +20,7 @@ class CardDetailsFormManager: ObservableObject {
     private let cardExpiryDateValidator: CardExpiryDateValidatior
     private let cardSecurityCodeValidator: CardSecurityCodeValidator
     private let cardDetailsFormatter: CardDetailsFormatter
+    private let cardNameValidator: CardNameValidator
     
     // MARK: - Properties
     
@@ -94,7 +95,8 @@ class CardDetailsFormManager: ObservableObject {
          cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
-         cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter()) {
+         cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter(),
+         cardNameValidator: CardNameValidator = CardNameValidator()) {
         self.shouldValidateCardholderName = shouldValidateCardholderName
         self.supportedSchemes = supportedSchemes
         self.enableCardValidation = enableCardValidation
@@ -102,6 +104,7 @@ class CardDetailsFormManager: ObservableObject {
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
         self.cardDetailsFormatter = cardExpiryDateFormatter
+        self.cardNameValidator = cardNameValidator
     }
 
     // MARK: - Methods
@@ -180,7 +183,7 @@ class CardDetailsFormManager: ObservableObject {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
 
-        } else if !cardholderNameText.isEmpty && isValidName(cardholderNameText) {
+        } else if !cardholderNameText.isEmpty && cardNameValidator.isValidName(cardholderNameText) {
             cardHolderNameValid = true
             cardholderNameError = ""
             
@@ -188,11 +191,6 @@ class CardDetailsFormManager: ObservableObject {
             cardHolderNameValid = false
             cardholderNameError = "Invalid name"
         }
-    }
-    
-    func isValidName(_ name: String) -> Bool {
-        let regex = "^[\\p{L}]+([\\p{L}'-]*\\s?[\\p{L}'-]+)*$"
-        return name.range(of: regex, options: .regularExpression) != nil
     }
     
     // MARK: - Validate card number
