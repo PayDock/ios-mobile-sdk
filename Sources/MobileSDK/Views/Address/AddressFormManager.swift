@@ -50,7 +50,7 @@ class AddressFormManager: ObservableObject {
     let addressLine2Title = "Address Line 2 (Optional)"
     let cityTitle = "City"
     let stateTitle = "State"
-    let postcodeTitle = "Postcode"
+    let postcodeTitle = "Postal Code"
     let countryTitle = "Country"
 
     let firstNamePlaceholder = ""
@@ -109,6 +109,8 @@ class AddressFormManager: ObservableObject {
             }
         }
     }
+    @Published var countrySearchText = ""
+
     @Published var countryText = "" {
         didSet {
             if !countryText.isEmpty {
@@ -119,6 +121,7 @@ class AddressFormManager: ObservableObject {
 
     private(set) var currentTextField: AddressFocusable?
     @Published var showAddressSearchPopup = false
+    @Published var showCountrySearchPopup = false
     @Published var isAddressFormExpanded = false
 
     // MARK: - Methods
@@ -127,6 +130,11 @@ class AddressFormManager: ObservableObject {
         // Hide address search popup when moving away from search address field
         if currentTextField == .searchAddress && focusedField != .searchAddress {
             showAddressSearchPopup = false
+        }
+        
+        // Hide country search popup when moving away from country field
+        if currentTextField == .country && focusedField != .country {
+            showCountrySearchPopup = false
         }
         
         currentTextField = focusedField
@@ -197,10 +205,16 @@ class AddressFormManager: ObservableObject {
             postcodeError = isValid ? "" : "Mandatory field"
 
         case .country:
-            let isValid = !countryText.trimmingCharacters(in: .whitespaces).isEmpty
+            let trimmedInput = countryText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let isValid = getCountryList().contains { $0.caseInsensitiveCompare(trimmedInput) == .orderedSame }
             countryValid = isValid
             countryError = isValid ? "" : "Mandatory field"
         }
+    }
+    
+    private func isCountryValid() -> Bool {
+        let trimmedInput = countryText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return getCountryList().contains { $0.caseInsensitiveCompare(trimmedInput) == .orderedSame }
     }
     
     func isFormValid() -> Bool {
@@ -210,7 +224,7 @@ class AddressFormManager: ObservableObject {
         let cityValid = !cityText.trimmingCharacters(in: .whitespaces).isEmpty
         let stateValid = !stateText.trimmingCharacters(in: .whitespaces).isEmpty
         let postcodeValid = !postcodeText.trimmingCharacters(in: .whitespaces).isEmpty
-        let countryValid = !countryText.trimmingCharacters(in: .whitespaces).isEmpty
+        let countryValid = isCountryValid()
         
         return firstNameValid && lastNameValid && addressLine1Valid && cityValid && stateValid && postcodeValid && countryValid
     }
@@ -237,6 +251,17 @@ class AddressFormManager: ObservableObject {
         countryText = address.country
 
         validateAllTextFields()
+    }
+    
+    func getCountryList() -> [String] {
+        let englishLocale = Locale(identifier: "en")
+        let countryCodes = Locale.isoRegionCodes
+
+        let countryNames = countryCodes.compactMap { code in
+            englishLocale.localizedString(forRegionCode: code)
+        }.sorted()
+        
+        return countryNames
     }
     
     // MARK: - Editing

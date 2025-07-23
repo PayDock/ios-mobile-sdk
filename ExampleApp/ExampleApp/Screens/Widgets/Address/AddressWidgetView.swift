@@ -19,7 +19,15 @@ struct AddressWidgetView: View {
             AddressWidget(
                 config: .init(),
                 appearance: getAppearance()) { address in
-                    alertMessage = address.addressLine1
+                    alertMessage = """
+                        \(address.firstName) \(address.lastName)
+                        \(address.addressLine1)
+                        \(address.addressLine2)
+                        \(address.city)
+                        \(address.state)
+                        \(address.postcode)
+                        \(address.country)
+                    """
                     showAlert = true
                 }
                 .alert("Address", isPresented: $showAlert, actions: {}, message: {
