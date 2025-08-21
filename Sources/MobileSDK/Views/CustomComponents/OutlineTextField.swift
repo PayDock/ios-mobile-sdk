@@ -11,9 +11,9 @@ import SwiftUI
 struct OutlineTextField: View {
 
     @Environment(\.dynamicTypeSize) var sizeCategory
-    
+
     // MARK: Properties
-    
+
     @State private var appearance: Theme.TextFieldAppearance
 
     @State private var borderColor = Color.clear
@@ -162,8 +162,7 @@ struct OutlineTextField: View {
                 .foregroundColor(appearance.colors.placeholder)
                 .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
-            
-            
+
             CursorPositionTextField(
                 text: $text,
                 placeholder: editing ? placeholder : "",
@@ -192,7 +191,7 @@ struct OutlineTextField: View {
             .disabled(disabled)
             .accessibilityLabel(title)
             .accessibilityHint(getValidMessage())
-            
+
             if validationIconEnabled {
                 validationIconView
                     .accessibilityHidden(true)
@@ -356,7 +355,7 @@ private extension OutlineTextField {
 // MARK: - Accessibility handling
 
 extension OutlineTextField {
-    
+
     private func getTextFieldHeight() -> CGFloat {
         switch sizeCategory {
         case .xSmall: return 38
@@ -366,7 +365,7 @@ extension OutlineTextField {
         case .xLarge: return 54
         case .xxLarge: return 58
         case .xxxLarge: return 62
-            
+
         case .accessibility1: return 70
         case .accessibility2: return 100
         case .accessibility3: return 130
@@ -375,7 +374,7 @@ extension OutlineTextField {
         @unknown default: return 48
         }
     }
-    
+
     private func getTitleExtraPadding() -> CGFloat {
         switch sizeCategory {
         case .xSmall: return -8.0
@@ -385,7 +384,7 @@ extension OutlineTextField {
         case .xLarge: return 8.0
         case .xxLarge: return 12.0
         case .xxxLarge: return 16.0
-            
+
         case .accessibility1: return 22.0
         case .accessibility2: return 52.0
         case .accessibility3: return 82.0
@@ -394,7 +393,7 @@ extension OutlineTextField {
         @unknown default: return 48
         }
     }
-    
+
     private func getValidMessage() -> String {
         guard let valid = valid else { return "" }
         return valid ? "Valid" : "Invalid. \(errorMessage)"

@@ -14,7 +14,7 @@ public struct Dimensions {
     public let textFieldCornerRadius: Double
     public let borderWidth: Double
     public let spacing: CGFloat
-    
+
     public init(buttonCornerRadius: Double = 4,
                 textFieldCornerRadius: Double = 4,
                 borderWidth: Double = 1,

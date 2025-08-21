@@ -18,7 +18,8 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.7.1"),
         .package(url: "https://github.com/paypal/paypal-ios/", exact: "1.5.0"),
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.0")
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.0"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", exact: "0.59.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -37,6 +38,9 @@ let package = Package(
                 .copy("MobileSDK/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_payment_token_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/card-schemes.json"),
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
         .testTarget(

@@ -56,7 +56,8 @@ extension WalletEndpoints: Endpoint {
     var header: [String: String]? {
         let accessToken =  ProjectEnvironment.shared.getApiAccessToken()
         switch self {
-        case .initialiseWalletCharge, .initialiseColesPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds, .captureCharge, .cardToken, .integrated3ds, .integrated3dsVault, .captureChargeColesPay:
+        case .initialiseWalletCharge, .initialiseColesPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds,
+                .captureCharge, .cardToken, .integrated3ds, .integrated3dsVault, .captureChargeColesPay:
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -87,11 +88,11 @@ extension WalletEndpoints: Endpoint {
         case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
         }
     }
-    
+
     var mockFile: String? {
         return nil
     }
-    
+
     var bundle: Bundle? {
         return nil
     }

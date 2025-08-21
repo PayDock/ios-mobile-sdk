@@ -13,7 +13,7 @@ struct CustomToolbarModifier: ViewModifier {
     let buttonFont: UIFont?
     let buttonTextColor: UIColor?
     let buttonAction: () -> Void
-    
+
     func body(content: Content) -> some View {
         content
             .environment(\.toolbarButton, ToolbarButtonInfo(

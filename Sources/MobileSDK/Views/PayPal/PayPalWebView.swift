@@ -80,11 +80,11 @@ struct PayPalWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             onFailure(.webViewFailed(error: error as NSError))
         }
-        
+
         /**
          This method handles errors that happen before the resource of the url can even be reached.
          These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
-         
+
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -103,15 +103,19 @@ struct PayPalWebView: UIViewRepresentable {
                     let parts = String(query).split(separator: "=")
                     partialResult[String(parts[0])] = parts.count > 1 ? String(parts[1]) : ""
                 })
-            
+
             handleRedirect(params: params)
         }
 
-        func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
+        func webView(_ webView: WKWebView,
+                     authenticationChallenge challenge: URLAuthenticationChallenge,
+                     shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(false)
         }
 
-        func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        func webView(_ webView: WKWebView,
+                     didReceive challenge: URLAuthenticationChallenge,
+                     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
             DispatchQueue.global(qos: .background).async {
                 let trust = challenge.protectionSpace.serverTrust!
                 let exceptions = SecTrustCopyExceptions(trust)
@@ -119,9 +123,9 @@ struct PayPalWebView: UIViewRepresentable {
                 completionHandler(.useCredential, URLCredential(trust: trust))
             }
         }
-        
+
         // MARK: - Helpers
-        
+
         private func handleRedirect(params: [String: String]) {
             if let opType = params["opType"], opType == "cancel" {
                 onFailure(.transactionCanceled)
@@ -135,4 +139,3 @@ struct PayPalWebView: UIViewRepresentable {
         }
     }
 }
-

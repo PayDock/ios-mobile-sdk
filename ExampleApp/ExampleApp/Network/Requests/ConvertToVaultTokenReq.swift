@@ -13,7 +13,6 @@ struct ConvertToVaultTokenReq: Codable {
     let token: String
     let vaultType: String
 
-
     enum CodingKeys: String, CodingKey {
         case token
         case vaultType = "vault_type"

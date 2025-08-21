@@ -13,13 +13,10 @@ struct CaptureChargeReq: Codable {
     let currency: String
     let reference: String
     let description: String
-    let _3ds: ThreeDS
-    
-    struct ThreeDS: Codable {
-        let _id: String
-        
-        enum CodingKeys: String, CodingKey {
-            case _id = "id"
-        }
+    let threeDS: CaptureChargeReq3DSData
+
+    enum CodingKeys: String, CodingKey {
+        case amount, currency, reference, description
+        case threeDS = "_3ds"
     }
 }

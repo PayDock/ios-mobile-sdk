@@ -10,11 +10,11 @@ import Foundation
 import SwiftUI
 
 extension Theme {
-    
+
     public struct OverlayLoaderAppearance {
         public var color: Color
         public var overlayColor: Color
-        
+
         public init(color: Color =  .defaultPrimary,
                     overlayColor: Color = .defaultLoaderOverlay) {
             self.color = color

@@ -37,7 +37,7 @@ extension PayPalVaultEndpoints: Endpoint {
 
     var header: [String: String]? {
         switch self {
-        case let .setupToken(_ , accessToken),
+        case let .setupToken(_, accessToken),
             let .clientId(_, accessToken),
             let .paymentToken(_, _, accessToken):
             return [
@@ -62,7 +62,7 @@ extension PayPalVaultEndpoints: Endpoint {
         case .paymentToken: return []
         }
     }
-    
+
     var mockFile: String? {
         switch self {
         case .setupToken: return "paypal_vault_setup_token_success_response"
@@ -70,7 +70,7 @@ extension PayPalVaultEndpoints: Endpoint {
         case .paymentToken: return "paypal_vault_payment_token_success_response"
         }
     }
-    
+
     var bundle: Bundle? {
         return Bundle.module
     }

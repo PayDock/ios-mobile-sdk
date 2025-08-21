@@ -10,9 +10,9 @@ import SwiftUI
 import MobileSDK
 
 class WidgetsVM: ObservableObject {
-    
+
     private let mobileSDK: MobileSDK
-    
+
     init(mobileSDK: MobileSDK = MobileSDK.shared) {
         self.mobileSDK = mobileSDK
 
@@ -29,5 +29,4 @@ class WidgetsVM: ObservableObject {
 
         mobileSDK.configureMobileSDK(config: config)
     }
-    
 }

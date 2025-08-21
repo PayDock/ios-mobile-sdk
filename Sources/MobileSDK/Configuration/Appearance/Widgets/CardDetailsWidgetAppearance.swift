@@ -28,7 +28,7 @@ public struct CardDetailsWidgetAppearance:
     public var toggle: Theme.ToggleAppearance
     public var toggleText: Theme.TextAppearance
     public var linkText: Theme.TextAppearance
-    
+
     public init(verticalSpacing: CGFloat = 6,
                 horizontalSpacing: CGFloat = 16,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,

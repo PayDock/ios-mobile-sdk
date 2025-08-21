@@ -32,19 +32,30 @@ class AfterpayVM: ObservableObject {
 
     private let completion: (Result<ChargeResponse, AfterpayError>) -> Void
     private let selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?
-    private let selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?
-
-
+    private let selectShippingOption: ((
+        _ shippingOption: ShippingOption,
+        _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void
+    ) -> Void)?
     // MARK: - Initialisation
 
-    init(viewState: ViewState,
-         configuration: AfterpaySdkConfig,
-         tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
-         selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
-         selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
-         walletService: WalletService = WalletServiceImpl(),
-         loadingDelegate: WidgetLoadingDelegate?,
-         completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
+    init(
+        viewState: ViewState,
+        configuration: AfterpaySdkConfig,
+        tokenRequest: @escaping (
+            _ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void
+        ) -> Void,
+        selectAddress: ((
+            _ address: ShippingAddress,
+            _ provideShippingOptions: ([ShippingOption]) -> Void
+        ) -> Void)?,
+        selectShippingOption: ((
+            _ shippingOption: ShippingOption,
+            _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void
+        ) -> Void)?,
+        walletService: WalletService = WalletServiceImpl(),
+        loadingDelegate: WidgetLoadingDelegate?,
+        completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void
+    ) {
         self.viewState = viewState
         self.configuration = configuration
         self.tokenRequest = tokenRequest
@@ -118,12 +129,12 @@ class AfterpayVM: ObservableObject {
                 self.afterPayOrderId = afterPayOrderId
                 self.presentAfterpay()
                 self.showWebView = true
-                
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.isLoading = false
                 self.showWebView = false
                 self.completion(.failure(.errorFetchingAfterpayUrl(error: errorResponse)))
-                
+
             } catch {
                 self.isLoading = false
                 self.showWebView = false
@@ -131,7 +142,7 @@ class AfterpayVM: ObservableObject {
             }
         }
     }
-    
+
     private func captureWalletCharge() {
         isLoading = true
         Task {
@@ -160,7 +171,7 @@ class AfterpayVM: ObservableObject {
             case .success(let response):
                 self?.token = response.token
                 self?.getAfterpayURL(token: response.token)
-            
+
             case .failure(let failure):
                 self?.updateLoadingState(isLoading: false)
                 self?.showWebView = false
@@ -186,12 +197,12 @@ class AfterpayVM: ObservableObject {
             }
         }
     }
-    
+
     // MARK: - State Management
 
     func updateLoadingState(isLoading: Bool) {
-        if (loadingDelegate != nil) {
-            if (isLoading) {
+        if loadingDelegate != nil {
+            if isLoading {
                 loadingDelegate?.loadingDidStart()
             } else {
                 loadingDelegate?.loadingDidFinish()
@@ -229,7 +240,7 @@ extension AfterpayVM {
         let paddingLength = requiredLength - length
         if paddingLength > 0 {
             let padding = "".padding(toLength: Int(paddingLength), withPad: "=", startingAt: 0)
-            base64 = base64 + padding
+            base64 += padding
         }
         return Data(base64Encoded: base64, options: .ignoreUnknownCharacters)
     }

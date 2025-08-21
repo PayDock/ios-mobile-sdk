@@ -1,8 +1,9 @@
 disabled_rules:
-  - nesting
-  - large_tuple
   - todo
   - inclusive_language
+
+line_length:
+  warning: 140
 
 identifier_name:
   max_length:

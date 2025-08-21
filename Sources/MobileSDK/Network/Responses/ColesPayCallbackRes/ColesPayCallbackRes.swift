@@ -19,11 +19,6 @@ struct ColesPayCallbackRes: Codable {
 
     struct CallbackData: Codable {
         let id: String
-        let charge: Charge
-
-        struct Charge: Codable {
-            let status: String
-        }
+        let charge: ColesPayChargeData
     }
 }
-

@@ -9,7 +9,7 @@
 import SwiftUI
 
 extension Button {
-    
+
     @ViewBuilder
     func myStyle(_ style: SDKButtonStyle) -> some View {
         switch style {

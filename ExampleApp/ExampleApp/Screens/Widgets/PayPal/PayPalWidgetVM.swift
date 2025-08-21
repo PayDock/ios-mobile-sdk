@@ -32,16 +32,20 @@ class PayPalWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargePaymentSource(
+                addressLine1: nil,
+                addressPostcode: nil,
+                gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "",
+                walletType: nil)
 
-            let customer = InitialiseWalletChargeReq.Customer(
+            let customer = InitialiseWalletChargeCustomer(
                 firstName: "Tom",
                 lastName: "Taylor",
                 email: "novaba9346@hondabbs.com",
                 phone: "+11234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeReq.MetaData(
+            let metaData = InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
@@ -55,7 +59,7 @@ class PayPalWidgetVM: ObservableObject {
                 reference: UUID().uuidString,
                 description: "Test transaction for PayPal",
                 meta: metaData)
-            
+
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 DispatchQueue.main.async {
@@ -86,7 +90,7 @@ extension PayPalWidgetVM: WidgetLoadingDelegate {
     func loadingDidStart() {
         isLoading = true
     }
-    
+
     func loadingDidFinish() {
         isLoading = false
     }

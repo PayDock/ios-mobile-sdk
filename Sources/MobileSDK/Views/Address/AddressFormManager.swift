@@ -87,7 +87,7 @@ class AddressFormManager: ObservableObject {
         }
     }
     @Published var addressLine2Text = ""
-    
+
     @Published var cityText = "" {
         didSet {
             if !cityText.isEmpty {
@@ -131,12 +131,12 @@ class AddressFormManager: ObservableObject {
         if currentTextField == .searchAddress && focusedField != .searchAddress {
             showAddressSearchPopup = false
         }
-        
+
         // Hide country search popup when moving away from country field
         if currentTextField == .country && focusedField != .country {
             showCountrySearchPopup = false
         }
-        
+
         currentTextField = focusedField
 
         editingFirstName = focusedField == .firstName
@@ -211,12 +211,12 @@ class AddressFormManager: ObservableObject {
             countryError = isValid ? "" : "Mandatory field"
         }
     }
-    
+
     private func isCountryValid() -> Bool {
         let trimmedInput = countryText.trimmingCharacters(in: .whitespacesAndNewlines)
         return getCountryList().contains { $0.caseInsensitiveCompare(trimmedInput) == .orderedSame }
     }
-    
+
     func isFormValid() -> Bool {
         let firstNameValid = !firstNameText.trimmingCharacters(in: .whitespaces).isEmpty
         let lastNameValid = !lastNameText.trimmingCharacters(in: .whitespaces).isEmpty
@@ -225,7 +225,7 @@ class AddressFormManager: ObservableObject {
         let stateValid = !stateText.trimmingCharacters(in: .whitespaces).isEmpty
         let postcodeValid = !postcodeText.trimmingCharacters(in: .whitespaces).isEmpty
         let countryValid = isCountryValid()
-        
+
         return firstNameValid && lastNameValid && addressLine1Valid && cityValid && stateValid && postcodeValid && countryValid
     }
 
@@ -252,20 +252,20 @@ class AddressFormManager: ObservableObject {
 
         validateAllTextFields()
     }
-    
+
     func getCountryList() -> [String] {
         let englishLocale = Locale(identifier: "en")
-        let countryCodes = Locale.isoRegionCodes
+        let countryCodes = Locale.Region.isoRegions.filter { $0.subRegions.isEmpty }.map { $0.identifier }.sorted()
 
         let countryNames = countryCodes.compactMap { code in
             englishLocale.localizedString(forRegionCode: code)
         }.sorted()
-        
+
         return countryNames
     }
-    
+
     // MARK: - Editing
-    
+
     func endEditing() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         editingFirstName = false

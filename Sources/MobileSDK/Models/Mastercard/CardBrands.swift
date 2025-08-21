@@ -9,11 +9,11 @@
 import Foundation
 
 public enum CardBrands: String, Codable {
-    case mastercard = "mastercard"
-    case maestro = "maestro"
-    case visa = "visa"
-    case amex = "amex"
-    case discover = "discover"
+    case mastercard
+    case maestro
+    case visa
+    case amex
+    case discover
 }
 
 public enum CheckoutExperience: String, Codable {

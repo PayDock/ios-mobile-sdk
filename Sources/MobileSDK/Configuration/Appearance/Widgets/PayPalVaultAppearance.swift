@@ -10,9 +10,9 @@ import Foundation
 import SwiftUI
 
 public struct PayPalVaultAppearance: ActionButtonStylableAppearance {
-    
+
     public var actionButton: Theme.ButtonAppearance
-    
+
     public init(button: Theme.ButtonAppearance =
         .init(
             colors: .init(background: .clear, text: .defaultPrimary, image: .defaultPrimary, border: .defaultPrimary),
@@ -20,6 +20,5 @@ public struct PayPalVaultAppearance: ActionButtonStylableAppearance {
             fonts: GlobalTheme.shared.globalTheme.actionButton.fonts,
             loader: .init(spinnerColor: .defaultPrimary))) {
                 self.actionButton = button
-        }
+            }
 }
-

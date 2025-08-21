@@ -20,7 +20,7 @@ class CardExpiryDateValidatior {
         }
 
         let now = Date()
-        if (endOfMonth < now) {
+        if endOfMonth < now {
             return .expired
         } else {
             return .valid

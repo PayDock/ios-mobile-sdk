@@ -18,7 +18,7 @@ struct ImageButtonStyle: ButtonStyle {
         self.appearance = appearance
         self.isDisabled = isDisabled
     }
-    
+
     func makeBody(configuration: Self.Configuration) -> some View {
         return configuration.label
             .opacity(isDisabled || configuration.isPressed ? 0.8 : 1.0)

@@ -44,7 +44,29 @@
 		287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */; };
 		287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */; };
 		287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */; };
+		2881BC442E55CDEB00390CD8 /* WalletChargeResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881BC432E55CDE700390CD8 /* WalletChargeResource.swift */; };
+		2881BC462E55CDFC00390CD8 /* WalletData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881BC452E55CDFA00390CD8 /* WalletData.swift */; };
+		2881BC482E55CE1500390CD8 /* ChargeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2881BC472E55CE1300390CD8 /* ChargeData.swift */; };
 		28850E572A559A6D00C39A9D /* WidgetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28850E562A559A6D00C39A9D /* WidgetsVM.swift */; };
+		2886AE5E2E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE592E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift */; };
+		2886AE5F2E55D1F60071BADC /* CreateCustomerTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE5B2E55D1F60071BADC /* CreateCustomerTokenRes.swift */; };
+		2886AE602E55D1F60071BADC /* CreateCustomerTokenResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE5C2E55D1F60071BADC /* CreateCustomerTokenResource.swift */; };
+		2886AE612E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE5A2E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift */; };
+		2886AE642E55D2570071BADC /* InitialiseWalletChargeCustomer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE632E55D2550071BADC /* InitialiseWalletChargeCustomer.swift */; };
+		2886AE662E55D2690071BADC /* InitialiseWalletChargeMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE652E55D2680071BADC /* InitialiseWalletChargeMetaData.swift */; };
+		2886AE682E55D2980071BADC /* InitialiseWalletChargePaymentSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE672E55D2960071BADC /* InitialiseWalletChargePaymentSource.swift */; };
+		2886AE6B2E55D39D0071BADC /* Standalone3DSCustomerPaymentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE6A2E55D39B0071BADC /* Standalone3DSCustomerPaymentData.swift */; };
+		2886AE6D2E55D3AD0071BADC /* Standalone3DSPaymentSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE6C2E55D3AB0071BADC /* Standalone3DSPaymentSource.swift */; };
+		2886AE6F2E55D3C30071BADC /* Standalone3DSData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE6E2E55D3C20071BADC /* Standalone3DSData.swift */; };
+		2886AE712E55D3DB0071BADC /* Standalone3DSAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE702E55D3DB0071BADC /* Standalone3DSAuthentication.swift */; };
+		2886AE752E55D4A80071BADC /* Standalone3DSCustomer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE742E55D4A60071BADC /* Standalone3DSCustomer.swift */; };
+		2886AE772E55D4BA0071BADC /* Standalone3DSSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE762E55D4B90071BADC /* Standalone3DSSource.swift */; };
+		2886AE7A2E55D52C0071BADC /* Integrated3DSData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE792E55D52A0071BADC /* Integrated3DSData.swift */; };
+		2886AE7C2E55D53C0071BADC /* Integrated3DSBrowserDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE7B2E55D53B0071BADC /* Integrated3DSBrowserDetails.swift */; };
+		2886AE7F2E55D6180071BADC /* Integrated3DSVaultCustomer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE7E2E55D6160071BADC /* Integrated3DSVaultCustomer.swift */; };
+		2886AE812E55D6270071BADC /* Integrated3DSVaultPaymentSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE802E55D6260071BADC /* Integrated3DSVaultPaymentSource.swift */; };
+		2886AE842E55D6660071BADC /* CaptureChargeReq3DSData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE832E55D6640071BADC /* CaptureChargeReq3DSData.swift */; };
+		2886AE872E55D6D10071BADC /* Integrated3DSResponseData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2886AE862E55D6D00071BADC /* Integrated3DSResponseData.swift */; };
 		2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D42A558F1800D6C7BE /* ExampleApp.swift */; };
 		2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2889B7D62A558F1800D6C7BE /* WidgetsView.swift */; };
 		2889B7D92A558F1A00D6C7BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2889B7D82A558F1A00D6C7BE /* Assets.xcassets */; };
@@ -76,7 +98,6 @@
 		28A81F572B1616F10068FE75 /* Integrated3DSRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */; };
 		28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */; };
 		28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */; };
-		28AD05F82CF7767800B12FB4 /* CreateCustomerTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F72CF7767200B12FB4 /* CreateCustomerTokenRes.swift */; };
 		28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F92CF7792100B12FB4 /* CustomersService.swift */; };
 		28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */; };
 		28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF542D00951E004C0672 /* AccountProfileView.swift */; };
@@ -166,7 +187,29 @@
 		287F39982DF8C02E00F4D771 /* ButtonStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleView.swift; sourceTree = "<group>"; };
 		287F399A2DF8C03400F4D771 /* ButtonStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleVM.swift; sourceTree = "<group>"; };
 		287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimensionsFieldView.swift; sourceTree = "<group>"; };
+		2881BC432E55CDE700390CD8 /* WalletChargeResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletChargeResource.swift; sourceTree = "<group>"; };
+		2881BC452E55CDFA00390CD8 /* WalletData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletData.swift; sourceTree = "<group>"; };
+		2881BC472E55CE1300390CD8 /* ChargeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeData.swift; sourceTree = "<group>"; };
 		28850E562A559A6D00C39A9D /* WidgetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsVM.swift; sourceTree = "<group>"; };
+		2886AE592E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenCustomerData.swift; sourceTree = "<group>"; };
+		2886AE5A2E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenPaymentSource.swift; sourceTree = "<group>"; };
+		2886AE5B2E55D1F60071BADC /* CreateCustomerTokenRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenRes.swift; sourceTree = "<group>"; };
+		2886AE5C2E55D1F60071BADC /* CreateCustomerTokenResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenResource.swift; sourceTree = "<group>"; };
+		2886AE632E55D2550071BADC /* InitialiseWalletChargeCustomer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeCustomer.swift; sourceTree = "<group>"; };
+		2886AE652E55D2680071BADC /* InitialiseWalletChargeMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargeMetaData.swift; sourceTree = "<group>"; };
+		2886AE672E55D2960071BADC /* InitialiseWalletChargePaymentSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialiseWalletChargePaymentSource.swift; sourceTree = "<group>"; };
+		2886AE6A2E55D39B0071BADC /* Standalone3DSCustomerPaymentData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSCustomerPaymentData.swift; sourceTree = "<group>"; };
+		2886AE6C2E55D3AB0071BADC /* Standalone3DSPaymentSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSPaymentSource.swift; sourceTree = "<group>"; };
+		2886AE6E2E55D3C20071BADC /* Standalone3DSData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSData.swift; sourceTree = "<group>"; };
+		2886AE702E55D3DB0071BADC /* Standalone3DSAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSAuthentication.swift; sourceTree = "<group>"; };
+		2886AE742E55D4A60071BADC /* Standalone3DSCustomer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSCustomer.swift; sourceTree = "<group>"; };
+		2886AE762E55D4B90071BADC /* Standalone3DSSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSSource.swift; sourceTree = "<group>"; };
+		2886AE792E55D52A0071BADC /* Integrated3DSData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSData.swift; sourceTree = "<group>"; };
+		2886AE7B2E55D53B0071BADC /* Integrated3DSBrowserDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSBrowserDetails.swift; sourceTree = "<group>"; };
+		2886AE7E2E55D6160071BADC /* Integrated3DSVaultCustomer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultCustomer.swift; sourceTree = "<group>"; };
+		2886AE802E55D6260071BADC /* Integrated3DSVaultPaymentSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultPaymentSource.swift; sourceTree = "<group>"; };
+		2886AE832E55D6640071BADC /* CaptureChargeReq3DSData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeReq3DSData.swift; sourceTree = "<group>"; };
+		2886AE862E55D6D00071BADC /* Integrated3DSResponseData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSResponseData.swift; sourceTree = "<group>"; };
 		2889B7D12A558F1800D6C7BE /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2889B7D42A558F1800D6C7BE /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
 		2889B7D62A558F1800D6C7BE /* WidgetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetsView.swift; sourceTree = "<group>"; };
@@ -203,7 +246,6 @@
 		28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSRes.swift; sourceTree = "<group>"; };
 		28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSReq.swift; sourceTree = "<group>"; };
 		28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenReq.swift; sourceTree = "<group>"; };
-		28AD05F72CF7767200B12FB4 /* CreateCustomerTokenRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenRes.swift; sourceTree = "<group>"; };
 		28AD05F92CF7792100B12FB4 /* CustomersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersService.swift; sourceTree = "<group>"; };
 		28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersEndpoints.swift; sourceTree = "<group>"; };
 		28B2FF542D00951E004C0672 /* AccountProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileView.swift; sourceTree = "<group>"; };
@@ -439,6 +481,91 @@
 			path = Button;
 			sourceTree = "<group>";
 		};
+		2881BC422E55CDCD00390CD8 /* InitialiseWalletChargeRes */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */,
+				2881BC432E55CDE700390CD8 /* WalletChargeResource.swift */,
+				2881BC452E55CDFA00390CD8 /* WalletData.swift */,
+				2881BC472E55CE1300390CD8 /* ChargeData.swift */,
+			);
+			path = InitialiseWalletChargeRes;
+			sourceTree = "<group>";
+		};
+		2886AE5D2E55D1F60071BADC /* CreateCustomerTokenRes */ = {
+			isa = PBXGroup;
+			children = (
+				2886AE592E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift */,
+				2886AE5A2E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift */,
+				2886AE5B2E55D1F60071BADC /* CreateCustomerTokenRes.swift */,
+				2886AE5C2E55D1F60071BADC /* CreateCustomerTokenResource.swift */,
+			);
+			path = CreateCustomerTokenRes;
+			sourceTree = "<group>";
+		};
+		2886AE622E55D20D0071BADC /* InitialiseWalletChargeReq */ = {
+			isa = PBXGroup;
+			children = (
+				28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */,
+				2886AE652E55D2680071BADC /* InitialiseWalletChargeMetaData.swift */,
+				2886AE632E55D2550071BADC /* InitialiseWalletChargeCustomer.swift */,
+				2886AE672E55D2960071BADC /* InitialiseWalletChargePaymentSource.swift */,
+			);
+			path = InitialiseWalletChargeReq;
+			sourceTree = "<group>";
+		};
+		2886AE692E55D32D0071BADC /* Standalone3DSReq */ = {
+			isa = PBXGroup;
+			children = (
+				28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */,
+				2886AE6E2E55D3C20071BADC /* Standalone3DSData.swift */,
+				2886AE702E55D3DB0071BADC /* Standalone3DSAuthentication.swift */,
+				2886AE742E55D4A60071BADC /* Standalone3DSCustomer.swift */,
+				2886AE762E55D4B90071BADC /* Standalone3DSSource.swift */,
+				2886AE6A2E55D39B0071BADC /* Standalone3DSCustomerPaymentData.swift */,
+				2886AE6C2E55D3AB0071BADC /* Standalone3DSPaymentSource.swift */,
+			);
+			path = Standalone3DSReq;
+			sourceTree = "<group>";
+		};
+		2886AE782E55D4E40071BADC /* Integrated3DSReq */ = {
+			isa = PBXGroup;
+			children = (
+				28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */,
+				2886AE792E55D52A0071BADC /* Integrated3DSData.swift */,
+				2886AE7B2E55D53B0071BADC /* Integrated3DSBrowserDetails.swift */,
+			);
+			path = Integrated3DSReq;
+			sourceTree = "<group>";
+		};
+		2886AE7D2E55D56A0071BADC /* Integrated3DSVaultReq */ = {
+			isa = PBXGroup;
+			children = (
+				2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */,
+				2886AE7E2E55D6160071BADC /* Integrated3DSVaultCustomer.swift */,
+				2886AE802E55D6260071BADC /* Integrated3DSVaultPaymentSource.swift */,
+			);
+			path = Integrated3DSVaultReq;
+			sourceTree = "<group>";
+		};
+		2886AE822E55D63E0071BADC /* CaptureChargeReq */ = {
+			isa = PBXGroup;
+			children = (
+				289D76C02B45FABA002601BB /* CaptureChargeReq.swift */,
+				2886AE832E55D6640071BADC /* CaptureChargeReq3DSData.swift */,
+			);
+			path = CaptureChargeReq;
+			sourceTree = "<group>";
+		};
+		2886AE852E55D6800071BADC /* Integrated3DSRes */ = {
+			isa = PBXGroup;
+			children = (
+				28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */,
+				2886AE862E55D6D00071BADC /* Integrated3DSResponseData.swift */,
+			);
+			path = Integrated3DSRes;
+			sourceTree = "<group>";
+		};
 		2889B7C82A558F1800D6C7BE = {
 			isa = PBXGroup;
 			children = (
@@ -669,13 +796,13 @@
 			isa = PBXGroup;
 			children = (
 				28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */,
-				28E86F6B2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift */,
+				2886AE622E55D20D0071BADC /* InitialiseWalletChargeReq */,
 				28A81F502B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift */,
-				28A81F542B160ECB0068FE75 /* Standalone3DSReq.swift */,
-				28A81F582B16388B0068FE75 /* Integrated3DSReq.swift */,
-				2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */,
+				2886AE692E55D32D0071BADC /* Standalone3DSReq */,
+				2886AE782E55D4E40071BADC /* Integrated3DSReq */,
+				2886AE7D2E55D56A0071BADC /* Integrated3DSVaultReq */,
 				28A27BE82B4478EA00196822 /* ConvertToVaultTokenReq.swift */,
-				289D76C02B45FABA002601BB /* CaptureChargeReq.swift */,
+				2886AE822E55D63E0071BADC /* CaptureChargeReq */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -683,10 +810,10 @@
 		28E86F692ACC13A1008E827E /* Responses */ = {
 			isa = PBXGroup;
 			children = (
-				28AD05F72CF7767200B12FB4 /* CreateCustomerTokenRes.swift */,
-				28E86F6F2ACC243F008E827E /* InitialiseWalletChargeRes.swift */,
+				2886AE5D2E55D1F60071BADC /* CreateCustomerTokenRes */,
+				2881BC422E55CDCD00390CD8 /* InitialiseWalletChargeRes */,
 				28A81F522B14E13E0068FE75 /* CardTokenRes.swift */,
-				28A81F562B1616F10068FE75 /* Integrated3DSRes.swift */,
+				2886AE852E55D6800071BADC /* Integrated3DSRes */,
 				280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */,
 			);
 			path = Responses;
@@ -735,6 +862,7 @@
 				2889B7CD2A558F1800D6C7BE /* Sources */,
 				2889B7CE2A558F1800D6C7BE /* Frameworks */,
 				2889B7CF2A558F1800D6C7BE /* Resources */,
+				28827D5E2E323EB700B33F6F /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -857,6 +985,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		28827D5E2E323EB700B33F6F /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint --config \"${SRCROOT}/../.swiftlint.yml\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2889B7CD2A558F1800D6C7BE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -867,11 +1018,13 @@
 				28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */,
 				287F39492DF25E5600F4D771 /* StyleWidgetItem.swift in Sources */,
 				289B83862B9E382F00CEA8B4 /* ClickToPayWidgetVM.swift in Sources */,
+				2886AE7A2E55D52C0071BADC /* Integrated3DSData.swift in Sources */,
 				28A2DB462E0AF68300A94753 /* AfterpayStyleVM.swift in Sources */,
 				288E33A82A5C984000DB2A41 /* ProjectEnvironment.swift in Sources */,
 				28D51D4E2DFC70070095CDE5 /* TextFieldStyleVM.swift in Sources */,
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
 				287F393D2DF259D500F4D771 /* StyleVM.swift in Sources */,
+				2886AE712E55D3DB0071BADC /* Standalone3DSAuthentication.swift in Sources */,
 				28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */,
 				287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */,
 				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
@@ -879,11 +1032,14 @@
 				287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */,
 				28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */,
 				2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */,
+				2886AE6D2E55D3AD0071BADC /* Standalone3DSPaymentSource.swift in Sources */,
+				2886AE752E55D4A80071BADC /* Standalone3DSCustomer.swift in Sources */,
 				2889B7D72A558F1800D6C7BE /* WidgetsView.swift in Sources */,
 				287F393F2DF259E400F4D771 /* StyleDarkModeView.swift in Sources */,
 				28D51D532DFF30C60095CDE5 /* DropdownStyleVM.swift in Sources */,
 				28A3A9C62A6969F2004A8D34 /* FocusablePadding.swift in Sources */,
 				28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */,
+				2886AE6F2E55D3C30071BADC /* Standalone3DSData.swift in Sources */,
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				28D8BA612E006ABE00EDD422 /* ResetStyleButton.swift in Sources */,
 				28A81F532B14E13E0068FE75 /* CardTokenRes.swift in Sources */,
@@ -892,16 +1048,18 @@
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
 				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
 				28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */,
+				2886AE772E55D4BA0071BADC /* Standalone3DSSource.swift in Sources */,
+				2886AE662E55D2690071BADC /* InitialiseWalletChargeMetaData.swift in Sources */,
 				280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */,
 				28F4E3242B83921500C73065 /* AfterpayWidgetView.swift in Sources */,
 				28A2DB4D2E0B3E6600A94753 /* SpacingsStyleVM.swift in Sources */,
 				2808B3422A7056F100E86C7E /* CardDetailsWidgetView.swift in Sources */,
 				287F397D2DF76F4100F4D771 /* LoaderStyleVM.swift in Sources */,
 				28E86F6E2ACC213F008E827E /* WalletService.swift in Sources */,
-				28AD05F82CF7767800B12FB4 /* CreateCustomerTokenRes.swift in Sources */,
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
+				2886AE872E55D6D10071BADC /* Integrated3DSResponseData.swift in Sources */,
 				28D51D582DFF619D0095CDE5 /* TextStyleVM.swift in Sources */,
 				287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
@@ -909,19 +1067,24 @@
 				287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
+				2881BC442E55CDEB00390CD8 /* WalletChargeResource.swift in Sources */,
 				28E86F6C2ACC1CAB008E827E /* InitialiseWalletChargeReq.swift in Sources */,
 				28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */,
 				28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */,
 				28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */,
 				28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */,
+				2886AE682E55D2980071BADC /* InitialiseWalletChargePaymentSource.swift in Sources */,
+				2886AE7F2E55D6180071BADC /* Integrated3DSVaultCustomer.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */,
 				28D8BA632E00706900EDD422 /* ResetConfirmationModifier.swift in Sources */,
 				28F19D2D2B029F46002F5526 /* GiftCardWidgetView.swift in Sources */,
 				2889B7D52A558F1800D6C7BE /* ExampleApp.swift in Sources */,
 				28A2DB442E0AF67500A94753 /* AfterpayStyleView.swift in Sources */,
+				2886AE6B2E55D39D0071BADC /* Standalone3DSCustomerPaymentData.swift in Sources */,
 				28A2DB4B2E0B3E5E00A94753 /* SpacingsStyleView.swift in Sources */,
 				287F39412DF259EA00F4D771 /* StyleDarkModeButton.swift in Sources */,
 				28A3A9C82A697647004A8D34 /* Color+Extensions.swift in Sources */,
+				2886AE842E55D6660071BADC /* CaptureChargeReq3DSData.swift in Sources */,
 				28A81F4B2B14DAF60068FE75 /* Integrated3DSWidgetView.swift in Sources */,
 				280E96322B176ED000BE8C3E /* Standalone3DSWidgetView.swift in Sources */,
 				287F398A2DF88E0300F4D771 /* ToggleStyleView.swift in Sources */,
@@ -934,15 +1097,24 @@
 				28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */,
 				280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */,
 				28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */,
+				2886AE5E2E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift in Sources */,
+				2886AE5F2E55D1F60071BADC /* CreateCustomerTokenRes.swift in Sources */,
+				2886AE602E55D1F60071BADC /* CreateCustomerTokenResource.swift in Sources */,
+				2886AE612E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift in Sources */,
+				2886AE812E55D6270071BADC /* Integrated3DSVaultPaymentSource.swift in Sources */,
 				287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */,
+				2881BC462E55CDFC00390CD8 /* WalletData.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
 				28A2DB512E0B54C600A94753 /* ButtonLoaderStyleView.swift in Sources */,
 				287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */,
 				28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */,
+				2886AE7C2E55D53C0071BADC /* Integrated3DSBrowserDetails.swift in Sources */,
 				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
 				287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */,
+				2886AE642E55D2570071BADC /* InitialiseWalletChargeCustomer.swift in Sources */,
 				28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */,
+				2881BC482E55CE1500390CD8 /* ChargeData.swift in Sources */,
 				283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
@@ -1068,6 +1240,7 @@
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ExampleApp/Sandbox-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "MT-Sandbox";
@@ -1228,6 +1401,7 @@
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ExampleApp/Staging-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "MT-Staging";
@@ -1381,6 +1555,7 @@
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ExampleApp/Sandbox-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "MT-Sandbox";
@@ -1534,6 +1709,7 @@
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ExampleApp/Staging-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "MT-Staging";
@@ -1750,6 +1926,7 @@
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ExampleApp/Production-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MT;
@@ -1796,6 +1973,7 @@
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "ExampleApp/Production-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MT;

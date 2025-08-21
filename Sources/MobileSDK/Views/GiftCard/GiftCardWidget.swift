@@ -14,7 +14,6 @@ public struct GiftCardWidget: View {
     @FocusState private var isViewFocused: Bool
     @State var appearance: GiftCardWidgetAppearance
 
-    
     public init(viewState: ViewState? = nil,
                 config: GiftCardWidgetConfig,
                 appearance: GiftCardWidgetAppearance = GiftCardWidgetAppearance(),
@@ -27,7 +26,7 @@ public struct GiftCardWidget: View {
             loadingDelegate: loadingDelegate,
             completion: completion))
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -44,7 +43,7 @@ public struct GiftCardWidget: View {
             .padding(16.0)
         }
     }
-    
+
     private var cardNumberTextField: some View {
         return OutlineTextField(
             appearance: appearance.textField,
@@ -58,14 +57,15 @@ public struct GiftCardWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             keyboardType: .numberPad,
             onTapGesture: {
-                if (!viewModel.viewState.isDisabled) {
+                if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .cardNumber
                     viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
                 }
             })
         .customToolbar(
             buttonTitle: "Next",
-            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name,
+                         size: appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = .pin
@@ -77,7 +77,7 @@ public struct GiftCardWidget: View {
         })
         .focused($textFieldInFocus, equals: .cardNumber)
     }
-    
+
     private var pinTextField: some View {
         return OutlineTextField(
             appearance: appearance.textField,
@@ -90,14 +90,15 @@ public struct GiftCardWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             keyboardType: .numberPad,
             onTapGesture: {
-                if (!viewModel.viewState.isDisabled) {
+                if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .pin
                     viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
                 }
             })
         .customToolbar(
             buttonTitle: "Done",
-            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name,
+                         size: appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = nil
@@ -114,23 +115,25 @@ public struct GiftCardWidget: View {
         .focused($textFieldInFocus, equals: .pin)
         .frame(width: UIScreen.main.bounds.width * 0.25)
     }
-    
+
     private var primaryButton: some View {
         let plusIcon = Image(systemName: "plus.circle")
 
         return SDKButton(title: "Add", image: plusIcon,
                          isLoading: viewModel.isLoading,
-                         style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled())),
+                         style: .custom(CustomButtonStyle(
+                            appearance: appearance.actionButton,
+                            isDisabled: viewModel.isActionButtonDisabled())),
                          shouldTemplate: true) {
             viewModel.giftCardFormManager.endEditing()
             viewModel.tokeniseGiftCard()
         }
-        .padding(.top, appearance.actionButton.dimensions.padding.top)
-        .padding(.leading, appearance.actionButton.dimensions.padding.leading)
-        .padding(.bottom, appearance.actionButton.dimensions.padding.bottom)
-        .padding(.trailing, appearance.actionButton.dimensions.padding.trailing)
+                         .padding(.top, appearance.actionButton.dimensions.padding.top)
+                         .padding(.leading, appearance.actionButton.dimensions.padding.leading)
+                         .padding(.bottom, appearance.actionButton.dimensions.padding.bottom)
+                         .padding(.trailing, appearance.actionButton.dimensions.padding.trailing)
     }
-    
+
     private var emptyFocusView: some View {
         VStack {}
             .conditionalFocusable()

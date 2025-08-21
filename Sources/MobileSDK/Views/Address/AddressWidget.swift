@@ -66,7 +66,7 @@ public struct AddressWidget: View {
             }
         }
     }
-    
+
     private func scrollToField(_ field: AddressFormManager.AddressFocusable, proxy: ScrollViewProxy) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -74,7 +74,7 @@ public struct AddressWidget: View {
             }
         }
     }
-    
+
     private func observeKeyboard() {
         NotificationCenter.default.addObserver(
             forName: UIResponder.keyboardWillShowNotification,
@@ -86,7 +86,7 @@ public struct AddressWidget: View {
                 keyboardHeight = keyboardFrame.height
             }
         }
-        
+
         NotificationCenter.default.addObserver(
             forName: UIResponder.keyboardWillHideNotification,
             object: nil,
@@ -179,7 +179,6 @@ public struct AddressWidget: View {
         }
         .customPadding(appearance.title.padding)
     }
-    
 
     private var autocompleteTextFieldView: some View {
         VStack(spacing: 0) {
@@ -208,7 +207,7 @@ public struct AddressWidget: View {
                 onSubmit: {
                     let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
                     textFieldInFocus = isFormExpanded ? .addressLine1 : nil
-                    
+
                     if isFormExpanded {
                         viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
                     } else {
@@ -416,13 +415,14 @@ public struct AddressWidget: View {
     }
 
     private var saveButton: some View {
-        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))) {
+        SDKButton(title: "Save",
+                  style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))) {
             viewModel.saveAddress()
         }
         .customPadding(appearance.actionButton.dimensions.padding)
         .font(appearance.actionButton.fonts.title.customFont.font)
     }
-    
+
     private var emptyFocusView: some View {
         VStack {}
             .conditionalFocusable()

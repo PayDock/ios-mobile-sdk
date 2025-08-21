@@ -11,7 +11,7 @@ import SwiftUI
 struct AddressAutoScrollModifier: ViewModifier {
     let textFieldInFocus: AddressFormManager.AddressFocusable?
     let proxy: ScrollViewProxy
-    
+
     func body(content: Content) -> some View {
         if #available(iOS 17.0, *) {
             content
@@ -24,7 +24,7 @@ struct AddressAutoScrollModifier: ViewModifier {
             content
         }
     }
-    
+
     private func scrollToField(_ field: AddressFormManager.AddressFocusable, proxy: ScrollViewProxy) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.easeInOut(duration: 0.3)) {

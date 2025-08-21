@@ -12,17 +12,11 @@ struct CustomButtonStyle: ButtonStyle {
 
     let appearance: Theme.ButtonAppearance
     var isDisabled: Bool = false
-    
-    init(appearance: Theme.ButtonAppearance,
-         isDisabled: Bool = false) {
-        self.appearance = appearance
-        self.isDisabled = isDisabled
-    }
 
     func makeBody(configuration: Self.Configuration) -> some View {
         let currentForegroundColor = isDisabled || configuration.isPressed ? appearance.colors.text.opacity(0.3) : appearance.colors.text
         let currentBorderColor = isDisabled || configuration.isPressed ? appearance.colors.border.opacity(0.3) : appearance.colors.border
-        
+
         return configuration.label
             .font(appearance.fonts.title.customFont.font)
             .imageScale(.small)

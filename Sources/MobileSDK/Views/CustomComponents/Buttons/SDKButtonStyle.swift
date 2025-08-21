@@ -10,13 +10,13 @@ import Foundation
 import SwiftUI
 
 enum SDKButtonStyle {
-    
+
     case fill(FillButtonStyle)
     case outline(OutlineButtonStyle)
     case image(ImageButtonStyle)
     // TODO: - Remove above once all widget themes are updated
     case custom(CustomButtonStyle)
-    
+
     var isDisabled: Bool {
         switch self {
         case .fill(let style):
@@ -29,7 +29,7 @@ enum SDKButtonStyle {
             return style.isDisabled
         }
     }
-    
+
     var textColour: Color {
         switch self {
         case .fill(let style):
@@ -42,7 +42,7 @@ enum SDKButtonStyle {
             return style.appearance.colors.text
         }
     }
-    
+
     var loaderColor: Color {
         switch self {
         case .fill(let style):
@@ -55,7 +55,7 @@ enum SDKButtonStyle {
             return style.appearance.loader.spinnerColor
         }
     }
-    
+
     var imageColor: Color {
         switch self {
         case .fill(let style):

@@ -10,7 +10,7 @@ import Foundation
 import SwiftUI
 
 extension Theme {
-    
+
     public struct TextFieldColors {
         public var active: Color
         public var inactive: Color
@@ -19,7 +19,7 @@ extension Theme {
         public var text: Color
         public var placeholder: Color
         public var background: Color
-        
+
         public init(active: Color = .defaultPrimary,
                     inactive: Color = .defaultBorder,
                     error: Color = .defaultError,

@@ -7,7 +7,7 @@
 //
 
 class CardNameValidator {
-    
+
     func isValidName(_ name: String) -> Bool {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let regex = #"^\p{L}[\p{L}'`.\s-]*[\p{L}'`.\-]$|^\p{L}$"#

@@ -9,11 +9,11 @@
 import SwiftUI
 
 struct ColorPickerView: View {
-    
+
     let title: String
     @Binding var text: String
     @Binding var pickedColor: Color
-    
+
     var body: some View {
         VStack {
             HStack {

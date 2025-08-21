@@ -34,7 +34,7 @@ public struct CardDetailsWidget: View {
     }
 
     // MARK: - View protocol properties
-    
+
     public var body: some View {
         VStack(spacing: appearance.verticalSpacing) {
             if viewModel.config.showCardTitle {
@@ -47,7 +47,7 @@ public struct CardDetailsWidget: View {
                 }
                 .customPadding(appearance.title.padding)
             }
-            
+
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 HStack(spacing: 7) {
                     ForEach(CardScheme.sortedArray(from: supportedSchemes), id: \.self) { scheme in
@@ -58,7 +58,12 @@ public struct CardDetailsWidget: View {
                     }
                 }
                 .accessibilityElement()
-                .accessibilityLabel("Supported card schemes: \(CardScheme.sortedArray(from: supportedSchemes).map(\.voiceoverName).joined(separator: ", "))")
+                .accessibilityLabel(
+                    "Supported card schemes: " +
+                    CardScheme.sortedArray(from: supportedSchemes)
+                        .map(\.voiceoverName)
+                        .joined(separator: ", ")
+                )
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 16)
             }
@@ -77,7 +82,7 @@ public struct CardDetailsWidget: View {
                         textContentType: getCreditCardName(),
                         returnKeyType: .next,
                         onTapGesture: {
-                            if (!viewModel.viewState.isDisabled) {
+                            if !viewModel.viewState.isDisabled {
                                 self.textFieldInFocus = .cardholderName
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
                             }
@@ -106,7 +111,7 @@ public struct CardDetailsWidget: View {
                     textContentType: .creditCardNumber,
                     keyboardType: .numberPad,
                     onTapGesture: {
-                        if (!viewModel.viewState.isDisabled) {
+                        if !viewModel.viewState.isDisabled {
                             self.textFieldInFocus = .cardNumber
                             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
                         }
@@ -117,7 +122,9 @@ public struct CardDetailsWidget: View {
                 )
                 .customToolbar(
                     buttonTitle: "Next",
-                    font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+                    font: UIFont(
+                        name: appearance.toolbarButton.fonts.title.customFont.name,
+                        size: appearance.toolbarButton.fonts.title.customFont.size),
                     textColor: UIColor(appearance.toolbarButton.colors.text)
                 ) {
                     textFieldInFocus = .expiryDate
@@ -144,7 +151,7 @@ public struct CardDetailsWidget: View {
                         disabled: $viewModel.viewState.isDisabled,
                         textContentType: getCreditCardExpiryDate(),
                         onTapGesture: {
-                            if (!viewModel.viewState.isDisabled) {
+                            if !viewModel.viewState.isDisabled {
                                 self.textFieldInFocus = .expiryDate
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
                             }
@@ -153,7 +160,9 @@ public struct CardDetailsWidget: View {
                     .keyboardType(.numberPad)
                     .customToolbar(
                         buttonTitle: "Next",
-                        font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+                        font: UIFont(
+                            name: appearance.toolbarButton.fonts.title.customFont.name,
+                            size: appearance.toolbarButton.fonts.title.customFont.size),
                         textColor: UIColor(appearance.toolbarButton.colors.text)
                     ) {
                         textFieldInFocus = .securityCode
@@ -179,7 +188,7 @@ public struct CardDetailsWidget: View {
                         disabled: $viewModel.viewState.isDisabled,
                         textContentType: getCreditCardSecurityCode(),
                         onTapGesture: {
-                            if (!viewModel.viewState.isDisabled) {
+                            if !viewModel.viewState.isDisabled {
                                 self.textFieldInFocus = .securityCode
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                             }
@@ -188,7 +197,9 @@ public struct CardDetailsWidget: View {
                     .keyboardType(.numberPad)
                     .customToolbar(
                         buttonTitle: "Done",
-                        font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name, size: appearance.toolbarButton.fonts.title.customFont.size),
+                        font: UIFont(
+                            name: appearance.toolbarButton.fonts.title.customFont.name,
+                            size: appearance.toolbarButton.fonts.title.customFont.size),
                         textColor: UIColor(appearance.toolbarButton.colors.text)
                     ) {
                         textFieldInFocus = nil
@@ -197,7 +208,8 @@ public struct CardDetailsWidget: View {
                     .onConditionalKeyPress(key: .tab, action: {
                         let collectCardholderName = viewModel.config.collectCardholderName
                         textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: collectCardholderName ? .cardholderName : .cardNumber)
+                        viewModel.cardDetailsFormManager.setEditingTextField(
+                            focusedField: collectCardholderName ? .cardholderName : .cardNumber)
                     })
                     .focused($textFieldInFocus, equals: .securityCode)
                     .onChange(of: viewModel.cardDetailsFormManager.securityCodeText) { newValue in
@@ -205,11 +217,11 @@ public struct CardDetailsWidget: View {
                     }
                 }
             }
-            
+
             if viewModel.config.allowSaveCard != nil {
                 privacyView
             }
-            
+
             SDKButton(title: viewModel.config.actionText,
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
                       style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))
@@ -220,7 +232,7 @@ public struct CardDetailsWidget: View {
             }
             .customPadding(appearance.actionButton.dimensions.padding)
             .accessibilityHint("Submits card details information.")
-            
+
             emptyFocusView
         }
         .padding(.horizontal, appearance.horizontalSpacing)
@@ -237,7 +249,7 @@ public struct CardDetailsWidget: View {
                 let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                 let link = "[\(text)](\(url))"
                 Text(.init(link))
-                
+
                     .applyAttributes(appearance.linkText.text)
                     .customPadding(appearance.linkText.padding)
                     .accentColor(appearance.linkText.text.textColor)
@@ -257,7 +269,7 @@ public struct CardDetailsWidget: View {
                 .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
         }
     }
-    
+
     private var emptyFocusView: some View {
         VStack {}
             .conditionalFocusable()
@@ -271,7 +283,7 @@ public struct CardDetailsWidget: View {
                 isViewFocused = true
             }
     }
-    
+
     private func getSchemeIcon(for scheme: CardScheme) -> Image {
         switch scheme {
         case .amex: Image("american-express", bundle: Bundle.module)
@@ -284,7 +296,7 @@ public struct CardDetailsWidget: View {
         case .visa: Image("visa", bundle: Bundle.module)
         }
     }
-    
+
     private func shouldAlignVertically() -> Bool {
         switch sizeCategory {
         case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
@@ -292,9 +304,9 @@ public struct CardDetailsWidget: View {
         @unknown default: return false
         }
     }
-    
+
     // MARK: - Autofill
-    
+
     private func getCreditCardName() -> UITextContentType {
         if #available(iOS 17.0, *) {
             return .creditCardName
@@ -302,7 +314,7 @@ public struct CardDetailsWidget: View {
             return .name
         }
     }
-    
+
     private func getCreditCardExpiryDate() -> UITextContentType? {
         if #available(iOS 17.0, *) {
             return .creditCardExpiration
@@ -310,7 +322,7 @@ public struct CardDetailsWidget: View {
             return .none
         }
     }
-    
+
     private func getCreditCardSecurityCode() -> UITextContentType? {
         if #available(iOS 17.0, *) {
             return .creditCardSecurityCode

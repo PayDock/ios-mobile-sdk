@@ -16,7 +16,7 @@ struct VaultTokenRes: Codable {
         let type: String
         let data: VaultData
     }
-    
+
     struct VaultData: Codable {
         let vaultToken: String
     }

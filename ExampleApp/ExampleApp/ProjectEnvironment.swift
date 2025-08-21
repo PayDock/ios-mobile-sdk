@@ -63,7 +63,7 @@ struct ProjectEnvironment {
         case .staging: return "apista.paydock.com"
         }
     }
-    
+
     func getApiAccessToken() -> String {
         guard let accessToken = Self.infoDictionary[Keys.apiAccessToken] as? String else {
             fatalError("API access token not found in .plist!")
@@ -133,7 +133,7 @@ struct ProjectEnvironment {
         }
         return serviceId
     }
-    
+
     func getColesPayClientId() -> String? {
         guard let clientId = Self.infoDictionary[Keys.colesPayClientId] as? String else {
             print("Coles Pay client ID not found in .plist!")
@@ -141,7 +141,7 @@ struct ProjectEnvironment {
         }
         return clientId
     }
-    
+
     func getMerchantId() -> String? {
         guard let merchantId = Self.infoDictionary[Keys.merchantId] as? String else {
             print("Merchant ID not found in .plist!")

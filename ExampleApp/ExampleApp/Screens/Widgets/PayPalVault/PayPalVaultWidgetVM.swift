@@ -17,16 +17,16 @@ class PayPalVaultWidgetVM: ObservableObject {
     @Published var alertTitle = ""
     @Published var alertMessage = ""
     @Published var isLoading = false
-    
+
     // MARK: - Config
-    
+
     func getConfig() -> PayPalVaultConfig {
         let accessToken = ProjectEnvironment.shared.getWidgetAccessToken()
         let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
         let config = PayPalVaultConfig(accessToken: accessToken, gatewayId: gatewayId)
         return config
     }
-    
+
     // MARK: - Completion handling
 
     func handleError(error: PayPalVaultError) {
@@ -50,7 +50,7 @@ extension PayPalVaultWidgetVM: WidgetLoadingDelegate {
     func loadingDidStart() {
         isLoading = true
     }
-    
+
     func loadingDidFinish() {
         isLoading = false
     }

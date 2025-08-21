@@ -69,13 +69,13 @@ struct SDKButton: View {
             .disabled(style.isDisabled)
             .accessibilityLabel(isLoading ? "Loading" : title ?? "")
         }
-        .frame(maxWidth:.infinity, minHeight: 48)
+        .frame(maxWidth: .infinity, minHeight: 48)
     }
 
     private func getImageAndTitle() -> some View {
         HStack {
             if imageLocation == .left {
-                if (!isLoading) {
+                if !isLoading {
                     image?
                         .resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
@@ -97,7 +97,7 @@ struct SDKButton: View {
                 Text(self.title ?? "")
             } else {
                 Text(self.title ?? "")
-                if (!isLoading) {
+                if !isLoading {
                     image?.resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
@@ -118,10 +118,10 @@ struct SDKButton: View {
             }
         }
     }
-    
+
     private func getTitle() -> some View {
         HStack {
-            if (isLoading) {
+            if isLoading {
                 if #available(iOS 18.0, *) {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))

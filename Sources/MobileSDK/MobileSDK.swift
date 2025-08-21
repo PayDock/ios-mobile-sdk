@@ -32,7 +32,7 @@ public class MobileSDK {
         // Once we have setup our config, we are able to setup our networking based on the environment
         setupNetworkLayer()
     }
-    
+
     private func setupNetworkLayer() {
         NetworkingLib.shared.host = Constants.baseURL
     }
@@ -62,7 +62,9 @@ extension MobileSDK {
             paymentRequest.merchantCapabilities = merchantCapabilities
             paymentRequest.supportedNetworks = supportedNetworks
             paymentRequest.requiredBillingContactFields = requireBillingAddress ? [.name, .postalAddress] : []
-            paymentRequest.requiredShippingContactFields = requireShippingAddress ? [.phoneNumber, .emailAddress, .postalAddress, .name] : []
+            paymentRequest.requiredShippingContactFields = requireShippingAddress
+                ? [.phoneNumber, .emailAddress, .postalAddress, .name]
+                : []
             paymentRequest.shippingMethods = shippingOptions
             return paymentRequest
     }
