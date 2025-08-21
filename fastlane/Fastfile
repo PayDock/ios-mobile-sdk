@@ -26,6 +26,7 @@ lane :test do
     only_testing: [
         "ExampleAppTests"
     ],
+    xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     output_types: "junit",
     output_directory: "fastlane/test_output"
@@ -38,6 +39,7 @@ lane :testPackage do
     package_path: ".",
     scheme: "MobileSDK",
     destination: "platform=iOS Simulator,name=iPhone 15",
+    xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     output_types: "junit",
     output_directory: "fastlane/test_output"

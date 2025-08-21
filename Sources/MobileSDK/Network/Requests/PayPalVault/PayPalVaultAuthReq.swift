@@ -7,7 +7,6 @@
 //
 
 struct PayPalVaultAuthReq: Codable {
-    
+
     let gatewayId: String
-    
 }

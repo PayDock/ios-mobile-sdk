@@ -11,15 +11,15 @@ import SwiftUI
 struct AfterpayStyleView: View {
 
     @StateObject var viewModel: AfterpayStyleVM
-    
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) {
         _viewModel = StateObject(wrappedValue: AfterpayStyleVM(
             selectedWidget: selectedWidget,
             stylingDarkMode: stylingDarkMode))
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -28,7 +28,7 @@ struct AfterpayStyleView: View {
                 VStack {
                     SectionTitleView(title: "Style")
                     stylePickersView
-                    ResetStyleButton() {
+                    ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
                 }
@@ -49,15 +49,15 @@ struct AfterpayStyleView: View {
                 entries: viewModel.buttonTypeNames,
                 selected: $viewModel.selectedButtonTypeName,
                 placeholder: "Select Button Type") { buttonTypeName in
-                viewModel.selectedButtonTypeName = buttonTypeName
-            }
-            
+                    viewModel.selectedButtonTypeName = buttonTypeName
+                }
+
             PickerView(
                 entries: viewModel.colorSchemeNames,
                 selected: $viewModel.selectedColorSchemeName,
                 placeholder: "Select Color Scheme") { colorSchemeName in
-                viewModel.selectedColorSchemeName = colorSchemeName
-            }
+                    viewModel.selectedColorSchemeName = colorSchemeName
+                }
         }
     }
 }

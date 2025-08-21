@@ -9,14 +9,14 @@
 import SwiftUI
 
 extension Theme {
-    
+
     public struct ButtonColors {
         public var background: Color
         public var text: Color
         public var image: Color
         public var border: Color
         public var opacity: Double
-        
+
         public init(background: Color = .defaultPrimary,
                     text: Color = .defaultOnPrimary,
                     image: Color = .defaultOnPrimary,

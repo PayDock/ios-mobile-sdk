@@ -7,11 +7,11 @@
 //
 
 public class GlobalTheme {
-    
+
     public var globalTheme: Theme
-    
+
     public static let shared = GlobalTheme()
-    
+
     private init() {
         self.globalTheme = Theme()
     }

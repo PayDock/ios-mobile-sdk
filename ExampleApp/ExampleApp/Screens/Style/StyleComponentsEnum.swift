@@ -23,7 +23,7 @@ enum StyleComponentsEnum {
     case afterpay
     case spacings
     case buttonLoader
-    
+
     var title: String {
         switch self {
         case .textField: return "Text Field"
@@ -42,7 +42,7 @@ enum StyleComponentsEnum {
         case .buttonLoader: return "Button Loader"
         }
     }
-    
+
     func destinationView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch self {
         case .loader:
@@ -75,9 +75,9 @@ enum StyleComponentsEnum {
             return AnyView(ButtonLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         }
     }
-    
+
     // MARK: - Button Helper Methods
-    
+
     private func createActionButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -114,7 +114,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createExpandSectionButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -133,7 +133,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createToolbarButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -158,7 +158,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     // MARK: - Text Helper Methods
 
     private func createTitleView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
@@ -191,7 +191,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createLinkTextView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -210,7 +210,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createToggleTextView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:

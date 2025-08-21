@@ -22,7 +22,11 @@ struct CardDetailsWidgetView: View {
                     config: CardDetailsWidgetConfig(
                         gatewayId: nil,
                         accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                        allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                        allowSaveCard: SaveCardConfig(
+                            consentText: "Remember this card for next time.",
+                            privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
+                                privacyPolicyText: "Read our privacy policy",
+                                privacyPolicyURL: "https://www.google.com")),
                         schemeSupport: SupportedSchemesConfig(
                             supportedSchemes: Set(CardScheme.allCases),
                             enableValidation: true
@@ -45,9 +49,13 @@ struct CardDetailsWidgetView: View {
             Text(alertMessage)
         })
     }
-    
+
     private func getAppearance() -> CardDetailsWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .card, isDarkMode: colorScheme == .dark, as: CardDetailsWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .card,
+            isDarkMode: colorScheme == .dark,
+            as: CardDetailsWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? CardDetailsWidgetAppearance()
     }
 }

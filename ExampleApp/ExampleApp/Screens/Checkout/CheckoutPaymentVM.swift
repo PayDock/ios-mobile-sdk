@@ -19,11 +19,11 @@ class CheckoutPaymentVM: ObservableObject {
     private let walletService: WalletService
 
     // MARK: - Properties
-    
+
     let applePayGatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
     let threeDSGatewayId = ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
-    
+
     private var cardToken = ""
     private var vaultToken = ""
     private(set) var token3DS = ""
@@ -87,16 +87,20 @@ extension CheckoutPaymentVM {
     /// Initializes wallet charge when paying through Afterpay
     func initializeAfterpayWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargePaymentSource(
+                addressLine1: "123 Test Street",
+                addressPostcode: "BN3 5SL",
+                gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "",
+                walletType: nil)
 
-            let customer = InitialiseWalletChargeReq.Customer(
+            let customer = InitialiseWalletChargeCustomer(
                 firstName: "David",
                 lastName: "Cameron",
                 email: "david.cameron@paydock.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeReq.MetaData(
+            let metaData = InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
@@ -110,7 +114,7 @@ extension CheckoutPaymentVM {
                 reference: UUID().uuidString,
                 description: "Test transaction for Afterpay",
                 meta: metaData)
-            
+
             do {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 completion(.success(.init(token: token)))
@@ -136,15 +140,20 @@ extension CheckoutPaymentVM {
 
     /// Helper method that creates Wallet Charge request
     private func createWalletChargeRequest(gatewayId: String, walletType: String?) -> InitialiseWalletChargeReq {
-        let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: gatewayId, walletType: walletType )
-        let customer = InitialiseWalletChargeReq.Customer(
+        let paymentSource = InitialiseWalletChargePaymentSource(
+            addressLine1: nil,
+            addressPostcode: nil,
+            gatewayId: gatewayId,
+            walletType: walletType)
+
+        let customer = InitialiseWalletChargeCustomer(
             firstName: "Tom",
             lastName: "Taylor",
             email: "novaba9346@hondabbs.com",
             phone: "+11234567890",
             paymentSource: paymentSource)
-        
-        let metaData = InitialiseWalletChargeReq.MetaData(
+
+        let metaData = InitialiseWalletChargeMetaData(
             storeName: "Tom Taylor Ltd.",
             merchantName: "Tom's store",
             storeId: "1234556",
@@ -166,7 +175,7 @@ extension CheckoutPaymentVM {
 // MARK: - Card Payment
 
 extension CheckoutPaymentVM {
-    
+
     /// Initialized card payment using the tokenised card details
     func payWithCard(_ token: String) {
         self.cardToken = token
@@ -188,7 +197,11 @@ extension CheckoutPaymentVM {
 
     /// Attempts to create 3DS token and receive 3DS auth status
     private func attempt3dsTokenCreation() {
-        let request = Integrated3DSVaultReq(amount: "5.50", currency: "AUD", customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)), _3ds: .init(browserDetails: .init()))
+        let request = Integrated3DSVaultReq(
+            amount: "5.50",
+            currency: "AUD",
+            customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)),
+            threeDS: .init(browserDetails: .init()))
         Task {
             do {
                 let response = try await walletService.createIntegrated3DSVaultToken(request: request)
@@ -202,7 +215,7 @@ extension CheckoutPaymentVM {
     /// Based on 3DS auth status selects the appropriate flow
     private func handleAuthStatus(_ response: Integrated3DSRes) {
         switch response.authStatus {
-        case .notSupported: captureCharge(_3dsId: response.resource.data.threeDS.id ?? "")
+        case .notSupported: captureCharge(threeDsId: response.resource.data.threeDS.id ?? "")
         case .pending:
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -214,7 +227,7 @@ extension CheckoutPaymentVM {
             showAlert(title: .error, message: "Error getting 3DS auth status!")
         }
     }
-    
+
     /// Handles the outcome of integrated 3DS WebView check
     func handle3dsEvent(_ event: Integrated3DSResult) {
         DispatchQueue.main.async {
@@ -232,13 +245,13 @@ extension CheckoutPaymentVM {
                 self.showAlert(title: .error, message: "3DS cancelled!")
             case .chargeAuthSuccess:
                 self.show3dsWebView = false
-                self.captureCharge(_3dsId: event.charge3dsId)
+                self.captureCharge(threeDsId: event.charge3dsId)
             }
         }
     }
 
     /// Captures the charge as the final step in the payment flow
-    private func captureCharge(_3dsId: String) {
+    private func captureCharge(threeDsId: String) {
         DispatchQueue.main.async {
             self.isLoading = true
         }
@@ -249,7 +262,7 @@ extension CheckoutPaymentVM {
                 currency: "AUD",
                 reference: UUID().uuidString,
                 description: "Test Payment",
-                _3ds: .init(_id: _3dsId))
+                threeDS: .init(id3DS: threeDsId))
 
             do {
                 let result = try await walletService.captureCharge(request: request)
@@ -274,11 +287,15 @@ extension CheckoutPaymentVM {
 extension CheckoutPaymentVM {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
-        let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
+        let config = AfterpaySdkConfig.AfterpayConfiguration(
+            minimumAmount: "1.0",
+            maximumAmount: "100.0",
+            currency: "AUD",
+            language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
         return AfterpaySdkConfig(config: config, environment: .sandbox, options: options)
     }
-    
+
     func getShippingOptions() -> [ShippingOption] {
         let shippingOption1 = ShippingOption(
             id: "Standard",
@@ -298,9 +315,12 @@ extension CheckoutPaymentVM {
     }
 
     func getShippingOptionUpdate() -> ShippingOptionUpdate {
-        return ShippingOptionUpdate(id: "Standard", shippingAmount: Money(amount: "5.0", currency: "AUD"), orderAmount: Money(amount: "10.0", currency: "AUD"))
+        return ShippingOptionUpdate(
+            id: "Standard",
+            shippingAmount: Money(amount: "5.0", currency: "AUD"),
+            orderAmount: Money(amount: "10.0", currency: "AUD"))
     }
-    
+
 }
 
 // MARK: - Mastercard ClickToPay
@@ -329,26 +349,30 @@ extension CheckoutPaymentVM {
 // MARK: - ColesPay
 
 extension CheckoutPaymentVM {
-    
+
     func initializeWalletChargeColesPay(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         viewState?.setState(.disabled)
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "", walletType: nil)
-            
-            let customer = InitialiseWalletChargeReq.Customer(
+            let paymentSource = InitialiseWalletChargePaymentSource(
+                addressLine1: "123 Test Street",
+                addressPostcode: "BN3 5SL",
+                gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "",
+                walletType: nil)
+
+            let customer = InitialiseWalletChargeCustomer(
                 firstName: "Wanda",
                 lastName: "Mertz",
                 email: "wanda.mertz@example.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
-            
-            let metaData = InitialiseWalletChargeReq.MetaData(
+
+            let metaData = InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
                 successUrl: nil,
                 errorUrl: nil)
-            
+
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 5,
@@ -356,11 +380,11 @@ extension CheckoutPaymentVM {
                 reference: "reference1234",
                 description: "Test transaction for Coles Pay",
                 meta: metaData)
-            
+
             do {
                 let response = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 let token = response.token
-                self.colesPayChargeId = response.charge._id
+                self.colesPayChargeId = response.charge.id
                 DispatchQueue.main.async {
                     completion(.success(WalletTokenResult(token: token)))
                     self.viewState?.setState(.none)
@@ -382,14 +406,14 @@ extension CheckoutPaymentVM {
     func handleSuccess() {
         captureColesPayCharge()
     }
-    
+
     private func captureColesPayCharge() {
         isLoading = true
         Task {
             do {
                 // For Coles Pay - a delay is needed as order is still processing with hook that needs to be fired to finish payment setup
-                // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture". Improvement to add polling of
-                // charge state and when in correct state then finish the charge.
+                // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture".
+                // Improvement to add polling of charge state and when in correct state then finish the charge.
                 try await Task.sleep(for: .seconds(2))
                 let res = try await walletService.captureChargeColesPay(chargeId: colesPayChargeId)
                 isLoading = false
@@ -400,7 +424,7 @@ extension CheckoutPaymentVM {
             }
         }
     }
-    
+
 }
 
 // MARK: - Helpers
@@ -431,11 +455,11 @@ extension CheckoutPaymentVM {
 }
 
 extension CheckoutPaymentVM: WidgetLoadingDelegate {
-    
+
     func loadingDidStart() {
         isLoading = true
     }
-    
+
     func loadingDidFinish() {
         isLoading = false
     }

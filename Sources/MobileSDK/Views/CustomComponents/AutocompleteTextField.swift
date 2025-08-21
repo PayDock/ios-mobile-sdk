@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct AutocompleteTextField: View {
-    
+
     // MARK: - Dependencies
-    
+
     @State var appearance: Theme.SearchDropdownAppearance
 
     // MARK: - OutlineTextField Properties
@@ -38,7 +38,7 @@ struct AutocompleteTextField: View {
     private var textContentType: UITextContentType?
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
-    private var onSelection: (Int?) -> ()
+    private var onSelection: (Int?) -> Void
 
     @FocusState private var focusField: Field?
 
@@ -68,9 +68,9 @@ struct AutocompleteTextField: View {
                 showPopup: Binding<Bool>,
                 disabled: Binding<Bool>,
                 validationIconEnabled: Bool = false,
-                options: Binding<Array<String>>,
+                options: Binding<[String]>,
                 textContentType: UITextContentType? = nil,
-                onSelection: @escaping (Int?) -> (),
+                onSelection: @escaping (Int?) -> Void,
                 onTapGesture: @escaping () -> Void,
                 keyboardType: UIKeyboardType = .default,
                 returnKeyType: UIReturnKeyType = .default,

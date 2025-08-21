@@ -10,9 +10,8 @@ import Foundation
 
 public struct ColesPayWidgetAppearance: ActionButtonLoaderStylableAppearance {
     public var loader: Theme.ButtonLoader
-    
+
     public init(loader: Theme.ButtonLoader = GlobalTheme.shared.globalTheme.actionButton.loader) {
         self.loader = loader
     }
 }
-

@@ -94,7 +94,7 @@ class GiftCardFormManager: ObservableObject {
             pinError = "Invalid PIN number"
         }
     }
-    
+
     func isFormValid() -> Bool {
         return pinValid ?? false && cardNumberValid ?? false
     }
@@ -104,9 +104,9 @@ class GiftCardFormManager: ObservableObject {
     func formatCardNumber(updatedText: String) -> String {
         cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
     }
-    
+
     // MARK: - Editing
-    
+
     func endEditing() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         editingCardNumber = false
@@ -123,4 +123,3 @@ extension GiftCardFormManager {
         case pin
     }
 }
-

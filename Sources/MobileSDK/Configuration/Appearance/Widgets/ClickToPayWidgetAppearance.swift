@@ -6,12 +6,14 @@
 //  Copyright © 2025 Paydock Ltd.
 //
 
+import SwiftUI
+
 public struct ClickToPayWidgetAppearance: LoaderStylableAppearance {
     public var loader: Theme.OverlayLoaderAppearance
-    
+
     public init(loader: Theme.OverlayLoaderAppearance = .init(
         color: GlobalTheme.shared.globalTheme.loader.color,
         overlayColor: .clear)) {
             self.loader = loader
-    }
+        }
 }

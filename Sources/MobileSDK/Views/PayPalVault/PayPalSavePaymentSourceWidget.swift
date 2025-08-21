@@ -35,7 +35,6 @@ public struct PayPalSavePaymentSourceWidget: View {
                 viewModel.initializePayPalSDK()
             }
     }
-    
 }
 
 struct PayPalSavePaymentSourceWidget_Previews: PreviewProvider {

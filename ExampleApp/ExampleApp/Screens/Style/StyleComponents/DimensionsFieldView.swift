@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct DimensionsFieldView: View {
-    
+
     let title: String
     @Binding var text: String
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -27,7 +27,7 @@ struct DimensionsFieldView: View {
                         .frame(height: 40)
                         .foregroundColor(Color.white)
                         .padding(.leading, 16)
-                    
+
                     TextField(title, text: $text)
                         .frame(height: 40)
                         .background(Color.white)

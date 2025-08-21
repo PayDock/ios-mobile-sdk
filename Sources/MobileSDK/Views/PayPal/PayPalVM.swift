@@ -45,8 +45,8 @@ class PayPalVM: ObservableObject {
         self.walletService = walletService
         self.loadingDelegate = loadingDelegate
         self.completion = completion
-        
-        if (loadingDelegate != nil) {
+
+        if loadingDelegate != nil {
             showLoaders = false
         }
     }
@@ -61,12 +61,12 @@ class PayPalVM: ObservableObject {
                 withAnimation {
                     self.showWebView = true
                 }
-                
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
                 self.completion(.failure(.errorFetchingPayPalUrl(error: errorResponse)))
-                
+
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
@@ -83,14 +83,19 @@ class PayPalVM: ObservableObject {
 
         Task {
             do {
-                let charge = try await walletService.captureCharge(token: token, paymentMethodId: paymentMethodId, payerId: payerId, refToken: nil)
+                let charge = try await walletService.captureCharge(
+                    token: token,
+                    paymentMethodId: paymentMethodId,
+                    payerId: payerId,
+                    refToken: nil)
+
                 self.completion(.success(charge))
                 self.showWebView = false
-                
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
                 self.showWebView = false
-                
+
             } catch {
                 self.completion(.failure(.unknownError))
                 self.showWebView = false
@@ -105,7 +110,7 @@ class PayPalVM: ObservableObject {
             case .success(let response):
                 self?.token = response.token
                 self?.getPayPalURL(token: response.token)
-            
+
             case .failure(let failure):
                 self?.updateLoadingState(isLoading: false)
                 self?.showWebView = false
@@ -118,20 +123,20 @@ class PayPalVM: ObservableObject {
         showWebView = false
         completion(.failure(error))
     }
-    
+
     func handleSheetCancellation() {
         completion(.failure(.transactionCanceled))
     }
 
     func updateLoadingState(isLoading: Bool) {
-        if (loadingDelegate != nil) {
-            if (isLoading) {
+        if loadingDelegate != nil {
+            if isLoading {
                 loadingDelegate?.loadingDidStart()
             } else {
                 loadingDelegate?.loadingDidFinish()
             }
         }
-        
+
         self.isLoading = isLoading
         viewState.isDisabled = isLoading
     }

@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct ActivityIndicatorModifier: AnimatableModifier {
-    
+
     private let appearance: Theme.OverlayLoaderAppearance
     var isLoading: Bool
-    @State private var hostingController: UIHostingController<ActivityIndicator>? = nil
+    @State private var hostingController: UIHostingController<ActivityIndicator>?
 
     init(appearance: Theme.OverlayLoaderAppearance,
          isLoading: Bool) {
@@ -24,12 +24,12 @@ struct ActivityIndicatorModifier: AnimatableModifier {
         ZStack {
             ZStack(alignment: .bottom) {
                 content
-                if isLoading  {
+                if isLoading {
                     VStack {}
                         .onAppear {
                             showIndicator()
                         }
-                        .onDisappear { 
+                        .onDisappear {
                             dismissIndicator()
                         }
                 }
@@ -39,7 +39,7 @@ struct ActivityIndicatorModifier: AnimatableModifier {
 
     func showIndicator() {
         let activityIndicator = ActivityIndicator(appearance: appearance, isAnimating: .constant(true), style: .large)
-        
+
         hostingController = UIHostingController(rootView: activityIndicator)
         hostingController?.view.backgroundColor = UIColor(appearance.overlayColor)
         hostingController?.view.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

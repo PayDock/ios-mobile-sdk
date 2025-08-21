@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct StyleDarkModeView: View {
-    
+
     @EnvironmentObject var viewModel: StyleVM
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -27,7 +27,7 @@ struct StyleDarkModeView: View {
             }
             Text("These styles apply to the widget screen based on your phone's dark or light mode settings. ")
                 .font(.caption)
-            
+
         }
         .background(Color(hex: "#EAE0D7"))
         .padding(.bottom, 16.0)

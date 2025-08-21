@@ -12,16 +12,6 @@ struct PayPalVaultConfigRes: Codable {
 
     struct Resource: Codable {
         let type: String
-        let data: CallbackData
-    }
-
-    struct CallbackData: Codable {
-        let type: String
-        let mode: String
-        let credentials: Credentials
-        
-        struct Credentials: Codable {
-            let clientAuth: String
-        }
+        let data: PayPalVaultCallbackData
     }
 }

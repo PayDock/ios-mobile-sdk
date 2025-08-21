@@ -18,7 +18,7 @@ struct Integrated3DSRes: Codable {
 
     struct Resource: Codable {
         let type: String
-        let data: Data3DS
+        let data: Integrated3DSResponseData
     }
 
     enum CodingKeys: String, CodingKey {
@@ -29,20 +29,5 @@ struct Integrated3DSRes: Codable {
     enum AuthStatus: String, Codable {
         case notSupported = "authentication_not_supported"
         case pending = "pre_authentication_pending"
-    }
-
-    struct Data3DS: Codable {
-        let threeDS: ThreeDS
-        let status: String
-
-        enum CodingKeys: String, CodingKey {
-            case threeDS = "_3ds"
-            case status
-        }
-
-        struct ThreeDS: Codable {
-            let token: String?
-            let id: String?
-        }
     }
 }

@@ -21,10 +21,10 @@ public struct AfterpaySdkConfig {
     }
 
     public struct CheckoutOptions {
-        public var pickup: Bool? = nil
-        public var buyNow: Bool? = nil
-        public var shippingOptionRequired: Bool? = nil
-        public var enableSingleShippingOptionUpdate: Bool? = nil
+        public var pickup: Bool?
+        public var buyNow: Bool?
+        public var shippingOptionRequired: Bool?
+        public var enableSingleShippingOptionUpdate: Bool?
 
         public init(pickup: Bool? = nil,
                     buyNow: Bool? = nil,
@@ -38,7 +38,7 @@ public struct AfterpaySdkConfig {
     }
 
     public struct AfterpayConfiguration {
-        public var minimumAmount: String? = nil
+        public var minimumAmount: String?
         public var maximumAmount: String
         public var currency: String
         public var language: String

@@ -32,9 +32,13 @@ struct GiftCardWidgetView: View {
             })
         }
     }
-    
+
     private func getAppearance() -> GiftCardWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .giftCard, isDarkMode: colorScheme == .dark, as: GiftCardWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .giftCard,
+            isDarkMode: colorScheme == .dark,
+            as: GiftCardWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? GiftCardWidgetAppearance()
     }
 }
@@ -44,4 +48,3 @@ struct GiftCardWidgetView_Previews: PreviewProvider {
         GiftCardWidgetView()
     }
 }
-

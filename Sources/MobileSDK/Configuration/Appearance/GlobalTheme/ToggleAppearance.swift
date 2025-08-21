@@ -10,10 +10,10 @@ import Foundation
 import SwiftUI
 
 extension Theme {
-    
+
     public struct ToggleAppearance {
         public var activeColor: Color
-        
+
         public init(activeColor: Color = .defaultPrimary) {
             self.activeColor = activeColor
         }

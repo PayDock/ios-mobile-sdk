@@ -29,4 +29,3 @@ public enum AfterpayError: Error {
         }
     }
 }
-

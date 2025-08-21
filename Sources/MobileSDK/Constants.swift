@@ -60,7 +60,7 @@ struct Constants {
         case .staging: return "staging"
         }
     }
-    
+
     static var payPalVaultEnvironment: CorePayments.Environment {
         guard let environment = MobileSDK.shared.config?.environment else {
             fatalError("Missing configuration!")

@@ -10,10 +10,10 @@ import SwiftUI
 import MobileSDK
 
 struct ColesPayWidgetView: View {
-    
+
     @StateObject private var viewModel = ColesPayWidgetVM()
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -26,8 +26,8 @@ struct ColesPayWidgetView: View {
                         case .success: viewModel.handleSuccess()
                         case .failure(let error): viewModel.handleError(error: error)
                         }
-                }
-                .padding()
+                    }
+                    .padding()
             }
             .background(Color(hex: "#EAE0D7"))
             .alert(viewModel.alertTitle,
@@ -37,9 +37,13 @@ struct ColesPayWidgetView: View {
             })
         }
     }
-    
+
     private func getAppearance() -> ColesPayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .colesPay, isDarkMode: colorScheme == .dark, as: ColesPayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .colesPay,
+            isDarkMode: colorScheme == .dark,
+            as: ColesPayWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? ColesPayWidgetAppearance()
     }
 }

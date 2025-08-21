@@ -13,7 +13,7 @@ public struct AfterpayWidgetAppearance: LoaderStylableAppearance {
     public var colorScheme: Afterpay.ColorScheme
     public var loader: Theme.OverlayLoaderAppearance
     public var type: ButtonKind
-    
+
     public init(colorScheme: ColorScheme = .static(.blackOnMint),
                 loader: Theme.OverlayLoaderAppearance = GlobalTheme.shared.globalTheme.loader,
                 type: ButtonKind = .buyNow) {

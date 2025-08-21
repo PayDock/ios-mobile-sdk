@@ -9,12 +9,12 @@
 import SwiftUI
 
 struct StyleWidgetListView: View {
-    
+
     @StateObject var viewModel: StyleVM = StyleVM()
 
     let widgetItems: [StyleWidgetItem] = {
         let allWidgets = StyleWidgetItem(widget: .all)
-        
+
         let otherWidgets = [
             StyleWidgetItem(widget: .card),
             StyleWidgetItem(widget: .address),
@@ -26,18 +26,18 @@ struct StyleWidgetListView: View {
             StyleWidgetItem(widget: .colesPay),
             StyleWidgetItem(widget: .afterPay),
             StyleWidgetItem(widget: .clickToPay),
-            StyleWidgetItem(widget: .paypalVault),
+            StyleWidgetItem(widget: .paypalVault)
         ].sorted { $0.widget.title < $1.widget.title }
 
         return [allWidgets] + otherWidgets
     }()
-    
+
     // MARK: - Initialization
-    
+
     init() {
         styleNavigation()
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -46,12 +46,12 @@ struct StyleWidgetListView: View {
                 VStack(alignment: .leading) {
                     Text("Customise the look and feel of the widgets on the Widget tab")
                         .font(.caption)
-                    
+
                     StyleDarkModeView()
                         .environmentObject(viewModel)
                         .listRowBackground(Color(hex: "#EAE0D7"))
                         .listRowSeparatorTint(.clear)
-                    
+
                     Text("Select Widget")
                         .font(.title3)
                         .padding(.vertical, 16)

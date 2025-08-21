@@ -10,10 +10,10 @@ import Foundation
 import PassKit
 
 public struct ApplePayRequestResult {
-    
+
     public let request: PKPaymentRequest
     public let token: String
-    
+
     public init(request: PKPaymentRequest, token: String) {
         self.request = request
         self.token = token

@@ -9,7 +9,7 @@
 import Foundation
 
 struct JSONLoader {
-    
+
     func loadJSON<T: Decodable>(filename: String?, bundle: Bundle? = Bundle.module, type: T.Type) -> T {
         guard let filename = filename else {
             fatalError("No filename provided for a mock response!")

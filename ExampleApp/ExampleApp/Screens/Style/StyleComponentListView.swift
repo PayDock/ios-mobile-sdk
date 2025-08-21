@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct StyleComponentListView: View {
-    
+
     @EnvironmentObject var viewModel: StyleVM
     let selectedWidget: WidgetsEnum
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -30,18 +30,18 @@ struct StyleComponentListView: View {
             viewModel.selectedWidget = selectedWidget
         }
     }
-    
+
     func stylizedNavigationLink(component: StyleComponentsEnum) -> some View {
         return NavigationLink(destination: component.destinationView(
             selectedWidget: selectedWidget,
             stylingDarkMode: viewModel.stylingDarkMode)) {
                 cell(component: component)
-        }
-        .listRowSeparatorTint(.black)
-        .listSectionSeparator(.hidden, edges: .top)
-        .listRowBackground(Color(hex: "#EAE0D7"))
+            }
+            .listRowSeparatorTint(.black)
+            .listSectionSeparator(.hidden, edges: .top)
+            .listRowBackground(Color(hex: "#EAE0D7"))
     }
-    
+
     func cell(component: StyleComponentsEnum) -> some View {
         HStack {
             HStack {

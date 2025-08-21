@@ -9,7 +9,7 @@
 import SwiftUI
 
 extension Text {
-    
+
     func applyAttributes(_ attributes: TextAttributes) -> Text {
         self
             .font(attributes.customFont.font)

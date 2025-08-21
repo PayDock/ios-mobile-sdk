@@ -20,13 +20,13 @@ public struct Address {
     public let country: String
 
     public init(firstName: String = "",
-         lastName: String = "",
-         addressLine1: String = "",
-         addressLine2: String = "",
-         city: String = "",
-         state: String = "",
-         postcode: String = "",
-         country: String = "") {
+                lastName: String = "",
+                addressLine1: String = "",
+                addressLine2: String = "",
+                city: String = "",
+                state: String = "",
+                postcode: String = "",
+                country: String = "") {
         self.firstName = firstName
         self.lastName = lastName
         self.addressLine1 = addressLine1
@@ -36,5 +36,4 @@ public struct Address {
         self.postcode = postcode
         self.country = country
     }
-
 }

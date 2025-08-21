@@ -19,7 +19,7 @@ extension EnvironmentValues {
 struct CursorPositionTextField: UIViewRepresentable {
     @Environment(\.toolbarButton) private var toolbarButton
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    
+
     @Binding var text: String
     let placeholder: String
     let keyboardType: UIKeyboardType
@@ -38,7 +38,7 @@ struct CursorPositionTextField: UIViewRepresentable {
     let onCommit: () -> Void
     let onSubmit: (() -> Void)?
     let onTextChange: ((String, Int) -> Int)? // Returns new cursor position
-    
+
     init(text: Binding<String>,
          placeholder: String = "",
          keyboardType: UIKeyboardType = .default,
@@ -75,7 +75,7 @@ struct CursorPositionTextField: UIViewRepresentable {
         self.onSubmit = onSubmit
         self.onTextChange = onTextChange
     }
-    
+
     func makeUIView(context: Context) -> UITextField {
         let textField = UITextField()
         textField.delegate = context.coordinator
@@ -88,30 +88,30 @@ struct CursorPositionTextField: UIViewRepresentable {
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textFieldDidChange), for: .editingChanged)
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textFieldDidEndEditing), for: .editingDidEnd)
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textFieldDidBeginEditing), for: .editingDidBegin)
-        
+
         // Set initial font with dynamic type support
         updateFont(textField)
-        
+
         return textField
     }
-    
+
     func updateUIView(_ uiView: UITextField, context: Context) {
         if uiView.text != text {
             uiView.text = text
             updateTextStyling(uiView)
         }
-        
+
         // Update font when dynamic type size changes
         updateFont(uiView)
-        
+
         uiView.returnKeyType = returnKeyType
-        
+
         // Update toolbar based on environment
         if let toolbarInfo = toolbarButton {
             if uiView.inputAccessoryView == nil {
                 let toolbar = UIToolbar()
                 toolbar.sizeToFit()
-                
+
                 let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
                 let button = UIBarButtonItem(
                     title: toolbarInfo.title,
@@ -119,36 +119,36 @@ struct CursorPositionTextField: UIViewRepresentable {
                     target: context.coordinator,
                     action: #selector(Coordinator.toolbarButtonTapped)
                 )
-                
+
                 if let font = toolbarInfo.font {
                     button.setTitleTextAttributes([.font: font], for: .normal)
                 }
-                
+
                 if let textColor = toolbarInfo.textColor {
                     button.setTitleTextAttributes([.foregroundColor: textColor], for: .normal)
                 }
-                
+
                 toolbar.setItems([flexSpace, button], animated: false)
                 uiView.inputAccessoryView = toolbar
             }
-            
+
             context.coordinator.toolbarAction = toolbarInfo.action
         } else {
             uiView.inputAccessoryView = nil
             context.coordinator.toolbarAction = nil
         }
     }
-    
+
     private func updateFont(_ textField: UITextField) {
         let scaledSize = UIFontMetrics.default.scaledValue(for: baseFontSize)
-        
+
         var font: UIFont
         if let fontName = baseFontName {
             font = UIFont(name: fontName, size: scaledSize) ?? UIFont.systemFont(ofSize: scaledSize)
         } else {
             font = UIFont.systemFont(ofSize: scaledSize)
         }
-        
+
         // Apply italic if needed
         if isItalic {
             let fontDescriptor = font.fontDescriptor.withSymbolicTraits(.traitItalic)
@@ -156,33 +156,33 @@ struct CursorPositionTextField: UIViewRepresentable {
                 font = UIFont(descriptor: italicDescriptor, size: scaledSize)
             }
         }
-        
+
         textField.font = font
-        
+
         // Update attributed text styling if text exists, preserving cursor position
         if !text.isEmpty {
             updateTextStyling(textField)
         }
     }
-    
+
     private func updateTextStyling(_ textField: UITextField) {
         guard !text.isEmpty else { return }
-        
+
         // Preserve cursor position
         let currentSelectedRange = textField.selectedTextRange
-        
+
         var attributes: [NSAttributedString.Key: Any] = [:]
-        
+
         // Apply font with dynamic type scaling
         let scaledSize = UIFontMetrics.default.scaledValue(for: baseFontSize)
         var finalFont: UIFont
-        
+
         if let fontName = baseFontName {
             finalFont = UIFont(name: fontName, size: scaledSize) ?? UIFont.systemFont(ofSize: scaledSize)
         } else {
             finalFont = UIFont.systemFont(ofSize: scaledSize)
         }
-        
+
         // Apply italic if needed
         if isItalic {
             let fontDescriptor = finalFont.fontDescriptor.withSymbolicTraits(.traitItalic)
@@ -190,14 +190,14 @@ struct CursorPositionTextField: UIViewRepresentable {
                 finalFont = UIFont(descriptor: italicDescriptor, size: scaledSize)
             }
         }
-        
+
         attributes[.font] = finalFont
-        
+
         // Apply text color
         if let textColor = textColor {
             attributes[.foregroundColor] = textColor
         }
-        
+
         // Apply underline
         if isUnderlined {
             attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
@@ -205,7 +205,7 @@ struct CursorPositionTextField: UIViewRepresentable {
                 attributes[.underlineColor] = underlineColor
             }
         }
-        
+
         // Apply strikethrough
         if isStrikethrough {
             attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
@@ -213,10 +213,10 @@ struct CursorPositionTextField: UIViewRepresentable {
                 attributes[.strikethroughColor] = strikethroughColor
             }
         }
-        
+
         let attributedString = NSAttributedString(string: text, attributes: attributes)
         textField.attributedText = attributedString
-        
+
         // Restore cursor position
         textField.selectedTextRange = currentSelectedRange
     }
@@ -228,33 +228,33 @@ struct CursorPositionTextField: UIViewRepresentable {
     class Coordinator: NSObject, UITextFieldDelegate {
         var parent: CursorPositionTextField
         var toolbarAction: (() -> Void)?
-        
+
         init(_ parent: CursorPositionTextField) {
             self.parent = parent
         }
-        
+
         @objc func textFieldDidChange(_ textField: UITextField) {
             let text: String
-            
+
             // Get text from attributed or regular text
             if let attributedText = textField.attributedText {
                 text = attributedText.string
             } else {
                 text = textField.text ?? ""
             }
-            
+
             // Update the binding first
             DispatchQueue.main.async {
                 self.parent.text = text
-                
+
                 // Get current cursor position before any modifications
                 let cursorPosition = textField.selectedTextRange?.start
                 let currentPosition = cursorPosition != nil ? textField.offset(from: textField.beginningOfDocument, to: cursorPosition!) : 0
-                
+
                 // Format the text and get new cursor position if callback exists
                 if let onTextChange = self.parent.onTextChange {
                     let newCursorPosition = onTextChange(text, currentPosition)
-                    
+
                     // Update styling after text formatting and set cursor position
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                         self.parent.updateTextStyling(textField)
@@ -268,20 +268,20 @@ struct CursorPositionTextField: UIViewRepresentable {
                 }
             }
         }
-        
+
         @objc func textFieldDidBeginEditing(_ textField: UITextField) {
             parent.onEditingChanged(true)
         }
-        
+
         @objc func textFieldDidEndEditing(_ textField: UITextField) {
             parent.onEditingChanged(false)
             parent.onCommit()
         }
-        
+
         @objc func toolbarButtonTapped() {
             toolbarAction?()
         }
-        
+
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
             parent.onSubmit?()
             return true

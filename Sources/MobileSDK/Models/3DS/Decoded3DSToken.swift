@@ -7,17 +7,17 @@
 //
 
 struct Decoded3DSToken: Codable {
-    
+
     let content: String
-    let format: _3DSFormat
+    let format: ThreeDsFormat
     let charge3dsId: String?
-    
-    enum _3DSFormat: String, Codable {
+
+    enum ThreeDsFormat: String, Codable {
         case html // Used in Integrated3DS token
         case url // Used in Integrated3DS token
         case standalone3ds = "standalone_3ds" // Used in Standalone3DS token
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case content
         case format

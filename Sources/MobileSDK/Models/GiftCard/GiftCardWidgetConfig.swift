@@ -7,12 +7,12 @@
 //
 
 public struct GiftCardWidgetConfig {
-    
+
     public let accessToken: String
     public let storePin: Bool
-    
+
     public init(accessToken: String,
-         storePin: Bool = true) {
+                storePin: Bool = true) {
         self.accessToken = accessToken
         self.storePin = storePin
     }

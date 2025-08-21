@@ -13,9 +13,9 @@ struct ButtonStyleView<T>: View {
 
     @StateObject var viewModel: ButtonStyleVM<T>
     let title: String
-    
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum,
          stylingDarkMode: Bool,
          buttonKeyPath: WritableKeyPath<T, Theme.ButtonAppearance>,
@@ -26,7 +26,7 @@ struct ButtonStyleView<T>: View {
             buttonKeyPath: buttonKeyPath))
         self.title = title
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -39,7 +39,7 @@ struct ButtonStyleView<T>: View {
                     dimensionsListView
                     SectionTitleView(title: "Fonts")
                     fontListView
-                    ResetStyleButton() {
+                    ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
                 }
@@ -62,28 +62,28 @@ struct ButtonStyleView<T>: View {
                     get: { viewModel.backgroundColor.toHex() },
                     set: { viewModel.backgroundColor = Color(hex: $0) }),
                 pickedColor: $viewModel.backgroundColor)
-            
+
             ColorPickerView(
                 title: "Text color",
                 text: Binding(
                     get: { viewModel.textColor.toHex() },
                     set: { viewModel.textColor = Color(hex: $0) }),
                 pickedColor: $viewModel.textColor)
-            
+
             ColorPickerView(
                 title: "Image color",
                 text: Binding(
                     get: { viewModel.imageColor.toHex() },
                     set: { viewModel.imageColor = Color(hex: $0) }),
                 pickedColor: $viewModel.imageColor)
-            
+
             ColorPickerView(
                 title: "Border color",
                 text: Binding(
                     get: { viewModel.borderColor.toHex() },
                     set: { viewModel.borderColor = Color(hex: $0) }),
                 pickedColor: $viewModel.borderColor)
-            
+
             ColorPickerView(
                 title: "Loader color",
                 text: Binding(
@@ -92,39 +92,39 @@ struct ButtonStyleView<T>: View {
                 pickedColor: $viewModel.loaderColor)
         }
     }
-    
+
     private var dimensionsListView: some View {
-        VStack (spacing: 16) {
+        VStack(spacing: 16) {
             DimensionsFieldView(
                 title: "Corner radius",
                 text: Binding(
                     get: { "\(viewModel.cornerRadius)" },
                     set: { viewModel.cornerRadius = CGFloat(Double($0) ?? 0) }))
-            
+
             DimensionsFieldView(
                 title: "Border width",
                 text: Binding(
                     get: { "\(viewModel.borderWidth)" },
                     set: { viewModel.borderWidth = CGFloat(Double($0) ?? 0) }))
-            
+
             DimensionsFieldView(
                 title: "Top padding",
                 text: Binding(
                     get: { "\(viewModel.topPadding)" },
                     set: { viewModel.topPadding = CGFloat(Double($0) ?? 0) }))
-            
+
             DimensionsFieldView(
                 title: "Leading padding",
                 text: Binding(
                     get: { "\(viewModel.leadingPadding)" },
                     set: { viewModel.leadingPadding = CGFloat(Double($0) ?? 0) }))
-            
+
             DimensionsFieldView(
                 title: "Bottom padding",
                 text: Binding(
                     get: { "\(viewModel.bottomPadding)" },
                     set: { viewModel.bottomPadding = CGFloat(Double($0) ?? 0) }))
-            
+
             DimensionsFieldView(
                 title: "Trailing padding",
                 text: Binding(
@@ -132,23 +132,23 @@ struct ButtonStyleView<T>: View {
                     set: { viewModel.trailingPadding = CGFloat(Double($0) ?? 0) }))
         }
     }
-    
+
     private var fontListView: some View {
-        VStack (spacing: 16) {
+        VStack(spacing: 16) {
             ColorPickerView(
                 title: "Underline color",
                 text: Binding(
                     get: { viewModel.underlineColor.toHex() },
                     set: { viewModel.underlineColor = Color(hex: $0) }),
                 pickedColor: $viewModel.underlineColor)
-            
+
             ColorPickerView(
                 title: "Strikethrough color",
                 text: Binding(
                     get: { viewModel.strikethroughColor.toHex() },
                     set: { viewModel.strikethroughColor = Color(hex: $0) }),
                 pickedColor: $viewModel.strikethroughColor)
-            
+
             PickerView(
                 entries: viewModel.allFontNames,
                 selected: $viewModel.fontName,
@@ -156,7 +156,7 @@ struct ButtonStyleView<T>: View {
                 onSelection: { fontName in
                     viewModel.fontName = fontName
                 })
-            
+
             DimensionsFieldView(
                 title: "Font size",
                 text: Binding(

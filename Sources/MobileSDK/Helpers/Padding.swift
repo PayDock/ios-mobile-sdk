@@ -9,12 +9,12 @@
 import Foundation
 
 public struct Padding {
-    
+
     public var top: CGFloat
     public var leading: CGFloat
     public var bottom: CGFloat
     public var trailing: CGFloat
-    
+
     public init(top: CGFloat = 0,
                 leading: CGFloat = 0,
                 bottom: CGFloat = 0,

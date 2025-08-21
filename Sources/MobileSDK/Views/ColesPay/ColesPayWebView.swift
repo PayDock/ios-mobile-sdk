@@ -19,7 +19,7 @@ struct ColesPayWebView: UIViewRepresentable {
     private let colesPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure
-    
+
     /**
      Javascript to intercept push, replace and pop states in the window to identify window location changes.
      */
@@ -59,7 +59,8 @@ struct ColesPayWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = WKWebsiteDataStore.default()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
-        configuration.userContentController.addUserScript(WKUserScript(source: historyAPIScript, injectionTime: .atDocumentStart, forMainFrameOnly: false))
+        configuration.userContentController.addUserScript(
+            WKUserScript(source: historyAPIScript, injectionTime: .atDocumentStart, forMainFrameOnly: false))
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
@@ -79,8 +80,17 @@ struct ColesPayWebView: UIViewRepresentable {
     private func getColesPayUrlRequest() -> URLRequest? {
         let urlString: String = {
             switch MobileSDK.shared.config?.environment {
-            case .production: return "https://checkout.colespay.com.au/?orderId=\(colesPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
-            case .staging, .sandbox: return "https://checkout.sandbox.cxbflypay.com.au/?orderId=\(colesPayOrderId)&redirectUrl=https://paydock.com&mode=default&clientId=\(clientId)"
+            case .production: return "https://checkout.colespay.com.au/?" +
+                "orderId=\(colesPayOrderId)" +
+                "&redirectUrl=https://paydock.com" +
+                "&mode=default" +
+                "&clientId=\(clientId)"
+
+            case .staging, .sandbox: return "https://checkout.sandbox.cxbflypay.com.au/?" +
+                "orderId=\(colesPayOrderId)" +
+                "&redirectUrl=https://paydock.com" +
+                "&mode=default" +
+                "&clientId=\(clientId)"
             case .none: return ""
             }
         }()
@@ -109,7 +119,7 @@ struct ColesPayWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
         }
-        
+
         /**
          This method handles errors that are reported that happen while loading the resource.
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
@@ -117,11 +127,11 @@ struct ColesPayWebView: UIViewRepresentable {
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             onFailure(.webViewFailed(error: error as NSError))
         }
-        
+
         /**
          This method handles errors that happen before the resource of the url can even be reached.
          These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
-         
+
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -136,17 +146,21 @@ struct ColesPayWebView: UIViewRepresentable {
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard let messageString = message.body as? String else { return }
-            
+
             if messageString.contains("/payment-confirmed") {
                 onApprove()
             }
         }
 
-        func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
+        func webView(_ webView: WKWebView,
+                     authenticationChallenge challenge: URLAuthenticationChallenge,
+                     shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(true)
         }
 
-        func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        func webView(_ webView: WKWebView,
+                     didReceive challenge: URLAuthenticationChallenge,
+                     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
             DispatchQueue.global(qos: .background).async {
                 let trust = challenge.protectionSpace.serverTrust!
                 let exceptions = SecTrustCopyExceptions(trust)

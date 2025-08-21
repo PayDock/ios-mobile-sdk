@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ActivityIndicatorModifier: AnimatableModifier {
     var isLoading: Bool
-    @State private var hostingController: UIHostingController<ActivityIndicator>? = nil
+    @State private var hostingController: UIHostingController<ActivityIndicator>?
 
     init(isLoading: Bool) {
         self.isLoading = isLoading
@@ -20,7 +20,7 @@ struct ActivityIndicatorModifier: AnimatableModifier {
         ZStack {
             ZStack(alignment: .bottom) {
                 content
-                if isLoading  {
+                if isLoading {
                     VStack {}
                         .onAppear {
                             showIndicator()

@@ -9,11 +9,10 @@
 import Foundation
 
 public struct ThreeDSConfig {
-    
+
     public let token: String
-    
+
     public init(token: String) {
         self.token = token
     }
 }
-
