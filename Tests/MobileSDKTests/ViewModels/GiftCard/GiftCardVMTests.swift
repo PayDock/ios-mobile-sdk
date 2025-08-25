@@ -11,7 +11,7 @@ import Combine
 
 @MainActor
 class GiftCardVMTests: XCTestCase {
-    
+
     var viewModel: GiftCardVM!
     var mockService: CardServiceMock!
     var viewState: ViewState!
@@ -19,7 +19,7 @@ class GiftCardVMTests: XCTestCase {
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<GiftCardResult, GiftCardError>?
     var cancellables = Set<AnyCancellable>()
-    
+
     override func setUp() {
         super.setUp()
         mockService = CardServiceMock()
@@ -34,7 +34,7 @@ class GiftCardVMTests: XCTestCase {
             self.completionResult = result
         }
     }
-    
+
     override func tearDown() {
         viewModel = nil
         mockService = nil
@@ -42,7 +42,7 @@ class GiftCardVMTests: XCTestCase {
         cancellables.removeAll()
         super.tearDown()
     }
-    
+
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -51,15 +51,15 @@ class GiftCardVMTests: XCTestCase {
                                loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
-        
+
         // When
         viewModel.updateLoadingState(isLoading: true)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, true)
     }
-    
+
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -70,15 +70,15 @@ class GiftCardVMTests: XCTestCase {
         }
         viewModel.isLoading = false
         loadingDelegate.isLoading = false
-        
+
         // When
         viewModel.updateLoadingState(isLoading: true)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
     }
-    
+
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -89,15 +89,15 @@ class GiftCardVMTests: XCTestCase {
         }
         viewModel.isLoading = false
         loadingDelegate.isLoading = true
-        
+
         // When
         viewModel.updateLoadingState(isLoading: false)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
     }
-    
+
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -108,10 +108,10 @@ class GiftCardVMTests: XCTestCase {
         }
         viewModel.isLoading = true
         loadingDelegate.isLoading = false
-        
+
         // When
         viewModel.updateLoadingState(isLoading: false)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)

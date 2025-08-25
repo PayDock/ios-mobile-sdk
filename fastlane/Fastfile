@@ -8,7 +8,9 @@ lane :lint do
   swiftlint(
     mode: :lint,
     config_file: ".swiftlint.yml",
-    output_file: "swiftlint.result.txt",
+    strict: true,
+    reporter: "codeclimate",
+    output_file: "fastlane/swiftlint_report.json",
     raise_if_swiftlint_error: true
   )
 end
@@ -23,9 +25,6 @@ lane :test do
     scheme: "ExampleApp",
     configuration: "Debug (Staging)",
     devices: ["iPhone 15"],
-    only_testing: [
-        "ExampleAppTests"
-    ],
     xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     output_types: "junit",

@@ -18,7 +18,7 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
 
         self.sut = PayPalVaultServiceMock()
     }
-    
+
     func testCreateTokenSuccess() async {
         sut.responseFilename = .authSuccess
         do {
@@ -29,7 +29,7 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
             XCTFail("Getting PayPal auth token FAILED!")
         }
     }
-    
+
     func testCreateSetupTokenSuccess() async {
         sut.responseFilename = .setupTokenSuccess
         do {
@@ -40,7 +40,7 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
             XCTFail("Getting PayPal setup token FAILED!")
         }
     }
-    
+
     func testGetClientIdSuccess() async {
         sut.responseFilename = .getClientId
         do {
@@ -50,7 +50,7 @@ final class PayPalVaultServicePositiveTests: XCTestCase {
             XCTFail("Getting PayPal client ID FAILED!")
         }
     }
-    
+
     func testCreatePaymentTokenSuccess() async {
         sut.responseFilename = .createPaymentToken
         do {

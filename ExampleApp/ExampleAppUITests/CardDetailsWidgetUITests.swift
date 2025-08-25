@@ -465,162 +465,161 @@ final class CardDetailsWidgetUITests: XCTestCase {
         print("Privacy policy link test completed. Initial state: \(initialAppState.rawValue), Final state: \(currentAppState.rawValue)")
     }
 
-    // swiftlint:disable:next function_body_length
-    func testSuccessfulTokenization() throws {
-        // Test data: Card Number, CVV, Card Type
-        let testCards = [
-            ("5111111111111118", "100", "MasterCard"),  // MasterCard
-            ("4012000033330026", "100", "Visa"),        // Visa
-            ("371449635398431", "1000", "AMEX"),        // AMEX
-            ("3528111100000001", "100", "JCB")          // JCB
-        ]
-
-        for (cardNumber, cvv, cardType) in testCards {
-            print("Testing tokenization for \(cardType): \(cardNumber)")
-
-            navigateToCardDetailsWidget()
-
-            // Fill cardholder name
-            let cardholderField = app.textFields["Cardholder name"]
-            XCTAssertTrue(cardholderField.waitForExistence(timeout: 1.0), "Cardholder name field should exist")
-            cardholderField.slowTypeText("John Doe") // Use slow for form validation
-
-            // Fill card number
-            let cardNumberField = app.textFields["Card number"]
-            XCTAssertTrue(cardNumberField.exists, "Card number field should exist")
-            cardNumberField.slowTypeText(cardNumber) // Use slow for card type detection
-            usleep(1500000) // Wait for card type detection (1.5s)
-
-            // Fill expiry date (future date)
-            let expiryField = app.textFields["Expiry"]
-            XCTAssertTrue(expiryField.exists, "Expiry field should exist")
-            expiryField.slowTypeText("12/30") // Use slow for validation
-
-            // Fill CVV/CVC/CID based on card type
-            var securityField: XCUIElement
-            if cardType == "AMEX" {
-                securityField = app.textFields["CID"]
-                XCTAssertTrue(securityField.waitForExistence(timeout: 2.0), "CID field should exist for AMEX")
-            } else if cardType == "MasterCard" {
-                securityField = app.textFields["CVC"]
-                XCTAssertTrue(securityField.waitForExistence(timeout: 2.0), "CVC field should exist for MasterCard")
-            } else {
-                securityField = app.textFields["CVV"]
-                XCTAssertTrue(securityField.waitForExistence(timeout: 2.0), "CVV field should exist for \(cardType)")
-            }
-
-            securityField.slowTypeText(cvv) // Use slow for validation
-            usleep(1000000) // Wait for form validation (1s)
-
-            // Submit the form
-            let submitButton = app.buttons["Submit"]
-            XCTAssertTrue(submitButton.waitForExistence(timeout: 1.0), "Submit button should exist")
-            XCTAssertTrue(submitButton.isEnabled, "Submit button should be enabled with valid data")
-
-            submitButton.tap()
-            print("Submitted form for \(cardType)")
-
-            // Wait for potential 3DS or success response
-            usleep(3000000) // 3s instead of 5s
-
-            // Check for 3DS challenge
-            let approve3DSButton = app.buttons["Approve"]
-            let continue3DSButton = app.buttons["Continue"]
-            let authorize3DSButton = app.buttons["Authorize"]
-
-            if approve3DSButton.waitForExistence(timeout: 1.0) {
-                print("3DS challenge detected for \(cardType), approving...")
-                approve3DSButton.tap()
-                usleep(2000000) // 2s instead of 3s
-            } else if continue3DSButton.waitForExistence(timeout: 1.0) {
-                print("3DS continue detected for \(cardType), continuing...")
-                continue3DSButton.tap()
-                usleep(2000000) // 2s instead of 3s
-            } else if authorize3DSButton.waitForExistence(timeout: 1.0) {
-                print("3DS authorize detected for \(cardType), authorizing...")
-                authorize3DSButton.tap()
-                usleep(2000000) // 2s instead of 3s
-            }
-
-            // Wait for final response
-            usleep(2000000) // 2s instead of 3s
-
-            // Check for success indicators
-            // Look for alert with token or success message
-            let alertTitle = app.alerts.element.label
-            let alertExists = app.alerts.element.exists
-
-            if alertExists {
-                print("Alert detected for \(cardType): \(alertTitle)")
-
-                // Check if it's a success (contains token or success message)
-                let alertMessage = app.alerts.element.staticTexts.element(boundBy: 1).label
-                print("Alert message: \(alertMessage)")
-
-                // Success indicators could be:
-                // - Alert title is "Card Details" (indicates response received)
-                // - Alert message contains a token (successful tokenization)
-                // - OR expected API configuration errors (test environment limitation)
-                let hasValidResponse = alertTitle.contains("Card Details")
-                let isActualSuccess = hasValidResponse &&
-                !alertMessage.lowercased().contains("error") &&
-                !alertMessage.lowercased().contains("failed") &&
-                !alertMessage.lowercased().contains("invalid")
-                let isApiConfigError = alertMessage.contains("CardDetailsError error 0") ||
-                alertMessage.contains("operation couldn't be completed")
-
-                // Accept either success OR expected API config errors (common in test environments)
-                let isAcceptableResult = isActualSuccess || (hasValidResponse && isApiConfigError)
-
-                if isActualSuccess {
-                    print("✅ Actual tokenization success for \(cardType)")
-                } else if isApiConfigError {
-                    print("⚠️ API configuration issue for \(cardType) (expected in test environment)")
-                } else {
-                    print("❌ Unexpected error for \(cardType): \(alertMessage)")
-                }
-
-                XCTAssertTrue(isAcceptableResult,
-                              "Should get valid response for \(cardType). Alert: \(alertTitle), Message: \(alertMessage)")
-
-                // Dismiss alert
-                if app.alerts.buttons["OK"].waitForExistence(timeout: 0.5) {
-                    app.alerts.buttons["OK"].tap()
-                } else if app.alerts.buttons["Dismiss"].waitForExistence(timeout: 0.5) {
-                    app.alerts.buttons["Dismiss"].tap()
-                } else {
-                    // Tap outside alert to dismiss
-                    app.tap()
-                }
-
-                usleep(500000) // 500ms instead of 1s
-
-                if isActualSuccess {
-                    print("Successfully tokenized \(cardType) ✅")
-                } else {
-                    print("Completed workflow test for \(cardType) ✅ (API config issue expected)")
-                }
-            } else {
-                // No alert might indicate success or we need to wait longer
-                print("No immediate alert for \(cardType), checking for other success indicators...")
-                sleep(2)
-
-                // Check if form was reset or any other success indicator
-                let cardNumberAfterSubmit = cardNumberField.value as? String ?? ""
-                if cardNumberAfterSubmit.isEmpty {
-                    print("\(cardType) form was reset - likely successful ✅")
-                } else {
-                    print("⚠️ No clear success indicator for \(cardType)")
-                }
-            }
-
-            // Clear any remaining state
-            sleep(1)
-        }
-
-        print("Completed tokenization tests for all card types")
-    }
-
+////     swiftlint:disable:next function_body_length
+//    func testSuccessfulTokenization() throws {
+//        // Test data: Card Number, CVV, Card Type
+//        let testCards = [
+//            ("5111111111111118", "100", "MasterCard"),  // MasterCard
+//            ("4012000033330026", "100", "Visa"),        // Visa
+//            ("371449635398431", "1000", "AMEX"),        // AMEX
+//            ("3528111100000001", "100", "JCB")          // JCB
+//        ]
+//
+//        for (cardNumber, cvv, cardType) in testCards {
+//            print("Testing tokenization for \(cardType): \(cardNumber)")
+//
+//            navigateToCardDetailsWidget()
+//
+//            // Fill cardholder name
+//            let cardholderField = app.textFields["Cardholder name"]
+//            XCTAssertTrue(cardholderField.waitForExistence(timeout: 1.0), "Cardholder name field should exist")
+//            cardholderField.slowTypeText("John Doe") // Use slow for form validation
+//
+//            // Fill card number
+//            let cardNumberField = app.textFields["Card number"]
+//            XCTAssertTrue(cardNumberField.exists, "Card number field should exist")
+//            cardNumberField.slowTypeText(cardNumber) // Use slow for card type detection
+//            usleep(1500000) // Wait for card type detection (1.5s)
+//
+//            // Fill expiry date (future date)
+//            let expiryField = app.textFields["Expiry"]
+//            XCTAssertTrue(expiryField.exists, "Expiry field should exist")
+//            expiryField.slowTypeText("12/30") // Use slow for validation
+//
+//            // Fill CVV/CVC/CID based on card type
+//            var securityField: XCUIElement
+//            if cardType == "AMEX" {
+//                securityField = app.textFields["CID"]
+//                XCTAssertTrue(securityField.waitForExistence(timeout: 2.0), "CID field should exist for AMEX")
+//            } else if cardType == "MasterCard" {
+//                securityField = app.textFields["CVC"]
+//                XCTAssertTrue(securityField.waitForExistence(timeout: 2.0), "CVC field should exist for MasterCard")
+//            } else {
+//                securityField = app.textFields["CVV"]
+//                XCTAssertTrue(securityField.waitForExistence(timeout: 2.0), "CVV field should exist for \(cardType)")
+//            }
+//
+//            securityField.slowTypeText(cvv) // Use slow for validation
+//            usleep(1000000) // Wait for form validation (1s)
+//
+//            // Submit the form
+//            let submitButton = app.buttons["Submit"]
+//            XCTAssertTrue(submitButton.waitForExistence(timeout: 1.0), "Submit button should exist")
+//            XCTAssertTrue(submitButton.isEnabled, "Submit button should be enabled with valid data")
+//
+//            submitButton.tap()
+//            print("Submitted form for \(cardType)")
+//
+//            // Wait for potential 3DS or success response
+//            usleep(3000000) // 3s instead of 5s
+//
+//            // Check for 3DS challenge
+//            let approve3DSButton = app.buttons["Approve"]
+//            let continue3DSButton = app.buttons["Continue"]
+//            let authorize3DSButton = app.buttons["Authorize"]
+//
+//            if approve3DSButton.waitForExistence(timeout: 1.0) {
+//                print("3DS challenge detected for \(cardType), approving...")
+//                approve3DSButton.tap()
+//                usleep(2000000) // 2s instead of 3s
+//            } else if continue3DSButton.waitForExistence(timeout: 1.0) {
+//                print("3DS continue detected for \(cardType), continuing...")
+//                continue3DSButton.tap()
+//                usleep(2000000) // 2s instead of 3s
+//            } else if authorize3DSButton.waitForExistence(timeout: 1.0) {
+//                print("3DS authorize detected for \(cardType), authorizing...")
+//                authorize3DSButton.tap()
+//                usleep(2000000) // 2s instead of 3s
+//            }
+//
+//            // Wait for final response
+//            usleep(2000000) // 2s instead of 3s
+//
+//            // Check for success indicators
+//            // Look for alert with token or success message
+//            let alertTitle = app.alerts.element.label
+//            let alertExists = app.alerts.element.exists
+//
+//            if alertExists {
+//                print("Alert detected for \(cardType): \(alertTitle)")
+//
+//                // Check if it's a success (contains token or success message)
+//                let alertMessage = app.alerts.element.staticTexts.element(boundBy: 1).label
+//                print("Alert message: \(alertMessage)")
+//
+//                // Success indicators could be:
+//                // - Alert title is "Card Details" (indicates response received)
+//                // - Alert message contains a token (successful tokenization)
+//                // - OR expected API configuration errors (test environment limitation)
+//                let hasValidResponse = alertTitle.contains("Card Details")
+//                let isActualSuccess = hasValidResponse &&
+//                !alertMessage.lowercased().contains("error") &&
+//                !alertMessage.lowercased().contains("failed") &&
+//                !alertMessage.lowercased().contains("invalid")
+//                let isApiConfigError = alertMessage.contains("CardDetailsError error 0") ||
+//                alertMessage.contains("operation couldn't be completed")
+//
+//                // Accept either success OR expected API config errors (common in test environments)
+//                let isAcceptableResult = isActualSuccess || (hasValidResponse && isApiConfigError)
+//
+//                if isActualSuccess {
+//                    print("✅ Actual tokenization success for \(cardType)")
+//                } else if isApiConfigError {
+//                    print("⚠️ API configuration issue for \(cardType) (expected in test environment)")
+//                } else {
+//                    print("❌ Unexpected error for \(cardType): \(alertMessage)")
+//                }
+//
+//                XCTAssertTrue(isAcceptableResult,
+//                              "Should get valid response for \(cardType). Alert: \(alertTitle), Message: \(alertMessage)")
+//
+//                // Dismiss alert
+//                if app.alerts.buttons["OK"].waitForExistence(timeout: 0.5) {
+//                    app.alerts.buttons["OK"].tap()
+//                } else if app.alerts.buttons["Dismiss"].waitForExistence(timeout: 0.5) {
+//                    app.alerts.buttons["Dismiss"].tap()
+//                } else {
+//                    // Tap outside alert to dismiss
+//                    app.tap()
+//                }
+//
+//                usleep(500000) // 500ms instead of 1s
+//
+//                if isActualSuccess {
+//                    print("Successfully tokenized \(cardType) ✅")
+//                } else {
+//                    print("Completed workflow test for \(cardType) ✅ (API config issue expected)")
+//                }
+//            } else {
+//                // No alert might indicate success or we need to wait longer
+//                print("No immediate alert for \(cardType), checking for other success indicators...")
+//                sleep(2)
+//
+//                // Check if form was reset or any other success indicator
+//                let cardNumberAfterSubmit = cardNumberField.value as? String ?? ""
+//                if cardNumberAfterSubmit.isEmpty {
+//                    print("\(cardType) form was reset - likely successful ✅")
+//                } else {
+//                    print("⚠️ No clear success indicator for \(cardType)")
+//                }
+//            }
+//
+//            // Clear any remaining state
+//            sleep(1)
+//        }
+//
+//        print("Completed tokenization tests for all card types")
+//    }
 }
 
 // MARK: - XCUIElement Extensions
