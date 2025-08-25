@@ -19,7 +19,7 @@ final class PayPalVaultServiceNegativeTests: XCTestCase {
         self.sut = PayPalVaultServiceMock()
         sut.sendError = true
     }
-    
+
     func testCreateTokenFailure() async {
         sut.responseFilename = .authFail
         do {
@@ -32,7 +32,7 @@ final class PayPalVaultServiceNegativeTests: XCTestCase {
             XCTFail("Should always fail with known error response!")
         }
     }
-    
+
     func testCreateSetupTokenFailure() async {
         // TODO: - Update error responses once we know how they will look
         sut.responseFilename = .authFail
@@ -46,7 +46,7 @@ final class PayPalVaultServiceNegativeTests: XCTestCase {
             XCTFail("Should always fail with known error response!")
         }
     }
-    
+
     func testGetClientIdFailure() async {
         // TODO: - Update error responses once we know how they will look
         sut.responseFilename = .authFail
@@ -59,7 +59,7 @@ final class PayPalVaultServiceNegativeTests: XCTestCase {
             XCTFail("Should always fail with known error response!")
         }
     }
-    
+
     func testCreatePaymentTokenFailure() async {
         // TODO: - Update error responses once we know how they will look
         sut.responseFilename = .authFail

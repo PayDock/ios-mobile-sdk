@@ -15,12 +15,12 @@ class CardServiceMock: Mockable, CardService {
         let cardTokenRes = loadJSON(filename: "card_tokenisation_success_response", type: CardTokenRes.self)
         return cardTokenRes.resource.data
     }
-    
+
     func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
         let cardTokenRes = loadJSON(filename: "card_tokenisation_success_response", type: CardTokenRes.self)
         return cardTokenRes.resource.data
     }
-    
+
     func getCardBinSchema(accessToken: String) async throws -> [BinSchemaRes.BinSchema] {
         let schemes = loadJSON(filename: "card_schemes", type: BinSchemaRes.self)
         return schemes.cardSchemas

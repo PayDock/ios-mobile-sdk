@@ -207,5 +207,4 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
     nonisolated func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         // No need to handle errors for now
     }
-
 }

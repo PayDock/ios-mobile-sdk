@@ -11,27 +11,27 @@ import Combine
 
 @MainActor
 class PayPalVMTests: XCTestCase {
-    
+
     var viewModel: PayPalVM!
     var mockService: WalletServiceMock!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<ChargeResponse, PayPalError>?
     var cancellables = Set<AnyCancellable>()
-    
+
     override func setUp() {
         super.setUp()
         mockService = WalletServiceMock()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
-        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: loadingDelegate, completion: { result in
             self.completionResult = result
-        }
+        })
     }
-    
+
     override func tearDown() {
         viewModel = nil
         mockService = nil
@@ -41,102 +41,102 @@ class PayPalVMTests: XCTestCase {
         cancellables.removeAll()
         super.tearDown()
     }
-    
+
     func testInitialisationWithOptionsStateNone() {
         XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
-    
+
     func testInitialisationWithOptionsStateDisabled() {
-        viewModel = PayPalVM(viewState: ViewState(state: .disabled), tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
+        viewModel = PayPalVM(viewState: ViewState(state: .disabled), tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: loadingDelegate, completion: { result in
             self.completionResult = result
-        }
-        
+        })
+
         XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
-    
+
     func testInitialisationWithDelegateShowLoader() {
         XCTAssertEqual(viewModel.showLoaders, false)
     }
-    
+
     func testInitialisationWithoutDelegateShowLoader() {
-        viewModel = PayPalVM(viewState: ViewState(state: .disabled), tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: nil) { result in
+        viewModel = PayPalVM(viewState: ViewState(state: .disabled), tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: nil, completion: { result in
             self.completionResult = result
-        }
-        
+        })
+
         XCTAssertEqual(viewModel.showLoaders, true)
     }
-    
+
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
-        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: loadingDelegate, completion: { result in
             self.completionResult = result
-        }
-        
+        })
+
         // When
         viewModel.updateLoadingState(isLoading: true)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, true)
         XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
-    
+
     func testUpdateLoadingStateToTrueWithoutDelegate() {
-        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: nil) { result in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: nil, completion: { result in
             self.completionResult = result
-        }
+        })
         viewModel.isLoading = false
         loadingDelegate.isLoading = false
-        
+
         // When
         viewModel.updateLoadingState(isLoading: true)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
         XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
-    
+
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
-        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: loadingDelegate) { result in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: loadingDelegate, completion: { result in
             self.completionResult = result
-        }
+        })
         viewModel.isLoading = false
         loadingDelegate.isLoading = true
-        
+
         // When
         viewModel.updateLoadingState(isLoading: false)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
         XCTAssertEqual(viewModel.viewState.isDisabled, false)
     }
-    
+
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
-        viewModel = PayPalVM(viewState: viewState, tokenRequest: { tokenResult in
-            
-        }, walletService: mockService, loadingDelegate: nil) { result in
+        viewModel = PayPalVM(viewState: viewState, tokenRequest: { _ in
+
+        }, walletService: mockService, loadingDelegate: nil, completion: { result in
             self.completionResult = result
-        }
+        })
         viewModel.isLoading = true
         loadingDelegate.isLoading = false
-        
+
         // When
         viewModel.updateLoadingState(isLoading: false)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)

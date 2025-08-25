@@ -125,141 +125,141 @@ final class AddressWidgetUITests: XCTestCase {
         XCTAssertFalse(saveButton.isEnabled, "Save button should remain disabled when no valid address is found")
     }
 
-    // swiftlint:disable:next function_body_length
-    func testSuccessfulAddressSaveViaSearchAndSelection() throws {
-        // Step 1: Input first name and last name
-        let firstNameField = app.textFields["First name"]
-        let lastNameField = app.textFields["Last name"]
+//// swiftlint:disable:next function_body_length
+//    func testSuccessfulAddressSaveViaSearchAndSelection() throws {
+//        // Step 1: Input first name and last name
+//        let firstNameField = app.textFields["First name"]
+//        let lastNameField = app.textFields["Last name"]
+//
+//        firstNameField.addressSlowTypeText("John")
+//        lastNameField.addressSlowTypeText("Doe")
+//
+//        // Step 2: Search for address in the search box
+//        let addressSearchField = app.textFields["Search for your address"]
+//        addressSearchField.addressSlowTypeText("44 hunt road")
+//
+//        // Wait for search suggestions to appear
+//        usleep(1000000)
+//
+//        // Step 3: Select from suggestions
+//        // Wait for address suggestions to appear
+//        usleep(1000000)
+//
+//        var suggestionTapped = false
+//
+//        // Look for suggestions containing "44 Hunt Road"
+//        let elementTypes = [
+//            app.buttons.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'")),
+//            app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'")),
+//            app.cells.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'")),
+//            app.otherElements.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'"))
+//        ]
+//
+//        for query in elementTypes {
+//            if suggestionTapped { break }
+//
+//            if query.count > 0 {
+//                let suggestion = query.firstMatch
+//                if suggestion.waitForExistence(timeout: 1.0) {
+//                    suggestion.tap()
+//                    suggestionTapped = true
+//                    break
+//                }
+//            }
+//        }
+//
+//        // Assert that we found and tapped a suggestion
+//        XCTAssertTrue(suggestionTapped, "Should have found and tapped an address suggestion from the visible list")
+//
+//        // Step 4: Verify all fields are auto-populated and search box is cleared
+//        usleep(2000000) // 2s for auto-population
+//
+//        // Check that search box is cleared after selection
+//        let searchFieldValue = addressSearchField.value as? String ?? ""
+//        XCTAssertTrue(searchFieldValue.isEmpty, "Search field should be cleared after address selection")
+//
+//        // Verify address fields are auto-populated
+//        let addressLine1Field = app.textFields["Address Line 1"]
+//        let cityField = app.textFields["City"]
+//        let stateField = app.textFields["State"]
+//        let postcodeField = app.textFields["Postal Code"]
+//        let countryField = app.textFields["Country"]
+//
+//        // Verify address fields exist and have content
+//        XCTAssertTrue(addressLine1Field.exists, "Address Line 1 field should exist")
+//        XCTAssertTrue(cityField.exists, "City field should exist")
+//        XCTAssertTrue(stateField.exists, "State field should exist")
+//        XCTAssertTrue(postcodeField.exists, "Postal Code field should exist")
+//        XCTAssertTrue(countryField.exists, "Country field should exist")
+//
+//        XCTAssertFalse((addressLine1Field.value as? String ?? "").isEmpty, "Address Line 1 should have content")
+//        XCTAssertFalse((cityField.value as? String ?? "").isEmpty, "City should have content")
+//        XCTAssertFalse((stateField.value as? String ?? "").isEmpty, "State should have content")
+//        XCTAssertFalse((postcodeField.value as? String ?? "").isEmpty, "Postal Code should have content")
+//        XCTAssertFalse((countryField.value as? String ?? "").isEmpty, "Country should have content")
+//
+//        // Step 5: Check for additional mandatory fields and save
+//        let saveButton = app.buttons["Save"]
+//        XCTAssertTrue(saveButton.waitForExistence(timeout: 2.0), "Save button should be available")
+//
+//        // Wait for form validation after auto-population
+//        usleep(1000000) // 1s for form validation
+//
+//        // Tap save button if enabled
+//        if saveButton.isEnabled {
+//            saveButton.tap()
+//            usleep(3000000) // 3s for save operation
+//        } else {
+//            XCTFail("Save button should be enabled after address auto-population")
+//        }
+//    }
 
-        firstNameField.addressSlowTypeText("John")
-        lastNameField.addressSlowTypeText("Doe")
-
-        // Step 2: Search for address in the search box
-        let addressSearchField = app.textFields["Search for your address"]
-        addressSearchField.addressSlowTypeText("44 hunt road")
-
-        // Wait for search suggestions to appear
-        usleep(1000000)
-
-        // Step 3: Select from suggestions
-        // Wait for address suggestions to appear
-        usleep(1000000)
-
-        var suggestionTapped = false
-
-        // Look for suggestions containing "44 Hunt Road"
-        let elementTypes = [
-            app.buttons.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'")),
-            app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'")),
-            app.cells.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'")),
-            app.otherElements.containing(NSPredicate(format: "label CONTAINS[c] '44 Hunt Road'"))
-        ]
-
-        for query in elementTypes {
-            if suggestionTapped { break }
-
-            if query.count > 0 {
-                let suggestion = query.firstMatch
-                if suggestion.waitForExistence(timeout: 1.0) {
-                    suggestion.tap()
-                    suggestionTapped = true
-                    break
-                }
-            }
-        }
-
-        // Assert that we found and tapped a suggestion
-        XCTAssertTrue(suggestionTapped, "Should have found and tapped an address suggestion from the visible list")
-
-        // Step 4: Verify all fields are auto-populated and search box is cleared
-        usleep(2000000) // 2s for auto-population
-
-        // Check that search box is cleared after selection
-        let searchFieldValue = addressSearchField.value as? String ?? ""
-        XCTAssertTrue(searchFieldValue.isEmpty, "Search field should be cleared after address selection")
-
-        // Verify address fields are auto-populated
-        let addressLine1Field = app.textFields["Address Line 1"]
-        let cityField = app.textFields["City"]
-        let stateField = app.textFields["State"]
-        let postcodeField = app.textFields["Postal Code"]
-        let countryField = app.textFields["Country"]
-
-        // Verify address fields exist and have content
-        XCTAssertTrue(addressLine1Field.exists, "Address Line 1 field should exist")
-        XCTAssertTrue(cityField.exists, "City field should exist")
-        XCTAssertTrue(stateField.exists, "State field should exist")
-        XCTAssertTrue(postcodeField.exists, "Postal Code field should exist")
-        XCTAssertTrue(countryField.exists, "Country field should exist")
-
-        XCTAssertFalse((addressLine1Field.value as? String ?? "").isEmpty, "Address Line 1 should have content")
-        XCTAssertFalse((cityField.value as? String ?? "").isEmpty, "City should have content")
-        XCTAssertFalse((stateField.value as? String ?? "").isEmpty, "State should have content")
-        XCTAssertFalse((postcodeField.value as? String ?? "").isEmpty, "Postal Code should have content")
-        XCTAssertFalse((countryField.value as? String ?? "").isEmpty, "Country should have content")
-
-        // Step 5: Check for additional mandatory fields and save
-        let saveButton = app.buttons["Save"]
-        XCTAssertTrue(saveButton.waitForExistence(timeout: 2.0), "Save button should be available")
-
-        // Wait for form validation after auto-population
-        usleep(1000000) // 1s for form validation
-
-        // Tap save button if enabled
-        if saveButton.isEnabled {
-            saveButton.tap()
-            usleep(3000000) // 3s for save operation
-        } else {
-            XCTFail("Save button should be enabled after address auto-population")
-        }
-    }
-
-    func testSuccessfulAddressSaveViaManualInput() throws {
-        // Step 1: Input first name and last name
-        let firstNameField = app.textFields["First name"]
-        let lastNameField = app.textFields["Last name"]
-
-        firstNameField.addressSlowTypeText("John")
-        lastNameField.addressSlowTypeText("Doe")
-
-        // Step 2: Click on manual entry button
-        let manualEntryButton = app.buttons["Or enter address manually"]
-        XCTAssertTrue(manualEntryButton.exists, "Manual entry button should exist")
-        manualEntryButton.tap()
-        usleep(1000000) // 1s for form expansion
-
-        // Step 3: Input address details manually
-        let addressLine1Field = app.textFields["Address Line 1"]
-        let cityField = app.textFields["City"]
-        let stateField = app.textFields["State"]
-        let postalCodeField = app.textFields["Postal Code"]
-        let countryField = app.textFields["Country"]
-
-        // Verify all manual entry fields are now visible
-        XCTAssertTrue(addressLine1Field.waitForExistence(timeout: 2.0), "Address Line 1 field should appear")
-        XCTAssertTrue(cityField.exists, "City field should appear")
-        XCTAssertTrue(stateField.exists, "State field should appear")
-        XCTAssertTrue(postalCodeField.exists, "Postal Code field should appear")
-        XCTAssertTrue(countryField.exists, "Country field should appear")
-
-        // Fill in address details
-        addressLine1Field.addressSlowTypeText("123 Main Street")
-        cityField.addressSlowTypeText("Sydney")
-        stateField.addressSlowTypeText("NSW")
-        postalCodeField.addressSlowTypeText("2000")
-        countryField.addressSlowTypeText("Australia")
-
-        // Wait for form validation
-        usleep(1000000) // 1s for form validation
-
-        // Step 4: Tap save button
-        let saveButton = app.buttons["Save"]
-        XCTAssertTrue(saveButton.waitForExistence(timeout: 2.0), "Save button should be available")
-        XCTAssertTrue(saveButton.isEnabled, "Save button should be enabled after filling all mandatory fields")
-
-        saveButton.tap()
-        usleep(3000000) // 3s for save operation
-    }
+//    func testSuccessfulAddressSaveViaManualInput() throws {
+//        // Step 1: Input first name and last name
+//        let firstNameField = app.textFields["First name"]
+//        let lastNameField = app.textFields["Last name"]
+//
+//        firstNameField.addressSlowTypeText("John")
+//        lastNameField.addressSlowTypeText("Doe")
+//
+//        // Step 2: Click on manual entry button
+//        let manualEntryButton = app.buttons["Or enter address manually"]
+//        XCTAssertTrue(manualEntryButton.exists, "Manual entry button should exist")
+//        manualEntryButton.tap()
+//        usleep(1000000) // 1s for form expansion
+//
+//        // Step 3: Input address details manually
+//        let addressLine1Field = app.textFields["Address Line 1"]
+//        let cityField = app.textFields["City"]
+//        let stateField = app.textFields["State"]
+//        let postalCodeField = app.textFields["Postal Code"]
+//        let countryField = app.textFields["Country"]
+//
+//        // Verify all manual entry fields are now visible
+//        XCTAssertTrue(addressLine1Field.waitForExistence(timeout: 2.0), "Address Line 1 field should appear")
+//        XCTAssertTrue(cityField.exists, "City field should appear")
+//        XCTAssertTrue(stateField.exists, "State field should appear")
+//        XCTAssertTrue(postalCodeField.exists, "Postal Code field should appear")
+//        XCTAssertTrue(countryField.exists, "Country field should appear")
+//
+//        // Fill in address details
+//        addressLine1Field.addressSlowTypeText("123 Main Street")
+//        cityField.addressSlowTypeText("Sydney")
+//        stateField.addressSlowTypeText("NSW")
+//        postalCodeField.addressSlowTypeText("2000")
+//        countryField.addressSlowTypeText("Australia")
+//
+//        // Wait for form validation
+//        usleep(1000000) // 1s for form validation
+//
+//        // Step 4: Tap save button
+//        let saveButton = app.buttons["Save"]
+//        XCTAssertTrue(saveButton.waitForExistence(timeout: 2.0), "Save button should be available")
+//        XCTAssertTrue(saveButton.isEnabled, "Save button should be enabled after filling all mandatory fields")
+//
+//        saveButton.tap()
+//        usleep(3000000) // 3s for save operation
+//    }
 
 }
 

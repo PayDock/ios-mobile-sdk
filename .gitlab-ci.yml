@@ -30,12 +30,29 @@ variables:
     - saas-macos-medium-m1
   image: macos-14-xcode-15
 
-#runLint:
-#  extends:
-#    - .macos_saas_runners
-#  stage: quality
-#  script:
-#   - fastlane lint
+runLint:
+  variables:
+    CODE_CLIMATE_REPORT_PATH: "fastlane/swiftlint_report.json"
+  extends:
+    - .macos_saas_runners
+    
+  stage: quality
+  before_script:
+    - brew install swiftlint
+    - brew install gnu-sed
+  script:
+   - fastlane lint
+
+  rules:
+   - if: '$CI_PIPELINE_SOURCE == "push"'
+   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+  artifacts:
+    when: always
+    paths:
+      - "$CODE_CLIMATE_REPORT_PATH"
+    reports:
+      codequality: "$CODE_CLIMATE_REPORT_PATH"
 
 run_ExampleApp_tests:
   extends:
@@ -44,8 +61,6 @@ run_ExampleApp_tests:
   script:
     # 👇 Allow SwiftPM plugins in CI
     - defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
-    # Optional sanity: confirm setting was applied
-    - defaults read com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation || true
 
     - fastlane test
     - mv fastlane/test_output/report.junit fastlane/test_output/report.xml
