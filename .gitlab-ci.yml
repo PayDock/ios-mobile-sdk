@@ -42,7 +42,6 @@ runLint:
     - brew install gnu-sed
   script:
    - fastlane lint
-
   rules:
    - if: '$CI_PIPELINE_SOURCE == "push"'
    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -72,7 +71,7 @@ run_ExampleApp_tests:
       junit: fastlane/test_output/report.xml
     paths:
       - fastlane/test_output
-   
+
 run_MobileSDK_tests:
   extends:
     - .macos_saas_runners
@@ -85,6 +84,10 @@ run_MobileSDK_tests:
 
     - fastlane testPackage
     - mv fastlane/test_output/report.junit fastlane/test_output/report.xml
+
+    - xcrun xccov view --report --json fastlane/test_output/MobileSDK.xcresult > fastlane/test_output/coverage.json
+    - "COVERAGE=$(xcrun xccov view --report fastlane/test_output/MobileSDK.xcresult | grep 'MobileSDK ' | awk '{print $2}'); echo Coverage: $COVERAGE"
+  coverage: '/\d+\.\d+%/'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   artifacts:
@@ -93,7 +96,7 @@ run_MobileSDK_tests:
       junit: fastlane/test_output/report.xml
     paths:
       - fastlane/test_output
-    
+
 pull_bin_file:
   stage: build
   # image: 412245956714.dkr.ecr.ap-southeast-2.amazonaws.com/ci:20241212-1584910654
