@@ -29,7 +29,7 @@ lane :test do
     result_bundle: true,
     output_types: "junit",
     output_directory: "fastlane/test_output"
-)
+  )
 end
   
 lane :testPackage do
@@ -40,6 +40,7 @@ lane :testPackage do
     destination: "platform=iOS Simulator,name=iPhone 15",
     xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
+    code_coverage: true,
     output_types: "junit",
     output_directory: "fastlane/test_output"
   )
