@@ -62,7 +62,7 @@ final class GiftCardWidgetUITests: XCTestCase {
             ("12345678901234", true, "14 digits - minimum valid"),
             ("62734010000131278", true, "17 digits - valid real test data"),
             ("1234567890123456789012345", true, "25 digits - maximum valid"),
-            ("12345678901234567890123456", false, "26 digits - too long")
+            ("12345678901234567890123456", true, "26 digits but form will allow only 25")
         ]
 
         for (cardNumber, shouldBeValid, description) in testCases {

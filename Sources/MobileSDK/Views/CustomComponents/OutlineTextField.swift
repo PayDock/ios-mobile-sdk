@@ -188,6 +188,8 @@ struct OutlineTextField: View {
                 onTapGesture()
             }))
             .frame(height: getTextFieldHeight())
+            .frame(maxWidth: .infinity)
+            .layoutPriority(0)
             .disabled(disabled)
             .accessibilityLabel(title)
             .accessibilityHint(getValidMessage())

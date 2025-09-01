@@ -61,7 +61,11 @@ public struct GiftCardWidget: View {
                     self.textFieldInFocus = .cardNumber
                     viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
                 }
-            })
+            },
+            onTextChange: { text, cursorPosition in
+                return viewModel.giftCardFormManager.formatCardNumber(updatedText: text, cursorPosition: cursorPosition)
+            }
+        )
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name,
