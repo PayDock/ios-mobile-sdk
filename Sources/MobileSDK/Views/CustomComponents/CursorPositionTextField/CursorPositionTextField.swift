@@ -85,6 +85,11 @@ struct CursorPositionTextField: UIViewRepresentable {
         textField.returnKeyType = returnKeyType
         textField.textColor = textColor
         textField.tintColor = tintColor
+
+        // Prevent the text field from expanding
+        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textFieldDidChange), for: .editingChanged)
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textFieldDidEndEditing), for: .editingDidEnd)
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textFieldDidBeginEditing), for: .editingDidBegin)
@@ -105,6 +110,10 @@ struct CursorPositionTextField: UIViewRepresentable {
         updateFont(uiView)
 
         uiView.returnKeyType = returnKeyType
+
+        // Ensure the text field doesn't expand
+        uiView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        uiView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         // Update toolbar based on environment
         if let toolbarInfo = toolbarButton {

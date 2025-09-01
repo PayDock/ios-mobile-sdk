@@ -101,8 +101,10 @@ class GiftCardFormManager: ObservableObject {
 
     // MARK: - Formatting
 
-    func formatCardNumber(updatedText: String) -> String {
-        cardDetailsFormatter.formatCardNumber(updatedText: updatedText)
+    func formatCardNumber(updatedText: String, cursorPosition: Int) -> Int {
+        let result = cardDetailsFormatter.formatGiftCardNumber(updatedText: updatedText, cursorPosition: cursorPosition)
+        cardNumberText = result.formattedText
+        return result.newCursorPosition
     }
 
     // MARK: - Editing

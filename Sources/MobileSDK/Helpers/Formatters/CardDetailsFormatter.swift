@@ -10,22 +10,36 @@ import Foundation
 
 class CardDetailsFormatter {
 
-    func formatCardNumber(updatedText: String) -> String {
+    func formatGiftCardNumber(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
         var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        var digitCount = 0
+
         for char in updatedText {
-            if char == " " && (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19) {
-                groomed.append(char)
-            } else if char.isASCII && char.isNumber {
-                if groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19 {
+            if char.isASCII && char.isNumber {
+                // Stop if we already have 25 digits
+                if digitCount == 25 { break }
+
+                // Insert space every 4 digits (except before the first digit)
+                if digitCount > 0 && digitCount % 4 == 0 {
                     groomed.append(" ")
+                    if originalIndex < cursorPosition {
+                        newCursorPosition += 1
+                    }
                 }
+
                 groomed.append(char)
+                digitCount += 1
             }
-            if groomed.count == 23 {
-                break
-            }
+
+            originalIndex += 1
         }
-        return groomed
+
+        // Ensure cursor position doesn't exceed the formatted text length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
     func formatCardNumber(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
@@ -85,5 +99,4 @@ class CardDetailsFormatter {
         }
         return groomed
     }
-
 }
