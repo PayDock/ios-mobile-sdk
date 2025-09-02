@@ -4,7 +4,6 @@
 //
 //  Created by Domagoj Grizelj on 28.08.2025..
 //  Created by Domagoj Grizelj on 13.01.2025..
-
 //
 
 import XCTest
@@ -50,24 +49,51 @@ class CardDetailsFormatterTests: XCTestCase {
 
     // MARK: - Expiry Date
 
-    func test_formatExpiryDate_insertsSlashAfter2Digits() {
-        let result = sut.formatExpiryDate(updatedText: "1225")
-        XCTAssertEqual(result, "12/25")
+    func testTypingMonth() {
+        let result = sut.formatExpiryDate(updatedText: "1", cursorPosition: 1)
+        XCTAssertEqual(result.formattedText, "1")
+        XCTAssertEqual(result.newCursorPosition, 1)
+
+        let result2 = sut.formatExpiryDate(updatedText: "12", cursorPosition: 2)
+        XCTAssertEqual(result2.formattedText, "12")
+        XCTAssertEqual(result2.newCursorPosition, 2)
     }
 
-    func test_formatExpiryDate_limitsTo5Characters() {
-        let result = sut.formatExpiryDate(updatedText: "12234567")
-        XCTAssertEqual(result, "12/23")
+    func testSlashAutoInsertion() {
+        let result = sut.formatExpiryDate(updatedText: "123", cursorPosition: 3)
+        XCTAssertEqual(result.formattedText, "12/3")
+        XCTAssertEqual(result.newCursorPosition, 4)
     }
 
-    func test_formatExpiryDate_handlesPreTypedSlash() {
-        let result = sut.formatExpiryDate(updatedText: "12/34")
-        XCTAssertEqual(result, "12/34")
+    func testAlreadyTypedSlash() {
+        let result = sut.formatExpiryDate(updatedText: "12/3", cursorPosition: 4)
+        XCTAssertEqual(result.formattedText, "12/3")
+        XCTAssertEqual(result.newCursorPosition, 4)
     }
 
-    func test_formatExpiryDate_ignoresNonDigits() {
-        let result = sut.formatExpiryDate(updatedText: "1a2b3c")
-        XCTAssertEqual(result, "12/3")
+    func testFullExpiryDate() {
+        let result = sut.formatExpiryDate(updatedText: "1227", cursorPosition: 4)
+        XCTAssertEqual(result.formattedText, "12/27")
+        XCTAssertEqual(result.newCursorPosition, 5)
+    }
+
+    func testMaxLength() {
+        let result = sut.formatExpiryDate(updatedText: "1223456", cursorPosition: 7)
+        XCTAssertEqual(result.formattedText, "12/23")
+        XCTAssertEqual(result.newCursorPosition, 5) // capped at end
+    }
+
+    func testCursorInsideMonth() {
+        let result = sut.formatExpiryDate(updatedText: "1234", cursorPosition: 1)
+        XCTAssertEqual(result.formattedText, "12/34")
+        XCTAssertEqual(result.newCursorPosition, 1) // cursor stays
+    }
+
+    func testCursorBeforeSlashInsertion() {
+        // Typing at index 2, slash should not push cursor forward
+        let result = sut.formatExpiryDate(updatedText: "123", cursorPosition: 2)
+        XCTAssertEqual(result.formattedText, "12/3")
+        XCTAssertEqual(result.newCursorPosition, 2)
     }
 
     // MARK: - Security Code

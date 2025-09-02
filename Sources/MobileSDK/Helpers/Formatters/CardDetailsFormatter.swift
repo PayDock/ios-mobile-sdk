@@ -42,22 +42,39 @@ class CardDetailsFormatter {
         return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
-    func formatExpiryDate(updatedText: String) -> String {
+    func formatExpiryDate(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
         var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        var digitCount = 0
+
         for char in updatedText {
-            if char == "/" && groomed.count == 2 {
-                groomed.append(char)
+            if char == "/" {
+                // Accept a slash only if it belongs at position 2 and there's not already one
+                if groomed.count == 2 && groomed.last != Character("/") {
+                    groomed.append(char)
+                    if originalIndex < cursorPosition {
+                        newCursorPosition += 1
+                    }
+                }
             } else if char.isASCII && char.isNumber {
-                if groomed.count == 2 {
+                // Insert slash before the 3rd digit only if we don't already have one
+                if digitCount == 2 && groomed.last != Character("/") {
                     groomed.append("/")
+                    if originalIndex < cursorPosition {
+                        newCursorPosition += 1
+                    }
                 }
                 groomed.append(char)
+                digitCount += 1
             }
-            if groomed.count == 5 {
-                break
-            }
+
+            originalIndex += 1
+            if groomed.count == 5 { break } // "MM/YY"
         }
-        return groomed
+
+        newCursorPosition = min(newCursorPosition, groomed.count)
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
     func formatSecurityCode(updatedText: String) -> String {

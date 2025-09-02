@@ -155,8 +155,10 @@ public struct CardDetailsWidget: View {
                                 self.textFieldInFocus = .expiryDate
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
                             }
-                        }
-                    )
+                        },
+                        onTextChange: { text, cursorPosition in
+                            return viewModel.cardDetailsFormManager.formatExpiryDate(updatedText: text, cursorPosition: cursorPosition)
+                        })
                     .keyboardType(.numberPad)
                     .customToolbar(
                         buttonTitle: "Next",
@@ -173,9 +175,6 @@ public struct CardDetailsWidget: View {
                         viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                     })
                     .focused($textFieldInFocus, equals: .expiryDate)
-                    .onChange(of: viewModel.cardDetailsFormManager.expiryDateText) { newValue in
-                        viewModel.cardDetailsFormManager.formatExpiryDate(updatedText: newValue)
-                    }
 
                     OutlineTextField(
                         appearance: appearance.textField,
