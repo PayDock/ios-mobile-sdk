@@ -24,30 +24,6 @@ class CardDetailsFormatterTests: XCTestCase {
         super.tearDown()
     }
 
-    // MARK: - Gift Card Number
-
-    func test_formatGiftCardNumber_insertsSpacesEvery4Digits() {
-        let result = sut.formatGiftCardNumber(updatedText: "123456789012", cursorPosition: 12)
-        XCTAssertEqual(result.formattedText, "1234 5678 9012")
-    }
-
-    func test_formatGiftCardNumber_truncatesAt25Digits() {
-        let longInput = String(repeating: "1", count: 30)
-        let result = sut.formatGiftCardNumber(updatedText: longInput, cursorPosition: 30)
-        XCTAssertEqual(result.formattedText.count, 25 + 6) // 25 digits + 6 spaces
-    }
-
-    func test_formatGiftCardNumber_ignoresNonDigits() {
-        let result = sut.formatGiftCardNumber(updatedText: "12a34b56", cursorPosition: 8)
-        XCTAssertEqual(result.formattedText, "1234 56")
-    }
-
-    func test_formatGiftCardNumber_adjustsCursorPosition() {
-        let result = sut.formatGiftCardNumber(updatedText: "12345", cursorPosition: 5)
-        XCTAssertEqual(result.formattedText, "1234 5")
-        XCTAssertEqual(result.newCursorPosition, 6) // cursor moved past inserted space
-    }
-
     // MARK: - Card Number
 
     func test_formatCardNumber_insertsSpacesCorrectly() {
@@ -104,5 +80,74 @@ class CardDetailsFormatterTests: XCTestCase {
     func test_formatSecurityCode_emptyInput() {
         let result = sut.formatSecurityCode(updatedText: "")
         XCTAssertEqual(result, "")
+    }
+
+    // MARK: - Gift Card Number
+
+    func test_formatGiftCardNumber_insertsSpacesEvery4Digits() {
+        let result = sut.formatGiftCardNumber(updatedText: "123456789012", cursorPosition: 12)
+        XCTAssertEqual(result.formattedText, "1234 5678 9012")
+    }
+
+    func test_formatGiftCardNumber_truncatesAt25Digits() {
+        let longInput = String(repeating: "1", count: 30)
+        let result = sut.formatGiftCardNumber(updatedText: longInput, cursorPosition: 30)
+        XCTAssertEqual(result.formattedText.count, 25 + 6) // 25 digits + 6 spaces
+    }
+
+    func test_formatGiftCardNumber_ignoresNonDigits() {
+        let result = sut.formatGiftCardNumber(updatedText: "12a34b56", cursorPosition: 8)
+        XCTAssertEqual(result.formattedText, "1234 56")
+    }
+
+    func test_formatGiftCardNumber_adjustsCursorPosition() {
+        let result = sut.formatGiftCardNumber(updatedText: "12345", cursorPosition: 5)
+        XCTAssertEqual(result.formattedText, "1234 5")
+        XCTAssertEqual(result.newCursorPosition, 6) // cursor moved past inserted space
+    }
+
+    // MARK: - Gift Card Pin
+
+    func test_formatGiftCardPin_acceptsOnlyDigits() {
+        let result = sut.formatGiftCardPin(updatedText: "12a3b", cursorPosition: 5)
+        XCTAssertEqual(result.formattedText, "123")
+    }
+
+    func test_formatGiftCardPin_truncatesAfter4Digits() {
+        let result = sut.formatGiftCardPin(updatedText: "123456789", cursorPosition: 9)
+        XCTAssertEqual(result.formattedText, "1234")
+        XCTAssertEqual(result.formattedText.count, 4)
+    }
+
+    func test_formatGiftCardPin_emptyInput() {
+        let result = sut.formatGiftCardPin(updatedText: "", cursorPosition: 0)
+        XCTAssertEqual(result.formattedText, "")
+        XCTAssertEqual(result.newCursorPosition, 0)
+    }
+
+    func test_formatGiftCardPin_updatesCursorPositionCorrectly() {
+        // Cursor at end of "123"
+        let result = sut.formatGiftCardPin(updatedText: "123", cursorPosition: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 3)
+    }
+
+    func test_formatGiftCardPin_cursorPositionDoesNotExceedLength() {
+        // Cursor originally beyond input length
+        let result = sut.formatGiftCardPin(updatedText: "12", cursorPosition: 10)
+        XCTAssertEqual(result.formattedText, "12")
+        XCTAssertEqual(result.newCursorPosition, 2) // capped at length
+    }
+
+    func test_formatGiftCardPin_cursorMovesWithValidDigits() {
+        let result = sut.formatGiftCardPin(updatedText: "12x3", cursorPosition: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 2) // after processing "2" at index 1
+    }
+
+    func test_formatGiftCardPin_cursorStopsAtMaxDigits() {
+        let result = sut.formatGiftCardPin(updatedText: "12345", cursorPosition: 5)
+        XCTAssertEqual(result.formattedText, "1234")
+        XCTAssertEqual(result.newCursorPosition, 4) // pinned at max digits
     }
 }
