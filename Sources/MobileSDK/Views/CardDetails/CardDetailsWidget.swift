@@ -191,8 +191,10 @@ public struct CardDetailsWidget: View {
                                 self.textFieldInFocus = .securityCode
                                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
                             }
-                        }
-                    )
+                        },
+                        onTextChange: { text, cursorPosition in
+                            return viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: text, cursorPosition: cursorPosition)
+                        })
                     .keyboardType(.numberPad)
                     .customToolbar(
                         buttonTitle: "Done",
@@ -211,9 +213,6 @@ public struct CardDetailsWidget: View {
                             focusedField: collectCardholderName ? .cardholderName : .cardNumber)
                     })
                     .focused($textFieldInFocus, equals: .securityCode)
-                    .onChange(of: viewModel.cardDetailsFormManager.securityCodeText) { newValue in
-                        viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: newValue)
-                    }
                 }
             }
 

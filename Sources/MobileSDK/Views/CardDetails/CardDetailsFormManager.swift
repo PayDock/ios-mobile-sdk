@@ -314,8 +314,12 @@ class CardDetailsFormManager: ObservableObject {
         return result.newCursorPosition
     }
 
-    func formatSecurityCode(updatedText: String) {
-        securityCodeText = cardDetailsFormatter.formatSecurityCode(updatedText: updatedText)
+    func formatSecurityCode(updatedText: String, cursorPosition: Int) -> Int {
+        let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) ?? .visa
+        let maxDigits = cardSecurityCodeValidator.requiredDigits(cardScheme: cardScheme)
+        let result = cardDetailsFormatter.formatSecurityCode(updatedText: updatedText, cursorPosition: cursorPosition, maxDigits: maxDigits)
+        securityCodeText = result.formattedText
+        return result.newCursorPosition
     }
 
     // MARK: - Editing

@@ -40,7 +40,7 @@ class CardSecurityCodeValidator {
 
      - Returns: Number of digits required.
      */
-    private func requiredDigits(cardScheme: CardScheme) -> Int {
+    func requiredDigits(cardScheme: CardScheme) -> Int {
         switch cardScheme {
         case .amex: return 4
         case .mastercard, .visa, .diners, .discover, .japcb, .solo, .ausbc: return 3

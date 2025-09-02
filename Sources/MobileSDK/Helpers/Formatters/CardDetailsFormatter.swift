@@ -77,14 +77,32 @@ class CardDetailsFormatter {
         return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
-    func formatSecurityCode(updatedText: String) -> String {
+    func formatSecurityCode(updatedText: String, cursorPosition: Int, maxDigits: Int) -> (formattedText: String, newCursorPosition: Int) {
         var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        var digitCount = 0
+
         for char in updatedText {
             if char.isASCII && char.isNumber {
+                // Stop if we already have maxDigits
+                if digitCount == maxDigits { break }
+
                 groomed.append(char)
+                digitCount += 1
             }
+
+            if originalIndex < cursorPosition {
+                newCursorPosition = groomed.count
+            }
+
+            originalIndex += 1
         }
-        return groomed
+
+        // Ensure cursor position doesn't exceed formatted length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
     // MARK: - Gift Card

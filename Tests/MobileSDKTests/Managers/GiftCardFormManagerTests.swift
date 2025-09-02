@@ -3,6 +3,7 @@
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 01.09.2025..
+//  Copyright © 2025 Paydock Ltd.
 //
 
 import XCTest
@@ -11,11 +12,11 @@ import XCTest
 class GiftCardFormManagerTests: XCTestCase {
 
     var sut: GiftCardFormManager!
-    var mockFormatter: MockCardDetailsFormatter!
+    var mockFormatter: MockGiftCardDetailsFormatter!
 
     override func setUp() {
         super.setUp()
-        mockFormatter = MockCardDetailsFormatter()
+        mockFormatter = MockGiftCardDetailsFormatter()
         sut = GiftCardFormManager(cardDetailsFormatter: mockFormatter)
     }
 
@@ -265,7 +266,7 @@ class GiftCardFormManagerTests: XCTestCase {
 
 // MARK: - Mock CardDetailsFormatter
 
-class MockCardDetailsFormatter: CardDetailsFormatter {
+class MockGiftCardDetailsFormatter: CardDetailsFormatter {
 
     var formatGiftCardNumberCallCount = 0
     var formatGiftCardPinCallCount = 0
