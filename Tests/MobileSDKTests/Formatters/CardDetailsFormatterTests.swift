@@ -3,7 +3,7 @@
 //  MobileSDK
 //
 //  Created by Domagoj Grizelj on 28.08.2025..
-//  Created by Domagoj Grizelj on 13.01.2025..
+//  Copyright © 2025 Paydock Ltd.
 //
 
 import XCTest
@@ -98,14 +98,58 @@ class CardDetailsFormatterTests: XCTestCase {
 
     // MARK: - Security Code
 
-    func test_formatSecurityCode_allowsOnlyDigits() {
-        let result = sut.formatSecurityCode(updatedText: "12a3b4")
-        XCTAssertEqual(result, "1234")
+    func testThreeDigitCVC_allDigits() {
+        let result = sut.formatSecurityCode(updatedText: "123", cursorPosition: 3, maxDigits: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 3)
     }
 
-    func test_formatSecurityCode_emptyInput() {
-        let result = sut.formatSecurityCode(updatedText: "")
-        XCTAssertEqual(result, "")
+    func testThreeDigitCVC_moreThanThreeDigits() {
+        let result = sut.formatSecurityCode(updatedText: "1234", cursorPosition: 4, maxDigits: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 3)
+    }
+
+    func testThreeDigitCVC_withLettersAndSymbols() {
+        let result = sut.formatSecurityCode(updatedText: "1a2!3", cursorPosition: 5, maxDigits: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 3)
+    }
+
+    func testThreeDigitCVC_cursorInMiddle() {
+        let result = sut.formatSecurityCode(updatedText: "1a2b3", cursorPosition: 2, maxDigits: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 1) // cursor after first digit
+    }
+
+    func testFourDigitCVC_allDigits() {
+        let result = sut.formatSecurityCode(updatedText: "1234", cursorPosition: 4, maxDigits: 4)
+        XCTAssertEqual(result.formattedText, "1234")
+        XCTAssertEqual(result.newCursorPosition, 4)
+    }
+
+    func testFourDigitCVC_moreThanFourDigits() {
+        let result = sut.formatSecurityCode(updatedText: "12345", cursorPosition: 5, maxDigits: 4)
+        XCTAssertEqual(result.formattedText, "1234")
+        XCTAssertEqual(result.newCursorPosition, 4)
+    }
+
+    func testFourDigitCVC_withNonDigits() {
+        let result = sut.formatSecurityCode(updatedText: "12x3y4", cursorPosition: 6, maxDigits: 4)
+        XCTAssertEqual(result.formattedText, "1234")
+        XCTAssertEqual(result.newCursorPosition, 4)
+    }
+
+    func testEmptyInput() {
+        let result = sut.formatSecurityCode(updatedText: "", cursorPosition: 0, maxDigits: 3)
+        XCTAssertEqual(result.formattedText, "")
+        XCTAssertEqual(result.newCursorPosition, 0)
+    }
+
+    func testCursorDoesNotExceedFormattedText() {
+        let result = sut.formatSecurityCode(updatedText: "abcd1234", cursorPosition: 8, maxDigits: 3)
+        XCTAssertEqual(result.formattedText, "123")
+        XCTAssertEqual(result.newCursorPosition, 3)
     }
 
     // MARK: - Gift Card Number
