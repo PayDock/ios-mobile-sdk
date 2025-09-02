@@ -86,7 +86,7 @@ class GiftCardFormManager: ObservableObject {
     }
 
     private func validatePin() {
-        if CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText)) && pinText.count >= 4 {
+        if CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText)) && pinText.count == 4 {
             pinValid = true
             pinError = ""
         } else {
@@ -104,6 +104,12 @@ class GiftCardFormManager: ObservableObject {
     func formatCardNumber(updatedText: String, cursorPosition: Int) -> Int {
         let result = cardDetailsFormatter.formatGiftCardNumber(updatedText: updatedText, cursorPosition: cursorPosition)
         cardNumberText = result.formattedText
+        return result.newCursorPosition
+    }
+
+    func formatPinNumber(updatedText: String, cursorPosition: Int) -> Int {
+        let result = cardDetailsFormatter.formatGiftCardPin(updatedText: updatedText, cursorPosition: cursorPosition)
+        pinText = result.formattedText
         return result.newCursorPosition
     }
 

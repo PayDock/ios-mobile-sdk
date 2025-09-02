@@ -98,6 +98,9 @@ public struct GiftCardWidget: View {
                     self.textFieldInFocus = .pin
                     viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
                 }
+            },
+            onTextChange: { text, cursorPosition in
+                return viewModel.giftCardFormManager.formatPinNumber(updatedText: text, cursorPosition: cursorPosition)
             })
         .customToolbar(
             buttonTitle: "Done",
