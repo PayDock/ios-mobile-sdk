@@ -150,6 +150,7 @@ public struct CardDetailsWidget: View {
                         valid: $viewModel.cardDetailsFormManager.expiryDateValid,
                         disabled: $viewModel.viewState.isDisabled,
                         textContentType: getCreditCardExpiryDate(),
+                        keyboardType: .numberPad,
                         onTapGesture: {
                             if !viewModel.viewState.isDisabled {
                                 self.textFieldInFocus = .expiryDate
@@ -186,6 +187,7 @@ public struct CardDetailsWidget: View {
                         valid: $viewModel.cardDetailsFormManager.securityCodeValid,
                         disabled: $viewModel.viewState.isDisabled,
                         textContentType: getCreditCardSecurityCode(),
+                        keyboardType: .numberPad,
                         onTapGesture: {
                             if !viewModel.viewState.isDisabled {
                                 self.textFieldInFocus = .securityCode

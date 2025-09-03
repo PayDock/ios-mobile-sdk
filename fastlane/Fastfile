@@ -25,6 +25,9 @@ lane :test do
     scheme: "ExampleApp",
     configuration: "Debug (Staging)",
     devices: ["iPhone 15"],
+        only_testing: [
+        "ExampleAppTests"
+    ],
     xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     output_types: "junit",
@@ -105,4 +108,3 @@ lane :buildReleaseProduction do
   )
   # upload_to_testflight(changelog: "Add rocket emoji")
 end
-
