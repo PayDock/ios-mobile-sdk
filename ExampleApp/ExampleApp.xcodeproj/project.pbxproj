@@ -13,7 +13,6 @@
 		280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */; };
 		280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */; };
 		280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */; };
-		2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D42B480A8400EEC5C3 /* ActivityIndicatorModifier.swift */; };
 		2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
 		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
@@ -156,7 +155,6 @@
 		280E96352B1798DC00BE8C3E /* VaultTokenRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultTokenRes.swift; sourceTree = "<group>"; };
 		280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetView.swift; sourceTree = "<group>"; };
 		280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetVM.swift; sourceTree = "<group>"; };
-		2816F7D42B480A8400EEC5C3 /* ActivityIndicatorModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorModifier.swift; sourceTree = "<group>"; };
 		2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
@@ -696,7 +694,6 @@
 				28A3A9C52A6969F2004A8D34 /* FocusablePadding.swift */,
 				282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */,
 				282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */,
-				2816F7D42B480A8400EEC5C3 /* ActivityIndicatorModifier.swift */,
 				2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */,
 			);
 			path = CustomViews;
@@ -1046,7 +1043,6 @@
 				282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */,
 				287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */,
 				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
-				2816F7D52B480A8500EEC5C3 /* ActivityIndicatorModifier.swift in Sources */,
 				28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */,
 				2886AE772E55D4BA0071BADC /* Standalone3DSSource.swift in Sources */,
 				2886AE662E55D2690071BADC /* InitialiseWalletChargeMetaData.swift in Sources */,
@@ -1257,7 +1253,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1418,7 +1414,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1572,7 +1568,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1726,7 +1722,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1943,7 +1939,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1990,7 +1986,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

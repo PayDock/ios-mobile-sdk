@@ -20,6 +20,8 @@ struct SDKButton: View {
     private let shouldTemplate: Bool
     private let action: () -> Void
 
+    @StateObject private var announcementManager = LoadingAnnouncementManager()
+
     init(title: String?,
          image: Image? = nil,
          imageLocation: ImageLocation = .left,
@@ -52,9 +54,16 @@ struct SDKButton: View {
                             .foregroundColor(style.imageColor)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .opacity(style.isDisabled ? 0.3 : 1.0)
+
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
                             .opacity(isLoading ? 1.0 : 0.0)
+                            .onAppear {
+                                announcementManager.start()
+                            }
+                            .onDisappear {
+                                announcementManager.stop()
+                            }
                     }
                 } else if image != nil && title != nil {
                     getImageAndTitle()
@@ -85,14 +94,14 @@ struct SDKButton: View {
                         .font(.system(size: 32, weight: .light))
                         .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
-                    if #available(iOS 18.0, *) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
-                    } else {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
-                            .padding(.trailing, 4)
-                    }
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
+                        .onAppear {
+                            announcementManager.start()
+                        }
+                        .onDisappear {
+                            announcementManager.stop()
+                        }
                 }
                 Text(self.title ?? "")
             } else {
@@ -106,14 +115,14 @@ struct SDKButton: View {
                         .font(.system(size: 32, weight: .light))
                         .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
-                    if #available(iOS 18.0, *) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
-                    } else {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
-                            .padding(.leading, 4)
-                    }
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
+                        .onAppear {
+                            announcementManager.start()
+                        }
+                        .onDisappear {
+                            announcementManager.stop()
+                        }
                 }
             }
         }
@@ -122,14 +131,16 @@ struct SDKButton: View {
     private func getTitle() -> some View {
         HStack {
             if isLoading {
-                if #available(iOS 18.0, *) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
-                } else {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
-                        .padding(.trailing, 4)
-                }
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: style.loaderColor))
+                    .onAppear {
+                        announcementManager.start()
+                        UIAccessibility.post(notification: .announcement, argument: "Loading")
+                    }
+                    .onDisappear {
+                        announcementManager.stop()
+                        UIAccessibility.post(notification: .announcement, argument: "Finished loading")
+                    }
             }
             Text(self.title ?? "")
             if isLeftAligned {

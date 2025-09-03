@@ -59,6 +59,9 @@ extension CheckoutPaymentVM {
                 completion(.success(.init(token: token)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
+                viewState?.setState(.none)
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -77,6 +80,9 @@ extension CheckoutPaymentVM {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
+                viewState?.setState(.none)
             } catch {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: nil)))
@@ -120,6 +126,9 @@ extension CheckoutPaymentVM {
                 completion(.success(.init(token: token)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
+                viewState?.setState(.none)
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -271,6 +280,12 @@ extension CheckoutPaymentVM {
                     viewState?.setState(.none)
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
+
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                viewState?.setState(.none)
+                showAlert(title: .error, message: errorResponse.error?.message ?? "Error creating a charge")
+
             } catch {
                 await MainActor.run {
                     isLoading = false
@@ -392,8 +407,11 @@ extension CheckoutPaymentVM {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
                 viewState?.setState(.none)
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
+                viewState?.setState(.none)
             } catch {
-                completion(.failure(.initialisingWalletToken(reason: nil)))
+                completion(.failure(.initialisingWalletToken(reason: error.localizedDescription)))
                 viewState?.setState(.none)
             }
         }
@@ -418,9 +436,14 @@ extension CheckoutPaymentVM {
                 let res = try await walletService.captureChargeColesPay(chargeId: colesPayChargeId)
                 isLoading = false
                 showAlert(title: .success, message: "Charge successful: \(res.amount) \(res.currency)")
+
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                showAlert(title: .error, message: errorResponse.error?.message ?? "Error creating ColesPay charge")
+
             } catch {
                 isLoading = false
-                showAlert(title: .error, message: error.localizedDescription)
+                showAlert(title: .error, message: "Error creating ColesPay charge")
             }
         }
     }
