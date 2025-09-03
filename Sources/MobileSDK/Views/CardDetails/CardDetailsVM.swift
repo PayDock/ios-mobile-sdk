@@ -69,7 +69,8 @@ class CardDetailsVM: ObservableObject {
                 return
             }
 
-            let cardName = cardDetailsFormManager.cardholderNameText.isEmpty ? nil : cardDetailsFormManager.cardholderNameText
+            let trimmedCardName = cardDetailsFormManager.cardholderNameText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let cardName = trimmedCardName.isEmpty ? nil : trimmedCardName
 
             let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
                 gatewayId: config.gatewayId,
