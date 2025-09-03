@@ -88,8 +88,12 @@ struct CheckoutPaymentSheet: View {
                                       loadingDelegate: viewModel,
                                       completion: { result in
                         switch result {
-                        case .success(let result): viewModel.payWithCard(result.token)
-                        case .failure: break
+                        case .success(let result):
+                            viewModel.payWithCard(result.token)
+                        case .failure(let error):
+                            viewModel.alertTitle = "Error"
+                            viewModel.alertMessage = error.customMessage
+                            viewModel.showAlert = true
                         }
                     })
                     Spacer()
@@ -161,9 +165,9 @@ struct CheckoutPaymentSheet: View {
                     viewModel.alertTitle = "Success"
                     viewModel.alertMessage = "Charge successful"
                     viewModel.showAlert = true
-                case .failure:
+                case .failure(let error):
                     viewModel.alertTitle = "Error"
-                    viewModel.alertMessage = "Charge failed"
+                    viewModel.alertMessage = error.customMessage
                     viewModel.showAlert = true
                 }
             })
@@ -205,21 +209,19 @@ struct CheckoutPaymentSheet: View {
     }
 
     private var colesPayWidget: some View {
-        NavigationStack {
-            ScrollView {
-                ColesPayWidget(
-                    viewState: viewModel.viewState,
-                    loadingDelegate: viewModel,
-                    config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "")) { tokenResult in
-                        viewModel.initializeWalletChargeColesPay(completion: tokenResult)
-                    } completion: { result in
-                        switch result {
-                        case .success: viewModel.handleSuccess()
-                        case .failure(let error): viewModel.handleError(error: error)
-                        }
+        ScrollView {
+            ColesPayWidget(
+                viewState: viewModel.viewState,
+                loadingDelegate: viewModel,
+                config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? "")) { tokenResult in
+                    viewModel.initializeWalletChargeColesPay(completion: tokenResult)
+                } completion: { result in
+                    switch result {
+                    case .success: viewModel.handleSuccess()
+                    case .failure(let error): viewModel.handleError(error: error)
                     }
-                    .padding()
-            }
+                }
+                .padding()
         }
     }
 
