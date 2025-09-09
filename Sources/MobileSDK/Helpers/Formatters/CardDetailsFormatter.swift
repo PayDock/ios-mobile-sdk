@@ -44,37 +44,44 @@ class CardDetailsFormatter {
 
     func formatExpiryDate(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
         var groomed = ""
-        var newCursorPosition = cursorPosition
-        var originalIndex = 0
         var digitCount = 0
+        var originalIndex = 0
+        var newCursorPosition: Int?
 
         for char in updatedText {
             if char == "/" {
-                // Accept a slash only if it belongs at position 2 and there's not already one
-                if groomed.count == 2 && groomed.last != Character("/") {
-                    groomed.append(char)
-                    if originalIndex < cursorPosition {
-                        newCursorPosition += 1
-                    }
-                }
-            } else if char.isASCII && char.isNumber {
-                // Insert slash before the 3rd digit only if we don't already have one
-                if digitCount == 2 && groomed.last != Character("/") {
+                if groomed.count == 2 && groomed.last != "/" {
                     groomed.append("/")
-                    if originalIndex < cursorPosition {
-                        newCursorPosition += 1
+                }
+            } else if char.isWholeNumber {
+                if digitCount == 2 && groomed.last != "/" {
+                    groomed.append("/")
+                    if newCursorPosition == nil && originalIndex == cursorPosition {
+                        newCursorPosition = groomed.count - 1
                     }
                 }
                 groomed.append(char)
                 digitCount += 1
             }
 
+            if newCursorPosition == nil && originalIndex + 1 == cursorPosition {
+                newCursorPosition = groomed.count
+            }
+
             originalIndex += 1
             if groomed.count == 5 { break } // "MM/YY"
         }
 
-        newCursorPosition = min(newCursorPosition, groomed.count)
-        return (formattedText: groomed, newCursorPosition: newCursorPosition)
+        // Special case: cursor was at very start
+        if cursorPosition == 0 {
+            newCursorPosition = 0
+        }
+
+        if newCursorPosition == nil {
+            newCursorPosition = groomed.count
+        }
+
+        return (groomed, newCursorPosition!)
     }
 
     func formatSecurityCode(updatedText: String, cursorPosition: Int, maxDigits: Int) -> (formattedText: String, newCursorPosition: Int) {
