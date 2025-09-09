@@ -70,8 +70,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             let payPalConfig = CoreConfig(clientID: clientId, environment: environment)
             let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
 
-            payPalClient.vaultDelegate = self
-            payPalClient.vault(vaultRequest)
+            do {
+                let vaultResult = try await payPalClient.vault(vaultRequest)
+                await createPaymentToken(setupToken: vaultResult.tokenID)
+            } catch {
+                handleVaultError(error)
+            }
         }
     }
 
@@ -150,32 +154,19 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         case .customIcon(let image): return image
         }
     }
-}
 
-// MARK: - PayPalVaultDelegate
+    // MARK: - Error Handling
 
-extension PayPalSavePaymentSourceVM: PayPalVaultDelegate {
-
-    nonisolated func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient,
-                            didFinishWithVaultResult paypalVaultResult: PayPalWebPayments.PayPalVaultResult) {
-        Task { @MainActor in
-            await createPaymentToken(setupToken: paypalVaultResult.tokenID)
-        }
-    }
-
-    nonisolated func paypal(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient,
-                            didFinishWithVaultError vaultError: CorePayments.CoreSDKError) {
-        Task { @MainActor in
-            let errorDescription = vaultError.errorDescription ?? ""
-            completion(.failure(.sdkException(description: errorDescription)))
-            updateLoadingState(isLoading: false)
-        }
-    }
-
-    nonisolated func paypalDidCancel(_ paypalWebClient: PayPalWebPayments.PayPalWebCheckoutClient) {
-        Task { @MainActor in
+    private func handleVaultError(_ error: Error) {
+        if PayPalWebPayments.PayPalError.isVaultCanceled(error) {
             completion(.failure(.userCancelled))
-            updateLoadingState(isLoading: false)
+        } else if let coreError = error as? CoreSDKError {
+            let errorDescription = coreError.errorDescription ?? ""
+            completion(.failure(.sdkException(description: errorDescription)))
+        } else {
+            completion(.failure(.unknownError(error as? RequestError)))
         }
+
+        updateLoadingState(isLoading: false)
     }
 }
