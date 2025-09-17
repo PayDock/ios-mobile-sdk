@@ -21,6 +21,7 @@ enum StyleComponentsEnum {
     case title
     case applePay
     case afterpay
+    case payPal
     case spacings
     case buttonLoader
 
@@ -38,6 +39,7 @@ enum StyleComponentsEnum {
         case .title: return "Title"
         case .applePay: return "Apple Pay Button"
         case .afterpay: return "Afterpay Button"
+        case .payPal: return "PayPal Button"
         case .spacings: return "Spacings"
         case .buttonLoader: return "Button Loader"
         }
@@ -69,6 +71,8 @@ enum StyleComponentsEnum {
             return AnyView(ApplePayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .afterpay:
             return AnyView(AfterpayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .payPal:
+            return AnyView(PayPalStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .spacings:
             return AnyView(SpacingsStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .buttonLoader:
