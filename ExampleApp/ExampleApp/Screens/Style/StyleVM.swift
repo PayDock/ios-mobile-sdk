@@ -31,7 +31,7 @@ class StyleVM: ObservableObject {
         case .giftCard: return [.actionButton, .spacings, .textField, .title, .toolbarButton]
         case .address: return [.actionButton, .expandSectionButton, .searchDropdown, .spacings, .textField, .title]
         case .applePay: return [.applePay]
-        case .paypal: return [.buttonLoader]
+        case .paypal: return [.payPal, .buttonLoader]
         case .paypalVault: return [.actionButton]
         case .colesPay: return [.buttonLoader]
         case .afterPay: return [.afterpay, .loader]
