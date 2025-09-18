@@ -42,7 +42,7 @@ public class PayPalDataCollectorUtil {
     }
 
     public func collectDeviceId(additionalData: [String: String] = [:]) throws -> String {
-        let config = CoreConfig(clientID: clientId, environment: Constants.payPalVaultEnvironment)
+        let config = CoreConfig(clientID: clientId, environment: Constants.payPalEnvironment)
         let payPalDataCollector = PayPalDataCollector(config: config)
 
         let deviceData = payPalDataCollector.collectDeviceData(additionalData: additionalData)

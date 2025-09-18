@@ -18,6 +18,7 @@ struct WalletCallbackRes: Codable {
     }
 
     struct CallbackData: Codable {
+        let id: String
         let callbackUrl: String
     }
 }

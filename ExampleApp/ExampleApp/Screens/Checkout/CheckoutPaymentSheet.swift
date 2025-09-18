@@ -124,7 +124,10 @@ struct CheckoutPaymentSheet: View {
 
     private var payPalWidget: some View {
         HStack {
-            PayPalWidget(viewState: viewModel.viewState, loadingDelegate: viewModel) { onPayPalButtonTap in
+            PayPalWidget(
+                viewState: viewModel.viewState,
+                config: viewModel.getPayPalConfig(),
+                loadingDelegate: viewModel) { onPayPalButtonTap in
                 viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
             } completion: { result in
                 switch result {

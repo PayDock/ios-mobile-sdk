@@ -42,7 +42,7 @@ struct WalletServiceImpl: HTTPClient, WalletService {
                 walletCallbackReq: walletCallbackReq),
             responseModel: WalletCallbackRes.self)
 
-        return response.resource.data.callbackUrl
+        return response.resource.data.id
     }
 
     func getColesPayCallback(token: String) async throws -> String {
