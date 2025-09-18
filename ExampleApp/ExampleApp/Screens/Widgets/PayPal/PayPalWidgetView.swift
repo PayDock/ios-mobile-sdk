@@ -17,7 +17,9 @@ struct PayPalWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                PayPalWidget(appearance: getAppearance()) { onPayPalButtonTap in
+                PayPalWidget(
+                    appearance: getAppearance(),
+                    config: viewModel.getConfig()) { onPayPalButtonTap in
                     viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
                 } completion: { result in
                     switch result {

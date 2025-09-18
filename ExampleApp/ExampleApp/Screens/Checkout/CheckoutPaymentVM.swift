@@ -297,6 +297,18 @@ extension CheckoutPaymentVM {
     }
 }
 
+// MARK: - PayPal
+
+extension CheckoutPaymentVM {
+
+    func getPayPalConfig() -> PayPalWidgetConfig {
+        let accessToken = ProjectEnvironment.shared.getWidgetAccessToken()
+        let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+        let config = PayPalWidgetConfig(accessToken: accessToken, gatewayId: gatewayId)
+        return config
+    }
+}
+
 // MARK: - Afterpay
 
 extension CheckoutPaymentVM {

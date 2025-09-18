@@ -84,6 +84,15 @@ class PayPalWidgetVM: ObservableObject {
         alertMessage = "\(charge.amount) \(charge.currency) charged!"
         showAlert = true
     }
+
+    // MARK: - Config
+
+    func getConfig() -> PayPalWidgetConfig {
+        let accessToken = ProjectEnvironment.shared.getWidgetAccessToken()
+        let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
+        let config = PayPalWidgetConfig(accessToken: accessToken, gatewayId: gatewayId)
+        return config
+    }
 }
 
 extension PayPalWidgetVM: WidgetLoadingDelegate {

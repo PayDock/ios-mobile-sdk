@@ -61,7 +61,7 @@ struct Constants {
         }
     }
 
-    static var payPalVaultEnvironment: CorePayments.Environment {
+    static var payPalEnvironment: CorePayments.Environment {
         guard let environment = MobileSDK.shared.config?.environment else {
             fatalError("Missing configuration!")
         }
