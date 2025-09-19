@@ -30,26 +30,28 @@ public struct PayPalWidget: View {
     }
 
     public var body: some View {
-        PayPalButton.Representable(
+        PayPalButtonRepresentable(
             insets: appearance.buttonInsets,
             color: appearance.buttonColor,
             edges: appearance.buttonEdges,
             size: appearance.buttonSize,
-            label: appearance.buttonLabel) {
+            label: appearance.buttonLabel,
+            isDisabled: viewModel.viewState.isDisabled,
+            action: {
                 viewModel.handleButtonTap()
             }
-            .disabled(viewModel.viewState.isDisabled)
-            .overlay {
-                if viewModel.isLoading && viewModel.showLoaders && appearance.buttonSize != .mini {
-                    GeometryReader { geometry in
-                        ProgressView()
-                            .tint(getProgressViewTint())
-                            .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.8)
-                            .background(getProgressViewBackground())
-                            .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-                    }
+        )
+        .overlay {
+            if viewModel.isLoading && viewModel.showLoaders && appearance.buttonSize != .mini {
+                GeometryReader { geometry in
+                    ProgressView()
+                        .tint(getProgressViewTint())
+                        .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.8)
+                        .background(getProgressViewBackground())
+                        .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }
             }
+        }
     }
 
     private func getProgressViewBackground() -> Color {
