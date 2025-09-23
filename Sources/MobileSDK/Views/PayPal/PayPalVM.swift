@@ -81,9 +81,9 @@ class PayPalVM: ObservableObject {
                 return
             }
 
-            let config = CoreConfig(clientID: clientId, environment: Constants.payPalEnvironment)
-            let payPalClient = PayPalWebCheckoutClient(config: config)
-            let payPalWebRequest = PayPalWebCheckoutRequest(orderID: orderId, fundingSource: .paypal)
+            let coreConfig = CoreConfig(clientID: clientId, environment: Constants.payPalEnvironment)
+            let payPalClient = PayPalWebCheckoutClient(config: coreConfig)
+            let payPalWebRequest = PayPalWebCheckoutRequest(orderID: orderId, fundingSource: config.fundingSource)
 
             payPalClient.start(request: payPalWebRequest) { [weak self] result in
                 guard let self else { return }
