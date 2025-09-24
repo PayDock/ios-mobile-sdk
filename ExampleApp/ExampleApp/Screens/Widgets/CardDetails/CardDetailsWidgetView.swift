@@ -35,8 +35,10 @@ struct CardDetailsWidgetView: View {
                     appearance: getAppearance(),
                     completion: { result in
                         switch result {
-                        case .success(let result): alertMessage = result.token
-                        case .failure(let error): alertMessage = error.localizedDescription
+                        case .success(let result):
+                            handleSuccess(result)
+                        case .failure(let error):
+                            handleError(error)
                         }
                         showAlert = true
                     })
@@ -57,6 +59,17 @@ struct CardDetailsWidgetView: View {
             as: CardDetailsWidgetAppearance.self,
             shouldCreateDefaultIfNeeded: false)
         return appearance ?? CardDetailsWidgetAppearance()
+    }
+
+    private func handleSuccess(_ result: CardResult) {
+        alertMessage = result.token
+        showAlert = true
+    }
+
+    private func handleError(_ error: CardDetailsError) {
+        alertMessage = error.customMessage
+        showAlert = true
+
     }
 }
 

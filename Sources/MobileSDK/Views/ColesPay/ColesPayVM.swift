@@ -71,7 +71,7 @@ class ColesPayVM: ObservableObject {
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError))
+                self.completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }

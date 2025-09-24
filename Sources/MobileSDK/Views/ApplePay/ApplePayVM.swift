@@ -99,7 +99,7 @@ class ApplePayVM: NSObject, ObservableObject {
 
             } catch {
                 paymentStatus = .failure
-                self.error = .unknownError
+                self.error = .unknownError(error as? RequestError)
                 completion(paymentStatus)
             }
         }

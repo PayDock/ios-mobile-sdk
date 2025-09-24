@@ -68,6 +68,8 @@ class AfterpayWidgetVM: ObservableObject {
                 }
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -115,9 +117,9 @@ class AfterpayWidgetVM: ObservableObject {
             orderAmount: Money(amount: "10.0", currency: "AUD"))
     }
 
-    func handleError(error: Error) {
+    func handleError(error: AfterpayError) {
         alertTitle = "Error"
-        alertMessage = "Transaction canceled"
+        alertMessage = error.customMessage
         self.showAlert = true
     }
 

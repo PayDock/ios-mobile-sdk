@@ -70,6 +70,9 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
             } catch {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: nil)))

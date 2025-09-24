@@ -95,7 +95,7 @@ class CardDetailsVM: ObservableObject {
 
             } catch {
                 updateLoadingState(isLoading: false)
-                completion(.failure(.unknownError))
+                completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }
