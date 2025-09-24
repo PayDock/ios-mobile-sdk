@@ -60,6 +60,10 @@ public struct ClickToPayWidget: UIViewRepresentable {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
         activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
+
+        activityIndicator.isAccessibilityElement = true
+        activityIndicator.accessibilityLabel = "Loading"
+
         context.coordinator.activityIndicator = activityIndicator
 
         containerView.addSubview(webView)
@@ -164,6 +168,10 @@ public struct ClickToPayWidget: UIViewRepresentable {
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             activityIndicator?.startAnimating()
+
+            DispatchQueue.main.async {
+                UIAccessibility.post(notification: .announcement, argument: "Loading")
+            }
         }
 
         /**

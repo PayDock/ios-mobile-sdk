@@ -49,6 +49,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
+        activityIndicator.isAccessibilityElement = true
+        activityIndicator.accessibilityLabel = "3DS Check Loading"
+
         context.coordinator.activityIndicator = activityIndicator
 
         containerView.addSubview(webView)
@@ -135,6 +138,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             activityIndicator?.startAnimating()
+            DispatchQueue.main.async {
+                UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
+            }
         }
 
         /**
