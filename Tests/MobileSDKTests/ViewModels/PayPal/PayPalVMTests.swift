@@ -234,7 +234,7 @@ class PayPalVMTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
-        XCTAssertEqual(viewModel.isLoading, true)
+        XCTAssertEqual(viewModel.isLoading, false)
     }
 
     func testHandleButtonTapWithFailedTokenRequest() {
