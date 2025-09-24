@@ -85,8 +85,11 @@ class PayPalVM: ObservableObject {
             let payPalClient = PayPalWebCheckoutClient(config: coreConfig)
             let payPalWebRequest = PayPalWebCheckoutRequest(orderID: orderId, fundingSource: config.fundingSource)
 
+            updateLoadingState(isLoading: false)
+
             payPalClient.start(request: payPalWebRequest) { [weak self] result in
                 guard let self else { return }
+                updateLoadingState(isLoading: true)
                 switch result {
                 case .success(let checkoutResult):
                     self.handlePayPalSuccess(result: checkoutResult)

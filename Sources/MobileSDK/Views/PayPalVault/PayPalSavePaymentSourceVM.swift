@@ -70,6 +70,8 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             let payPalConfig = CoreConfig(clientID: clientId, environment: environment)
             let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
 
+            updateLoadingState(isLoading: false)
+
             do {
                 let vaultResult = try await payPalClient.vault(vaultRequest)
                 await createPaymentToken(setupToken: vaultResult.tokenID)
