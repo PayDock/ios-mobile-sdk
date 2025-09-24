@@ -67,6 +67,8 @@ class ColesPayWidgetVM: ObservableObject {
                 }
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }

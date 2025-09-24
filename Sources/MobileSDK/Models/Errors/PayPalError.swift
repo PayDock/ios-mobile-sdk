@@ -27,7 +27,7 @@ public enum PayPalError: Error {
         case .userCancelled: return "PayPal transaction was canceled."
         case .initialisingWalletToken(let reason): return reason
         case .sdkException(let description): return description
-        case .unknownError: return "Unknown error"
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }

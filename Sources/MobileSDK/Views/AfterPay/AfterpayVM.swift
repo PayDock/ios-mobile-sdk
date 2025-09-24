@@ -30,7 +30,7 @@ class AfterpayVM: ObservableObject {
 
     // MARK: - Handlers
 
-    private let completion: (Result<ChargeResponse, AfterpayError>) -> Void
+    let completion: (Result<ChargeResponse, AfterpayError>) -> Void
     private let selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?
     private let selectShippingOption: ((
         _ shippingOption: ShippingOption,
@@ -138,7 +138,7 @@ class AfterpayVM: ObservableObject {
             } catch {
                 self.isLoading = false
                 self.showWebView = false
-                self.completion(.failure(.unknownError))
+                self.completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }
@@ -159,7 +159,7 @@ class AfterpayVM: ObservableObject {
                 completion(.failure(.errorCapturingCharge(error: errorResponse)))
             } catch {
                 isLoading = false
-                completion(.failure(.unknownError))
+                completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }
@@ -193,7 +193,7 @@ class AfterpayVM: ObservableObject {
                 completion(.failure(.errorCancelingTransaction(error: errorResponse)))
             } catch {
                 isLoading = false
-                completion(.failure(.unknownError))
+                self.completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }

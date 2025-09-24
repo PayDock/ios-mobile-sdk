@@ -120,8 +120,10 @@ class AddressVM: NSObject, ObservableObject {
                     }
 
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                    self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
-                    self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
+                    Task { @MainActor in
+                        self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
+                        self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
+                    }
                 }
             }
         }

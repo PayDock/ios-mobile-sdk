@@ -25,7 +25,7 @@ public enum PayPalVaultError: Error {
         case .createPaymentToken: return "Error creating payment token."
         case .sdkException(let description): return description
         case .userCancelled: return "User canceled the operation."
-        case .unknownError: return "Unknown error"
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }
