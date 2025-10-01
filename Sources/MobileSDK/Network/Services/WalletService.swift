@@ -72,7 +72,7 @@ struct WalletServiceImpl: HTTPClient, WalletService {
     func declineWalletTransaction(token: String, chargeId: String) async throws -> String {
         let endpoint = WalletEndpoints.declineWalletTransaction(token: token, chargeId: chargeId)
         let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self)
-        return response.resource.status
+        return response.resource.data.status
 
     }
 
