@@ -1,5 +1,32 @@
 # Changelog
 
+## [4.1.0] - 2025-10-03
+
+### Changed
+
+- Implemented native PayPal checkout flow using the latest PayPal SDK (`2.0.0`)
+- Updated to use PayPal's native button; removed reliance on web views for PayPal
+- Updated existing widget errors to propagate underlying network errors
+- General improvements to `AddressWidget` (input UX and defaults)
+
+### Fixed
+
+- `AddressWidget` will now scroll active text field to prevent keyboard overlap
+- `CardDetailsWidget` cursor positioning while editing card number and expiry fields
+- `CardDetailsWidget` will now show approapriate keyboard type for each text field
+- Security code validation not refreshing when switching between card schemes
+- Cardholder name validation issues (including hyphen handling and invalid characters)
+- `ColesPayWidget` will no longer get reset when changing device orientation
+- `GiftCardWidget` PIN length validation
+
+### Added
+
+- Voiceover readouts for various loading states across the widgets
+
+### Removed
+
+- All WebView dependencies related to PayPal checkout
+
 ## [4.0.0] - 2025-07-04
 
 ### Added
