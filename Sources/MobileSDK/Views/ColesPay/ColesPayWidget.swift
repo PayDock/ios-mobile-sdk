@@ -34,20 +34,25 @@ public struct ColesPayWidget: View {
                 webViewSheetContent
             })
     }
-    
+
     private var colesPayButton: some View {
         SDKButton(
             title: nil,
-            image: Image((viewModel.isLoading && viewModel.showLoaders) ? "coles-pay-button-blank" : "coles-pay-button", bundle: Bundle.module),
+            image: Image(
+                (viewModel.isLoading && viewModel.showLoaders)
+                    ? "coles-pay-button-blank"
+                    : "coles-pay-button",
+                bundle: Bundle.module
+            ),
             imageLocation: .left,
             isLoading: viewModel.isLoading && viewModel.showLoaders,
             style: .image(ImageButtonStyle(appearance: appearance.loader, isDisabled: viewModel.viewState.isDisabled)),
             scaleToFit: true) {
                 viewModel.handleButtonTap()
             }
-            .accessibilityLabel(Text("Pay with Coles Pay"))
+            .accessibilityHint("Initiates payment using Coles Pay.")
     }
-    
+
     private var webViewSheetContent: some View {
         NavigationStack {
             ColesPayWebView(
@@ -65,18 +70,21 @@ public struct ColesPayWidget: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         viewModel.showCancelConfirmation = true
-                    }) {
+                    }, label: {
                         Image(systemName: "xmark")
                             .font(.title)
                             .imageScale(.small)
-                    }
+                    })
                 }
             }
         }
         .interactiveDismiss(canDismissSheet: false) {
             viewModel.showCancelConfirmation = true
         }
-        .confirmationDialog("Are you sure you want to cancel?", isPresented: $viewModel.showCancelConfirmation, titleVisibility: .visible, actions: {
+        .confirmationDialog("Are you sure you want to cancel?",
+                            isPresented: $viewModel.showCancelConfirmation,
+                            titleVisibility: .visible,
+                            actions: {
             Button("Yes", role: .destructive) {
                 viewModel.showWebView = false
                 viewModel.handleSheetCancellation()

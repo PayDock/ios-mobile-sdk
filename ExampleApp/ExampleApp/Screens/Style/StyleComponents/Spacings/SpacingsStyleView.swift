@@ -11,15 +11,15 @@ import SwiftUI
 struct SpacingsStyleView: View {
 
     @StateObject var viewModel: SpacingsStyleVM
-    
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) {
         _viewModel = StateObject(wrappedValue: SpacingsStyleVM(
             selectedWidget: selectedWidget,
             stylingDarkMode: stylingDarkMode))
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -27,7 +27,7 @@ struct SpacingsStyleView: View {
             ScrollView {
                 VStack {
                     spacingsListView
-                    ResetStyleButton() {
+                    ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
                 }
@@ -48,7 +48,7 @@ struct SpacingsStyleView: View {
                 text: Binding(
                     get: { "\(viewModel.horizontalSpacing)" },
                     set: { viewModel.horizontalSpacing = CGFloat(Double($0) ?? 0) }))
-            
+
             DimensionsFieldView(
                 title: "Vertical spacing",
                 text: Binding(

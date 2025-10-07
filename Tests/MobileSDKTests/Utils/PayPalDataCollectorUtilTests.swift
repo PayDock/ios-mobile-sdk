@@ -10,27 +10,29 @@ import XCTest
 @testable import MobileSDK
 
 class PayPalDataCollectorUtilTests: XCTestCase {
-    
+
     var mockConfig: PayPalDataCollectorConfig!
     var mockService: PayPalVaultServiceMock!
-    
+
     override func setUp() {
         super.setUp()
         mockConfig = PayPalDataCollectorConfig(accessToken: "testAccessToken", gatewayId: "testGateway")
         mockService = PayPalVaultServiceMock()
         MobileSDK.shared.configureMobileSDK(config: MobileSDKConfig(environment: .sandbox))
     }
-    
+
     func testInitializeDataCollector_Success() async throws {
         let util = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: mockService)
-        
+
         XCTAssertNotNil(util)
-        XCTAssertEqual(util.clientId, "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0", "Client ID should match the expected mock client ID.")
+        XCTAssertEqual(util.clientId,
+                       "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0",
+                       "Client ID should match the expected mock client ID.")
     }
-    
+
     func testInitializeDataCollectorFail() async throws {
         mockService.sendError = true
-        
+
         do {
             _ = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: mockService)
             XCTFail("Expected to throw PayPalDataCollectorError.initialisationClientId, but succeeded.")
@@ -44,12 +46,12 @@ class PayPalDataCollectorUtilTests: XCTestCase {
             XCTFail("Unexpected error type: \(error)")
         }
     }
-    
+
     func testCollectDeviceDataEmpty() {
         let config = PayPalDataCollectorConfig(accessToken: "testAccessToken", gatewayId: "testGateway")
         let clientId = "testClientID"
         let util = PayPalDataCollectorUtil(config: config, clientId: clientId)
-        
+
         do {
             let deviceData =  try util.collectDeviceId(additionalData: [:])
             XCTAssertFalse(deviceData.isEmpty, "Device data should not be empty.")
@@ -57,12 +59,12 @@ class PayPalDataCollectorUtilTests: XCTestCase {
             XCTFail("Collecting device data should succeed!")
         }
     }
-    
+
     func testCollectDeviceDataWithAdditionalData() {
         let config = PayPalDataCollectorConfig(accessToken: "testAccessToken", gatewayId: "testGateway")
         let clientId = "testClientID"
         let util = PayPalDataCollectorUtil(config: config, clientId: clientId)
-        
+
         let additionalData: [String: String] = ["key1": "value1", "key2": "value2"]
         do {
             let deviceData = try util.collectDeviceId(additionalData: additionalData)
@@ -70,6 +72,6 @@ class PayPalDataCollectorUtilTests: XCTestCase {
         } catch {
             XCTFail("Collecting device data should succeed!")
         }
-        
+
     }
 }

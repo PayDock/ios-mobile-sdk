@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct AutocompleteTextField: View {
-    
+
     // MARK: - Dependencies
-    
+
     @State var appearance: Theme.SearchDropdownAppearance
 
     // MARK: - OutlineTextField Properties
@@ -24,6 +24,11 @@ struct AutocompleteTextField: View {
     private let title: String
     private let placeholder: String
     private let onTapGesture: () -> Void
+    private let validationIconEnabled: Bool
+    private let returnKeyType: UIReturnKeyType
+    private let onTextChange: ((String, Int) -> Int)?
+    private let onSubmit: (() -> Void)?
+    private let keyboardType: UIKeyboardType
 
     // MARK: - AutocompleteTextField Properties
 
@@ -33,7 +38,7 @@ struct AutocompleteTextField: View {
     private var textContentType: UITextContentType?
     @State private var popupOpacity: CGFloat = 0
     @State private var popupScale = 0.7
-    private var onSelection: (Int?) -> ()
+    private var onSelection: (Int?) -> Void
 
     @FocusState private var focusField: Field?
 
@@ -62,10 +67,15 @@ struct AutocompleteTextField: View {
                 valid: Binding<Bool?>,
                 showPopup: Binding<Bool>,
                 disabled: Binding<Bool>,
-                options: Binding<Array<String>>,
+                validationIconEnabled: Bool = false,
+                options: Binding<[String]>,
                 textContentType: UITextContentType? = nil,
-                onSelection: @escaping (Int?) -> (),
-                onTapGesture: @escaping () -> Void) {
+                onSelection: @escaping (Int?) -> Void,
+                onTapGesture: @escaping () -> Void,
+                keyboardType: UIKeyboardType = .default,
+                returnKeyType: UIReturnKeyType = .default,
+                onTextChange: ((String, Int) -> Int)? = nil,
+                onSubmit: (() -> Void)? = nil) {
         self.appearance = appearance
         self._text = text
         self.title = title
@@ -76,10 +86,15 @@ struct AutocompleteTextField: View {
         self._valid = valid
         self._showPopup = showPopup
         self._disabled = disabled
+        self.validationIconEnabled = validationIconEnabled
         self._options = options
         self.textContentType = textContentType
         self.onSelection = onSelection
+        self.keyboardType = keyboardType
+        self.returnKeyType = returnKeyType
         self.onTapGesture = onTapGesture
+        self.onTextChange = onTextChange
+        self.onSubmit = onSubmit
     }
 
     var body: some View {
@@ -93,17 +108,20 @@ struct AutocompleteTextField: View {
                 editing: $editing,
                 valid: $valid,
                 disabled: $disabled,
-                validationIconEnabled: false,
+                validationIconEnabled: validationIconEnabled,
                 textContentType: textContentType,
-                onTapGesture: onTapGesture
+                keyboardType: keyboardType,
+                returnKeyType: returnKeyType,
+                onTapGesture: onTapGesture,
+                onTextChange: onTextChange,
+                onSubmit: onSubmit
             )
             .overlay(content: {
                 autocompletePopup
-                    .offset(x: -1, y: 52)
+                    .offset(x: -1, y: 72)
                     .accessibilityElement(children: .contain)
             })
         }
-        .frame(height: 48)
     }
 
     private var autocompletePopup: some View {

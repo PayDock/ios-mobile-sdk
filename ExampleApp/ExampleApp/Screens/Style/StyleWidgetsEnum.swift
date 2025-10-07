@@ -22,7 +22,7 @@ enum WidgetsEnum {
     case applePay
     case integrated3ds
     case standalone3ds
-    
+
     var title: String {
         switch self {
         case .all: return "All widgets"
@@ -39,7 +39,7 @@ enum WidgetsEnum {
         case .standalone3ds: return "Standalone 3DS"
         }
     }
-    
+
     var icon: Image {
         switch self {
         case .all: Image("all-widgets-style")

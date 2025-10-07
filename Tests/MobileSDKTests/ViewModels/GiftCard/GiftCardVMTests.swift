@@ -7,11 +7,13 @@
 
 import XCTest
 import Combine
+import NetworkingLib
 @testable import MobileSDK
 
+// swiftlint:disable all
 @MainActor
 class GiftCardVMTests: XCTestCase {
-    
+
     var viewModel: GiftCardVM!
     var mockService: CardServiceMock!
     var viewState: ViewState!
@@ -19,7 +21,7 @@ class GiftCardVMTests: XCTestCase {
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var completionResult: Result<GiftCardResult, GiftCardError>?
     var cancellables = Set<AnyCancellable>()
-    
+
     override func setUp() {
         super.setUp()
         mockService = CardServiceMock()
@@ -34,7 +36,7 @@ class GiftCardVMTests: XCTestCase {
             self.completionResult = result
         }
     }
-    
+
     override func tearDown() {
         viewModel = nil
         mockService = nil
@@ -42,7 +44,7 @@ class GiftCardVMTests: XCTestCase {
         cancellables.removeAll()
         super.tearDown()
     }
-    
+
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -51,15 +53,15 @@ class GiftCardVMTests: XCTestCase {
                                loadingDelegate: loadingDelegate) { result in
             self.completionResult = result
         }
-        
+
         // When
         viewModel.updateLoadingState(isLoading: true)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, true)
     }
-    
+
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -70,15 +72,15 @@ class GiftCardVMTests: XCTestCase {
         }
         viewModel.isLoading = false
         loadingDelegate.isLoading = false
-        
+
         // When
         viewModel.updateLoadingState(isLoading: true)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, false)
     }
-    
+
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -89,15 +91,15 @@ class GiftCardVMTests: XCTestCase {
         }
         viewModel.isLoading = false
         loadingDelegate.isLoading = true
-        
+
         // When
         viewModel.updateLoadingState(isLoading: false)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
     }
-    
+
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
         viewModel = GiftCardVM(viewState: viewState,
@@ -108,12 +110,95 @@ class GiftCardVMTests: XCTestCase {
         }
         viewModel.isLoading = true
         loadingDelegate.isLoading = false
-        
+
         // When
         viewModel.updateLoadingState(isLoading: false)
-        
+
         // Then
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
     }
+
+    // MARK: - Helpers
+
+    private func populateValidFormFields() {
+        viewModel.giftCardFormManager.cardNumberText = "6034880000000018"
+        viewModel.giftCardFormManager.pinText = "1234"
+    }
+
+    // swiftlint:disable:next nesting
+    private class ErroringCardServiceMock: CardService {
+        enum FailureType {
+            case requestError(message: String, code: String)
+            case connectionError(URLError)
+            case genericError
+        }
+
+        var failure: FailureType
+
+        init(failure: FailureType) {
+            self.failure = failure
+        }
+
+        func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
+            switch failure {
+
+            case .connectionError(let urlError):
+                throw RequestError.connectionError(urlError)
+
+            case .genericError:
+                throw GiftCardError.unknownError(nil)
+
+            default:
+                throw GiftCardError.unknownError(nil)
+            }
+        }
+    }
+
+    // MARK: - Completion Error Tests
+
+    func testTokeniseGiftCard_CompletesWithUnknownError_OnConnectionError() async {
+        // Given
+        let urlError = URLError(.notConnectedToInternet)
+        let failingService = ErroringCardServiceMock(failure: .connectionError(urlError))
+        let expectation = XCTestExpectation(description: "Completion called with unknownError")
+
+        viewModel = GiftCardVM(
+            viewState: viewState,
+            cardService: failingService,
+            config: config,
+            loadingDelegate: loadingDelegate
+        ) { result in
+            self.completionResult = result
+            expectation.fulfill()
+        }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseGiftCard()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        switch completionResult {
+        case .failure(let error):
+            switch error {
+            case .unknownError(let requestError):
+                XCTAssertNotNil(requestError, "Expected wrapped RequestError in unknownError")
+            default:
+                XCTFail("Expected unknownError, got: \(error)")
+            }
+        default:
+            XCTFail("Expected failure result")
+        }
+
+        // Loading state should be reset
+        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
+    }
 }
+// swiftlint:enable all

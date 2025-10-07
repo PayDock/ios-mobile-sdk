@@ -28,11 +28,13 @@ class ApplePayVM: NSObject, ObservableObject {
     // MARK: - Handlers
 
     private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
-    private let createPaymentRequest: (_ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void
+    private let createPaymentRequest: (
+        _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void
 
     // MARK: - Initialisation
 
-    init(createPaymentRequest: @escaping (_ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
+    init(createPaymentRequest: @escaping (
+        _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         self.createPaymentRequest = createPaymentRequest
@@ -47,7 +49,7 @@ class ApplePayVM: NSObject, ObservableObject {
             case .success(let response):
                 self?.applePayRequest = ApplePayRequest(token: response.token, request: response.request)
                 self?.startPayment()
-            
+
             case .failure(let failure):
                 self?.completion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
             }
@@ -70,14 +72,14 @@ class ApplePayVM: NSObject, ObservableObject {
             }
         })
     }
-    
+
     private func captureCharge(payment: PKPayment, completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
         guard let applePayRequest = applePayRequest else {
             error = .invalidApplePayRequest
             self.completion(.failure(.invalidApplePayRequest))
             return
         }
-        
+
         Task {
             do {
                 let refToken = String(data: payment.token.paymentData, encoding: .utf8)
@@ -89,15 +91,15 @@ class ApplePayVM: NSObject, ObservableObject {
                 paymentStatus = .success
                 self.completion(.success(chargeResponse))
                 completion(paymentStatus)
-                
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 paymentStatus = .failure
                 self.error = .errorCompletingPayment(error: errorResponse)
                 completion(paymentStatus)
-                
+
             } catch {
                 paymentStatus = .failure
-                self.error = .unknownError
+                self.error = .unknownError(error as? RequestError)
                 completion(paymentStatus)
             }
         }
@@ -113,7 +115,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
                                         completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
         captureCharge(payment: payment, completion: completion )
     }
-    
+
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
             if self.paymentStatus == .success, let chargeData = self.chargeData {

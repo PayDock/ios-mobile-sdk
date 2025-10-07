@@ -9,13 +9,13 @@ import XCTest
 @testable import MobileSDK
 
 class WidgetLoadingDelegateUtil: WidgetLoadingDelegate {
-    
+
     public var isLoading: Bool = false
-    
+
     func loadingDidStart() {
         isLoading = true
     }
-    
+
     func loadingDidFinish() {
         isLoading = false
     }

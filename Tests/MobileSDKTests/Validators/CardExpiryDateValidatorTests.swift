@@ -9,7 +9,6 @@
 import XCTest
 @testable import MobileSDK
 
-
 class CardExpiryDateValidatorTests: XCTestCase {
 
     var validator: CardExpiryDateValidatior!

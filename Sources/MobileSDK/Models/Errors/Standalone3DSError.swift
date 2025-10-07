@@ -12,7 +12,7 @@ public enum Standalone3DSError: Error, Equatable {
     case webViewFailed(error: NSError)
     case invalidToken
     case mappingFailed
-    
+
     public var customMessage: String {
         switch self {
         case .webViewFailed: return "3DS WebView widget has failed"

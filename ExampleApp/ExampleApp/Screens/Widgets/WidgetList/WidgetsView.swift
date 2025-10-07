@@ -15,7 +15,7 @@ struct WidgetsView: View {
     init() {
         styleNavigation()
     }
-    
+
     let widgetItems: [WidgetItem] = [
         WidgetItem(destination: AnyView(CardDetailsWidgetView()), title: "Card Details", subtitle: "Tokenise card details"),
         WidgetItem(destination: AnyView(AddressWidgetView()), title: "Address", subtitle: "Capture customer address form"),
@@ -27,7 +27,8 @@ struct WidgetsView: View {
         WidgetItem(destination: AnyView(ColesPayWidgetView()), title: "Coles Pay", subtitle: "Standalone Coles Pay widget"),
         WidgetItem(destination: AnyView(AfterpayWidgetView()), title: "Afterpay", subtitle: "Standalone Afterpay widget"),
         WidgetItem(destination: AnyView(ClickToPayWidgetView()), title: "Click to Pay", subtitle: "ClickToPay flow"),
-        WidgetItem(destination: AnyView(PayPalVaultWidgetView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout"),
+        WidgetItem(destination:
+                    AnyView(PayPalVaultWidgetView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout")
     ].sorted { $0.title < $1.title }
 
     var body: some View {

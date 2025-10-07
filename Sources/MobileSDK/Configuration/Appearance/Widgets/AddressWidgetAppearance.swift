@@ -16,7 +16,7 @@ public struct AddressWidgetAppearance:
     DropdownStylableAppearance,
     TitleStylableAppearance,
     SpacingStylableAppearance {
-    
+
     public var horizontalSpacing: CGFloat
     public var verticalSpacing: CGFloat
     public var title: Theme.TextAppearance
@@ -24,7 +24,7 @@ public struct AddressWidgetAppearance:
     public var actionButton: Theme.ButtonAppearance
     public var expandSectionButton: Theme.ButtonAppearance
     public var searchDropdown: Theme.SearchDropdownAppearance
-    
+
     public init(horizontalSpacing: CGFloat = 16.0,
                 verticalSpacing: CGFloat = 8.0,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,

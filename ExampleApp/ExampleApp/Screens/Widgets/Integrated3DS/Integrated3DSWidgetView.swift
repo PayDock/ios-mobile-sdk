@@ -25,7 +25,7 @@ struct Integrated3DSWidgetView: View {
                                 viewModel.showAlert = true
                             }
                             viewModel.isLoading = false
-                        }) {
+                        }, content: {
                             NavigationStack {
                                 VStack {
                                     Integrated3DSWidget(
@@ -35,7 +35,7 @@ struct Integrated3DSWidgetView: View {
                                             switch result {
                                             case .success(let result):
                                                 viewModel.handle3dsEvent(result)
-                                                
+
                                             case .failure(let error):
                                                 viewModel.handleFailure(error: error)
                                             }
@@ -44,7 +44,7 @@ struct Integrated3DSWidgetView: View {
                                     .navigationBarTitleDisplayMode(.inline)
                                 }
                             }
-                        }
+                        })
                     if viewModel.isLoading {
                         ProgressView()
                     }
@@ -60,9 +60,13 @@ struct Integrated3DSWidgetView: View {
             viewModel.tokeniseCardDetails()
         }
     }
-    
+
     private func getAppearance() -> ThreeDSWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .integrated3ds, isDarkMode: colorScheme == .dark, as: ThreeDSWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .integrated3ds,
+            isDarkMode: colorScheme == .dark,
+            as: ThreeDSWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? ThreeDSWidgetAppearance()
     }
 }

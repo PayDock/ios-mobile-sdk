@@ -7,9 +7,9 @@
 //
 
 public struct AddressWidgetConfig {
-    
+
     public let address: Address?
-    
+
     public init(address: Address? = nil) {
         self.address = address
     }

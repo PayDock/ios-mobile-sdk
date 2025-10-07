@@ -9,9 +9,9 @@
 import Foundation
 
 public struct ColesPayConfig {
-    
+
     public let clientId: String
-    
+
     public init(clientId: String) {
         self.clientId = clientId
     }

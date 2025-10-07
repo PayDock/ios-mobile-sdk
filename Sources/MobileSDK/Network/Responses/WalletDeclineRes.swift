@@ -13,6 +13,10 @@ public struct WalletDeclineRes: Codable {
     public let resource: Resource
 
     public struct Resource: Codable {
+        public let data: Data
+    }
+
+    public struct Data: Codable {
         public let status: String
     }
 }

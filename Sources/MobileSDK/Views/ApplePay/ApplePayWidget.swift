@@ -14,7 +14,9 @@ public struct ApplePayWidget: View {
     @State var appearance: ApplePayWidgetAppearance
 
     public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
-                createPaymentRequest: @escaping (_ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
+                createPaymentRequest: @escaping (
+                    _ createPaymentRequestResult: @escaping (
+                        Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
             createPaymentRequest: createPaymentRequest,

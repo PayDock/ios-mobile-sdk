@@ -22,10 +22,11 @@ class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Properties
 
-    @Published var addressSearchSuggestions: Array<String> = [""]
-    @Published var isDisabled = false
-    var mkLocalSearchCompletions: Array<MKLocalSearchCompletion> = []
-    var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
+    @Published var addressSearchSuggestions: [String] = [""]
+    @Published var countrySearchSuggestions: [String] = [""]
+    @Published var isDisabled = false // not used currently as there's no need for ViewState
+    var mkLocalSearchCompletions: [MKLocalSearchCompletion] = []
+    var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
     let completion: (Address) -> Void
 
     // MARK: - Custom bindings
@@ -37,6 +38,18 @@ class AddressVM: NSObject, ObservableObject {
             }, set: {
                 self.addressFormManager.addressSearchText = $0
                 self.searchAddress($0)
+            }
+        )
+    }
+
+    var countrySearchBinding: Binding<String> {
+        Binding(
+            get: {
+                self.addressFormManager.countrySearchText
+            }, set: {
+                self.addressFormManager.countrySearchText = $0
+                self.addressFormManager.countryText = $0
+                self.searchCountry($0)
             }
         )
     }
@@ -96,8 +109,8 @@ class AddressVM: NSObject, ObservableObject {
                 coordinateK = coordinate
             }
 
-            if let c = coordinateK {
-                let location = CLLocation(latitude: c.latitude, longitude: c.longitude)
+            if let coordinate = coordinateK {
+                let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
                 CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
 
                     guard let placemark = placemarks?.first else {
@@ -107,10 +120,44 @@ class AddressVM: NSObject, ObservableObject {
                     }
 
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                    self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
+                    Task { @MainActor in
+                        self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
+                        self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
+                    }
                 }
             }
         }
+    }
+
+    // MARK: - Country search
+
+    func searchCountry(_ searchableText: String) {
+        guard !searchableText.isEmpty else {
+            addressFormManager.showCountrySearchPopup = false
+            countrySearchSuggestions = [""]
+            return
+        }
+
+        let filteredCountries = addressFormManager.getCountryList().filter { country in
+            country.lowercased().contains(searchableText.lowercased())
+        }
+
+        countrySearchSuggestions = Array(filteredCountries.prefix(4))
+
+        if addressFormManager.currentTextField == .country && !addressFormManager.countrySearchText.isEmpty {
+            addressFormManager.showCountrySearchPopup = true
+        }
+    }
+
+    func handleTapOnCountryOptionAt(index: Int?) {
+        guard let index = index, index < countrySearchSuggestions.count else { return }
+
+        let selectedCountry = countrySearchSuggestions[index]
+        addressFormManager.countrySearchText = selectedCountry
+        addressFormManager.countryText = selectedCountry
+        addressFormManager.showCountrySearchPopup = false
+        countrySearchSuggestions = [""]
+
     }
 
     // MARK: - Logic
@@ -133,9 +180,15 @@ class AddressVM: NSObject, ObservableObject {
 
         completion(address)
     }
-    
+
     func updateAddress() {
         addressFormManager.updateFormWith(address: config.address)
+    }
+
+    // MARK: - Validation
+
+    func isActionButtonDisabled() -> Bool {
+        return !addressFormManager.isFormValid()
     }
 }
 
@@ -143,16 +196,17 @@ class AddressVM: NSObject, ObservableObject {
 
 extension AddressVM: MKLocalSearchCompleterDelegate {
 
-    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
-        addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
-        if addressFormManager.currentTextField == .searchAddress  && !addressFormManager.addressSearchText.isEmpty {
-            addressFormManager.showAddressSearchPopup = true
+    nonisolated func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        Task { @MainActor in
+            mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
+            addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
+            if addressFormManager.currentTextField == .searchAddress  && !addressFormManager.addressSearchText.isEmpty {
+                addressFormManager.showAddressSearchPopup = true
+            }
         }
     }
 
-    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+    nonisolated func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         // No need to handle errors for now
     }
-
 }

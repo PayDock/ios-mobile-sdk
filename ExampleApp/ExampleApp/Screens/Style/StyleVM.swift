@@ -9,28 +9,29 @@
 import SwiftUI
 
 class StyleVM: ObservableObject {
-    
+
     // MARK: - Properties
-    
+
     var selectedWidget: WidgetsEnum
     @Published var stylingDarkMode = false
-    
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum = .all) {
         self.selectedWidget = selectedWidget
     }
-    
+
     // MARK: - Helpers
-    
+
     func getComponentsForWidget(_ widget: WidgetsEnum) -> [StyleComponentsEnum] {
         switch widget {
-        case .all: return [.actionButton, .expandSectionButton, .linkText, .loader, .searchDropdown, .textField, .title, .toggle, .toggleText, .toolbarButton]
+        case .all: return [.actionButton, .expandSectionButton, .linkText, .loader, .searchDropdown,
+                           .textField, .title, .toggle, .toggleText, .toolbarButton]
         case .card: return [.actionButton, .linkText, .spacings, .textField, .title, .toggle, .toggleText, .toolbarButton]
         case .giftCard: return [.actionButton, .spacings, .textField, .title, .toolbarButton]
         case .address: return [.actionButton, .expandSectionButton, .searchDropdown, .spacings, .textField, .title]
         case .applePay: return [.applePay]
-        case .paypal: return [.buttonLoader]
+        case .paypal: return [.payPal, .buttonLoader]
         case .paypalVault: return [.actionButton]
         case .colesPay: return [.buttonLoader]
         case .afterPay: return [.afterpay, .loader]

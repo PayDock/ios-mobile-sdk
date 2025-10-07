@@ -10,50 +10,167 @@ import Foundation
 
 class CardDetailsFormatter {
 
-    func formatCardNumber(updatedText: String) -> String {
+    // MARK: - Bank Card
+
+    func formatCardNumber(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
         var groomed = ""
-        for c in updatedText {
-            if c == " " && (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19)  {
-                groomed.append(c)
-            } else if c.isASCII && c.isNumber {
-                if (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19) {
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+
+        for char in updatedText {
+            if char == " " && (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19) {
+                groomed.append(char)
+            } else if char.isASCII && char.isNumber {
+                if groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19 {
                     groomed.append(" ")
+                    // If cursor was at or after this position, adjust it
+                    if originalIndex < cursorPosition {
+                        newCursorPosition += 1
+                    }
                 }
-                groomed.append(c)
+                groomed.append(char)
             }
+            originalIndex += 1
             if groomed.count == 23 {
                 break
             }
         }
-        return groomed
+
+        // Ensure cursor position doesn't exceed the formatted text length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
     }
 
-    func formatExpiryDate(updatedText: String) -> String {
+    func formatExpiryDate(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
         var groomed = ""
-        for c in updatedText {
-            if c == "/" && groomed.count == 2  {
-                groomed.append(c)
-            } else if c.isASCII && c.isNumber {
-                if groomed.count == 2 {
+        var digitCount = 0
+        var originalIndex = 0
+        var newCursorPosition: Int?
+
+        for char in updatedText {
+            if char == "/" {
+                if groomed.count == 2 && groomed.last != "/" {
                     groomed.append("/")
                 }
-                groomed.append(c)
+            } else if char.isWholeNumber {
+                if digitCount == 2 && groomed.last != "/" {
+                    groomed.append("/")
+                    if newCursorPosition == nil && originalIndex == cursorPosition {
+                        newCursorPosition = groomed.count - 1
+                    }
+                }
+                groomed.append(char)
+                digitCount += 1
             }
-            if groomed.count == 5 {
-                break
+
+            if newCursorPosition == nil && originalIndex + 1 == cursorPosition {
+                newCursorPosition = groomed.count
             }
+
+            originalIndex += 1
+            if groomed.count == 5 { break } // "MM/YY"
         }
-        return groomed
-    }
-    
-    func formatSecurityCode(updatedText: String) -> String {
-       var groomed = ""
-        for c in updatedText {
-            if c.isASCII && c.isNumber {
-                groomed.append(c)
-            }
+
+        // Special case: cursor was at very start
+        if cursorPosition == 0 {
+            newCursorPosition = 0
         }
-        return groomed
+
+        if newCursorPosition == nil {
+            newCursorPosition = groomed.count
+        }
+
+        return (groomed, newCursorPosition!)
     }
 
+    func formatSecurityCode(updatedText: String, cursorPosition: Int, maxDigits: Int) -> (formattedText: String, newCursorPosition: Int) {
+        var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        var digitCount = 0
+
+        for char in updatedText {
+            if char.isASCII && char.isNumber {
+                // Stop if we already have maxDigits
+                if digitCount == maxDigits { break }
+
+                groomed.append(char)
+                digitCount += 1
+            }
+
+            if originalIndex < cursorPosition {
+                newCursorPosition = groomed.count
+            }
+
+            originalIndex += 1
+        }
+
+        // Ensure cursor position doesn't exceed formatted length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
+    }
+
+    // MARK: - Gift Card
+
+    func formatGiftCardNumber(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
+        var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        var digitCount = 0
+
+        for char in updatedText {
+            if char.isASCII && char.isNumber {
+                // Stop if we already have 25 digits
+                if digitCount == 25 { break }
+
+                // Insert space every 4 digits (except before the first digit)
+                if digitCount > 0 && digitCount % 4 == 0 {
+                    groomed.append(" ")
+                    if originalIndex < cursorPosition {
+                        newCursorPosition += 1
+                    }
+                }
+
+                groomed.append(char)
+                digitCount += 1
+            }
+
+            originalIndex += 1
+        }
+
+        // Ensure cursor position doesn't exceed the formatted text length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
+    }
+
+    func formatGiftCardPin(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
+        var groomed = ""
+        var newCursorPosition = cursorPosition
+        var originalIndex = 0
+        var digitCount = 0
+
+        for char in updatedText {
+            if char.isASCII && char.isNumber {
+                // Stop if we already have 4 digits
+                if digitCount == 4 { break }
+
+                groomed.append(char)
+                digitCount += 1
+            }
+
+            if originalIndex < cursorPosition {
+                newCursorPosition = groomed.count
+            }
+
+            originalIndex += 1
+        }
+
+        // Ensure cursor position doesn't exceed formatted length
+        newCursorPosition = min(newCursorPosition, groomed.count)
+
+        return (formattedText: groomed, newCursorPosition: newCursorPosition)
+    }
 }

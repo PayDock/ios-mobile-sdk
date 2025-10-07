@@ -7,15 +7,15 @@
 //
 
 public struct ClickToPayDPAData: Codable {
-    public var dpaAddress: String? = nil
-    public var dpaEmailAddress: String? = nil
-    public var dpaPhoneNumber: PhoneNumber? = nil
-    public var dpaLogoUri: String? = nil
-    public var dpaSupportedEmailAddress: String? = nil
-    public var dpaSupportedPhoneNumber: PhoneNumber? = nil
-    public var dpaUri: String? = nil
-    public var dpaSupportUri: String? = nil
-    public var applicationType: ApplicationType? = nil
+    public var dpaAddress: String?
+    public var dpaEmailAddress: String?
+    public var dpaPhoneNumber: PhoneNumber?
+    public var dpaLogoUri: String?
+    public var dpaSupportedEmailAddress: String?
+    public var dpaSupportedPhoneNumber: PhoneNumber?
+    public var dpaUri: String?
+    public var dpaSupportUri: String?
+    public var applicationType: ApplicationType?
 
     enum CodingKeys: String, CodingKey {
         case dpaAddress = "dpa_address"

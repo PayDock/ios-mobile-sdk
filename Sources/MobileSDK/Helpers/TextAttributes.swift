@@ -16,7 +16,7 @@ public struct TextAttributes {
     public var isStrikethrough: Bool
     public var strikethroughColor: Color
     public var isItalic: Bool
-    
+
     public init(font: CustomFont = CustomFont(name: "FFF-AcidGrotesk-Normal", size: 14.0),
                 textColor: Color = .defaultText,
                 isUnderlined: Bool = true,

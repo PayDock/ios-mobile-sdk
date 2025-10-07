@@ -10,25 +10,25 @@ import SwiftUI
 import MobileSDK
 
 struct AccountProfileView: View {
-    
+
     @StateObject private var viewModel = AccountProfileVM()
-    
+
     var body: some View {
-            VStack{
-                title()
-                box()
-                    .cornerRadius(10.0)
-                    .padding()
-                Spacer()
-            }
-            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
-                Text(viewModel.alertMessage)
-            })
+        VStack {
+            title()
+            box()
+                .cornerRadius(10.0)
+                .padding()
+            Spacer()
+        }
+        .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+            Text(viewModel.alertMessage)
+        })
         .background(Color.white)
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("My Account")
     }
-    
+
     private func title() -> some View {
         Text("Saved payment method")
             .font(.system(size: 18))
@@ -36,7 +36,7 @@ struct AccountProfileView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding([.top, .leading, .trailing], 18)
     }
-    
+
     private func box() -> some View {
         VStack {
             HStack {
@@ -53,7 +53,7 @@ struct AccountProfileView: View {
         }
         .background(Color.gray.opacity(0.1))
     }
-    
+
     private func vaultWidget() -> some View {
         PayPalSavePaymentSourceWidget(config: viewModel.getVaultConfig()) { result in
             switch result {

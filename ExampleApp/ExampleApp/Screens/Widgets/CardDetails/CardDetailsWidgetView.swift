@@ -22,7 +22,11 @@ struct CardDetailsWidgetView: View {
                     config: CardDetailsWidgetConfig(
                         gatewayId: nil,
                         accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                        allowSaveCard: SaveCardConfig(consentText: "Remember this card for next time.", privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(privacyPolicyText: "Read our privacy policy", privacyPolicyURL: "https://www.google.com")),
+                        allowSaveCard: SaveCardConfig(
+                            consentText: "Remember this card for next time.",
+                            privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
+                                privacyPolicyText: "Read our privacy policy",
+                                privacyPolicyURL: "https://www.google.com")),
                         schemeSupport: SupportedSchemesConfig(
                             supportedSchemes: Set(CardScheme.allCases),
                             enableValidation: true
@@ -31,8 +35,10 @@ struct CardDetailsWidgetView: View {
                     appearance: getAppearance(),
                     completion: { result in
                         switch result {
-                        case .success(let result): alertMessage = result.token
-                        case .failure(let error): alertMessage = error.localizedDescription
+                        case .success(let result):
+                            handleSuccess(result)
+                        case .failure(let error):
+                            handleError(error)
                         }
                         showAlert = true
                     })
@@ -45,10 +51,25 @@ struct CardDetailsWidgetView: View {
             Text(alertMessage)
         })
     }
-    
+
     private func getAppearance() -> CardDetailsWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .card, isDarkMode: colorScheme == .dark, as: CardDetailsWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .card,
+            isDarkMode: colorScheme == .dark,
+            as: CardDetailsWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? CardDetailsWidgetAppearance()
+    }
+
+    private func handleSuccess(_ result: CardResult) {
+        alertMessage = result.token
+        showAlert = true
+    }
+
+    private func handleError(_ error: CardDetailsError) {
+        alertMessage = error.customMessage
+        showAlert = true
+
     }
 }
 

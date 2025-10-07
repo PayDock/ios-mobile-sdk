@@ -11,21 +11,23 @@ import NetworkingLib
 
 public enum PayPalError: Error {
 
-    case errorFetchingPayPalUrl(error: ErrorRes)
+    case getPayPalClientId(error: ErrorRes)
+    case errorFetchingOrderId(error: ErrorRes)
     case errorCapturingCharge(error: ErrorRes)
-    case webViewFailed(error: NSError)
-    case transactionCanceled
+    case userCancelled
     case initialisingWalletToken(reason: String)
-    case unknownError
+    case sdkException(description: String)
+    case unknownError(RequestError?)
 
     public var customMessage: String {
         switch self {
-        case .errorFetchingPayPalUrl: return "Unable to fetch PayPal widget URL"
+        case .getPayPalClientId: return "Error getting PayPal client ID."
+        case .errorFetchingOrderId: return "Unable to fetch PayPal order ID"
         case .errorCapturingCharge: return "Unable to complete the charge"
-        case .webViewFailed: return "PayPal WebView widget has failed"
-        case .transactionCanceled: return "PayPal transaction was canceled."
+        case .userCancelled: return "PayPal transaction was canceled."
         case .initialisingWalletToken(let reason): return reason
-        case .unknownError: return "Unknown error"
+        case .sdkException(let description): return description
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }

@@ -50,7 +50,7 @@ class AddressFormManager: ObservableObject {
     let addressLine2Title = "Address Line 2 (Optional)"
     let cityTitle = "City"
     let stateTitle = "State"
-    let postcodeTitle = "Postcode"
+    let postcodeTitle = "Postal Code"
     let countryTitle = "Country"
 
     let firstNamePlaceholder = ""
@@ -63,30 +63,80 @@ class AddressFormManager: ObservableObject {
     let postcodePlaceholder = ""
     let countryPlaceholder = ""
 
-    @Published var firstNameText = ""
-    @Published var lastNameText = ""
+    var firstNameText = "" {
+        didSet {
+            if !firstNameText.isEmpty {
+                self.validateTextField(.firstName)
+            }
+        }
+    }
+    @Published var lastNameText = "" {
+        didSet {
+            if !lastNameText.isEmpty {
+                self.validateTextField(.lastName)
+            }
+        }
+    }
     @Published var addressSearchText = ""
-    @Published var addressLine1Text = ""
+
+    @Published var addressLine1Text = "" {
+        didSet {
+            if !addressLine1Text.isEmpty {
+                self.validateTextField(.addressLine1)
+            }
+        }
+    }
     @Published var addressLine2Text = ""
-    @Published var cityText = ""
-    @Published var stateText = ""
-    @Published var postcodeText = ""
-    @Published var countryText = ""
+
+    @Published var cityText = "" {
+        didSet {
+            if !cityText.isEmpty {
+                self.validateTextField(.city)
+            }
+        }
+    }
+    @Published var stateText = "" {
+        didSet {
+            if !stateText.isEmpty {
+                self.validateTextField(.state)
+            }
+        }
+    }
+    @Published var postcodeText = "" {
+        didSet {
+            if !postcodeText.isEmpty {
+                self.validateTextField(.postcode)
+            }
+        }
+    }
+    @Published var countrySearchText = ""
+
+    @Published var countryText = "" {
+        didSet {
+            if !countryText.isEmpty {
+                self.validateTextField(.country)
+            }
+        }
+    }
 
     private(set) var currentTextField: AddressFocusable?
     @Published var showAddressSearchPopup = false
+    @Published var showCountrySearchPopup = false
     @Published var isAddressFormExpanded = false
 
     // MARK: - Methods
 
     func setEditingTextField(focusedField: AddressFocusable?) {
-        validateTextField(currentTextField)
-        
         // Hide address search popup when moving away from search address field
         if currentTextField == .searchAddress && focusedField != .searchAddress {
             showAddressSearchPopup = false
         }
-        
+
+        // Hide country search popup when moving away from country field
+        if currentTextField == .country && focusedField != .country {
+            showCountrySearchPopup = false
+        }
+
         currentTextField = focusedField
 
         editingFirstName = focusedField == .firstName
@@ -121,44 +171,62 @@ class AddressFormManager: ObservableObject {
 
         switch textField {
         case .firstName:
-            let isValid = !firstNameText.isEmpty && !firstNameText.trimmingCharacters(in: .whitespaces).isEmpty
+            let isValid = !firstNameText.trimmingCharacters(in: .whitespaces).isEmpty
             firstNameValid = isValid
             firstNameError = isValid ? "" : "Mandatory field"
 
         case .lastName:
-            let isValid = !lastNameText.isEmpty && !lastNameText.trimmingCharacters(in: .whitespaces).isEmpty
+            let isValid = !lastNameText.trimmingCharacters(in: .whitespaces).isEmpty
             lastNameValid = isValid
             lastNameError = isValid ? "" : "Mandatory field"
 
         case .searchAddress: break // Search field - no need to validate
 
         case .addressLine1:
-            let isValid = !addressLine1Text.isEmpty && !addressLine1Text.trimmingCharacters(in: .whitespaces).isEmpty
+            let isValid = !addressLine1Text.trimmingCharacters(in: .whitespaces).isEmpty
             addressLine1Valid = isValid
             addressLine1Error = isValid ? "" : "Mandatory field"
 
         case .addressLine2: break
 
         case .city:
-            let isValid = !cityText.isEmpty && !cityText.trimmingCharacters(in: .whitespaces).isEmpty
+            let isValid = !cityText.trimmingCharacters(in: .whitespaces).isEmpty
             cityValid = isValid
             cityError = isValid ? "" : "Mandatory field"
 
         case .state:
-            let isValid = !stateText.isEmpty && !stateText.trimmingCharacters(in: .whitespaces).isEmpty
+            let isValid = !stateText.trimmingCharacters(in: .whitespaces).isEmpty
             stateValid = isValid
             stateError = isValid ? "" : "Mandatory field"
 
         case .postcode:
-            let isValid = !postcodeText.isEmpty && !postcodeText.trimmingCharacters(in: .whitespaces).isEmpty
+            let isValid = !postcodeText.trimmingCharacters(in: .whitespaces).isEmpty
             postcodeValid = isValid
             postcodeError = isValid ? "" : "Mandatory field"
 
         case .country:
-            let isValid = !countryText.isEmpty && !countryText.trimmingCharacters(in: .whitespaces).isEmpty
+            let trimmedInput = countryText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let isValid = getCountryList().contains { $0.caseInsensitiveCompare(trimmedInput) == .orderedSame }
             countryValid = isValid
             countryError = isValid ? "" : "Mandatory field"
         }
+    }
+
+    private func isCountryValid() -> Bool {
+        let trimmedInput = countryText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return getCountryList().contains { $0.caseInsensitiveCompare(trimmedInput) == .orderedSame }
+    }
+
+    func isFormValid() -> Bool {
+        let firstNameValid = !firstNameText.trimmingCharacters(in: .whitespaces).isEmpty
+        let lastNameValid = !lastNameText.trimmingCharacters(in: .whitespaces).isEmpty
+        let addressLine1Valid = !addressLine1Text.trimmingCharacters(in: .whitespaces).isEmpty
+        let cityValid = !cityText.trimmingCharacters(in: .whitespaces).isEmpty
+        let stateValid = !stateText.trimmingCharacters(in: .whitespaces).isEmpty
+        let postcodeValid = !postcodeText.trimmingCharacters(in: .whitespaces).isEmpty
+        let countryValid = isCountryValid()
+
+        return firstNameValid && lastNameValid && addressLine1Valid && cityValid && stateValid && postcodeValid && countryValid
     }
 
     func updateFormWith(reversedGeoLocation: ReversedGeoLocation) {
@@ -184,9 +252,20 @@ class AddressFormManager: ObservableObject {
 
         validateAllTextFields()
     }
-    
+
+    func getCountryList() -> [String] {
+        let englishLocale = Locale(identifier: "en")
+        let countryCodes = Locale.Region.isoRegions.filter { $0.subRegions.isEmpty }.map { $0.identifier }.sorted()
+
+        let countryNames = countryCodes.compactMap { code in
+            englishLocale.localizedString(forRegionCode: code)
+        }.sorted()
+
+        return countryNames
+    }
+
     // MARK: - Editing
-    
+
     func endEditing() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         editingFirstName = false

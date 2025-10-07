@@ -13,6 +13,5 @@ public enum SDKEnvironment: String {
     case production
     case sandbox
     case staging
-    
-}
 
+}

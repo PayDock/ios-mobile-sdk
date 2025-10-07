@@ -12,7 +12,7 @@ import PassKit
 struct ApplePayButton: View {
     @State var appearance: ApplePayWidgetAppearance
     private let action: () -> Void
-    
+
     init(appearance: ApplePayWidgetAppearance,
          action: @escaping () -> Void) {
         self.appearance = appearance
@@ -59,7 +59,7 @@ extension ApplePayButton {
             self.action = action
             self.button = PKPaymentButton(paymentButtonType: appearance.type, paymentButtonStyle: appearance.style)
             super.init()
-            
+
             setup()
         }
 

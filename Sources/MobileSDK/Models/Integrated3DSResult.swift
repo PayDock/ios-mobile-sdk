@@ -9,9 +9,10 @@
 import Foundation
 
 public struct Integrated3DSResult {
+
     public let event: EventType
     public let charge3dsId: String
-    
+
     public enum EventType: String {
         case chargeAuthSuccess
         case chargeAuthReject

@@ -10,13 +10,13 @@ import Foundation
 import SwiftUI
 
 extension Theme {
-    
+
     public struct TextFieldFonts {
         public var text: TextAttributes
         public var title: TextAttributes
         public var placeholder: TextAttributes
         public var error: TextAttributes
-        
+
         public init(text: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
                     title: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
                     placeholder: TextAttributes = TextAttributes(font: CustomFont(size: 16)),

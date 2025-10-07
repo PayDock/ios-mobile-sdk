@@ -11,7 +11,7 @@ import SwiftUI
 import AuthenticationServices
 
 public struct Integrated3DSWidget: UIViewRepresentable {
-    
+
     private let config: ThreeDSConfig
     private let appearance: ThreeDSWidgetAppearance
     private let completion: (Result<Integrated3DSResult, Integrated3DSError>) -> Void
@@ -23,10 +23,10 @@ public struct Integrated3DSWidget: UIViewRepresentable {
         self.config = config
         self.appearance = appearance
         self.completion = completion
-        
+
         validateToken()
     }
-    
+
     private func validateToken() {
         guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
               decodedToken.format == .html || decodedToken.format == .url else {
@@ -37,13 +37,13 @@ public struct Integrated3DSWidget: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> UIView {
         let containerView = UIView()
-        
+
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
-        
+
         let activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.color = UIColor(appearance.loader.color)
         activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
@@ -51,11 +51,15 @@ public struct Integrated3DSWidget: UIViewRepresentable {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
         activityIndicator.startAnimating()  // Start animating initially
         activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
+
+        activityIndicator.isAccessibilityElement = true
+        activityIndicator.accessibilityLabel = "3DS Check Loading"
+
         context.coordinator.activityIndicator = activityIndicator
-        
+
         containerView.addSubview(webView)
         containerView.addSubview(activityIndicator)
-        
+
         // Set up constraints for activity indicator
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -64,7 +68,7 @@ public struct Integrated3DSWidget: UIViewRepresentable {
             activityIndicator.topAnchor.constraint(equalTo: containerView.topAnchor),
             activityIndicator.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
-        
+
         // Set up constraints for webView
         webView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -73,7 +77,7 @@ public struct Integrated3DSWidget: UIViewRepresentable {
             webView.topAnchor.constraint(equalTo: containerView.topAnchor),
             webView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
-        
+
         // Set up constraints for activityIndicator to be centered
         NSLayoutConstraint.activate([
             activityIndicator.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
@@ -116,16 +120,16 @@ public struct Integrated3DSWidget: UIViewRepresentable {
                 return
             }
             let statusRaw = data["status"] as? String
-            let _ = Integrated3DSStatus(rawValue: statusRaw ?? "") // Not used currently
-            
+            _ = Integrated3DSStatus(rawValue: statusRaw ?? "") // Not used currently
+
             completion(.success(Integrated3DSResult(event: event, charge3dsId: token)))
         }
-        
+
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
             activityIndicator?.stopAnimating()
         }
-        
+
         /**
          This method handles errors that are reported that happen while loading the resource.
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
@@ -137,12 +141,15 @@ public struct Integrated3DSWidget: UIViewRepresentable {
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             activityIndicator?.startAnimating()
+            DispatchQueue.main.async {
+                UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
+            }
         }
-        
+
         /**
          This method handles errors that happen before the resource of the url can even be reached.
          These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
-         
+
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -150,11 +157,15 @@ public struct Integrated3DSWidget: UIViewRepresentable {
             completion(.failure(.webViewFailed(error: error as NSError)))
         }
 
-        public func webView(_ webView: WKWebView, authenticationChallenge challenge: URLAuthenticationChallenge, shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
+        public func webView(_ webView: WKWebView,
+                            authenticationChallenge challenge: URLAuthenticationChallenge,
+                            shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
             decisionHandler(true)
         }
 
-        public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        public func webView(_ webView: WKWebView,
+                            didReceive challenge: URLAuthenticationChallenge,
+                            completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
             DispatchQueue.global(qos: .background).async {
                 let trust = challenge.protectionSpace.serverTrust!
                 let exceptions = SecTrustCopyExceptions(trust)
@@ -164,6 +175,7 @@ public struct Integrated3DSWidget: UIViewRepresentable {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     static func html(_ token: String) -> String {
         let clientSdkUrl = Constants.clientSdkUrlString
         let clientSdkEnvironment = Constants.clientSdkEnvironment

@@ -20,7 +20,7 @@ public struct Theme:
     TitleStylableAppearance,
     LinkTextStylableAppearance,
     ToggleTextStylableAppearance {
-    
+
     public var textField: TextFieldAppearance
     public var searchDropdown: SearchDropdownAppearance
     public var actionButton: ButtonAppearance
@@ -31,14 +31,17 @@ public struct Theme:
     public var linkText: TextAppearance
     public var toggleText: TextAppearance
     public var title: TextAppearance
-    
+
     public init(textField: TextFieldAppearance = TextFieldAppearance(),
                 searchDropdown: SearchDropdownAppearance = SearchDropdownAppearance(),
                 actionButton: ButtonAppearance = ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
                 expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
                     colors: .init(background: .defaultBackground, text: .defaultPrimary, border: .clear),
                     fonts: .init(title: .init(isUnderlined: true, underlineColor: .defaultPrimary))),
-                toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(background: .clear, text: .defaultPrimary, border: .clear)),
+                toolbarButton: ButtonAppearance = ButtonAppearance(colors: .init(
+                    background: .clear,
+                    text: .defaultPrimary,
+                    border: .clear)),
                 loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),
                 linkText: Theme.TextAppearance = Theme.TextAppearance(text:

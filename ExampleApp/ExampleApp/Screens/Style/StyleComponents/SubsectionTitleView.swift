@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct SubsectionTitleView: View {
-    
+
     let title: String
-    
+
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
             Text(title)

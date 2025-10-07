@@ -9,13 +9,13 @@
 import SwiftUI
 
 struct ResetStyleButton: View {
-    
+
     let action: () -> Void
-    
+
     init(action: @escaping () -> Void) {
         self.action = action
     }
-    
+
     var body: some View {
         Button {
             action()

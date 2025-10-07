@@ -9,7 +9,7 @@
 import Foundation
 
 extension CGFloat {
-    
+
     public static var defaultButtonCornerRadius: CGFloat = 4.0
     public static var defaultTextFieldCornerRadius: CGFloat = 4.0
     public static var defaultBorderWidth: CGFloat = 1.0

@@ -11,15 +11,15 @@ import SwiftUI
 struct LoaderStyleView: View {
 
     @StateObject var viewModel: LoaderStyleVM
-    
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) {
         _viewModel = StateObject(wrappedValue: LoaderStyleVM(
             selectedWidget: selectedWidget,
             stylingDarkMode: stylingDarkMode))
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -28,7 +28,7 @@ struct LoaderStyleView: View {
                 VStack {
                     SectionTitleView(title: "Colors")
                     colorListView
-                    ResetStyleButton() {
+                    ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
                 }
@@ -51,7 +51,7 @@ struct LoaderStyleView: View {
                     set: { viewModel.loaderColor = Color(hex: $0) }),
                 pickedColor: $viewModel.loaderColor
             )
-            
+
             ColorPickerView(
                 title: "Loader overlay",
                 text: Binding(

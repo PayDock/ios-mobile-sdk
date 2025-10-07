@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct FocusablePadding : ViewModifier {
+struct FocusablePadding: ViewModifier {
 
     private let edges: Edge.Set
     private let size: CGFloat?

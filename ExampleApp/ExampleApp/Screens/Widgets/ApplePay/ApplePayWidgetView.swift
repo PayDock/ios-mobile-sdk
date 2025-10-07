@@ -36,9 +36,13 @@ struct ApplePayWidgetView: View {
             })
         }
     }
-    
+
     private func getAppearance() -> ApplePayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .applePay, isDarkMode: colorScheme == .dark, as: ApplePayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .applePay,
+            isDarkMode: colorScheme == .dark,
+            as: ApplePayWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? ApplePayWidgetAppearance()
     }
 }

@@ -34,9 +34,7 @@ public struct PayPalSavePaymentSourceWidget: View {
             shouldTemplate: true) {
                 viewModel.initializePayPalSDK()
             }
-            .accessibilityHint("Initiates linking of PayPal account.")
     }
-    
 }
 
 struct PayPalSavePaymentSourceWidget_Previews: PreviewProvider {

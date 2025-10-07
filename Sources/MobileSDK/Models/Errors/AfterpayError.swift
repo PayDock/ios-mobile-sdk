@@ -16,7 +16,7 @@ public enum AfterpayError: Error {
     case errorCancelingTransaction(error: ErrorRes)
     case transactionCanceled
     case initialisingWalletToken(reason: String)
-    case unknownError
+    case unknownError(RequestError?)
 
     public var customMessage: String {
         switch self {
@@ -25,8 +25,7 @@ public enum AfterpayError: Error {
         case .errorCancelingTransaction: return "Unable to cancel transaction"
         case .transactionCanceled: return "Afterpay transaction was canceled."
         case .initialisingWalletToken(let reason): return reason
-        case .unknownError: return "Unknown error"
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }
-

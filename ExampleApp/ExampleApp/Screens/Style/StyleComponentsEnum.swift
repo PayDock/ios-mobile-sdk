@@ -21,9 +21,10 @@ enum StyleComponentsEnum {
     case title
     case applePay
     case afterpay
+    case payPal
     case spacings
     case buttonLoader
-    
+
     var title: String {
         switch self {
         case .textField: return "Text Field"
@@ -38,11 +39,12 @@ enum StyleComponentsEnum {
         case .title: return "Title"
         case .applePay: return "Apple Pay Button"
         case .afterpay: return "Afterpay Button"
+        case .payPal: return "PayPal Button"
         case .spacings: return "Spacings"
         case .buttonLoader: return "Button Loader"
         }
     }
-    
+
     func destinationView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch self {
         case .loader:
@@ -69,15 +71,17 @@ enum StyleComponentsEnum {
             return AnyView(ApplePayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .afterpay:
             return AnyView(AfterpayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .payPal:
+            return AnyView(PayPalStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .spacings:
             return AnyView(SpacingsStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .buttonLoader:
             return AnyView(ButtonLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         }
     }
-    
+
     // MARK: - Button Helper Methods
-    
+
     private func createActionButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -114,7 +118,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createExpandSectionButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -133,7 +137,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createToolbarButtonView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -158,7 +162,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     // MARK: - Text Helper Methods
 
     private func createTitleView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
@@ -191,7 +195,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createLinkTextView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:
@@ -210,7 +214,7 @@ enum StyleComponentsEnum {
             return AnyView(EmptyView())
         }
     }
-    
+
     private func createToggleTextView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch selectedWidget {
         case .all:

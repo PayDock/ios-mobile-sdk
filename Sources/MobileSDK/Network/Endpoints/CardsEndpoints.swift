@@ -53,13 +53,13 @@ extension CardsEndpoints: Endpoint {
         default: return []
         }
     }
-    
+
     var mockFile: String? {
         switch self {
         case .cardToken, .giftCardToken: return nil
         }
     }
-    
+
     var bundle: Bundle? {
         return Bundle.module
     }

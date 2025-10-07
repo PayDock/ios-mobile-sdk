@@ -31,22 +31,26 @@ class ColesPayWidgetVM: ObservableObject {
     }
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargePaymentSource(
+                addressLine1: "123 Test Street",
+                addressPostcode: "BN3 5SL",
+                gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "",
+                walletType: nil)
 
-            let customer = InitialiseWalletChargeReq.Customer(
+            let customer = InitialiseWalletChargeCustomer(
                 firstName: "Wanda",
                 lastName: "Mertz",
                 email: "wanda.mertz@example.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeReq.MetaData(
+            let metaData = InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
                 successUrl: nil,
                 errorUrl: nil)
-            
+
             let initializeWalletChargeReq = InitialiseWalletChargeReq(
                 customer: customer,
                 amount: 5,
@@ -56,12 +60,15 @@ class ColesPayWidgetVM: ObservableObject {
                 meta: metaData)
 
             do {
-                let token = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq).token
+                let token = try await walletService.initialiseColesPayWalletCharge(
+                    initializeWalletChargeReq: initializeWalletChargeReq).token
                 DispatchQueue.main.async {
                     completion(.success(.init(token: token)))
                 }
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -91,7 +98,7 @@ extension ColesPayWidgetVM: WidgetLoadingDelegate {
     func loadingDidStart() {
         isLoading = true
     }
-    
+
     func loadingDidFinish() {
         isLoading = false
     }
