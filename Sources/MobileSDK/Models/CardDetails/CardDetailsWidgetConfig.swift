@@ -14,7 +14,7 @@ public struct CardDetailsWidgetConfig {
     public let collectCardholderName: Bool
     public let allowSaveCard: SaveCardConfig?
     public let schemeSupport: SupportedSchemesConfig
-    
+
     public init(
         gatewayId: String?,
         accessToken: String,

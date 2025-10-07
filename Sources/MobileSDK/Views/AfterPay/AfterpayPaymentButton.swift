@@ -49,7 +49,7 @@ extension AfterpayPaymentButton {
                 button.leadingAnchor.constraint(equalTo: container.leadingAnchor),
                 button.trailingAnchor.constraint(equalTo: container.trailingAnchor),
                 button.topAnchor.constraint(equalTo: container.topAnchor),
-                button.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+                button.bottomAnchor.constraint(equalTo: container.bottomAnchor)
             ])
 
             return container

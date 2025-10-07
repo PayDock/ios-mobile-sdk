@@ -28,7 +28,7 @@ struct CheckoutView: View {
             image: "demoItem2"
         )
     ]
-    
+
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
@@ -40,7 +40,7 @@ struct CheckoutView: View {
                         .padding(.bottom, 16)
                 }
                 Spacer()
-                VStack (spacing: 16) {
+                VStack(spacing: 16) {
                     TotalRowView(title: "Subtotal", value: "$5,498", color: .gray)
                     TotalRowView(title: "Shipping", value: "Free", color: .gray)
                     Divider()
@@ -52,7 +52,7 @@ struct CheckoutView: View {
                 .foregroundStyle(.white)
                 .font(Font.system(size: 16, weight: .semibold))
                 .frame(height: 48)
-                .frame(maxWidth:.infinity)
+                .frame(maxWidth: .infinity)
                 .background(Color.defaultPrimary)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
@@ -80,7 +80,7 @@ struct TotalRowView: View {
     let title: String
     let value: String
     let color: Color
-    
+
     var body: some View {
         HStack {
             Text(title)
@@ -104,7 +104,7 @@ struct BasketItem: Identifiable {
 
 struct BasketItemView: View {
     let item: BasketItem
-    
+
     var body: some View {
         HStack(spacing: 16) {
             Image(item.image)

@@ -12,7 +12,7 @@ import SwiftUI
 struct DismissDetectingView<T: View>: UIViewControllerRepresentable {
     let view: T
     let canDismissSheet: Bool
-    let onDismissalAttempt: (() -> ())?
+    let onDismissalAttempt: (() -> Void)?
 
     func makeUIViewController(context: Context) -> DismissDetectingHostingController<T> {
         let controller = DismissDetectingHostingController(rootView: view)
@@ -33,7 +33,7 @@ struct DismissDetectingView<T: View>: UIViewControllerRepresentable {
 
 class DismissDetectingHostingController<Content: View>: UIHostingController<Content>, UIAdaptivePresentationControllerDelegate {
     var canDismissSheet = true
-    var onDismissalAttempt: (() -> ())?
+    var onDismissalAttempt: (() -> Void)?
 
     override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)

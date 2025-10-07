@@ -9,9 +9,10 @@
 import Foundation
 
 public struct ClickToPayResult {
+
     public let event: EventType
     public let mastercardToken: String
-    
+
     public enum EventType: String {
         case checkoutCompleted
         case checkoutReady

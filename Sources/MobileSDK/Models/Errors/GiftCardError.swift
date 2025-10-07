@@ -12,12 +12,12 @@ import NetworkingLib
 public enum GiftCardError: Error {
 
     case errorTokenisingCard(error: ErrorRes)
-    case unknownError
+    case unknownError(RequestError?)
 
     public var customMessage: String {
         switch self {
         case let .errorTokenisingCard(error): return error.error?.message ?? "Error tokenising gift card"
-        case .unknownError: return "Unknown error occured"
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }

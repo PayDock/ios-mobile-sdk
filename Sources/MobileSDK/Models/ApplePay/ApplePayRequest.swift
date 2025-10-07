@@ -14,8 +14,7 @@ public struct ApplePayRequest {
         self.token = token
         self.request = request
     }
-    
+
     public let token: String
     public let request: PKPaymentRequest
-
 }

@@ -51,11 +51,11 @@ extension CustomersEndpoints: Endpoint {
         case .createCustomer: return []
         }
     }
-    
+
     var mockFile: String? {
         return nil
     }
-    
+
     var bundle: Bundle? {
         return nil
     }

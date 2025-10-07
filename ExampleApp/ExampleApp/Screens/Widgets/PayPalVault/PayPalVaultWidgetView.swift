@@ -10,7 +10,7 @@ import SwiftUI
 import MobileSDK
 
 struct PayPalVaultWidgetView: View {
-    
+
     @StateObject private var viewModel = PayPalVaultWidgetVM()
     @Environment(\.colorScheme) var colorScheme
 
@@ -36,9 +36,13 @@ struct PayPalVaultWidgetView: View {
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         }
     }
-    
+
     private func getAppearance() -> PayPalVaultAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .paypalVault, isDarkMode: colorScheme == .dark, as: PayPalVaultAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .paypalVault,
+            isDarkMode: colorScheme == .dark,
+            as: PayPalVaultAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? PayPalVaultAppearance()
     }
 }

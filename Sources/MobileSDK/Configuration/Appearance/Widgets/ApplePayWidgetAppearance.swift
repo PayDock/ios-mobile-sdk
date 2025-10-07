@@ -11,7 +11,7 @@ import PassKit
 public struct ApplePayWidgetAppearance {
     public var type: PKPaymentButtonType
     public var style: PKPaymentButtonStyle
-    
+
     public init(type: PKPaymentButtonType = .plain,
                 style: PKPaymentButtonStyle = .automatic) {
         self.type = type

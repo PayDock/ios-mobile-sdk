@@ -29,7 +29,7 @@ class GiftCardVM: ObservableObject {
     @Published var isLoading = false
     private weak var loadingDelegate: WidgetLoadingDelegate?
 
-    var anyCancellable: AnyCancellable? = nil // Required to allow updating the view from nested observable objects - SwiftUI quirk
+    var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
 
@@ -52,7 +52,7 @@ class GiftCardVM: ObservableObject {
     }
 
     // MARK: - Requests
-    
+
     func tokeniseGiftCard() {
         Task {
             updateLoadingState(isLoading: true)
@@ -62,7 +62,9 @@ class GiftCardVM: ObservableObject {
                 storePin: config.storePin)
 
             do {
-                let cardToken = try await cardService.createGiftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: config.accessToken)
+                let cardToken = try await cardService.createGiftCardToken(
+                    tokeniseGiftCardReq: tokeniseGiftCardReq,
+                    accessToken: config.accessToken)
                 updateLoadingState(isLoading: false)
                 completion(.success(GiftCardResult(token: cardToken)))
 
@@ -72,7 +74,7 @@ class GiftCardVM: ObservableObject {
 
             } catch {
                 updateLoadingState(isLoading: false)
-                completion(.failure(.unknownError))
+                completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }
@@ -80,8 +82,8 @@ class GiftCardVM: ObservableObject {
     // MARK: - State Management
 
     func updateLoadingState(isLoading: Bool) {
-        if (loadingDelegate != nil) {
-            if (isLoading) {
+        if loadingDelegate != nil {
+            if isLoading {
                 loadingDelegate?.loadingDidStart()
             } else {
                 loadingDelegate?.loadingDidFinish()

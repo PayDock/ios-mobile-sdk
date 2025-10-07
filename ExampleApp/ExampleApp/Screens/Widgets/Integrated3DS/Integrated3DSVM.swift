@@ -55,21 +55,21 @@ class Integrated3DSVM: NSObject, ObservableObject {
 
     private func create3dsToken(cardToken: String) {
         Task {
-            let req = Integrated3DSReq(amount: "10", currency: "AUD", _3ds: .init(browserDetails: .init()), token: cardToken)
+            let req = Integrated3DSReq(amount: "10", currency: "AUD", threeDS: .init(browserDetails: .init()), token: cardToken)
             do {
                 let token3DS = try await walletService.createIntegrated3DSToken(request: req)
-                    self.isLoading = false
-                    self.token3DS = token3DS ?? ""
-                    self.showWebView = true
+                self.isLoading = false
+                self.token3DS = token3DS ?? ""
+                self.showWebView = true
             } catch {
-                    self.isLoading = false
-                    self.showWebView = false
-                    self.alertMessage = "Error tokenising card details!"
-                    self.showAlert = true
+                self.isLoading = false
+                self.showWebView = false
+                self.alertMessage = "Error tokenising card details!"
+                self.showAlert = true
             }
         }
     }
-    
+
     func handle3dsEvent(_ event: Integrated3DSResult) {
         switch event.event {
         case .chargeAuth: break
@@ -77,21 +77,21 @@ class Integrated3DSVM: NSObject, ObservableObject {
         case .chargeAuthReject:
             self.showWebView = false
             alertMessage = "3DS auth rejected!"
-            
+
         case .additionalDataCollectReject:
             self.showWebView = false
             alertMessage = "3DS additional data rejected!"
-            
+
         case .chargeAuthCancelled:
             self.showWebView = false
             alertMessage = "3DS cancelled!"
-            
+
         case .chargeAuthSuccess:
             self.showWebView = false
             alertMessage = event.charge3dsId
         }
     }
-    
+
     func handleFailure(error: Integrated3DSError) {
         showWebView = false
         alertMessage = error.customMessage

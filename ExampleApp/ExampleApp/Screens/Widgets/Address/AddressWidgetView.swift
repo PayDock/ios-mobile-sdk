@@ -16,22 +16,32 @@ struct AddressWidgetView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                AddressWidget(
-                    config: .init(),
-                    appearance: getAppearance()) { address in
-                    alertMessage = address.addressLine1
+            AddressWidget(
+                config: .init(),
+                appearance: getAppearance()) { address in
+                    alertMessage = """
+                        \(address.firstName) \(address.lastName)
+                        \(address.addressLine1)
+                        \(address.addressLine2)
+                        \(address.city)
+                        \(address.state)
+                        \(address.postcode)
+                        \(address.country)
+                    """
                     showAlert = true
                 }
-            }
-            .alert("Address", isPresented: $showAlert, actions: {}, message: {
-                Text(alertMessage)
-            })
+                .alert("Address", isPresented: $showAlert, actions: {}, message: {
+                    Text(alertMessage)
+                })
         }
     }
-    
+
     private func getAppearance() -> AddressWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .address, isDarkMode: colorScheme == .dark, as: AddressWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .address,
+            isDarkMode: colorScheme == .dark,
+            as: AddressWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? AddressWidgetAppearance()
     }
 }

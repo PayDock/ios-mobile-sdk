@@ -1,0 +1,381 @@
+//
+//  ColesPayVMTests.swift
+//  MobileSDK
+//
+//  Created by Domagoj Grizelj on 24.09.2025..
+//
+
+import XCTest
+import Combine
+@testable import MobileSDK
+@testable import NetworkingLib
+
+// swiftlint:disable all
+@MainActor
+class ColesPayVMTests: XCTestCase {
+
+    var viewModel: ColesPayVM!
+
+    private var walletService: ColesWalletServiceMock!
+    var viewState: ViewState!
+    var loadingDelegate: WidgetLoadingDelegateUtil!
+    var config: ColesPayConfig!
+
+    var completionResult: Result<String, ColesPayError>?
+
+    override func setUp() {
+        super.setUp()
+        walletService = ColesWalletServiceMock()
+        viewState = ViewState()
+        loadingDelegate = WidgetLoadingDelegateUtil()
+        config = ColesPayConfig(clientId: "client_123")
+        completionResult = nil
+
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate,
+            completion: { result in
+                self.completionResult = result
+        })
+    }
+
+    override func tearDown() {
+        viewModel = nil
+        walletService = nil
+        viewState = nil
+        loadingDelegate = nil
+        config = nil
+        completionResult = nil
+        super.tearDown()
+    }
+
+    // MARK: - Initialisation
+
+    func testInitialisationWithDelegateShowLoader() {
+        XCTAssertEqual(viewModel.showLoaders, false)
+    }
+
+    func testInitialisationWithoutDelegateShowLoader() {
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: nil
+        ) { result in
+            self.completionResult = result
+        }
+
+        XCTAssertEqual(viewModel.showLoaders, true)
+    }
+
+    // MARK: - Loading state updates
+
+    func testUpdateLoadingStateToTrueWithDelegate() {
+        // When
+        viewModel.updateLoadingState(isLoading: true)
+
+        // Then
+        XCTAssertEqual(viewModel.isLoading, true)
+        XCTAssertEqual(loadingDelegate.isLoading, true)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
+    }
+
+    func testUpdateLoadingStateToTrueWithoutDelegate() {
+        // Given
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: nil
+        ) { result in
+            self.completionResult = result
+        }
+        viewModel.isLoading = false
+        loadingDelegate.isLoading = false
+
+        // When
+        viewModel.updateLoadingState(isLoading: true)
+
+        // Then
+        XCTAssertEqual(viewModel.isLoading, true)
+        XCTAssertEqual(loadingDelegate.isLoading, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
+    }
+
+    func testUpdateLoadingStateToFalseWithDelegate() {
+        // Given
+        viewModel.isLoading = true
+        loadingDelegate.isLoading = true
+
+        // When
+        viewModel.updateLoadingState(isLoading: false)
+
+        // Then
+        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(loadingDelegate.isLoading, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
+    }
+
+    func testUpdateLoadingStateToFalseWithoutDelegate() {
+        // Given
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: nil
+        ) { result in
+            self.completionResult = result
+        }
+        viewModel.isLoading = true
+        loadingDelegate.isLoading = false
+
+        // When
+        viewModel.updateLoadingState(isLoading: false)
+
+        // Then
+        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(loadingDelegate.isLoading, false)
+        XCTAssertEqual(viewModel.viewState.isDisabled, false)
+    }
+
+    // MARK: - Button tap / token request
+
+    func testHandleButtonTap_SetsLoadingAndShowsWebView_OnSuccess() async {
+        // Given: wallet service will return a valid order id
+        walletService.colesPayResult = .success("order_123")
+
+        // When
+        viewModel.handleButtonTap()
+
+        // Then: wait briefly for async Task in getColesPayURL
+        let exp = expectation(description: "WebView shown after fetching URL")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            exp.fulfill()
+        }
+        await fulfillment(of: [exp], timeout: 1.0)
+
+        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(viewModel.showWebView, true)
+        XCTAssertEqual(viewModel.colesPayOrderId, "order_123")
+        // Note: viewState remains disabled while WebView is shown
+        XCTAssertEqual(viewModel.viewState.isDisabled, true)
+    }
+
+    func testHandleButtonTap_CompletesWithInitialisingWalletToken_OnTokenFailure() {
+        // Given: token request fails
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.failure(.initialisingWalletToken(reason: "Token init failed")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate
+        ) { result in
+            self.completionResult = result
+        }
+
+        // When
+        viewModel.handleButtonTap()
+
+        // Then
+        switch completionResult {
+        case .failure(let error):
+            switch error {
+            case .initialisingWalletToken(let reason):
+                XCTAssertEqual(reason, "Token init failed")
+            default:
+                XCTFail("Expected initialisingWalletToken error, got: \(error)")
+            }
+        default:
+            XCTFail("Expected failure result")
+        }
+
+        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(viewModel.showWebView, false)
+    }
+
+    func testGetColesPayURL_CompletesWithUnknownError_OnOtherError() async {
+        // Given: service throws a different RequestError
+        walletService.colesPayResult = .failure(.unknownError(.connectionError(URLError(.notConnectedToInternet))))
+
+        let exp = expectation(description: "Completion called with unknownError")
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate
+        ) { result in
+            self.completionResult = result
+            exp.fulfill()
+        }
+
+        // When
+        viewModel.getColesPayURL(token: "wallet_token")
+
+        // Then
+        await fulfillment(of: [exp], timeout: 1.0)
+        switch completionResult {
+        case .failure(let error):
+            switch error {
+            case .unknownError:
+                XCTAssert(true)
+            default:
+                XCTFail("Expected unknownError, got: \(error)")
+            }
+        default:
+            XCTFail("Expected failure result")
+        }
+
+        XCTAssertEqual(viewModel.isLoading, false)
+        XCTAssertEqual(viewModel.showWebView, false)
+    }
+
+    // MARK: - Handlers
+
+    func testHandleSuccess_CompletesWithOrderId_AndHidesWebView() {
+        // Given
+        walletService.colesPayResult = .success("order_123")
+        viewModel.getColesPayURL(token: "wallet_token")
+
+        // Wait briefly for showWebView to be set
+        let exp = expectation(description: "URL fetched")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { exp.fulfill() }
+        wait(for: [exp], timeout: 1.0)
+
+        // When
+        let completionExp = expectation(description: "Completion called with success")
+        completionResult = nil
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate
+        ) { result in
+            self.completionResult = result
+            completionExp.fulfill()
+        }
+        // Manually set order id to simulate fetched state
+        viewModel.getColesPayURL(token: "wallet_token")
+        let exp2 = expectation(description: "URL fetched 2")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { exp2.fulfill() }
+        wait(for: [exp2], timeout: 1.0)
+
+        viewModel.handleSuccess()
+
+        wait(for: [completionExp], timeout: 1.0)
+        switch completionResult {
+        case .success(let orderId):
+            XCTAssertFalse(orderId.isEmpty)
+        default:
+            XCTFail("Expected success result")
+        }
+        XCTAssertEqual(viewModel.showWebView, false)
+        XCTAssertEqual(viewModel.isLoading, false)
+    }
+
+    func testHandleFailure_CompletesWithError_AndHidesWebView() {
+        // Given
+        let errorRes = ErrorRes(status: 500, error: .init(message: "Server error", code: "ServerError"), resource: nil, errorSummary: nil)
+        let error = ColesPayError.errorFetchingColesPayOrder(error: errorRes)
+        let exp = expectation(description: "Completion called with failure")
+
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate
+        ) { result in
+            self.completionResult = result
+            exp.fulfill()
+        }
+
+        // When
+        viewModel.handleFailure(error: error)
+
+        // Then
+        wait(for: [exp], timeout: 1.0)
+        switch completionResult {
+        case .failure(let e):
+            switch e {
+            case .errorFetchingColesPayOrder(let err):
+                XCTAssertEqual(err.error?.message, "Server error")
+            default:
+                XCTFail("Expected errorFetchingColesPayOrder, got: \(e)")
+            }
+        default:
+            XCTFail("Expected failure result")
+        }
+        XCTAssertEqual(viewModel.showWebView, false)
+        XCTAssertEqual(viewModel.isLoading, false)
+    }
+
+    func testHandleSheetCancellation_CompletesWithTransactionCanceled() {
+        // Given
+        let exp = expectation(description: "Completion called with transactionCanceled")
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate
+        ) { result in
+            self.completionResult = result
+            exp.fulfill()
+        }
+
+        // When
+        viewModel.handleSheetCancellation()
+
+        // Then
+        wait(for: [exp], timeout: 1.0)
+        switch completionResult {
+        case .failure(let error):
+            switch error {
+            case .transactionCanceled: XCTAssertTrue(true)
+            default: XCTFail("Expected transactionCanceled, got: \(error)")
+            }
+        default:
+            XCTFail("Expected failure result")
+        }
+        XCTAssertEqual(viewModel.isLoading, false)
+    }
+}
+
+// MARK: - Test doubles
+
+private class ColesWalletServiceMock: WalletServiceMock {
+    var colesPayResult: Result<String, ColesPayError>? = .success("")
+
+    override func getColesPayCallback(token: String) async throws -> String {
+        if let colesPayResult = colesPayResult {
+            switch colesPayResult {
+            case .success(let orderId):
+                return orderId
+            case .failure(let error):
+                throw error
+            }
+        }
+        return ""
+    }
+}
+// swiftlint:enable all

@@ -14,6 +14,7 @@ public struct AddressWidget: View {
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
     @FocusState private var isViewFocused: Bool
     @State var appearance: AddressWidgetAppearance
+    @State private var keyboardHeight: CGFloat = 0
 
     // MARK: - Initialisation
 
@@ -26,33 +27,73 @@ public struct AddressWidget: View {
 
     public var body: some View {
         ZStack {
-            ScrollView {
-                VStack(spacing: appearance.verticalSpacing) {
-                    VStack(spacing: 8.0) {
-                        nameAndLastNameView
-                        autocompleteTextFieldView
-                            .zIndex(100)
-                            .padding(.bottom, viewModel.addressFormManager.showAddressSearchPopup ? 120 : 0)
-                        if viewModel.addressFormManager.isAddressFormExpanded {
-                            addressLine1View
-                            addressLine2View
-                            cityView
-                            stateView
-                            postcodeView
-                            countryView
-                        } else {
-                            manualEntryButton
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: appearance.verticalSpacing) {
+                        VStack(spacing: 8.0) {
+                            nameAndLastNameView
+                            autocompleteTextFieldView
+                                .zIndex(100)
+                                .padding(.bottom, viewModel.addressFormManager.showAddressSearchPopup ? 140 : 0)
+                            if viewModel.addressFormManager.isAddressFormExpanded {
+                                addressLine1View
+                                addressLine2View
+                                cityView
+                                stateView
+                                postcodeView
+                                countryView
+                                    .zIndex(100)
+                                    .padding(.bottom, viewModel.addressFormManager.showCountrySearchPopup ? 140 : 0)
+                            } else {
+                                manualEntryButton
+                            }
                         }
-                    }
 
-                    saveButton
-                    emptyFocusView
+                        saveButton
+                            .id("saveButton")
+                        emptyFocusView
+                    }
+                    .animation(.easeInOut, value: viewModel.addressFormManager.showAddressSearchPopup)
+                    .animation(.easeInOut, value: viewModel.addressFormManager.showCountrySearchPopup)
+                    .padding(.horizontal, 16.0)
+                    .padding(.bottom, keyboardHeight > 0 ? keyboardHeight + 20 : 0)
                 }
-                .animation(.easeInOut, value: viewModel.addressFormManager.showAddressSearchPopup)
-                .padding(.horizontal, 16.0)
+                .modifier(AddressAutoScrollModifier(textFieldInFocus: textFieldInFocus, proxy: proxy))
             }
             .onAppear {
                 viewModel.updateAddress()
+                observeKeyboard()
+            }
+        }
+    }
+
+    private func scrollToField(_ field: AddressFormManager.AddressFocusable, proxy: ScrollViewProxy) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                proxy.scrollTo(field, anchor: .center)
+            }
+        }
+    }
+
+    private func observeKeyboard() {
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillShowNotification,
+            object: nil,
+            queue: .main
+        ) { notification in
+            guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                keyboardHeight = keyboardFrame.height
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillHideNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            withAnimation(.easeInOut(duration: 0.3)) {
+                keyboardHeight = 0
             }
         }
     }
@@ -83,21 +124,21 @@ public struct AddressWidget: View {
                     valid: $viewModel.addressFormManager.firstNameValid,
                     disabled: $viewModel.isDisabled,
                     textContentType: .givenName,
+                    returnKeyType: .next,
                     onTapGesture: {
                         self.textFieldInFocus = .firstName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
+                    }, onSubmit: {
+                        textFieldInFocus = .lastName
+                        viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
                     }
                 )
-                .submitLabel(.next)
-                .onSubmit {
-                    textFieldInFocus = .lastName
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
-                }
                 .onConditionalKeyPress(key: .tab, action: {
                     textFieldInFocus = .lastName
                     viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
                 })
                 .focused($textFieldInFocus, equals: .firstName)
+                .id(AddressFormManager.AddressFocusable.firstName)
 
                 OutlineTextField(
                     appearance: appearance.textField,
@@ -109,21 +150,21 @@ public struct AddressWidget: View {
                     valid: $viewModel.addressFormManager.lastNameValid,
                     disabled: $viewModel.isDisabled,
                     textContentType: .familyName,
+                    returnKeyType: .next,
                     onTapGesture: {
                         self.textFieldInFocus = .lastName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
+                    }, onSubmit: {
+                        textFieldInFocus = .searchAddress
+                        viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
                     }
                 )
-                .submitLabel(.next)
-                .onSubmit {
-                    textFieldInFocus = .searchAddress
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
-                }
                 .onConditionalKeyPress(key: .tab, action: {
                     textFieldInFocus = .searchAddress
                     viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
                 })
                 .focused($textFieldInFocus, equals: .lastName)
+                .id(AddressFormManager.AddressFocusable.lastName)
             }
         }
     }
@@ -138,7 +179,6 @@ public struct AddressWidget: View {
         }
         .customPadding(appearance.title.padding)
     }
-    
 
     private var autocompleteTextFieldView: some View {
         VStack(spacing: 0) {
@@ -162,25 +202,27 @@ public struct AddressWidget: View {
                 onTapGesture: {
                     self.textFieldInFocus = .searchAddress
                     viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
+                },
+                returnKeyType: .next,
+                onSubmit: {
+                    let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
+                    textFieldInFocus = isFormExpanded ? .addressLine1 : nil
+
+                    if isFormExpanded {
+                        viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
+                    } else {
+                        viewModel.addressFormManager.endEditing()
+                    }
                 }
             )
             .submitLabel(.next)
-            .onSubmit {
-                let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
-                textFieldInFocus = isFormExpanded ? .addressLine1 : nil
-                
-                if isFormExpanded {
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
-                } else {
-                    viewModel.addressFormManager.endEditing()
-                }
-            }
             .onConditionalKeyPress(key: .tab, action: {
                 let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
                 textFieldInFocus = isFormExpanded ? .addressLine1 : .firstName
                 viewModel.addressFormManager.setEditingTextField(focusedField: isFormExpanded ? .addressLine1 : .firstName)
             })
             .focused($textFieldInFocus, equals: .searchAddress)
+            .id(AddressFormManager.AddressFocusable.searchAddress)
             .padding(.bottom, 6)
         }
     }
@@ -194,6 +236,7 @@ public struct AddressWidget: View {
                 action: {
                     self.viewModel.addressFormManager.isAddressFormExpanded = true
                 })
+            .accessibilityHint("Saves address information.")
             Spacer()
         }
     }
@@ -209,21 +252,21 @@ public struct AddressWidget: View {
             valid: $viewModel.addressFormManager.addressLine1Valid,
             disabled: $viewModel.isDisabled,
             textContentType: .streetAddressLine1,
+            returnKeyType: .next,
             onTapGesture: {
                 self.textFieldInFocus = .addressLine1
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
+            }, onSubmit: {
+                textFieldInFocus = .addressLine2
+                viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
             }
         )
-        .submitLabel(.next)
-        .onSubmit {
-            textFieldInFocus = .addressLine2
-            viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
-        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .addressLine2
             viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
         })
         .focused($textFieldInFocus, equals: .addressLine1)
+        .id(AddressFormManager.AddressFocusable.addressLine1)
     }
 
     private var addressLine2View: some View {
@@ -237,21 +280,21 @@ public struct AddressWidget: View {
             valid: $viewModel.addressFormManager.addressLine2Valid,
             disabled: $viewModel.isDisabled,
             textContentType: .streetAddressLine2,
+            returnKeyType: .next,
             onTapGesture: {
                 self.textFieldInFocus = .addressLine2
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
+            }, onSubmit: {
+                textFieldInFocus = .city
+                viewModel.addressFormManager.setEditingTextField(focusedField: .city)
             }
         )
-        .submitLabel(.next)
-        .onSubmit {
-            textFieldInFocus = .city
-            viewModel.addressFormManager.setEditingTextField(focusedField: .city)
-        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .city
             viewModel.addressFormManager.setEditingTextField(focusedField: .city)
         })
         .focused($textFieldInFocus, equals: .addressLine2)
+        .id(AddressFormManager.AddressFocusable.addressLine2)
     }
 
     private var cityView: some View {
@@ -265,21 +308,21 @@ public struct AddressWidget: View {
             valid: $viewModel.addressFormManager.cityValid,
             disabled: $viewModel.isDisabled,
             textContentType: .addressCity,
+            returnKeyType: .next,
             onTapGesture: {
-                self.textFieldInFocus = .city
+                textFieldInFocus = .city
                 viewModel.addressFormManager.setEditingTextField(focusedField: .city)
+            }, onSubmit: {
+                textFieldInFocus = .state
+                viewModel.addressFormManager.setEditingTextField(focusedField: .state)
             }
         )
-        .submitLabel(.next)
-        .onSubmit {
-            textFieldInFocus = .state
-            viewModel.addressFormManager.setEditingTextField(focusedField: .state)
-        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .state
             viewModel.addressFormManager.setEditingTextField(focusedField: .state)
         })
         .focused($textFieldInFocus, equals: .city)
+        .id(AddressFormManager.AddressFocusable.city)
     }
 
     private var stateView: some View {
@@ -293,21 +336,21 @@ public struct AddressWidget: View {
             valid: $viewModel.addressFormManager.stateValid,
             disabled: $viewModel.isDisabled,
             textContentType: .addressState,
+            returnKeyType: .next,
             onTapGesture: {
                 self.textFieldInFocus = .state
                 viewModel.addressFormManager.setEditingTextField(focusedField: .state)
+            }, onSubmit: {
+                textFieldInFocus = .postcode
+                viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
             }
         )
-        .submitLabel(.next)
-        .onSubmit {
-            textFieldInFocus = .postcode
-            viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
-        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .postcode
             viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
         })
         .focused($textFieldInFocus, equals: .state)
+        .id(AddressFormManager.AddressFocusable.state)
     }
 
     private var postcodeView: some View {
@@ -321,59 +364,65 @@ public struct AddressWidget: View {
             valid: $viewModel.addressFormManager.postcodeValid,
             disabled: $viewModel.isDisabled,
             textContentType: .postalCode,
+            returnKeyType: .next,
             onTapGesture: {
                 self.textFieldInFocus = .postcode
                 viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
+            }, onSubmit: {
+                textFieldInFocus = .country
+                viewModel.addressFormManager.setEditingTextField(focusedField: .country)
             }
         )
-        .submitLabel(.next)
-        .onSubmit {
-            textFieldInFocus = .country
-            viewModel.addressFormManager.setEditingTextField(focusedField: .country)
-        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .country
             viewModel.addressFormManager.setEditingTextField(focusedField: .country)
         })
         .focused($textFieldInFocus, equals: .postcode)
+        .id(AddressFormManager.AddressFocusable.postcode)
     }
 
     private var countryView: some View {
-        OutlineTextField(
-            appearance: appearance.textField,
-            text: $viewModel.addressFormManager.countryText,
+        AutocompleteTextField(
+            appearance: appearance.searchDropdown,
+            text: viewModel.countrySearchBinding,
             title: viewModel.addressFormManager.countryTitle,
             placeholder: viewModel.addressFormManager.countryPlaceholder,
             errorMessage: $viewModel.addressFormManager.countryError,
             editing: $viewModel.addressFormManager.editingCountry,
             valid: $viewModel.addressFormManager.countryValid,
+            showPopup: $viewModel.addressFormManager.showCountrySearchPopup,
             disabled: $viewModel.isDisabled,
+            validationIconEnabled: true,
+            options: $viewModel.countrySearchSuggestions,
             textContentType: .countryName,
+            onSelection: {
+                viewModel.handleTapOnCountryOptionAt(index: $0)
+            },
             onTapGesture: {
                 self.textFieldInFocus = .country
                 viewModel.addressFormManager.setEditingTextField(focusedField: .country)
+            }, onSubmit: {
+                textFieldInFocus = nil
+                viewModel.addressFormManager.endEditing()
             }
         )
-        .submitLabel(.done)
-        .onSubmit {
-            textFieldInFocus = nil
-            viewModel.addressFormManager.endEditing()
-        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .firstName
             viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
         })
         .focused($textFieldInFocus, equals: .country)
+        .id(AddressFormManager.AddressFocusable.country)
     }
 
     private var saveButton: some View {
-        SDKButton(title: "Save", style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isDisabled))) {
+        SDKButton(title: "Save",
+                  style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))) {
             viewModel.saveAddress()
         }
         .customPadding(appearance.actionButton.dimensions.padding)
         .font(appearance.actionButton.fonts.title.customFont.font)
     }
-    
+
     private var emptyFocusView: some View {
         VStack {}
             .conditionalFocusable()

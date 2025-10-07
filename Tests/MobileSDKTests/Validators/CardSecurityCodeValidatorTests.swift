@@ -58,11 +58,11 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testValidVisaSecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .visa))
     }
-    
+
     func testInvalidVisaSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .visa))
     }
-    
+
     func testInvalidVisaSecurityCode_LenghtTooShort() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .visa))
     }
@@ -70,11 +70,11 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testValidDiscoverSecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .discover))
     }
-    
+
     func testInvalidDiscoverSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .discover))
     }
-    
+
     func testInvalidDiscoverSecurityCode_LenghtTooShort() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .discover))
     }
@@ -82,11 +82,11 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testValidDinersSecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .diners))
     }
-    
+
     func testInvalidDinersSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .diners))
     }
-    
+
     func testInvalidDinersSecurityCode_LenghtTooShort() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .diners))
     }
@@ -94,11 +94,11 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testValidJapcbSecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .japcb))
     }
-    
+
     func testInvalidJapcbSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .japcb))
     }
-    
+
     func testInvalidJapcbSecurityCode_LenghtTooShort() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .japcb))
     }
@@ -106,11 +106,11 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testValidSoloSecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .solo))
     }
-    
+
     func testInvalidSoloSecurityCode_LenghtTooShort() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .solo))
     }
-    
+
     func testInvalidSoloSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .solo))
     }
@@ -118,11 +118,11 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testValidAusbcSecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .ausbc))
     }
-    
+
     func testInvalidAusbcSecurityCode_LenghtTooShort() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .ausbc))
     }
-    
+
     func testInvalidAusbcSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .ausbc))
     }

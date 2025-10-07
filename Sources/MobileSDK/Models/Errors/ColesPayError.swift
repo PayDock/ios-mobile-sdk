@@ -16,7 +16,7 @@ public enum ColesPayError: Error {
     case webViewFailed(error: NSError)
     case transactionCanceled
     case initialisingWalletToken(reason: String)
-    case unknownError
+    case unknownError(RequestError?)
 
     public var customMessage: String {
         switch self {
@@ -25,8 +25,7 @@ public enum ColesPayError: Error {
         case .webViewFailed: return "Coles Pay WebView widget has failed"
         case .transactionCanceled: return "Coles Pay transaction was canceled."
         case .initialisingWalletToken(let reason): return reason
-        case .unknownError: return "Unknown error"
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }
-

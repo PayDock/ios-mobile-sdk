@@ -9,10 +9,9 @@
 import SwiftUI
 
 extension Theme {
-    
     public struct ButtonLoader {
         public var spinnerColor: Color
-        
+
         public init(spinnerColor: Color = .defaultOnPrimary) {
             self.spinnerColor = spinnerColor
         }

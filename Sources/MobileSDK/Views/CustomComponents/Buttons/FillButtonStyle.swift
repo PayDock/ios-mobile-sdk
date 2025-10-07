@@ -12,7 +12,7 @@ struct FillButtonStyle: ButtonStyle {
 
     let appearance: Theme.ButtonAppearance
     var isDisabled: Bool = false
-    
+
     // TODO: - Consider removing the button stylings to not limit merchant configuration
     init(appearance: Theme.ButtonAppearance = Theme.ButtonAppearance(),
          isDisabled: Bool = false) {
@@ -22,7 +22,7 @@ struct FillButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         let currentForegroundColor = isDisabled || configuration.isPressed ? appearance.colors.text.opacity(0.3) : appearance.colors.text
-    
+
         return configuration.label
             .font(appearance.fonts.title.customFont.font)
             .lineLimit(1)

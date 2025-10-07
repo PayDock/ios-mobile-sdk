@@ -13,9 +13,9 @@ struct ActivityIndicator: UIViewRepresentable {
     private let appearance: Theme.OverlayLoaderAppearance
     @Binding var isAnimating: Bool
     let style: UIActivityIndicatorView.Style
-    
+
     // MARK: - Initialization
-    
+
     init(appearance: Theme.OverlayLoaderAppearance,
          isAnimating: Binding<Bool>,
          style: UIActivityIndicatorView.Style) {
@@ -31,7 +31,10 @@ struct ActivityIndicator: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<ActivityIndicator>) {
-        isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
+        if isAnimating {
+            uiView.startAnimating()
+        } else {
+            uiView.stopAnimating()
+        }
     }
-
 }

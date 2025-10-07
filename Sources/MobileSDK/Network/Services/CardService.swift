@@ -19,12 +19,16 @@ protocol CardService {
 struct CardServiceImpl: HTTPClient, CardService {
 
     func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String) async throws -> String {
-        let response = try await sendRequest(endpoint: CardsEndpoints.cardToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: accessToken), responseModel: CardTokenRes.self)
+        let response = try await sendRequest(
+            endpoint: CardsEndpoints.cardToken(tokeniseCardDetailsReq: tokeniseCardDetailsReq, accessToken: accessToken),
+            responseModel: CardTokenRes.self)
         return response.resource.data
     }
 
     func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
-        let response = try await sendRequest(endpoint: CardsEndpoints.giftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: accessToken), responseModel: CardTokenRes.self)
+        let response = try await sendRequest(
+            endpoint: CardsEndpoints.giftCardToken(tokeniseGiftCardReq: tokeniseGiftCardReq, accessToken: accessToken),
+            responseModel: CardTokenRes.self)
         return response.resource.data
     }
 }

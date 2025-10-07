@@ -11,13 +11,13 @@ import SwiftUI
 extension View {
 
     func animatableFont(size: CGFloat, fontName: String) -> some View {
-      modifier(AnimatableCustomFontModifier(size: size, fontName: fontName))
+        modifier(AnimatableCustomFontModifier(size: size, fontName: fontName))
     }
-    
+
     func customPadding(_ padding: Padding) -> some View {
         self.modifier(CustomPaddingModifier(padding: padding))
     }
-    
+
     @ViewBuilder
     func onConditionalKeyPress(key: KeyEquivalent, action: @escaping () -> Void) -> some View {
         if #available(iOS 17.0, *) {
@@ -29,7 +29,7 @@ extension View {
             self
         }
     }
-    
+
     @ViewBuilder
     func conditionalFocusable() -> some View {
         if #available(iOS 17.0, *) {
@@ -38,8 +38,8 @@ extension View {
             self
         }
     }
-    
-    func interactiveDismiss(canDismissSheet: Bool, onDismissalAttempt: (() -> ())? = nil) -> some View {
+
+    func interactiveDismiss(canDismissSheet: Bool, onDismissalAttempt: (() -> Void)? = nil) -> some View {
         DismissDetectingView(
             view: self,
             canDismissSheet: canDismissSheet,

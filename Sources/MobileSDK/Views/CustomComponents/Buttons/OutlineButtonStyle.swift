@@ -12,7 +12,7 @@ struct OutlineButtonStyle: ButtonStyle {
 
     let appearance: Theme.ButtonAppearance
     var isDisabled: Bool = false
-    
+
     init(appearance: Theme.ButtonAppearance = Theme.ButtonAppearance(),
          isDisabled: Bool = false) {
         self.appearance = appearance
@@ -23,7 +23,7 @@ struct OutlineButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         let currentForegroundColor = isDisabled || configuration.isPressed ? appearance.colors.text.opacity(0.3) : appearance.colors.text
         let currentBorderColor = isDisabled || configuration.isPressed ? appearance.colors.border.opacity(0.3) : appearance.colors.border
-        
+
         return configuration.label
             .font(appearance.fonts.title.customFont.font)
             .imageScale(.small)

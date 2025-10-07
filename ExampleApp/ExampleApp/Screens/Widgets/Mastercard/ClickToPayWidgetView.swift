@@ -31,7 +31,7 @@ struct ClickToPayWidgetView: View {
                                             switch result {
                                             case .success(let result):
                                                 viewModel.handleMastercardResult(result)
-                                                
+
                                             case .failure(let error):
                                                 viewModel.alertMessage = error.localizedDescription
                                                 viewModel.showAlert = true
@@ -49,9 +49,13 @@ struct ClickToPayWidgetView: View {
             Text(viewModel.alertMessage)
         })
     }
-    
+
     private func getAppearance() -> ClickToPayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .clickToPay, isDarkMode: colorScheme == .dark, as: ClickToPayWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .clickToPay,
+            isDarkMode: colorScheme == .dark,
+            as: ClickToPayWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? ClickToPayWidgetAppearance()
     }
 }

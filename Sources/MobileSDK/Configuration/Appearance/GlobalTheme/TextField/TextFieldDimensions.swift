@@ -10,13 +10,13 @@ import Foundation
 import SwiftUI
 
 extension Theme {
-    
+
     public struct TextFieldDimensions {
         public var cornerRadius: CGFloat
         public var borderWidth: CGFloat
         public var activeBorderWidth: CGFloat
         public var padding: Padding
-        
+
         public init(cornerRadius: CGFloat = .defaultTextFieldCornerRadius,
                     borderWidth: CGFloat = .defaultBorderWidth,
                     activeBorderWidth: CGFloat = .defaultBorderWidth * 2,

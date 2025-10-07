@@ -10,7 +10,7 @@ import SwiftUI
 import Afterpay
 
 public struct AfterpayWidget: View {
-    
+
     @StateObject private var viewModel: AfterpayVM
     @State var appearance: AfterpayWidgetAppearance
 
@@ -20,7 +20,8 @@ public struct AfterpayWidget: View {
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
-                selectShippingOption: ((_ shippingOption: ShippingOption, _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
+                selectShippingOption: ((_ shippingOption: ShippingOption,
+                                        _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void) -> Void)?,
                 completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void) {
         _viewModel = StateObject(
             wrappedValue: AfterpayVM(
@@ -42,6 +43,7 @@ public struct AfterpayWidget: View {
                 viewModel.handleButtonTap()
             })
         .modifier(ActivityIndicatorModifier(appearance: appearance.loader, isLoading: viewModel.isLoading))
+        .accessibilityHint("Initiates payment using Afterpay.")
     }
 }
 
@@ -52,13 +54,13 @@ struct AfterpayWidget_Previews: PreviewProvider {
                 config: .init(maximumAmount: "100.0", currency: "AUD"),
                 environment: .sandbox,
                 options: .init())) { _ in
-                    
-                } selectAddress: { address, provideShippingOptions in
-                    
-                } selectShippingOption: { shippingOption, provideShippingOptionUpdateResult in
-                    
+
+                } selectAddress: { _, _ in
+
+                } selectShippingOption: { _, _ in
+
                 } completion: { _ in
-                    
+
                 }
     }
 }

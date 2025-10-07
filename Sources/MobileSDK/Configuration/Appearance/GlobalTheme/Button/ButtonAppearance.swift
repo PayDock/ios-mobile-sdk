@@ -10,13 +10,13 @@ import Foundation
 import SwiftUI
 
 extension Theme {
-    
+
     public struct ButtonAppearance {
         public var colors: ButtonColors
         public var dimensions: ButtonDimensions
         public var fonts: ButtonFonts
         public var loader: ButtonLoader
-        
+
         public init(colors: ButtonColors = ButtonColors(),
                     dimensions: ButtonDimensions = ButtonDimensions(),
                     fonts: ButtonFonts = ButtonFonts(),

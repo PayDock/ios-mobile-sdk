@@ -11,15 +11,16 @@ import MobileSDK
 
 class StyleThemeManager {
 
-    private static var lightAppearances: [WidgetsEnum: Any] = [.all : Theme()]
-    private static var darkAppearances: [WidgetsEnum: Any] = [.all : Theme()]
+    private static var lightAppearances: [WidgetsEnum: Any] = [.all: Theme()]
+    private static var darkAppearances: [WidgetsEnum: Any] = [.all: Theme()]
 
-    static func getAppearance<T>(for widget: WidgetsEnum, isDarkMode: Bool, as type: T.Type, shouldCreateDefaultIfNeeded: Bool = true) -> T? {
-        
+    static func getAppearance<T>(for widget: WidgetsEnum,
+                                 isDarkMode: Bool, as type: T.Type,
+                                 shouldCreateDefaultIfNeeded: Bool = true) -> T? {
         if shouldCreateDefaultIfNeeded {
             createDefaultAppearanceIfNeeded(for: widget, isDarkMode: isDarkMode)
         }
-        
+
         let dict = isDarkMode ? darkAppearances : lightAppearances
         return dict[widget] as? T
     }
@@ -30,21 +31,21 @@ class StyleThemeManager {
         } else {
             lightAppearances[widget] = appearance
         }
-        
+
         if widget == .all {
             if let globalTheme = appearance as? Theme {
                 GlobalTheme.shared.globalTheme = globalTheme
             }
         }
     }
-    
+
     static func resetAppearance(for widget: WidgetsEnum, isDarkMode: Bool) {
         if isDarkMode {
             darkAppearances[widget] = nil
         } else {
             lightAppearances[widget] = nil
         }
-        
+
         createDefaultAppearanceIfNeeded(for: widget, isDarkMode: isDarkMode)
     }
 

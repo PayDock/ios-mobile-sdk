@@ -10,16 +10,16 @@ import SwiftUI
 
 struct ButtonLoaderStyleView: View {
 
-    @StateObject var viewModel: ButtonLoaderStyleVM;
-    
+    @StateObject var viewModel: ButtonLoaderStyleVM
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) {
         _viewModel = StateObject(wrappedValue: ButtonLoaderStyleVM(
             selectedWidget: selectedWidget,
             stylingDarkMode: stylingDarkMode))
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -28,7 +28,7 @@ struct ButtonLoaderStyleView: View {
                 VStack {
                     SectionTitleView(title: "Colors")
                     colorListView
-                    ResetStyleButton() {
+                    ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
                 }

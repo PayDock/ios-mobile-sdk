@@ -53,7 +53,6 @@ extension WalletEndpoints: Endpoint {
         }
     }
 
-
     var parameters: [URLQueryItem] {
         switch self {
         case let .walletCapture(capture, _, _):
@@ -62,11 +61,11 @@ extension WalletEndpoints: Endpoint {
         case .declineWalletTransaction: return []
         }
     }
-    
+
     var mockFile: String? {
         return nil
     }
-    
+
     var bundle: Bundle? {
         return nil
     }

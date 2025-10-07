@@ -33,16 +33,20 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: nil, addressPostcode: nil, gatewayId: ProjectEnvironment.shared.getApplePayGatewayId() ?? "", walletType: "apple")
+            let paymentSource = InitialiseWalletChargePaymentSource(
+                addressLine1: nil,
+                addressPostcode: nil,
+                gatewayId: ProjectEnvironment.shared.getApplePayGatewayId() ?? "",
+                walletType: "apple")
 
-            let customer = InitialiseWalletChargeReq.Customer(
+            let customer = InitialiseWalletChargeCustomer(
                 firstName: "Tom",
                 lastName: "Taylor",
                 email: "tom.taylor@tommy.com",
                 phone: "+11234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeReq.MetaData(
+            let metaData = InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
@@ -56,16 +60,19 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 description: "Test purchase",
                 meta: metaData)
-            
+
             do {
                 isLoading = true
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 let applePayRequestResult = self.getApplePayRequestResult(walletToken: token)
                 completion(.success(applePayRequestResult))
-                
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                isLoading = false
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
             } catch {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: nil)))

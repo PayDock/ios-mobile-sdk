@@ -21,10 +21,11 @@ struct GiftCardWidgetView: View {
                 GiftCardWidget(config: GiftCardWidgetConfig(accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), storePin: false),
                                appearance: getAppearance()) { result in
                     switch result {
-                    case .success(let giftCardResult): self.alertMessage = giftCardResult.token
-                    case .failure(let error): self.alertMessage = error.localizedDescription
+                    case .success(let giftCardResult):
+                        handleSuccess(giftCardResult)
+                    case .failure(let error):
+                        handleError(error)
                     }
-                    showAlert = true
                 }
             }
             .alert("Gift Card", isPresented: $showAlert, actions: {}, message: {
@@ -32,10 +33,25 @@ struct GiftCardWidgetView: View {
             })
         }
     }
-    
+
     private func getAppearance() -> GiftCardWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .giftCard, isDarkMode: colorScheme == .dark, as: GiftCardWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .giftCard,
+            isDarkMode: colorScheme == .dark,
+            as: GiftCardWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? GiftCardWidgetAppearance()
+    }
+
+    private func handleSuccess(_ result: GiftCardResult) {
+        alertMessage = result.token
+        showAlert = true
+    }
+
+    private func handleError(_ error: GiftCardError) {
+        alertMessage = error.customMessage
+        showAlert = true
+
     }
 }
 
@@ -44,4 +60,3 @@ struct GiftCardWidgetView_Previews: PreviewProvider {
         GiftCardWidgetView()
     }
 }
-

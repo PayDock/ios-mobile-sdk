@@ -32,16 +32,20 @@ class AfterpayWidgetVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargeReq.Customer.PaymentSource(addressLine1: "123 Test Street", addressPostcode: "BN3 5SL", gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "", walletType: nil)
+            let paymentSource = InitialiseWalletChargePaymentSource(
+                addressLine1: "123 Test Street",
+                addressPostcode: "BN3 5SL",
+                gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "",
+                walletType: nil)
 
-            let customer = InitialiseWalletChargeReq.Customer(
+            let customer = InitialiseWalletChargeCustomer(
                 firstName: "David",
                 lastName: "Cameron",
                 email: "david.cameron@paydock.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeReq.MetaData(
+            let metaData = InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
@@ -55,14 +59,17 @@ class AfterpayWidgetVM: ObservableObject {
                 reference: UUID().uuidString,
                 description: "Test transaction for Afterpay",
                 meta: metaData)
-            
+
             do {
-                let token = try await walletService.initialiseColesPayWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq).token
+                let token = try await walletService.initialiseColesPayWalletCharge(
+                    initializeWalletChargeReq: initializeWalletChargeReq).token
                 DispatchQueue.main.async {
                     completion(.success(.init(token: token)))
                 }
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+            } catch let RequestError.connectionError(urlError) {
+                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -70,7 +77,11 @@ class AfterpayWidgetVM: ObservableObject {
     }
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
-        let config = AfterpaySdkConfig.AfterpayConfiguration(minimumAmount: "1.0", maximumAmount: "100.0", currency: "AUD", language: "en_AU")
+        let config = AfterpaySdkConfig.AfterpayConfiguration(
+            minimumAmount: "1.0",
+            maximumAmount: "100.0",
+            currency: "AUD",
+            language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions()
         let environment: Environment = {
             switch ProjectEnvironment.shared.environment {
@@ -95,17 +106,20 @@ class AfterpayWidgetVM: ObservableObject {
             description: "",
             shippingAmount: Money(amount: "2.0", currency: "AUD"),
             orderAmount: Money(amount: "10.0", currency: "AUD"))
-        
+
         return [shippingOption1, shippingOption2]
     }
 
     func getShippingOptionUpdate() -> ShippingOptionUpdate {
-        return ShippingOptionUpdate(id: "Standard", shippingAmount: Money(amount: "5.0", currency: "AUD"), orderAmount: Money(amount: "10.0", currency: "AUD"))
+        return ShippingOptionUpdate(
+            id: "Standard",
+            shippingAmount: Money(amount: "5.0", currency: "AUD"),
+            orderAmount: Money(amount: "10.0", currency: "AUD"))
     }
 
-    func handleError(error: Error) {
+    func handleError(error: AfterpayError) {
         alertTitle = "Error"
-        alertMessage = "Transaction canceled"
+        alertMessage = error.customMessage
         self.showAlert = true
     }
 

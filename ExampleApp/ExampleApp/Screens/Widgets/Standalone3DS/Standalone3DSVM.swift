@@ -24,7 +24,6 @@ class Standalone3DSVM: NSObject, ObservableObject {
     @Published var alertMessage = ""
     @Published var isLoading = false
 
-
     // MARK: - Initialisation
 
     init(walletService: WalletService = WalletServiceImpl()) {
@@ -64,7 +63,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
-                    service_id: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
+                    serviceId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
                     authentication: .init(
                         type: "01",
                         date: "2023-06-01T13:00:00.521Z",
@@ -109,22 +108,22 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 self.showWebView = false
                 self.alertMessage = "3DS Auth Decoupled!"
                 self.showAlert = true
-                
+
             case .chargeAuthInfo:
                 self.showWebView = false
                 self.alertMessage = "3DS Auth Info!"
                 self.showAlert = true
-                
+
             case .chargeAuthSuccess:
                 self.showWebView = false
                 self.alertMessage = event.charge3dsId
                 self.showAlert = true
-                
+
             case .chargeAuthReject:
                 self.showWebView = false
                 self.alertMessage = "3DS Auth rejected!"
                 self.showAlert = true
-                
+
             case .chargeError:
                 self.showWebView = false
                 self.alertMessage = "3DS failed!"
@@ -132,7 +131,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
             }
         }
     }
-    
+
     func handleFailure(error: Standalone3DSError) {
         showWebView = false
         alertMessage = error.customMessage

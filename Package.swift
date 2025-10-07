@@ -12,13 +12,14 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "MobileSDK",
-            targets: ["MobileSDK"]),
+            targets: ["MobileSDK"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.7.1"),
-        .package(url: "https://github.com/paypal/paypal-ios/", exact: "1.5.0"),
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.0")
+        .package(url: "https://github.com/paypal/paypal-ios/", exact: "2.0.0"),
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.0"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", exact: "0.59.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -29,6 +30,7 @@ let package = Package(
                 .product(name: "Afterpay", package: "sdk-ios"),
                 .product(name: "NetworkingLib", package: "ios-core-networking"),
                 .product(name: "FraudProtection", package: "paypal-ios"),
+                .product(name: "PaymentButtons", package: "paypal-ios"),
                 .product(name: "PayPalWebPayments", package: "paypal-ios")],
             path: "Sources",
             resources: [
@@ -36,7 +38,10 @@ let package = Package(
                 .copy("MobileSDK/Resources/JSON/paypal_vault_setup_token_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_payment_token_success_response.json"),
-                .copy("MobileSDK/Resources/JSON/card-schemes.json"),
+                .copy("MobileSDK/Resources/JSON/card-schemes.json")
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
         .testTarget(
@@ -51,8 +56,11 @@ let package = Package(
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_setup_token_success_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_payment_token_success_response.json"),
-                .copy("MobileSDKTests/Resources/JSON/card_schemes.json"),
+                .copy("MobileSDKTests/Resources/JSON/card_schemes.json")
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
-        ),
+        )
     ]
 )

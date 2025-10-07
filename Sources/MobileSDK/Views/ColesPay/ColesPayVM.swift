@@ -48,8 +48,8 @@ class ColesPayVM: ObservableObject {
         self.viewState = viewState
         self.loadingDelegate = loadingDelegate
         self.completion = completion
-        
-        if (loadingDelegate != nil) {
+
+        if loadingDelegate != nil {
             showLoaders = false
         }
     }
@@ -62,16 +62,16 @@ class ColesPayVM: ObservableObject {
                 self.isLoading = false
                 self.colesPayOrderId = colesPayOrderId
                 self.showWebView = true
-                
+
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.updateLoadingState(isLoading: false)
                 self.showWebView = false
                 self.completion(.failure(.errorFetchingColesPayOrder(error: errorResponse)))
-                
+
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError))
+                self.completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }
@@ -83,7 +83,7 @@ class ColesPayVM: ObservableObject {
             case .success(let response):
                 self?.token = response.token
                 self?.getColesPayURL(token: response.token)
-            
+
             case .failure(let failure):
                 self?.updateLoadingState(isLoading: false)
                 self?.showWebView = false
@@ -103,21 +103,21 @@ class ColesPayVM: ObservableObject {
         showWebView = false
         completion(.failure(error))
     }
-    
+
     func handleSheetCancellation() {
         updateLoadingState(isLoading: false)
         completion(.failure(.transactionCanceled))
     }
-    
+
     func updateLoadingState(isLoading: Bool) {
-        if (loadingDelegate != nil) {
-            if (isLoading) {
+        if loadingDelegate != nil {
+            if isLoading {
                 loadingDelegate?.loadingDidStart()
             } else {
                 loadingDelegate?.loadingDidFinish()
             }
         }
-        
+
         self.isLoading = isLoading
         viewState.isDisabled = isLoading
     }

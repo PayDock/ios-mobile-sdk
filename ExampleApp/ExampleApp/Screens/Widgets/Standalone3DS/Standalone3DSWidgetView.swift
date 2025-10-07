@@ -15,7 +15,7 @@ struct Standalone3DSWidgetView: View {
     @StateObject private var viewModel = Standalone3DSVM()
     @State var isSheetPresented = false
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -25,7 +25,7 @@ struct Standalone3DSWidgetView: View {
                             if !viewModel.alertMessage.isEmpty {
                                 viewModel.showAlert = true
                             }
-                        }) {
+                        }, content: {
                             NavigationStack {
                                 VStack {
                                     Standalone3DSWidget(
@@ -35,7 +35,7 @@ struct Standalone3DSWidgetView: View {
                                             switch result {
                                             case .success(let result):
                                                 viewModel.handle3dsEvent(result)
-                                                
+
                                             case .failure(let error):
                                                 viewModel.handleFailure(error: error)
                                             }
@@ -44,7 +44,7 @@ struct Standalone3DSWidgetView: View {
                                     .navigationBarTitleDisplayMode(.inline)
                                 }
                             }
-                        }
+                        })
                     if viewModel.isLoading {
                         ProgressView()
                     }
@@ -60,9 +60,13 @@ struct Standalone3DSWidgetView: View {
             viewModel.getValutToken()
         }
     }
-    
+
     private func getAppearance() -> ThreeDSWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(for: .standalone3ds, isDarkMode: colorScheme == .dark, as: ThreeDSWidgetAppearance.self, shouldCreateDefaultIfNeeded: false)
+        let appearance = StyleThemeManager.getAppearance(
+            for: .standalone3ds,
+            isDarkMode: colorScheme == .dark,
+            as: ThreeDSWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
         return appearance ?? ThreeDSWidgetAppearance()
     }
 }

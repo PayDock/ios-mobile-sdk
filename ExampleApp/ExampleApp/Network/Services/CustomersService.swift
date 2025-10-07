@@ -16,9 +16,11 @@ protocol CustomersService {
 }
 
 struct CustomersServiceImpl: HTTPClient, CustomersService {
-    
+
     func createCustomer(request: CreateCustomerTokenReq) async throws -> CreateCustomerTokenRes {
-        let response = try await sendRequest(endpoint: CustomersEndpoints.createCustomer(request: request), responseModel: CreateCustomerTokenRes.self)
+        let response = try await sendRequest(
+            endpoint: CustomersEndpoints.createCustomer(request: request),
+            responseModel: CreateCustomerTokenRes.self)
         return response
     }
 }

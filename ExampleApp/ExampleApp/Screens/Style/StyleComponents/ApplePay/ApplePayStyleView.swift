@@ -10,15 +10,15 @@ import SwiftUI
 struct ApplePayStyleView: View {
 
     @StateObject var viewModel: ApplePayStyleVM
-    
+
     // MARK: - Initialization
-    
+
     init(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) {
         _viewModel = StateObject(wrappedValue: ApplePayStyleVM(
             selectedWidget: selectedWidget,
             stylingDarkMode: stylingDarkMode))
     }
-    
+
     // MARK: - View
 
     var body: some View {
@@ -27,7 +27,7 @@ struct ApplePayStyleView: View {
                 VStack {
                     SectionTitleView(title: "Style")
                     pickerListView
-                    ResetStyleButton() {
+                    ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
                 }
@@ -42,20 +42,20 @@ struct ApplePayStyleView: View {
     }
 
     private var pickerListView: some View {
-        VStack (spacing: 16) {
+        VStack(spacing: 16) {
             PickerView(
-                entries: viewModel.buttonTypeNames, 
-                selected: $viewModel.selectedButtonTypeName, 
+                entries: viewModel.buttonTypeNames,
+                selected: $viewModel.selectedButtonTypeName,
                 placeholder: "Select Type") { buttonTypeName in
-                viewModel.selectedButtonTypeName = buttonTypeName
-            }
-            
+                    viewModel.selectedButtonTypeName = buttonTypeName
+                }
+
             PickerView(
-                entries: viewModel.buttonStyleNames, 
-                selected: $viewModel.selectedButtonStyleName, 
+                entries: viewModel.buttonStyleNames,
+                selected: $viewModel.selectedButtonStyleName,
                 placeholder: "Select Style") { buttonStyleName in
-                viewModel.selectedButtonStyleName = buttonStyleName
-            }
+                    viewModel.selectedButtonStyleName = buttonStyleName
+                }
         }
     }
 }
