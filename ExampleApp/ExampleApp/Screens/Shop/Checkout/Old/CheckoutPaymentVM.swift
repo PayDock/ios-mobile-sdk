@@ -59,9 +59,6 @@ extension CheckoutPaymentVM {
                 completion(.success(.init(token: token)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
-            } catch let RequestError.connectionError(urlError) {
-                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
-                viewState?.setState(.none)
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -80,9 +77,6 @@ extension CheckoutPaymentVM {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
-            } catch let RequestError.connectionError(urlError) {
-                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
-                viewState?.setState(.none)
             } catch {
                 isLoading = false
                 completion(.failure(.initialisingWalletToken(reason: nil)))
@@ -126,9 +120,6 @@ extension CheckoutPaymentVM {
                 completion(.success(.init(token: token)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
-            } catch let RequestError.connectionError(urlError) {
-                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
-                viewState?.setState(.none)
             } catch {
                 completion(.failure(.initialisingWalletToken(reason: nil)))
             }
@@ -209,7 +200,10 @@ extension CheckoutPaymentVM {
         let request = Integrated3DSVaultReq(
             amount: "5.50",
             currency: "AUD",
-            customer: .init(paymentSource: .init(vaultToken: vaultToken, gatewayId: threeDSGatewayId)),
+            customer: .init(
+                paymentSource: .init(
+                    vaultToken: vaultToken,
+                    gatewayId: threeDSGatewayId)),
             threeDS: .init(browserDetails: .init()))
         Task {
             do {
@@ -224,7 +218,7 @@ extension CheckoutPaymentVM {
     /// Based on 3DS auth status selects the appropriate flow
     private func handleAuthStatus(_ response: Integrated3DSRes) {
         switch response.authStatus {
-        case .notSupported: captureCharge(threeDsId: response.resource.data.threeDS.id ?? "")
+        case .notSupported: captureCharge(id3ds: response.resource.data.threeDS.id ?? "")
         case .pending:
             DispatchQueue.main.async {
                 self.isLoading = false
@@ -254,13 +248,13 @@ extension CheckoutPaymentVM {
                 self.showAlert(title: .error, message: "3DS cancelled!")
             case .chargeAuthSuccess:
                 self.show3dsWebView = false
-                self.captureCharge(threeDsId: event.charge3dsId)
+                self.captureCharge(id3ds: event.charge3dsId)
             }
         }
     }
 
     /// Captures the charge as the final step in the payment flow
-    private func captureCharge(threeDsId: String) {
+    private func captureCharge(id3ds: String) {
         DispatchQueue.main.async {
             self.isLoading = true
         }
@@ -271,7 +265,7 @@ extension CheckoutPaymentVM {
                 currency: "AUD",
                 reference: UUID().uuidString,
                 description: "Test Payment",
-                threeDS: .init(id3DS: threeDsId))
+                threeDS: .init(id3DS: id3ds))
 
             do {
                 let result = try await walletService.captureCharge(request: request)
@@ -280,32 +274,13 @@ extension CheckoutPaymentVM {
                     viewState?.setState(.none)
                     showAlert(title: .success, message: "\(result.amount) \(result.currency) successfully charged!")
                 }
-
-            } catch let RequestError.requestError(errorResponse: errorResponse) {
-                isLoading = false
-                viewState?.setState(.none)
-                showAlert(title: .error, message: errorResponse.error?.message ?? "Error creating a charge")
-
             } catch {
                 await MainActor.run {
                     isLoading = false
                     viewState?.setState(.none)
-                    showAlert(title: .error, message: "Error creating a charge!")
                 }
             }
         }
-    }
-}
-
-// MARK: - PayPal
-
-extension CheckoutPaymentVM {
-
-    func getPayPalConfig() -> PayPalWidgetConfig {
-        let accessToken = ProjectEnvironment.shared.getWidgetAccessToken()
-        let gatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
-        let config = PayPalWidgetConfig(accessToken: accessToken, gatewayId: gatewayId)
-        return config
     }
 }
 
@@ -323,30 +298,28 @@ extension CheckoutPaymentVM {
         return AfterpaySdkConfig(config: config, environment: .sandbox, options: options)
     }
 
-    func getShippingOptions() -> [ShippingOption] {
-        let shippingOption1 = ShippingOption(
-            id: "Standard",
-            name: "Standard",
-            description: "",
-            shippingAmount: Money(amount: "5.0", currency: "AUD"),
-            orderAmount: Money(amount: "10.0", currency: "AUD"))
-
-        let shippingOption2 = ShippingOption(
-            id: "Standard",
-            name: "Standard",
-            description: "",
-            shippingAmount: Money(amount: "2.0", currency: "AUD"),
-            orderAmount: Money(amount: "10.0", currency: "AUD"))
-
-        return [shippingOption1, shippingOption2]
-    }
-
-    func getShippingOptionUpdate() -> ShippingOptionUpdate {
-        return ShippingOptionUpdate(
-            id: "Standard",
-            shippingAmount: Money(amount: "5.0", currency: "AUD"),
-            orderAmount: Money(amount: "10.0", currency: "AUD"))
-    }
+    //    func getShippingOptions() -> [ShippingOption] {
+    //        let shippingOption1 = ShippingOption(
+    //            id: "Standard",
+    //            name: "Standard",
+    //            description: "",
+    //            shippingAmount: Money(amount: "5.0", currency: "AUD"),
+    //            orderAmount: Money(amount: "10.0", currency: "AUD"))
+    //
+    //        let shippingOption2 = ShippingOption(
+    //            id: "Standard",
+    //            name: "Standard",
+    //            description: "",
+    //            shippingAmount: Money(amount: "2.0", currency: "AUD"),
+    //            orderAmount: Money(amount: "10.0", currency: "AUD"))
+    //
+    //        return [shippingOption1, shippingOption2]
+    //    }
+    //
+    //    func getShippingOptionUpdate() -> ShippingOptionUpdate {
+    //        return ShippingOptionUpdate(id: "Standard", shippingAmount: Money(
+    //                  amount: "5.0", currency: "AUD"), orderAmount: Money(amount: "10.0", currency: "AUD"))
+    //    }
 
 }
 
@@ -419,11 +392,8 @@ extension CheckoutPaymentVM {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
                 viewState?.setState(.none)
-            } catch let RequestError.connectionError(urlError) {
-                completion(.failure(.initialisingWalletToken(reason: urlError.localizedDescription)))
-                viewState?.setState(.none)
             } catch {
-                completion(.failure(.initialisingWalletToken(reason: error.localizedDescription)))
+                completion(.failure(.initialisingWalletToken(reason: nil)))
                 viewState?.setState(.none)
             }
         }
@@ -443,19 +413,15 @@ extension CheckoutPaymentVM {
             do {
                 // For Coles Pay - a delay is needed as order is still processing with hook that needs to be fired to finish payment setup
                 // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture".
-                // Improvement to add polling of charge state and when in correct state then finish the charge.
+                // Improvement to add polling of
+                // charge state and when in correct state then finish the charge.
                 try await Task.sleep(for: .seconds(2))
                 let res = try await walletService.captureChargeColesPay(chargeId: colesPayChargeId)
                 isLoading = false
                 showAlert(title: .success, message: "Charge successful: \(res.amount) \(res.currency)")
-
-            } catch let RequestError.requestError(errorResponse: errorResponse) {
-                isLoading = false
-                showAlert(title: .error, message: errorResponse.error?.message ?? "Error creating ColesPay charge")
-
             } catch {
                 isLoading = false
-                showAlert(title: .error, message: "Error creating ColesPay charge")
+                showAlert(title: .error, message: error.localizedDescription)
             }
         }
     }
