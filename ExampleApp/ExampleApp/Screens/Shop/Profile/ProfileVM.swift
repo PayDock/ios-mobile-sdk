@@ -10,7 +10,7 @@ import SwiftUI
 import MobileSDK
 
 @MainActor
-class AccountProfileVM: ObservableObject {
+class ProfileVM: ObservableObject {
 
     private let customersService: CustomersService
 
@@ -41,10 +41,10 @@ class AccountProfileVM: ObservableObject {
                 let response = try await customersService.createCustomer(request: request)
                 showAlert(
                     title: "Customer Created",
-                    message:
-                        "\(response.resource.data.firstName) "
-                        + "\(response.resource.data.lastName)\n"
-                        + "\(response.resource.data.email ?? "")"
+                    message: """
+                    \(response.resource.data.firstName) \(response.resource.data.lastName)
+                    \(response.resource.data.email ?? "")
+                    """
                 )
             } catch {
                 showAlert(title: "Error", message: "Customer creation failed!")

@@ -1,0 +1,226 @@
+//
+//  EnhancedCheckoutView.swift
+//  ExampleApp
+//
+//  Created by Domagoj Grizelj on 30.09.2025..
+//  Copyright © 2025 Paydock Ltd. All rights reserved.
+//
+
+import SwiftUI
+import MobileSDK
+
+struct EnhancedCheckoutView: View {
+    @StateObject private var cartManager = CartManager.shared
+    @StateObject private var profileManager = UserProfileManager.shared
+    @StateObject private var viewModel = EnhancedCheckoutVM()
+    @Environment(\.dismiss) private var dismiss
+    @State private var currentStep: CheckoutStep = .information
+    @State private var showingAddressWidget = false
+    @State private var addressWidgetType: AddressWidgetType = .shipping
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                // Progress Indicator
+                CheckoutProgressIndicator(currentStep: currentStep)
+
+                // Content
+                ScrollView {
+                    VStack(spacing: 20) {
+                        switch currentStep {
+                        case .information:
+                            CheckoutInformationStepView(
+                                viewModel: viewModel,
+                                profileManager: profileManager,
+                                showingAddressWidget: $showingAddressWidget,
+                                addressWidgetType: $addressWidgetType,
+                                onLoadProfileData: loadProfileData,
+                                onSelectSavedAddress: selectSavedAddress,
+                                onClearShippingAddress: clearShippingAddress,
+                                onClearBillingAddress: clearBillingAddress
+                            )
+                        case .payment:
+                            CheckoutPaymentStepView(
+                                viewModel: viewModel,
+                                currentStep: $currentStep
+                            )
+                        case .review:
+                            CheckoutReviewStepView(
+                                viewModel: viewModel,
+                                cartManager: cartManager
+                            )
+                        }
+                    }
+                    .padding()
+                }
+
+                // Action Buttons
+                CheckoutActionButtons(
+                    currentStep: currentStep,
+                    canProceed: canProceed,
+                    onBack: {
+                        withAnimation {
+                            goToPreviousStep()
+                        }
+                    },
+                    onAction: {
+                        withAnimation {
+                            handleActionButton()
+                        }
+                    }
+                )
+            }
+            .navigationTitle("Checkout")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {
+                Button("OK") {
+                    if viewModel.orderCompleted {
+                        cartManager.clearCart()
+                        dismiss()
+                    }
+                }
+            }, message: {
+                Text(viewModel.alertMessage)
+            })
+            .sheet(isPresented: $showingAddressWidget) {
+                CheckoutAddressWidgetView(
+                    type: addressWidgetType,
+                    onAddressSelected: { result in
+                        handleAddressResult(result, for: addressWidgetType)
+                        showingAddressWidget = false
+                    },
+                    onCancel: {
+                        showingAddressWidget = false
+                    }
+                )
+            }
+            .onAppear {
+                loadProfileData()
+            }
+        }
+    }
+    // MARK: - Computed Properties
+
+    private var canProceed: Bool {
+        switch currentStep {
+        case .information:
+            return viewModel.isInformationComplete
+        case .payment:
+            return viewModel.selectedPaymentMethod != nil
+        case .review:
+            return true
+        }
+    }
+
+    // MARK: - Helper Methods
+
+    private func loadProfileData() {
+        let profileData = profileManager.populateCheckoutFromProfile()
+        viewModel.firstName = profileData.firstName
+        viewModel.lastName = profileData.lastName
+        viewModel.email = profileData.email
+        viewModel.phone = profileData.phone
+
+        if let defaultAddress = profileData.address {
+            selectSavedAddress(defaultAddress, for: .shipping)
+        }
+    }
+
+    private func selectSavedAddress(_ address: SavedAddress, for type: AddressWidgetType) {
+        switch type {
+        case .shipping:
+            viewModel.selectedShippingAddressId = address.id
+            viewModel.address = address.addressLine1
+            viewModel.addressLine2 = address.addressLine2
+            viewModel.city = address.city
+            viewModel.state = address.state
+            viewModel.postalCode = address.postalCode
+            viewModel.country = address.country
+        case .billing:
+            viewModel.selectedBillingAddressId = address.id
+            viewModel.billingAddress = address.addressLine1
+            viewModel.billingAddressLine2 = address.addressLine2
+            viewModel.billingCity = address.city
+            viewModel.billingState = address.state
+            viewModel.billingPostalCode = address.postalCode
+            viewModel.billingCountry = address.country
+        }
+    }
+
+    private func clearShippingAddress() {
+        viewModel.address = ""
+        viewModel.addressLine2 = ""
+        viewModel.city = ""
+        viewModel.state = ""
+        viewModel.postalCode = ""
+        viewModel.country = ""
+    }
+
+    private func clearBillingAddress() {
+        viewModel.billingAddress = ""
+        viewModel.billingAddressLine2 = ""
+        viewModel.billingCity = ""
+        viewModel.billingState = ""
+        viewModel.billingPostalCode = ""
+        viewModel.billingCountry = ""
+    }
+
+    private func handleAddressResult(_ result: Address, for type: AddressWidgetType) {
+        switch type {
+        case .shipping:
+            viewModel.address = result.addressLine1
+            viewModel.addressLine2 = result.addressLine2
+            viewModel.city = result.city
+            viewModel.state = result.state
+            viewModel.postalCode = result.postcode
+            viewModel.country = result.country
+        case .billing:
+            viewModel.billingAddress = result.addressLine1
+            viewModel.billingAddressLine2 = result.addressLine2
+            viewModel.billingCity = result.city
+            viewModel.billingState = result.state
+            viewModel.billingPostalCode = result.postcode
+            viewModel.billingCountry = result.country
+        }
+    }
+
+    private func goToPreviousStep() {
+        let allCases = CheckoutStep.allCases
+        if let currentIndex = allCases.firstIndex(of: currentStep), currentIndex > 0 {
+            currentStep = allCases[currentIndex - 1]
+        }
+    }
+
+    private func handleActionButton() {
+        switch currentStep {
+        case .information:
+            // Save profile data if user wants
+            profileManager.saveCheckoutDataToProfile(
+                firstName: viewModel.firstName,
+                lastName: viewModel.lastName,
+                email: viewModel.email,
+                phone: viewModel.phone
+            )
+            currentStep = .payment
+
+        case .payment:
+            currentStep = .review
+
+        case .review:
+            viewModel.placeOrder()
+        }
+    }
+}
+
+struct EnhancedCheckoutView_Previews: PreviewProvider {
+    static var previews: some View {
+        EnhancedCheckoutView()
+    }
+}

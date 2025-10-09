@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct CheckoutView: View {
+struct LegacyCheckoutView: View {
 
     @State var isSheetPresented = false
 
@@ -16,7 +16,7 @@ struct CheckoutView: View {
         .init(
             id: "1",
             title: "ThinkPad X1 Yoga Gen 7",
-            description: "ThinkPad X1 Yoga Gen 7\n14” Intel 2 in 1 Laptop",
+            description: "ThinkPad X1 Yoga Gen 7",
             price: "$3,299",
             image: "demoItem1"
         ),
@@ -62,7 +62,7 @@ struct CheckoutView: View {
                         Image("demoLogo")
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: AccountProfileView()) {
+                        NavigationLink(destination: ProfileView()) {
                             Image(systemName: "person")
                         }
                     }
@@ -130,8 +130,8 @@ struct BasketItemView: View {
     }
 }
 
-struct CheckoutView_Previews: PreviewProvider {
+struct LegacyCheckoutView_Previews: PreviewProvider {
     static var previews: some View {
-        CheckoutView()
+        LegacyCheckoutView()
     }
 }
