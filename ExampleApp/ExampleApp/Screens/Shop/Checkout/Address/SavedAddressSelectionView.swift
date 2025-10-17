@@ -23,11 +23,13 @@ struct SavedAddressSelectionView: View {
                     Text(address.label)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
 
                     Text(address.formattedAddress.replacingOccurrences(of: "\n", with: ", "))
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                         .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                 }
 
                 Spacer()

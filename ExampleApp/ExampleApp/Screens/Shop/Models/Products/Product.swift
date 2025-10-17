@@ -35,7 +35,7 @@ enum ProductCategory: String, CaseIterable, Codable {
 }
 
 struct CartItem: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let product: Product
     var quantity: Int
 
@@ -84,7 +84,7 @@ enum CartShippingOption: CaseIterable {
 // MARK: - Gift Card Models
 
 struct GiftCard: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let cardNumber: String
     let pin: String
     var balance: Double
@@ -101,7 +101,7 @@ struct GiftCard: Identifiable, Codable {
 }
 
 struct AppliedGiftCard: Identifiable, Codable {
-    let id = UUID()
+    var id = UUID()
     let giftCard: GiftCard
     var appliedAmount: Double
 
@@ -132,6 +132,8 @@ struct UserProfile: Codable {
 struct SavedAddress: Identifiable, Codable {
     var id = UUID().uuidString
     var label: String // e.g., "Home", "Work", "Billing"
+    var firstName: String = ""
+    var lastName: String = ""
     var addressLine1: String = ""
     var addressLine2: String = ""
     var city: String = ""
@@ -143,6 +145,9 @@ struct SavedAddress: Identifiable, Codable {
     var formattedAddress: String {
         var components: [String] = []
 
+        if !firstName.isEmpty && !lastName.isEmpty {
+            components.append("\(firstName) \(lastName)")
+        }
         if !addressLine1.isEmpty {
             components.append(addressLine1)
         }
@@ -165,7 +170,9 @@ struct SavedAddress: Identifiable, Codable {
     }
 
     var isComplete: Bool {
-        return !addressLine1.isEmpty &&
+        return !firstName.isEmpty &&
+        !lastName.isEmpty &&
+        !addressLine1.isEmpty &&
         !city.isEmpty &&
         !postalCode.isEmpty &&
         !country.isEmpty

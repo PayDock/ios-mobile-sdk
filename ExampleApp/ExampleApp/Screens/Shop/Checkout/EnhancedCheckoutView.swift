@@ -39,20 +39,17 @@ struct EnhancedCheckoutView: View {
                                 onClearShippingAddress: clearShippingAddress,
                                 onClearBillingAddress: clearBillingAddress
                             )
-                        case .payment:
-                            CheckoutPaymentStepView(
+                        case .paymentAndReview:
+                            CheckoutPaymentAndReviewStepView(
                                 viewModel: viewModel,
+                                cartManager: cartManager,
                                 currentStep: $currentStep
-                            )
-                        case .review:
-                            CheckoutReviewStepView(
-                                viewModel: viewModel,
-                                cartManager: cartManager
                             )
                         }
                     }
                     .padding()
                 }
+                .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
 
                 // Action Buttons
                 CheckoutActionButtons(
@@ -101,10 +98,56 @@ struct EnhancedCheckoutView: View {
                     }
                 )
             }
+            .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }, content: {
+                NavigationStack {
+                    VStack {
+                        Integrated3DSWidget(
+                            config: .init(token: viewModel.token3DS),
+                            completion: { result in
+                                switch result {
+                                case .success(let result):
+                                    viewModel.handle3dsEvent(result)
+
+                                case .failure(let error):
+                                    viewModel.alertMessage = error.localizedDescription
+                                    viewModel.showAlert = true
+                                }
+                            })
+                        .navigationTitle("3DS Check")
+                        .navigationBarTitleDisplayMode(.inline)
+
+                    }
+                }
+            })
             .onAppear {
                 loadProfileData()
             }
         }
+        .overlay(
+            // Result Overlay
+            Group {
+                if viewModel.showResultOverlay {
+                    CheckoutResultOverlay(
+                        isSuccess: viewModel.resultIsSuccess,
+                        message: viewModel.resultMessage,
+                        onDismiss: {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                viewModel.showResultOverlay = false
+                            }
+                            if viewModel.resultIsSuccess {
+                                cartManager.clearCart()
+                                dismiss()
+                            } else {
+                                currentStep = .information
+                            }
+                        }
+                    )
+                    .transition(.asymmetric(insertion: .opacity.combined(with: .scale), removal: .opacity))
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.showResultOverlay)
+                    .zIndex(1000)
+                }
+            }
+        )
     }
     // MARK: - Computed Properties
 
@@ -112,10 +155,8 @@ struct EnhancedCheckoutView: View {
         switch currentStep {
         case .information:
             return viewModel.isInformationComplete
-        case .payment:
+        case .paymentAndReview:
             return viewModel.selectedPaymentMethod != nil
-        case .review:
-            return true
         }
     }
 
@@ -208,13 +249,9 @@ struct EnhancedCheckoutView: View {
                 email: viewModel.email,
                 phone: viewModel.phone
             )
-            currentStep = .payment
+            currentStep = .paymentAndReview
 
-        case .payment:
-            currentStep = .review
-
-        case .review:
-            viewModel.placeOrder()
+        case .paymentAndReview: break
         }
     }
 }

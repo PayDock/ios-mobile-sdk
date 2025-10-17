@@ -25,6 +25,8 @@ class ApplePayVM: NSObject, ObservableObject {
     var chargeData: ChargeResponse?
     var error: ApplePayError?
 
+    private var isCompletionCalled = false
+
     // MARK: - Handlers
 
     private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
@@ -44,6 +46,7 @@ class ApplePayVM: NSObject, ObservableObject {
 
     func handleButtonTap() {
         error = nil
+        isCompletionCalled = false
         createPaymentRequest { [weak self] result in
             switch result {
             case .success(let response):
@@ -51,7 +54,7 @@ class ApplePayVM: NSObject, ObservableObject {
                 self?.startPayment()
 
             case .failure(let failure):
-                self?.completion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+                self?.callCompletion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
             }
         }
     }
@@ -59,7 +62,7 @@ class ApplePayVM: NSObject, ObservableObject {
     private func startPayment() {
         guard let applePayRequest = applePayRequest else {
             error = .invalidApplePayRequest
-            completion(.failure(.invalidApplePayRequest))
+            callCompletion(.failure(.invalidApplePayRequest))
             return
         }
 
@@ -76,7 +79,7 @@ class ApplePayVM: NSObject, ObservableObject {
     private func captureCharge(payment: PKPayment, completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
         guard let applePayRequest = applePayRequest else {
             error = .invalidApplePayRequest
-            self.completion(.failure(.invalidApplePayRequest))
+            callCompletion(.failure(.invalidApplePayRequest))
             return
         }
 
@@ -89,7 +92,7 @@ class ApplePayVM: NSObject, ObservableObject {
                     payerId: nil,
                     refToken: refToken)
                 paymentStatus = .success
-                self.completion(.success(chargeResponse))
+                self.callCompletion(.success(chargeResponse))
                 completion(paymentStatus)
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
@@ -103,6 +106,13 @@ class ApplePayVM: NSObject, ObservableObject {
                 completion(paymentStatus)
             }
         }
+    }
+
+    private func callCompletion(_ completion: (Result<ChargeResponse, ApplePayError>)) {
+        guard !isCompletionCalled else { return }
+        self.completion(completion)
+        isCompletionCalled = true
+
     }
 }
 
@@ -119,9 +129,9 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
             if self.paymentStatus == .success, let chargeData = self.chargeData {
-                self.completion(.success(chargeData))
+                self.callCompletion(.success(chargeData))
             } else {
-                self.completion(.failure(self.error ?? .userCanceledPayment))
+                self.callCompletion(.failure(self.error ?? .userCanceledPayment))
             }
         }
     }

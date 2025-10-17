@@ -18,7 +18,6 @@ struct ApplePayPaymentWidget: View {
             viewModel.initializeApplePayCharge(completion: onApplePayButtonTap)
         } completion: { result in
             viewModel.handleApplePayResult(result)
-            currentStep = .review
         }
         .frame(height: 50)
     }

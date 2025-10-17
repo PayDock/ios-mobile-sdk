@@ -13,10 +13,20 @@ import MobileSDK
 class ProfileVM: ObservableObject {
 
     private let customersService: CustomersService
+    private let profileManager = UserProfileManager.shared
 
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
+
+    // Computed properties that delegate to UserProfileManager
+    var isCustomerLinked: Bool {
+        profileManager.isCustomerLinked
+    }
+
+    var linkedCustomerInfo: CustomerInfo? {
+        profileManager.linkedCustomerInfo
+    }
 
     init(customersService: CustomersService = CustomersServiceImpl()) {
         self.customersService = customersService
@@ -39,15 +49,28 @@ class ProfileVM: ObservableObject {
             let request = CreateCustomerTokenReq(token: payPalVaultResult.token)
             do {
                 let response = try await customersService.createCustomer(request: request)
+
+                // Store the customer information using UserProfileManager
+                let customerInfo = CustomerInfo(
+                    firstName: response.resource.data.firstName,
+                    lastName: response.resource.data.lastName,
+                    phone: response.resource.data.phone,
+                    email: payPalVaultResult.email
+                )
+
+                profileManager.linkCustomer(customerInfo: customerInfo)
+
                 showAlert(
-                    title: "Customer Created",
+                    title: "Customer Linked Successfully",
                     message: """
+                    Account linked with:
                     \(response.resource.data.firstName) \(response.resource.data.lastName)
-                    \(response.resource.data.email ?? "")
+                    \(response.resource.data.phone)
+                    \(payPalVaultResult.email)
                     """
                 )
             } catch {
-                showAlert(title: "Error", message: "Customer creation failed!")
+                showAlert(title: "Error", message: "Customer linking failed!")
             }
         }
     }
@@ -56,5 +79,13 @@ class ProfileVM: ObservableObject {
         alertTitle = title
         alertMessage = message
         showAlert = true
+    }
+
+    func unlinkCustomer() {
+        profileManager.unlinkCustomer()
+        showAlert(title: "Account Unlinked", message: "PayPal account has been unlinked successfully.")
+    }
+    func clearPersistedData() {
+        profileManager.clearAllData()
     }
 }

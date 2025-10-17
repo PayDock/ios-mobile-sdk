@@ -19,22 +19,14 @@ struct CheckoutPaymentStepView: View {
                 .font(.title2)
                 .fontWeight(.bold)
 
-            // Payment Method Selection
             PaymentMethodSelectionView(
                 selectedMethod: viewModel.selectedPaymentMethod,
                 onMethodSelected: { method in
                     viewModel.selectedPaymentMethod = method
-                }
+                },
+                viewModel: viewModel,
+                currentStep: $currentStep
             )
-
-            // Payment Widget based on selection
-            if let selectedMethod = viewModel.selectedPaymentMethod {
-                PaymentWidgetView(
-                    method: selectedMethod,
-                    viewModel: viewModel,
-                    currentStep: $currentStep
-                )
-            }
         }
     }
 }
