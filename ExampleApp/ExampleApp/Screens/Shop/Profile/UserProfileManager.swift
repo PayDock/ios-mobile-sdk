@@ -9,16 +9,28 @@
 import Foundation
 import Combine
 
+struct CustomerInfo: Codable {
+    let firstName: String
+    let lastName: String
+    let phone: String
+    let email: String?
+}
+
 class UserProfileManager: ObservableObject {
     static let shared = UserProfileManager()
 
     @Published var profile: UserProfile = UserProfile()
+    @Published var isCustomerLinked = false
+    @Published var linkedCustomerInfo: CustomerInfo?
 
     private let userDefaults = UserDefaults.standard
     private let profileKey = "userProfile"
+    private let customerLinkKey = "linkedCustomerInfo"
+    private let customerLinkedStatusKey = "isCustomerLinked"
 
     private init() {
         loadProfile()
+        loadCustomerLinkStatus()
     }
 
     // MARK: - Profile Management
@@ -42,6 +54,25 @@ class UserProfileManager: ObservableObject {
     func clearProfile() {
         profile = UserProfile()
         saveProfile()
+    }
+
+    // MARK: - Customer Linking Management
+
+    func linkCustomer(customerInfo: CustomerInfo) {
+        linkedCustomerInfo = customerInfo
+        isCustomerLinked = true
+        saveCustomerLinkStatus()
+    }
+
+    func unlinkCustomer() {
+        isCustomerLinked = false
+        linkedCustomerInfo = nil
+        saveCustomerLinkStatus()
+    }
+
+    func clearAllData() {
+        clearProfile()
+        unlinkCustomer()
     }
 
     // MARK: - Address Management
@@ -151,6 +182,8 @@ class UserProfileManager: ObservableObject {
         // Load sample profile data for demo
         let sampleAddress = SavedAddress(
             label: "Home",
+            firstName: "John",
+            lastName: "Doe",
             addressLine1: "123 Demo Street",
             addressLine2: "Apt 4B",
             city: "Sydney",
@@ -187,5 +220,39 @@ class UserProfileManager: ObservableObject {
 
     func saveCheckoutDataToProfile(firstName: String, lastName: String, email: String, phone: String) {
         updateProfile(firstName: firstName, lastName: lastName, email: email, phone: phone)
+    }
+
+    // MARK: - Customer Link Persistence
+
+    private func saveCustomerLinkStatus() {
+        userDefaults.set(isCustomerLinked, forKey: customerLinkedStatusKey)
+
+        if let customerInfo = linkedCustomerInfo {
+            do {
+                let data = try JSONEncoder().encode(customerInfo)
+                userDefaults.set(data, forKey: customerLinkKey)
+            } catch {
+                print("Failed to save customer info: \(error)")
+            }
+        } else {
+            userDefaults.removeObject(forKey: customerLinkKey)
+        }
+    }
+
+    private func loadCustomerLinkStatus() {
+        // Load the linked status
+        isCustomerLinked = userDefaults.bool(forKey: customerLinkedStatusKey)
+
+        // Load the customer info if it exists
+        if let data = userDefaults.data(forKey: customerLinkKey) {
+            do {
+                linkedCustomerInfo = try JSONDecoder().decode(CustomerInfo.self, from: data)
+            } catch {
+                print("Failed to load customer info: \(error)")
+                // If we can't load the info, reset the status
+                isCustomerLinked = false
+                linkedCustomerInfo = nil
+            }
+        }
     }
 }

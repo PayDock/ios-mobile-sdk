@@ -22,11 +22,7 @@ struct PayPalPaymentWidget: View {
             loadingDelegate: viewModel) { onPayPalButtonTap in
                 viewModel.initializeWalletCharge(completion: onPayPalButtonTap)
             } completion: { result in
-                switch result {
-                case .success:
-                    currentStep = .review
-                case .failure: break
-                }
+                viewModel.handlePayPalResult(result)
             }
             .frame(height: 48.0)
     }

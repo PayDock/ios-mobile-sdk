@@ -18,46 +18,70 @@ struct ProfileView: View {
     @State private var alertMessage = ""
 
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Profile Info Section
-                    profileInfoSection
+        ScrollView {
+            VStack(spacing: 20) {
+                // Profile Info Section
+                profileInfoSection
 
-                    // Saved Payment Methods Section
-                    savedPaymentMethodsSection
+                // Saved Payment Methods Section
+                savedPaymentMethodsSection
 
-                    // Saved Addresses Section
-                    savedAddressesSection
-                }
-                .padding()
-            }
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.large)
-            .sheet(isPresented: $showingAddressWidget) {
-                AddressWidgetFormView(
-                    editingAddress: editingAddress,
-                    onSave: { address in
-                        saveAddress(address)
-                        showingAddressWidget = false
-                    },
-                    onCancel: {
-                        editingAddress = nil
-                        showingAddressWidget = false
-                    }
-                )
-            }
-            .alert(viewModel.showAlert ? viewModel.alertTitle : "Address", isPresented: $viewModel.showAlert) {
-                Button("OK") {}
-            } message: {
-                Text(viewModel.showAlert ? viewModel.alertMessage : alertMessage)
-            }
-            .alert("Address", isPresented: $showAlert) {
-                Button("OK") {}
-            } message: {
-                Text(alertMessage)
+                // Saved Addresses Section
+                savedAddressesSection
             }
         }
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.large)
+        .sheet(isPresented: $showingAddressWidget) {
+            AddressWidgetFormView(
+                editingAddress: nil,
+                onSave: { address in
+                    saveAddress(address)
+                    showingAddressWidget = false
+                },
+                onCancel: {
+                    editingAddress = nil
+                    showingAddressWidget = false
+                },
+                addressResult: nil
+            )
+        }
+        .sheet(item: $editingAddress) { selectedAddress in
+            AddressWidgetFormView(
+                editingAddress: selectedAddress,
+                onSave: { address in
+                    saveAddress(address)
+                    editingAddress = nil
+                },
+                onCancel: {
+                    editingAddress = nil
+                },
+                addressResult: getAddressFromSavedAddress(selectedAddress)
+            )
+        }
+        .alert(viewModel.showAlert ? viewModel.alertTitle : "Address", isPresented: $viewModel.showAlert) {
+            Button("OK") {}
+        } message: {
+            Text(viewModel.showAlert ? viewModel.alertMessage : alertMessage)
+        }
+        .alert("Address", isPresented: $showAlert) {
+            Button("OK") {}
+        } message: {
+            Text(alertMessage)
+        }
+    }
+
+    private func getAddressFromSavedAddress(_ savedAddress: SavedAddress?) -> Address? {
+        guard let savedAddress = savedAddress else { return nil }
+        return Address(
+            firstName: savedAddress.firstName,
+            lastName: savedAddress.lastName,
+            addressLine1: savedAddress.addressLine1,
+            addressLine2: savedAddress.addressLine2,
+            city: savedAddress.city,
+            state: savedAddress.state,
+            postcode: savedAddress.postalCode,
+            country: savedAddress.country)
     }
 
     private var profileInfoSection: some View {
@@ -119,12 +143,50 @@ struct ProfileView: View {
                         .padding([.top, .leading, .trailing], 16)
                     Spacer()
                 }
-                Text("Link your PayPal account to use method next time you shop")
-                    .font(.system(size: 15))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 4)
-                    .padding([.leading, .trailing], 16)
-                vaultWidget()
+
+                if viewModel.isCustomerLinked, let customerInfo = viewModel.linkedCustomerInfo {
+                    // Show linked customer information
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text("Account Linked")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.green)
+                            Spacer()
+                        }
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(customerInfo.firstName) \(customerInfo.lastName)")
+                                .font(.system(size: 15, weight: .medium))
+                            Text("\(customerInfo.phone)")
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                            if let email = customerInfo.email {
+                                Text(email)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        Button("Unlink Account") {
+                            viewModel.unlinkCustomer()
+                        }
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.red)
+                        .padding(.top, 8)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                } else {
+                    // Show link account message and widget
+                    Text("Link your PayPal account to use method next time you shop")
+                        .font(.system(size: 15))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
+                        .padding([.leading, .trailing], 16)
+                    vaultWidget()
+                }
             }
             .background(Color.gray.opacity(0.1))
             .cornerRadius(10.0)
@@ -184,8 +246,8 @@ struct ProfileView: View {
                     SavedAddressCardView(
                         address: address,
                         onEdit: {
+                            print(address)
                             editingAddress = address
-                            showingAddressWidget = true
                         },
                         onDelete: {
                             deleteAddress(address)
@@ -241,20 +303,6 @@ struct ProfileView: View {
         showAlert = true
     }
 }
-
-// Helper extension to bridge between AddressResult and SavedAddress
-// extension AddressResult {
-//    init(addressLine1: String, addressLine2: String?, city: String, state: String?, postalCode: String, country: String) {
-//        // This is a mock initializer - in reality you'd use the actual AddressResult from the SDK
-//        // For now, we'll assume AddressResult has these properties
-//        self.addressLine1 = addressLine1
-//        self.addressLine2 = addressLine2
-//        self.city = city
-//        self.state = state
-//        self.postalCode = postalCode
-//        self.country = country
-//    }
-// }
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {

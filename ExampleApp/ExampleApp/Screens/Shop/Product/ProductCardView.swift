@@ -11,6 +11,7 @@ import SwiftUI
 struct ProductCardView: View {
     let product: Product
     let cardHeight: CGFloat
+    let currentQuantityInCart: Int
     let onAddToCart: () -> Void
     @State private var showingAddedAnimation = false
 
@@ -22,15 +23,24 @@ struct ProductCardView: View {
     private let buttonHeight: CGFloat = 36
     private let padding: CGFloat = 12
 
-    init(product: Product, cardHeight: CGFloat, onAddToCart: @escaping () -> Void) {
+    init(product: Product, cardHeight: CGFloat, currentQuantityInCart: Int, onAddToCart: @escaping () -> Void) {
         self.product = product
         self.cardHeight = cardHeight
+        self.currentQuantityInCart = currentQuantityInCart
         self.onAddToCart = onAddToCart
 
         // Calculate image height based on remaining space
         let contentHeight = cardHeight - (padding * 2)
         let fixedContentHeight = titleHeight + descriptionHeight + priceHeight + buttonHeight + (4 * 8) // 8pt spacing between elements
         self.imageHeight = contentHeight - fixedContentHeight
+    }
+
+    private var buttonText: String {
+        if currentQuantityInCart > 0 {
+            return "Add to Cart (\(currentQuantityInCart))"
+        } else {
+            return "Add to Cart"
+        }
     }
 
     var body: some View {
@@ -107,7 +117,7 @@ struct ProductCardView: View {
                     HStack(spacing: 6) {
                         Image(systemName: showingAddedAnimation ? "checkmark" : "plus")
                             .font(.system(size: 14, weight: .semibold))
-                        Text(showingAddedAnimation ? "Added!" : "Add to Cart")
+                        Text(showingAddedAnimation ? "Added!" : buttonText)
                             .font(.system(size: 14, weight: .semibold))
                     }
                     .foregroundColor(.white)

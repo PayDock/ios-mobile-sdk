@@ -34,7 +34,8 @@ struct ProductListView: View {
                         ForEach(filteredProducts) { product in
                             ProductCardView(
                                 product: product,
-                                cardHeight: cardHeight
+                                cardHeight: cardHeight,
+                                currentQuantityInCart: cartManager.getQuantity(for: product)
                             ) {
                                 cartManager.addToCart(product: product)
                             }
@@ -64,10 +65,10 @@ struct ProductListView: View {
                                     .font(.caption2)
                                     .fontWeight(.bold)
                                     .foregroundColor(.white)
-                                    .frame(width: 18, height: 18)
+                                    .frame(width: 16, height: 16)
                                     .background(Color.red)
                                     .clipShape(Circle())
-                                    .offset(x: 12, y: -12)
+                                    .offset(x: 12, y: -10)
                             }
                         }
                     }

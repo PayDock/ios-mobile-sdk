@@ -37,10 +37,10 @@ struct CheckoutAddressWidgetView: View {
                         onAddressSelected(result)
                     }
                 )
-                .padding()
 
                 Spacer()
             }
+            .background(Color.white)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

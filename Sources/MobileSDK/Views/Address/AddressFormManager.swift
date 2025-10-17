@@ -63,7 +63,7 @@ class AddressFormManager: ObservableObject {
     let postcodePlaceholder = ""
     let countryPlaceholder = ""
 
-    var firstNameText = "" {
+    @Published var firstNameText = "" {
         didSet {
             if !firstNameText.isEmpty {
                 self.validateTextField(.firstName)
@@ -241,16 +241,20 @@ class AddressFormManager: ObservableObject {
 
     func updateFormWith(address: Address?) {
         guard let address = address else { return }
-        firstNameText = address.firstName
-        lastNameText = address.lastName
-        addressLine1Text = address.addressLine1
-        addressLine2Text = address.addressLine2
-        cityText = address.city
-        stateText = address.state
-        postcodeText = address.postcode
-        countryText = address.country
+        isAddressFormExpanded = true
 
-        validateAllTextFields()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.firstNameText = address.firstName
+            self.lastNameText = address.lastName
+            self.addressLine1Text = address.addressLine1
+            self.addressLine2Text = address.addressLine2
+            self.cityText = address.city
+            self.stateText = address.state
+            self.postcodeText = address.postcode
+            self.countryText = address.country
+
+            self.validateAllTextFields()
+        }
     }
 
     func getCountryList() -> [String] {
@@ -265,6 +269,28 @@ class AddressFormManager: ObservableObject {
     }
 
     // MARK: - Editing
+
+    private func updateEditState() {
+        editingFirstName = true
+        editingLastName = true
+        editingAddressSearch = true
+        editingAddressLine1 = true
+        editingAddressLine2 = true
+        editingCity = true
+        editingState = true
+        editingPostcode = true
+        editingCountry = true
+
+        editingFirstName = false
+        editingLastName = false
+        editingAddressSearch = false
+        editingAddressLine1 = false
+        editingAddressLine2 = false
+        editingCity = false
+        editingState = false
+        editingPostcode = false
+        editingCountry = false
+    }
 
     func endEditing() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)

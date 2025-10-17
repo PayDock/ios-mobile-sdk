@@ -16,7 +16,7 @@ struct AddressWidgetFormView: View {
 
     @State private var label: String = ""
     @State private var isDefault: Bool = false
-    @State private var addressResult: Address?
+    @State var addressResult: Address?
     @State private var showingAddressWidget = false
 
     var isEditing: Bool {
@@ -42,21 +42,24 @@ struct AddressWidgetFormView: View {
                     Toggle("Set as default address", isOn: $isDefault)
 
                     if let result = addressResult {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Address:")
-                                .font(.headline)
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Address:")
+                                    .font(.headline)
 
-                            Text(formatAddress(result))
-                                .font(.body)
-                                .padding()
-                                .background(Color(.systemGroupedBackground))
-                                .cornerRadius(8)
+                                Text(formatAddress(result))
+                                    .font(.body)
+                                    .padding()
+                                    .background(Color(.systemGroupedBackground))
+                                    .cornerRadius(8)
 
-                            Button("Change Address") {
-                                showingAddressWidget = true
+                                Button("Change Address") {
+                                    showingAddressWidget = true
+                                }
+                                .font(.system(size: 14))
+                                .foregroundColor(.defaultPrimary)
                             }
-                            .font(.system(size: 14))
-                            .foregroundColor(.defaultPrimary)
+                            Spacer()
                         }
                     } else {
                         Button("Enter Address") {
@@ -102,7 +105,7 @@ struct AddressWidgetFormView: View {
                 .padding()
             }
             .sheet(isPresented: $showingAddressWidget) {
-                AddressWidget(config: .init()) { address in
+                AddressWidgetContainerView(address: addressResult) { address in
                     addressResult = address
                     showingAddressWidget = false
                 }
@@ -120,6 +123,8 @@ struct AddressWidgetFormView: View {
 
             // Convert SavedAddress to AddressResult for display
             addressResult = Address(
+                firstName: editingAddress.firstName,
+                lastName: editingAddress.lastName,
                 addressLine1: editingAddress.addressLine1,
                 addressLine2: editingAddress.addressLine2,
                 city: editingAddress.city,
@@ -135,6 +140,8 @@ struct AddressWidgetFormView: View {
 
         let savedAddress = SavedAddress(
             label: label,
+            firstName: result.firstName,
+            lastName: result.lastName,
             addressLine1: result.addressLine1,
             addressLine2: result.addressLine2,
             city: result.city,
@@ -150,8 +157,11 @@ struct AddressWidgetFormView: View {
     private func formatAddress(_ result: Address) -> String {
         var components: [String] = []
 
+        components.append("\(result.firstName) \(result.lastName)")
         components.append(result.addressLine1)
-        components.append(result.addressLine2)
+        if !result.addressLine2.isEmpty {
+            components.append(result.addressLine2)
+        }
         components.append("\(result.city), \(result.state)")
         components.append(result.postcode)
         components.append(result.country)

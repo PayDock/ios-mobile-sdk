@@ -34,8 +34,9 @@ struct CardPaymentWidget: View {
             completion: { result in
                 switch result {
                 case .success(let result):
-                    viewModel.cardToken = result.token
-                    currentStep = .review
+                    viewModel.payWithCard(result.token)
+//                    viewModel.cardToken = result.token
+                    // TODO: - success screen handling
                 case .failure: break
                 }
             }

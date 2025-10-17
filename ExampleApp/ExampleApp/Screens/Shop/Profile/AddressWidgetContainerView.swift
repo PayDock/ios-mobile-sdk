@@ -10,6 +10,7 @@ import SwiftUI
 import MobileSDK
 
 struct AddressWidgetContainerView: View {
+    let address: Address?
     let onAddressSelected: (Address) -> Void
     @Environment(\.dismiss) private var dismiss
 
@@ -23,13 +24,12 @@ struct AddressWidgetContainerView: View {
 
                 AddressWidget(
                     config: AddressWidgetConfig(
-                        address: nil
+                        address: address
                     ),
                     completion: { result in
                         onAddressSelected(result)
                     }
                 )
-                .padding()
 
                 Spacer()
             }

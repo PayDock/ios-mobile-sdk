@@ -36,11 +36,7 @@ struct MastercardPaymentWidget: View {
                             meta: nil
                         )
                     ) { result in
-                        switch result {
-                        case .success:
-                            currentStep = .review
-                        case .failure: break
-                        }
+                        viewModel.handleMastercardResult(result)
                     }
                 }
                 .navigationTitle("Checkout with Click to Pay")

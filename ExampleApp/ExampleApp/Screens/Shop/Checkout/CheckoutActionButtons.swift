@@ -33,16 +33,19 @@ struct CheckoutActionButtons: View {
                     )
                 }
 
-                Button(actionButtonTitle) {
-                    onAction()
+                if currentStep == .information {
+                    Button(actionButtonTitle) {
+                        onAction()
+                    }
+
+                    .foregroundColor(.white)
+                    .font(.system(size: 16, weight: .semibold))
+                    .frame(height: 50)
+                    .frame(maxWidth: .infinity)
+                    .background(canProceed ? Color.defaultPrimary : Color.gray)
+                    .cornerRadius(8)
+                    .disabled(!canProceed)
                 }
-                .foregroundColor(.white)
-                .font(.system(size: 16, weight: .semibold))
-                .frame(height: 50)
-                .frame(maxWidth: .infinity)
-                .background(canProceed ? Color.defaultPrimary : Color.gray)
-                .cornerRadius(8)
-                .disabled(!canProceed)
             }
             .padding()
         }
@@ -52,8 +55,7 @@ struct CheckoutActionButtons: View {
     private var actionButtonTitle: String {
         switch currentStep {
         case .information: return "Continue to Payment"
-        case .payment: return "Continue to Review"
-        case .review: return "Place Order"
+        case .paymentAndReview: return "Place Order"
         }
     }
 }

@@ -14,6 +14,9 @@ struct CheckoutInformationStepView: View {
     @Binding var showingAddressWidget: Bool
     @Binding var addressWidgetType: AddressWidgetType
 
+    @StateObject private var cartManager = CartManager.shared
+    @State private var showingGiftCardEntry = false
+
     let onLoadProfileData: () -> Void
     let onSelectSavedAddress: (SavedAddress, AddressWidgetType) -> Void
     let onClearShippingAddress: () -> Void
@@ -62,6 +65,54 @@ struct CheckoutInformationStepView: View {
                     onClearBillingAddress: onClearBillingAddress
                 )
             }
+
+            Text("Gift Cards")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.top)
+
+            VStack(alignment: .leading, spacing: 16) {
+                if cartManager.hasGiftCards {
+                    ForEach(cartManager.appliedGiftCards) { appliedGiftCard in
+                        GiftCardRowView(appliedGiftCard: appliedGiftCard) {
+                            cartManager.removeGiftCard(appliedGiftCard)
+                        }
+                    }
+                } else {
+                    Text("No gift cards applied")
+                        .font(.body)
+                        .foregroundColor(.gray)
+                        .padding(.vertical, 8)
+                }
+
+                HStack {
+                    Button("Add Gift Card") {
+                        showingGiftCardEntry = true
+                    }
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.defaultPrimary)
+
+                    Spacer()
+                }
+            }
+            .padding()
+            .background(Color(.systemGroupedBackground))
+            .cornerRadius(12)
+
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Order Summary")
+                    .font(.title2)
+                    .fontWeight(.bold)
+
+                OrderSummaryView(
+                    cartManager: cartManager,
+                    showShipping: true,
+                    showGiftCards: true
+                )
+            }
+        }
+        .sheet(isPresented: $showingGiftCardEntry) {
+            GiftCardEntryView()
         }
     }
 }

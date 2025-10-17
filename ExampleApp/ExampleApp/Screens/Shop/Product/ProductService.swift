@@ -19,18 +19,18 @@ class ProductService {
             // Electronics
             Product(
                 id: "1",
-                name: "ThinkPad X1 Yoga Gen 7",
+                name: "Laptop",
                 description: "14″ Intel 2 in 1 Laptop with touch screen and 360° flexibility",
                 price: 3299.00,
-                imageName: "demoItem1",
+                imageName: "laptop",
                 category: .electronics
             ),
             Product(
                 id: "2",
-                name: "Galaxy S23 Ultra",
-                description: "SM-S918BZGHSEK 512 GB｜12 GB｜Green - Latest flagship smartphone",
+                name: "Smartphone",
+                description: "512 GB｜12 GB｜Green - Latest flagship smartphone",
                 price: 2199.00,
-                imageName: "demoItem2",
+                imageName: "smartphone",
                 category: .electronics
             ),
             Product(
@@ -38,7 +38,7 @@ class ProductService {
                 name: "Wireless Headphones",
                 description: "Premium noise-cancelling wireless headphones with 30-hour battery",
                 price: 349.99,
-                imageName: "demoItem1",
+                imageName: "headphones",
                 category: .electronics
             ),
             Product(
@@ -46,7 +46,7 @@ class ProductService {
                 name: "Smart Watch",
                 description: "Fitness tracking smartwatch with heart rate monitor and GPS",
                 price: 299.99,
-                imageName: "demoItem2",
+                imageName: "smartwatch",
                 category: .electronics
             ),
             Product(
@@ -54,7 +54,7 @@ class ProductService {
                 name: "Bluetooth Speaker",
                 description: "Portable waterproof speaker with 360° sound and 12-hour battery",
                 price: 129.99,
-                imageName: "demoItem1",
+                imageName: "bluetooth-speaker",
                 category: .electronics
             ),
             Product(
@@ -62,7 +62,7 @@ class ProductService {
                 name: "Tablet Pro",
                 description: "11-inch tablet with stylus support and all-day battery life",
                 price: 899.99,
-                imageName: "demoItem2",
+                imageName: "tablet",
                 category: .electronics
             ),
 
@@ -72,7 +72,7 @@ class ProductService {
                 name: "Premium Cotton T-Shirt",
                 description: "Soft organic cotton tee with modern fit and sustainable materials",
                 price: 29.99,
-                imageName: "tshirt.fill",
+                imageName: "cotton-tshirt",
                 category: .clothing
             ),
             Product(
@@ -80,7 +80,7 @@ class ProductService {
                 name: "Denim Jacket",
                 description: "Classic blue denim jacket with vintage wash and comfortable fit",
                 price: 89.99,
-                imageName: "jacket",
+                imageName: "denim-jacket",
                 category: .clothing
             ),
             Product(
@@ -88,7 +88,7 @@ class ProductService {
                 name: "Wool Sweater",
                 description: "Cozy merino wool sweater perfect for cool weather and layering",
                 price: 79.99,
-                imageName: "sweater",
+                imageName: "wool-sweater",
                 category: .clothing
             ),
             Product(
@@ -96,7 +96,7 @@ class ProductService {
                 name: "Slim Fit Jeans",
                 description: "Comfortable stretch denim with modern slim fit and dark wash",
                 price: 69.99,
-                imageName: "pants",
+                imageName: "jeans-pants",
                 category: .clothing
             ),
             Product(
@@ -104,7 +104,7 @@ class ProductService {
                 name: "Athletic Hoodie",
                 description: "Performance hoodie with moisture-wicking fabric and kangaroo pocket",
                 price: 59.99,
-                imageName: "hoodie",
+                imageName: "sport-hoodie",
                 category: .clothing
             ),
             Product(
@@ -112,7 +112,7 @@ class ProductService {
                 name: "Summer Dress",
                 description: "Flowy midi dress in breathable fabric, perfect for warm weather",
                 price: 49.99,
-                imageName: "dress.fill",
+                imageName: "dress",
                 category: .clothing
             ),
             Product(
@@ -120,7 +120,7 @@ class ProductService {
                 name: "Running Shorts",
                 description: "Lightweight athletic shorts with built-in compression and pockets",
                 price: 34.99,
-                imageName: "shorts",
+                imageName: "running-shorts",
                 category: .clothing
             ),
             Product(
@@ -128,7 +128,7 @@ class ProductService {
                 name: "Winter Coat",
                 description: "Insulated winter coat with waterproof shell and removable hood",
                 price: 199.99,
-                imageName: "coat",
+                imageName: "winter-coat",
                 category: .clothing
             ),
 
@@ -138,7 +138,7 @@ class ProductService {
                 name: "Leather Wallet",
                 description: "Genuine leather bifold wallet with RFID blocking and card slots",
                 price: 45.99,
-                imageName: "wallet.fill",
+                imageName: "wallet",
                 category: .accessories
             ),
             Product(
@@ -146,7 +146,7 @@ class ProductService {
                 name: "Designer Sunglasses",
                 description: "UV protection sunglasses with polarized lenses and metal frame",
                 price: 129.99,
-                imageName: "sunglasses.fill",
+                imageName: "sunglasses",
                 category: .accessories
             ),
             Product(
@@ -154,7 +154,7 @@ class ProductService {
                 name: "Canvas Backpack",
                 description: "Durable canvas backpack with laptop compartment and multiple pockets",
                 price: 79.99,
-                imageName: "backpack.fill",
+                imageName: "backpack",
                 category: .accessories
             ),
             Product(
@@ -162,7 +162,7 @@ class ProductService {
                 name: "Silk Scarf",
                 description: "Luxurious silk scarf with elegant pattern and soft texture",
                 price: 39.99,
-                imageName: "scarf",
+                imageName: "silk-scarf",
                 category: .accessories
             ),
             Product(
@@ -170,7 +170,7 @@ class ProductService {
                 name: "Sports Cap",
                 description: "Adjustable baseball cap with breathable fabric and curved brim",
                 price: 24.99,
-                imageName: "cap.fill",
+                imageName: "cap",
                 category: .accessories
             ),
             Product(
@@ -178,7 +178,7 @@ class ProductService {
                 name: "Leather Belt",
                 description: "Classic leather belt with metal buckle and genuine cowhide",
                 price: 35.99,
-                imageName: "belt",
+                imageName: "leather-belt",
                 category: .accessories
             ),
             Product(
@@ -186,7 +186,7 @@ class ProductService {
                 name: "Wrist Watch",
                 description: "Analog watch with leather strap and water-resistant design",
                 price: 159.99,
-                imageName: "watch.analog",
+                imageName: "watch",
                 category: .accessories
             ),
             Product(
@@ -194,7 +194,7 @@ class ProductService {
                 name: "Crossbody Bag",
                 description: "Compact crossbody bag with adjustable strap and secure zipper",
                 price: 54.99,
-                imageName: "bag.fill",
+                imageName: "crossbody-bag",
                 category: .accessories
             ),
 
@@ -204,7 +204,7 @@ class ProductService {
                 name: "Coffee Maker",
                 description: "Programmable drip coffee maker with thermal carafe and auto-brew",
                 price: 89.99,
-                imageName: "mug.fill",
+                imageName: "coffee-maker",
                 category: .home
             ),
             Product(
@@ -212,7 +212,7 @@ class ProductService {
                 name: "Table Lamp",
                 description: "Modern LED table lamp with adjustable brightness and USB charging",
                 price: 49.99,
-                imageName: "lamp.desk.fill",
+                imageName: "table-lamp",
                 category: .home
             ),
             Product(
@@ -220,7 +220,7 @@ class ProductService {
                 name: "Throw Pillow Set",
                 description: "Set of 2 decorative throw pillows with removable covers",
                 price: 29.99,
-                imageName: "bed.double.fill",
+                imageName: "pillows",
                 category: .home
             ),
             Product(
@@ -228,7 +228,7 @@ class ProductService {
                 name: "Kitchen Scale",
                 description: "Digital kitchen scale with precise measurements and LCD display",
                 price: 34.99,
-                imageName: "scalemass.fill",
+                imageName: "scale",
                 category: .home
             ),
 
@@ -238,7 +238,7 @@ class ProductService {
                 name: "$25 Gift Card",
                 description: "Perfect for any occasion - can be used on any purchase in our store",
                 price: 25.00,
-                imageName: "giftcard.fill",
+                imageName: "gift25",
                 category: .giftCards
             ),
             Product(
@@ -246,7 +246,7 @@ class ProductService {
                 name: "$50 Gift Card",
                 description: "Perfect for any occasion - can be used on any purchase in our store",
                 price: 50.00,
-                imageName: "giftcard.fill",
+                imageName: "gift50",
                 category: .giftCards
             ),
             Product(
@@ -254,7 +254,7 @@ class ProductService {
                 name: "$100 Gift Card",
                 description: "Perfect for any occasion - can be used on any purchase in our store",
                 price: 100.00,
-                imageName: "giftcard.fill",
+                imageName: "gift100",
                 category: .giftCards
             )
         ]

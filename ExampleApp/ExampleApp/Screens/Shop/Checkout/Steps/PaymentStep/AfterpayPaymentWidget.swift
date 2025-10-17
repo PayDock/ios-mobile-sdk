@@ -15,26 +15,20 @@ struct AfterpayPaymentWidget: View {
 
     var body: some View {
         AfterpayWidget(
+            viewState: viewModel.viewState,
             configuration: viewModel.getAfterpayConfig(),
+            loadingDelegate: viewModel,
             tokenRequest: { tokenResult in
                 viewModel.initializeAfterpayCharge(completion: tokenResult)
             },
-            selectAddress: { _, _ in
-                // Provide shipping options based on user selected address if needed
-                // Check AfterpayWidget example for more details
-                // provideShippingOptions(viewModel.getShippingOptions())
+            selectAddress: { _, provideShippingOptions in
+                provideShippingOptions(viewModel.getAfterpayShippingOptions())
             },
             selectShippingOption: { _, _ in
-                // Provide shipping update if needed based on the selected shipping option
-                // Check AfterpayWidget example for more details
-                // provideShippingOptionUpdateResult(viewModel.getShippingOptionUpdate())
+
             }, completion: { result in
-                switch result {
-                case .success:
-                    currentStep = .review
-                case .failure: break
-                }
+                viewModel.handleAfterpayResult(result)
             })
-            .frame(height: 50)
+        .frame(height: 50)
     }
 }

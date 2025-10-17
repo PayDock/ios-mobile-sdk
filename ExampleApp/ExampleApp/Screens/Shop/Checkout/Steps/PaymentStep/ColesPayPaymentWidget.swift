@@ -21,11 +21,7 @@ struct ColesPayPaymentWidget: View {
         ) { tokenResult in
             viewModel.initializeWalletChargeColesPay(completion: tokenResult)
         } completion: { result in
-            switch result {
-            case .success:
-                currentStep = .review
-            case .failure: break
-            }
+            viewModel.handleColesPayResult(result)
         }
         .frame(height: 50)
     }

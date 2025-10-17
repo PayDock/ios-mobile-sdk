@@ -148,7 +148,7 @@ final class AddressVMTests: XCTestCase {
         XCTAssertEqual(formManager.addressSearchText, "")
     }
 
-    func testUpdateAddressLoadsFromConfig() {
+    func testUpdateAddressLoadsFromConfig() async throws {
         // Given
         let prefilled = Address(
             firstName: "Alice",
@@ -173,6 +173,7 @@ final class AddressVMTests: XCTestCase {
         // When
         viewModel.updateAddress()
 
+        try await Task.sleep(nanoseconds: 500_000_000)
         // Then
         XCTAssertEqual(formManager.firstNameText, "Alice")
         XCTAssertEqual(formManager.lastNameText, "Wonder")

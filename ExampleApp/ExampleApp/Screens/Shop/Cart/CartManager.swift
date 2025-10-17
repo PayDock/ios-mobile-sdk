@@ -50,6 +50,10 @@ class CartManager: ObservableObject {
         appliedGiftCards.removeAll()
     }
 
+    func getQuantity(for product: Product) -> Int {
+        return cartItems.first(where: { $0.product.id == product.id })?.quantity ?? 0
+    }
+
     // MARK: - Gift Card Operations
 
     func applyGiftCard(_ giftCard: GiftCard) -> Bool {
@@ -124,6 +128,18 @@ class CartManager: ObservableObject {
 
     var formattedTotal: String {
         return String(format: "$%.2f", total)
+    }
+
+    var stringTotal: String {
+        return String(format: "%.2f", total)
+    }
+
+    var stringTotalWithoutShipping: String {
+        return String(format: "%.2f", (total - shippingCost))
+    }
+
+    var stringShippingCost: String {
+        return String(format: "%.2f", shippingCost)
     }
 
     var isEmpty: Bool {

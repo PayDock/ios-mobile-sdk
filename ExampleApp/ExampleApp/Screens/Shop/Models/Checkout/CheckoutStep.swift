@@ -8,14 +8,12 @@
 
 enum CheckoutStep: CaseIterable {
     case information
-    case payment
-    case review
+    case paymentAndReview
 
     var title: String {
         switch self {
         case .information: return "Information"
-        case .payment: return "Payment"
-        case .review: return "Review"
+        case .paymentAndReview: return "Payment & Review"
         }
     }
 }
