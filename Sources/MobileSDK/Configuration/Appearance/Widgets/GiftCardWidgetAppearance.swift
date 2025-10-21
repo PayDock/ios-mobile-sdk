@@ -27,7 +27,9 @@ public struct GiftCardWidgetAppearance:
                 horizontalSpacing: CGFloat = 16,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                actionButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                actionButton: Theme.ButtonAppearance = .init(
+                    icon: Image(systemName: "plus.circle"),
+                    text: "Add"),
                 toolbarButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.toolbarButton) {
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing

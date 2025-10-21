@@ -124,9 +124,7 @@ public struct GiftCardWidget: View {
     }
 
     private var primaryButton: some View {
-        let plusIcon = Image(systemName: "plus.circle")
-
-        return SDKButton(title: "Add", image: plusIcon,
+        return SDKButton(title: appearance.actionButton.text,
                          isLoading: viewModel.isLoading,
                          style: .custom(CustomButtonStyle(
                             appearance: appearance.actionButton,
