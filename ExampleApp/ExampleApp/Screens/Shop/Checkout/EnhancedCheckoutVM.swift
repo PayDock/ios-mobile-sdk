@@ -12,6 +12,7 @@ import Afterpay
 import NetworkingLib
 
 @MainActor
+// swiftlint:disable file_length
 class EnhancedCheckoutVM: ObservableObject {
 
     // MARK: - Dependencies
@@ -58,7 +59,8 @@ class EnhancedCheckoutVM: ObservableObject {
     @Published var showAlert = false
     @Published var isLoading = false
     @Published var orderCompleted = false
-    @Published var show3dsWebView = false
+    @Published var showIntegrated3dsWebView = false
+    @Published var showStandalone3dsWebView = false
     @Published var showMastercardWebView = false
 
     var alertTitle = ""
@@ -69,6 +71,8 @@ class EnhancedCheckoutVM: ObservableObject {
     @Published var showResultOverlay = false
     @Published var resultIsSuccess = false
     @Published var resultMessage = ""
+
+    private let useStandalone3DS = true
 
     // MARK: - Computed Properties
 
@@ -450,16 +454,18 @@ extension EnhancedCheckoutVM {
             do {
                 let vaultToken = try await walletService.convertCardTokenToVaultToken(request: request)
                 self.vaultToken = vaultToken
-                attempt3dsTokenCreation()
+                if useStandalone3DS {
+                    attemptStandalone3dsTokenCreation()
+                } else {
+                    attemptIntegrated3dsTokenCreation()
+                }
             } catch {
                 showResultOverlay(success: false, message: "Error converting to vault token!")
             }
         }
     }
 
-    /// Attempts to create 3DS token and receive 3DS auth status
-    private func attempt3dsTokenCreation() {
-
+    private func attemptIntegrated3dsTokenCreation() {
         let request = Integrated3DSVaultReq(
             amount: cartManager.stringTotal,
             currency: "AUD",
@@ -471,7 +477,46 @@ extension EnhancedCheckoutVM {
         Task {
             do {
                 let response = try await walletService.createIntegrated3DSVaultToken(request: request)
-                handleAuthStatus(response)
+                handleIntegrated3dsStatus(response)
+            } catch {
+                showResultOverlay(success: false, message: "Error creating integrated 3DS token!")
+            }
+        }
+    }
+
+    private func attemptStandalone3dsTokenCreation() {
+        Task {
+            let request = Standalone3DSReq(
+                amount: cartManager.stringTotal,
+                currency: "AUD",
+                reference: UUID().uuidString,
+                customer: .init(paymentSource: .init(token: vaultToken)),
+                data: .init(
+                    serviceId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
+                    authentication: .init(
+                        type: "01",
+                        date: "2025-06-01T13:00:00.521Z",
+                        version: "2.2.0",
+                        customer: .init(
+                            created: "2025-05-31T13:06:05.521Z",
+                            updated: "2025-05-31T13:06:05.521Z",
+                            credsUpdated: "2025-05-31T13:06:05.521Z",
+                            suspicious: false,
+                            source: .init(
+                                created: "2025-05-31T13:06:05.521Z",
+                                attempts: ["2025-05-31T13:06:05.521Z"],
+                                cardType: "02"
+                            )
+                        )
+                    )
+                )
+            )
+            do {
+                let response = try await walletService.createStandalone3DSToken(request: request)
+                self.isLoading = false
+                self.viewState?.setState(.none)
+                self.token3DS = response ?? ""
+                self.showStandalone3dsWebView = true
             } catch {
                 showResultOverlay(success: false, message: "Error creating integrated 3DS token!")
             }
@@ -479,7 +524,7 @@ extension EnhancedCheckoutVM {
     }
 
     /// Based on 3DS auth status selects the appropriate flow
-    private func handleAuthStatus(_ response: Integrated3DSRes) {
+    func handleIntegrated3dsStatus(_ response: Integrated3DSRes) {
         switch response.authStatus {
         case .notSupported: captureCharge(id3ds: response.resource.data.threeDS.id ?? "")
         case .pending:
@@ -487,7 +532,7 @@ extension EnhancedCheckoutVM {
                 self.isLoading = false
                 self.viewState?.setState(.none)
                 self.token3DS = response.resource.data.threeDS.token ?? ""
-                self.show3dsWebView = true
+                self.showIntegrated3dsWebView = true
             }
         case .none:
             showResultOverlay(success: false, message: "Error getting 3DS auth status!")
@@ -495,23 +540,46 @@ extension EnhancedCheckoutVM {
     }
 
     /// Handles the outcome of integrated 3DS WebView check
-    func handle3dsEvent(_ event: Integrated3DSResult) {
+    func handleIntegrated3dsEvent(_ event: Integrated3DSResult) {
         DispatchQueue.main.async {
             switch event.event {
             case .chargeAuth: break
             case .additionalDataCollectSuccess: break
             case .chargeAuthReject:
-                self.show3dsWebView = false
+                self.showIntegrated3dsWebView = false
                 self.showResultOverlay(success: false, message: "3DS auth rejected!")
             case .additionalDataCollectReject:
-                self.show3dsWebView = false
+                self.showIntegrated3dsWebView = false
                 self.showResultOverlay(success: false, message: "3DS additional data rejected!")
             case .chargeAuthCancelled:
-                self.show3dsWebView = false
+                self.showIntegrated3dsWebView = false
                 self.showResultOverlay(success: false, message: "3DS cancelled!")
             case .chargeAuthSuccess:
-                self.show3dsWebView = false
+                self.showIntegrated3dsWebView = false
                 self.captureCharge(id3ds: event.charge3dsId)
+            }
+        }
+    }
+
+    /// Handles the outcome of standlone  3DS WebView check
+    func handleStandalone3dsEvent(_ event: Standalone3DSResult) {
+        DispatchQueue.main.async {
+            switch event.event {
+            case .chargeAuthSuccess:
+                self.showStandalone3dsWebView = false
+                self.captureChargeForStandalone(id3ds: event.charge3dsId)
+            case .chargeAuthReject:
+                self.showStandalone3dsWebView = false
+                self.showResultOverlay(success: false, message: "3DS auth rejected!")
+            case .chargeAuthChallenge:
+                break
+            case .chargeAuthDecoupled:
+                break
+            case .chargeAuthInfo:
+                break
+            case .chargeError:
+                self.showStandalone3dsWebView = false
+                self.showResultOverlay(success: false, message: "3DS auth error!")
             }
         }
     }
@@ -532,6 +600,45 @@ extension EnhancedCheckoutVM {
 
             do {
                 let result = try await walletService.captureCharge(request: request)
+                await MainActor.run {
+                    isLoading = false
+                    viewState?.setState(.none)
+                    showResultOverlay(success: true, message: "\(result.amount) \(result.currency) successfully charged!")
+                }
+            } catch {
+                await MainActor.run {
+                    isLoading = false
+                    viewState?.setState(.none)
+                    showResultOverlay(success: false, message: "Payment failed. Please try again.")
+                }
+            }
+        }
+    }
+
+    private func captureChargeForStandalone(id3ds: String) {
+        DispatchQueue.main.async {
+            self.isLoading = true
+        }
+        viewState?.setState(.disabled)
+        Task {
+            let request = CaptureChargeStandaloneReq(
+                amount: cartManager.stringTotal,
+                currency: "AUD",
+                customer: .init(
+                    email: email,
+                    firstName: firstName,
+                    lastName: lastName,
+                    paymentSource: .init(
+                        gatewayID: applePayGatewayId,
+                        vaultToken: vaultToken),
+                    phone: phone,
+                    suspicious: false),
+                description: "Test transaction standalone",
+                reference: UUID().uuidString,
+                threeDSChargeId: id3ds)
+
+            do {
+                let result = try await walletService.captureChargeForStandaloneFlow(request: request)
                 await MainActor.run {
                     isLoading = false
                     viewState?.setState(.none)
