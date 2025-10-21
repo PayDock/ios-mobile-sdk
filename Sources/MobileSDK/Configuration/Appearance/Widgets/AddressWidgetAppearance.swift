@@ -30,7 +30,8 @@ public struct AddressWidgetAppearance:
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textfield: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
                 primaryButton: Theme.ButtonAppearance = .init(
-                    icon: Image(systemName: "plus.circle"), text: "Add"),
+                    icon: Image(systemName: "plus.circle"),
+                    text: "Add"),
                 linkButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.expandSectionButton,
                 searchDropdown: Theme.SearchDropdownAppearance = GlobalTheme.shared.globalTheme.searchDropdown) {
         self.horizontalSpacing = horizontalSpacing
