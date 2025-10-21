@@ -20,6 +20,7 @@ enum WalletEndpoints {
     case vaultToken(request: TokeniseCardDetailsReq)
     case convertToVaultToken(request: ConvertToVaultTokenReq)
     case captureCharge(request: CaptureChargeReq)
+    case captureChargeForStandalone(request: CaptureChargeStandaloneReq)
     case captureChargeColesPay(chargeId: String)
 
 }
@@ -34,6 +35,7 @@ extension WalletEndpoints: Endpoint {
         case .standalone3ds: return "/v1/charges/standalone-3ds"
         case .vaultToken, .convertToVaultToken: return "/v1/vault/payment_sources"
         case .captureCharge: return "/v1/charges"
+        case .captureChargeForStandalone: return "/v1/charges"
         case .captureChargeColesPay(let chargeId): return "/v1/charges/\(chargeId)/capture"
         }
     }
@@ -49,6 +51,7 @@ extension WalletEndpoints: Endpoint {
         case .vaultToken: return .post
         case .convertToVaultToken: return .post
         case .captureCharge: return .post
+        case .captureChargeForStandalone: return .post
         case .captureChargeColesPay: return .post
         }
     }
@@ -57,7 +60,7 @@ extension WalletEndpoints: Endpoint {
         let accessToken =  ProjectEnvironment.shared.getApiAccessToken()
         switch self {
         case .initialiseWalletCharge, .initialiseColesPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds,
-                .captureCharge, .cardToken, .integrated3ds, .integrated3dsVault, .captureChargeColesPay:
+                .captureCharge, .captureChargeForStandalone, .cardToken, .integrated3ds, .integrated3dsVault, .captureChargeColesPay:
             return [
                 "x-access-token": "\(accessToken)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -76,6 +79,7 @@ extension WalletEndpoints: Endpoint {
         case .vaultToken(let request): return try? encoder.encode(request)
         case .convertToVaultToken(let request): return try? encoder.encode(request)
         case .captureCharge(let request): return try? encoder.encode(request)
+        case .captureChargeForStandalone(let request): return try? encoder.encode(request)
         case .captureChargeColesPay: return nil
         }
     }
@@ -85,7 +89,8 @@ extension WalletEndpoints: Endpoint {
         case .initialiseWalletCharge: return [URLQueryItem(name: "capture", value: "true")]
         case .initialiseColesPayWalletCharge: return [URLQueryItem(name: "capture", value: "false")]
         case .captureChargeColesPay: return [URLQueryItem(name: "mobile", value: "true")]
-        case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault, .captureCharge: return []
+        case .cardToken, .integrated3ds, .standalone3ds, .vaultToken, .convertToVaultToken, .integrated3dsVault,
+                .captureCharge, .captureChargeForStandalone: return []
         }
     }
 

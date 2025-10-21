@@ -98,7 +98,7 @@ struct EnhancedCheckoutView: View {
                     }
                 )
             }
-            .sheet(isPresented: $viewModel.show3dsWebView, onDismiss: { }, content: {
+            .sheet(isPresented: $viewModel.showIntegrated3dsWebView, onDismiss: { }, content: {
                 NavigationStack {
                     VStack {
                         Integrated3DSWidget(
@@ -106,13 +106,33 @@ struct EnhancedCheckoutView: View {
                             completion: { result in
                                 switch result {
                                 case .success(let result):
-                                    viewModel.handle3dsEvent(result)
-
+                                    viewModel.handleIntegrated3dsEvent(result)
                                 case .failure(let error):
-                                    viewModel.alertMessage = error.localizedDescription
-                                    viewModel.showAlert = true
+                                    Task {
+                                        viewModel.alertMessage = error.localizedDescription
+                                        viewModel.showAlert = true
+                                    }
                                 }
                             })
+                        .navigationTitle("3DS Check")
+                        .navigationBarTitleDisplayMode(.inline)
+
+                    }
+                }
+            })
+            .sheet(isPresented: $viewModel.showStandalone3dsWebView, onDismiss: { }, content: {
+                NavigationStack {
+                    VStack {
+                        Standalone3DSWidget(
+                            config: .init(token: viewModel.token3DS)) { result in
+                                switch result {
+                                case let .success(result):
+                                    viewModel.handleStandalone3dsEvent(result)
+                                case let .failure(error):
+                                    viewModel.alertMessage = error.customMessage
+                                    viewModel.showAlert = true
+                                }
+                            }
                         .navigationTitle("3DS Check")
                         .navigationBarTitleDisplayMode(.inline)
 
