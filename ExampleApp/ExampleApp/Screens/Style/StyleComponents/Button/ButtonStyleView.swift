@@ -39,6 +39,8 @@ struct ButtonStyleView<T>: View {
                     dimensionsListView
                     SectionTitleView(title: "Fonts")
                     fontListView
+                    SectionTitleView(title: "Button Content")
+                    iconListView
                     ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
@@ -162,6 +164,23 @@ struct ButtonStyleView<T>: View {
                 text: Binding(
                     get: { "\(viewModel.fontSize)" },
                     set: { viewModel.fontSize = CGFloat(Double($0) ?? 0) }))
+        }
+    }
+
+    private var iconListView: some View {
+        VStack(spacing: 16) {
+            IconPickerView(
+                entries: viewModel.allSystemIconNames,
+                selected: $viewModel.icon,
+                placeholder: "Select icon",
+                onSelection: { icon in
+                    viewModel.icon = icon
+                })
+
+            DimensionsFieldView(title: "Text",
+                                text: Binding(
+                                    get: { viewModel.buttonText },
+                                    set: { viewModel.buttonText = $0 }))
         }
     }
 }

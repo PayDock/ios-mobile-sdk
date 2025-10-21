@@ -14,6 +14,8 @@
 		280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */; };
 		280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */; };
 		2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */; };
+		281859062EA29A64002D7CDE /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859052EA29A64002D7CDE /* IconPickerView.swift */; };
+		281859082EA29B24002D7CDE /* IconGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859072EA29B21002D7CDE /* IconGridView.swift */; };
 		281859042EA280E6002D7CDE /* CaptureChargeStandaloneReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */; };
 		281DECA32E70767E00C3DC0C /* PayPalStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */; };
 		281DECA52E70768400C3DC0C /* PayPalStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */; };
@@ -201,6 +203,8 @@
 		280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetView.swift; sourceTree = "<group>"; };
 		280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetVM.swift; sourceTree = "<group>"; };
 		2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
+		281859052EA29A64002D7CDE /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
+		281859072EA29B21002D7CDE /* IconGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconGridView.swift; sourceTree = "<group>"; };
 		281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeStandaloneReq.swift; sourceTree = "<group>"; };
 		281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleView.swift; sourceTree = "<group>"; };
 		281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleVM.swift; sourceTree = "<group>"; };
@@ -675,6 +679,8 @@
 				28D8BA602E006AB900EDD422 /* ResetStyleButton.swift */,
 				28D8BA622E00706400EDD422 /* ResetConfirmationModifier.swift */,
 				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
+				281859052EA29A64002D7CDE /* IconPickerView.swift */,
+				281859072EA29B21002D7CDE /* IconGridView.swift */,
 				287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */,
 				287F39792DF76C6F00F4D771 /* Loader */,
 				287F39882DF88DFB00F4D771 /* Toggle */,
@@ -1372,6 +1378,7 @@
 				28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */,
 				2886AE5E2E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift in Sources */,
 				2886AE5F2E55D1F60071BADC /* CreateCustomerTokenRes.swift in Sources */,
+				281859082EA29B24002D7CDE /* IconGridView.swift in Sources */,
 				2886AE602E55D1F60071BADC /* CreateCustomerTokenResource.swift in Sources */,
 				2886AE612E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift in Sources */,
 				2886AE812E55D6270071BADC /* Integrated3DSVaultPaymentSource.swift in Sources */,
@@ -1386,6 +1393,7 @@
 				287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */,
 				2886AE642E55D2570071BADC /* InitialiseWalletChargeCustomer.swift in Sources */,
 				28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */,
+				281859062EA29A64002D7CDE /* IconPickerView.swift in Sources */,
 				2881BC482E55CE1500390CD8 /* ChargeData.swift in Sources */,
 				283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */,
 				281859042EA280E6002D7CDE /* CaptureChargeStandaloneReq.swift in Sources */,

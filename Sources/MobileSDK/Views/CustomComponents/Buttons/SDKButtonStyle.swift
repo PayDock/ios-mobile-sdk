@@ -11,18 +11,11 @@ import SwiftUI
 
 enum SDKButtonStyle {
 
-    case fill(FillButtonStyle)
-    case outline(OutlineButtonStyle)
     case image(ImageButtonStyle)
-    // TODO: - Remove above once all widget themes are updated
     case custom(CustomButtonStyle)
 
     var isDisabled: Bool {
         switch self {
-        case .fill(let style):
-            return style.isDisabled
-        case .outline(let style):
-            return style.isDisabled
         case .image(let style):
             return style.isDisabled
         case .custom(let style):
@@ -32,10 +25,6 @@ enum SDKButtonStyle {
 
     var textColour: Color {
         switch self {
-        case .fill(let style):
-            return style.appearance.colors.text
-        case .outline(let style):
-            return style.appearance.colors.text
         case .image:
             return .clear
         case .custom(let style):
@@ -45,10 +34,6 @@ enum SDKButtonStyle {
 
     var loaderColor: Color {
         switch self {
-        case .fill(let style):
-            return style.appearance.loader.spinnerColor
-        case .outline(let style):
-            return style.appearance.loader.spinnerColor
         case .image(let style):
             return style.appearance.spinnerColor
         case .custom(let style):
@@ -58,14 +43,19 @@ enum SDKButtonStyle {
 
     var imageColor: Color {
         switch self {
-        case .fill(let style):
-            return style.appearance.colors.image
-        case .outline(let style):
-            return style.appearance.colors.image
         case .image:
             return .clear // It's a background button only - no image contained
         case .custom(let style):
             return style.appearance.colors.image
+        }
+    }
+
+    var image: Image? {
+        switch self {
+        case .image:
+            return nil
+        case .custom(let style):
+            return style.appearance.icon
         }
     }
 }

@@ -11,7 +11,7 @@ import SwiftUI
 struct SDKButton: View {
 
     private let title: String?
-    private let image: Image?
+    private let image: Image? // TODO: - Remove after all buttons are updated!
     private let imageLocation: ImageLocation
     private let isLoading: Bool
     private let style: SDKButtonStyle
@@ -23,7 +23,7 @@ struct SDKButton: View {
     @StateObject private var announcementManager = LoadingAnnouncementManager()
 
     init(title: String?,
-         image: Image? = nil,
+         image: Image? = nil, // TODO: - Remove after all buttons are updated!
          imageLocation: ImageLocation = .left,
          isLoading: Bool = false,
          style: SDKButtonStyle,
@@ -32,7 +32,7 @@ struct SDKButton: View {
          shouldTemplate: Bool = false,
          action: @escaping () -> Void) {
         self.title = title
-        self.image = image
+        self.image = image // TODO: - Remove after all buttons are updated!
         self.imageLocation = imageLocation
         self.isLoading = isLoading
         self.style = style
@@ -47,7 +47,7 @@ struct SDKButton: View {
             Button(action: self.action) {
                 if scaleToFit {
                     ZStack {
-                        image?
+                        style.image?
                             .resizable()
                             .renderingMode(shouldTemplate ? .template : .original)
                             .scaledToFit()
@@ -65,7 +65,7 @@ struct SDKButton: View {
                                 announcementManager.stop()
                             }
                     }
-                } else if image != nil && title != nil {
+                } else if let image = style.image, let title = title, !title.isEmpty {
                     getImageAndTitle()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -85,7 +85,7 @@ struct SDKButton: View {
         HStack {
             if imageLocation == .left {
                 if !isLoading {
-                    image?
+                    style.image?
                         .resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
@@ -107,7 +107,7 @@ struct SDKButton: View {
             } else {
                 Text(self.title ?? "")
                 if !isLoading {
-                    image?.resizable()
+                    style.image?.resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
                         .foregroundColor(style.imageColor)
@@ -160,6 +160,6 @@ struct SDKButton: View {
 struct LargeButton_Previews: PreviewProvider {
 
     static var previews: some View {
-        SDKButton(title: "asdf", style: .outline(OutlineButtonStyle())) { }
+        SDKButton(title: "asdf", style: .custom(CustomButtonStyle(appearance: .init()))) { }
     }
 }
