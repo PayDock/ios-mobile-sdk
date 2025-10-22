@@ -35,9 +35,14 @@ class ProfileVM: ObservableObject {
     func getVaultConfig() -> PayPalVaultConfig {
         let config = PayPalVaultConfig(
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "",
-            icon: .customIcon(image: Image("payPalSmall")))
+            gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "")
         return config
+    }
+
+    func getVaultAppearance() -> PayPalVaultAppearance {
+        var appearance = PayPalVaultAppearance()
+        appearance.actionButton.icon = Image("payPalSmall")
+        return appearance
     }
 
     func handleError(error: PayPalVaultError) {

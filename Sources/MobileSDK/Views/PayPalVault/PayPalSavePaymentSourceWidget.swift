@@ -27,8 +27,7 @@ public struct PayPalSavePaymentSourceWidget: View {
 
     public var body: some View {
         SDKButton(
-            title: viewModel.actionText,
-            image: viewModel.getButtonIcon(),
+            title: appearance.actionButton.text,
             isLoading: viewModel.isLoading && viewModel.showLoaders,
             style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.viewState.isDisabled)),
             shouldTemplate: true) {

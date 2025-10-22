@@ -47,12 +47,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         if loadingDelegate != nil {
             showLoaders = false
         }
-
-        setUp()
-    }
-
-    private func setUp() {
-        actionText = config.actionText ?? "Link PayPal account"
     }
 
     // MARK: - PayPal Initialization
@@ -145,16 +139,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
         self.isLoading = isLoading
         self.viewState.isDisabled = isLoading
-    }
-
-    // MARK: - Helpers
-
-    func getButtonIcon() -> Image? {
-        switch config.icon {
-        case .none: return nil
-        case .defaultIcon: return Image("link", bundle: Bundle.module)
-        case .customIcon(let image): return image
-        }
     }
 
     // MARK: - Error Handling
