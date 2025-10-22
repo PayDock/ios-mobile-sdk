@@ -33,7 +33,8 @@ public struct CardDetailsWidgetAppearance:
                 horizontalSpacing: CGFloat = 16,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                actionButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                actionButton: Theme.ButtonAppearance = .init(
+                    text: "Submit"),
                 toolbarButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.toolbarButton,
                 toggle: Theme.ToggleAppearance = GlobalTheme.shared.globalTheme.toggle,
                 toggleText: Theme.TextAppearance = GlobalTheme.shared.globalTheme.toggleText,

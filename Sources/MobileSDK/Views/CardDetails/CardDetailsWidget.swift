@@ -222,10 +222,13 @@ public struct CardDetailsWidget: View {
                 privacyView
             }
 
-            SDKButton(title: viewModel.config.actionText,
+            SDKButton(title: appearance.actionButton.text,
                       isLoading: viewModel.isLoading && viewModel.showLoaders,
-                      style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.isActionButtonDisabled()))
-            ) {
+                      style: .custom(
+                        CustomButtonStyle(
+                            appearance: appearance.actionButton,
+                            isDisabled: viewModel.isActionButtonDisabled())),
+                      shouldTemplate: true) {
                 textFieldInFocus = nil
                 viewModel.cardDetailsFormManager.endEditing()
                 viewModel.tokeniseCardDetails()

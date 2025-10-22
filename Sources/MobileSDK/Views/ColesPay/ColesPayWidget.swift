@@ -38,7 +38,7 @@ public struct ColesPayWidget: View {
     private var colesPayButton: some View {
         SDKButton(
             title: nil,
-            image: Image(
+            backgroundImage: Image(
                 (viewModel.isLoading && viewModel.showLoaders)
                     ? "coles-pay-button-blank"
                     : "coles-pay-button",
