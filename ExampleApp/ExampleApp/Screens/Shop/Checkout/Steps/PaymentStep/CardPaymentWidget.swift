@@ -19,7 +19,6 @@ struct CardPaymentWidget: View {
             config: CardDetailsWidgetConfig(
                 gatewayId: nil,
                 accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                actionText: "Continue",
                 showCardTitle: false,
                 collectCardholderName: true,
                 allowSaveCard: SaveCardConfig(
@@ -30,16 +29,22 @@ struct CardPaymentWidget: View {
                     )
                 )
             ),
+            appearance: getAppearance(),
             loadingDelegate: viewModel,
             completion: { result in
                 switch result {
                 case .success(let result):
                     viewModel.payWithCard(result.token)
-//                    viewModel.cardToken = result.token
-                    // TODO: - success screen handling
-                case .failure: break
+                case .failure(let error):
+                    viewModel.showResultOverlay(success: false, message: error.customMessage)
                 }
             }
         )
+    }
+
+    private func getAppearance() -> CardDetailsWidgetAppearance {
+        var appearance = CardDetailsWidgetAppearance()
+        appearance.actionButton.icon = Image("card-icon")
+        return appearance
     }
 }

@@ -11,7 +11,7 @@ import SwiftUI
 struct SDKButton: View {
 
     private let title: String?
-    private let image: Image? // TODO: - Remove after all buttons are updated!
+    private let backgroundImage: Image?
     private let imageLocation: ImageLocation
     private let isLoading: Bool
     private let style: SDKButtonStyle
@@ -23,7 +23,7 @@ struct SDKButton: View {
     @StateObject private var announcementManager = LoadingAnnouncementManager()
 
     init(title: String?,
-         image: Image? = nil, // TODO: - Remove after all buttons are updated!
+         backgroundImage: Image? = nil,
          imageLocation: ImageLocation = .left,
          isLoading: Bool = false,
          style: SDKButtonStyle,
@@ -32,7 +32,7 @@ struct SDKButton: View {
          shouldTemplate: Bool = false,
          action: @escaping () -> Void) {
         self.title = title
-        self.image = image // TODO: - Remove after all buttons are updated!
+        self.backgroundImage = backgroundImage
         self.imageLocation = imageLocation
         self.isLoading = isLoading
         self.style = style
@@ -47,7 +47,7 @@ struct SDKButton: View {
             Button(action: self.action) {
                 if scaleToFit {
                     ZStack {
-                        style.image?
+                        (style.image ?? backgroundImage)?
                             .resizable()
                             .renderingMode(shouldTemplate ? .template : .original)
                             .scaledToFit()

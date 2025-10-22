@@ -37,7 +37,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -65,7 +64,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -87,7 +85,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -106,7 +103,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -131,7 +127,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -158,7 +153,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -185,7 +179,6 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
@@ -258,7 +251,6 @@ class CardDetailsVMTests: XCTestCase {
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                actionText: "actionText",
                 showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
