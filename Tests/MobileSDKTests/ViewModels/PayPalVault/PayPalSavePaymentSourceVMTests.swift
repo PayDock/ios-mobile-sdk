@@ -25,7 +25,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         super.setUp()
         mockService = PayPalVaultServiceMock()
         viewState = ViewState()
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: "Custom Action Text")
+        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway")
         loadingDelegate = WidgetLoadingDelegateUtil()
         completionResult = nil
         viewModel = PayPalSavePaymentSourceVM(
@@ -76,22 +76,6 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         }
 
         XCTAssertEqual(viewModel.showLoaders, false)
-    }
-
-    func testInitializationSetsActionText() {
-        XCTAssertEqual(viewModel.actionText, "Custom Action Text", "The actionText should match the provided config value.")
-    }
-
-    func testDefaultActionTextIfNil() {
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: nil)
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: viewState,
-            config: config,
-            payPalVaultService: mockService,
-            loadingDelegate: nil
-        ) { _ in }
-
-        XCTAssertEqual(viewModel.actionText, "Link PayPal account", "The actionText should default to 'Link PayPal account' when nil.")
     }
 
     // MARK: - Positive service interaction
