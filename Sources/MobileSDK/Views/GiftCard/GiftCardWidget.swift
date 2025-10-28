@@ -9,6 +9,7 @@
 import SwiftUI
 
 public struct GiftCardWidget: View {
+    @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
     @FocusState private var isViewFocused: Bool
@@ -31,7 +32,10 @@ public struct GiftCardWidget: View {
         ScrollView {
             VStack(spacing: 0) {
                 VStack(spacing: appearance.verticalSpacing) {
-                    HStack(spacing: appearance.horizontalSpacing) {
+                    let layout = shouldAlignVertically() ?
+                    AnyLayout(VStackLayout(spacing: appearance.verticalSpacing)) :
+                    AnyLayout(HStackLayout(alignment: .top, spacing: appearance.horizontalSpacing))
+                    layout {
                         cardNumberTextField
                         pinTextField
                     }
@@ -120,7 +124,7 @@ public struct GiftCardWidget: View {
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
         })
         .focused($textFieldInFocus, equals: .pin)
-        .frame(width: UIScreen.main.bounds.width * 0.25)
+        .frame(width: shouldAlignVertically() ? UIScreen.main.bounds.width - 32.0 : UIScreen.main.bounds.width * 0.30)
     }
 
     private var primaryButton: some View {
@@ -150,6 +154,14 @@ public struct GiftCardWidget: View {
             .onAppear {
                 isViewFocused = true
             }
+    }
+
+    private func shouldAlignVertically() -> Bool {
+        switch sizeCategory {
+        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
+        @unknown default: return false
+        }
     }
 }
 
