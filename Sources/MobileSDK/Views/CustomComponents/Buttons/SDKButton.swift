@@ -65,12 +65,12 @@ struct SDKButton: View {
                                 announcementManager.stop()
                             }
                     }
-                } else if let image = style.image, let title = title, !title.isEmpty {
-                    getImageAndTitle()
+                } else if style.image == nil {
+                    getTitle()
+                        .padding(4) // Adds padding between outer button edges and the title inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    getTitle()
-                        .padding(4)
+                    getImageAndTitle()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -103,9 +103,14 @@ struct SDKButton: View {
                             announcementManager.stop()
                         }
                 }
-                Text(self.title ?? "")
+                if let title = title, !title.isEmpty {
+                    Text(title)
+                }
             } else {
-                Text(self.title ?? "")
+                if let title = title, !title.isEmpty {
+                    Text(title)
+                }
+
                 if !isLoading {
                     style.image?.resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
