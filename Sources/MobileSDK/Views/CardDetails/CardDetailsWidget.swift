@@ -13,6 +13,7 @@ public struct CardDetailsWidget: View {
     // MARK: - Properties
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @ScaledMetric private var cardIconWidth: CGFloat = 26.0
     @StateObject var viewModel: CardDetailsVM
     @State var appearance: CardDetailsWidgetAppearance
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
@@ -47,25 +48,8 @@ public struct CardDetailsWidget: View {
                 }
                 .customPadding(appearance.title.padding)
             }
-
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
-                HStack(spacing: 7) {
-                    ForEach(CardScheme.sortedArray(from: supportedSchemes), id: \.self) { scheme in
-                        getSchemeIcon(for: scheme)
-                            .resizable()
-                            .frame(width: 26, height: 20)
-                            .scaledToFit()
-                    }
-                }
-                .accessibilityElement()
-                .accessibilityLabel(
-                    "Supported card schemes: " +
-                    CardScheme.sortedArray(from: supportedSchemes)
-                        .map(\.voiceoverName)
-                        .joined(separator: ", ")
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 16)
+                getCardSchemeIconList(supportedSchemes: supportedSchemes)
             }
 
             VStack(spacing: 8) {
@@ -271,6 +255,28 @@ public struct CardDetailsWidget: View {
                 .disabled(viewModel.viewState.isDisabled)
                 .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
         }
+    }
+
+    private func getCardSchemeIconList(supportedSchemes: Set<CardScheme>) -> some View {
+        LazyVGrid(columns: [
+            GridItem(.adaptive(minimum: cardIconWidth + 4), spacing: 0)
+        ], spacing: 8.0) {
+            ForEach(CardScheme.sortedArray(from: supportedSchemes), id: \.self) { scheme in
+                getSchemeIcon(for: scheme)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: cardIconWidth)
+            }
+        }
+        .accessibilityElement()
+        .accessibilityLabel(
+            "Supported card schemes: " +
+            CardScheme.sortedArray(from: supportedSchemes)
+                .map(\.voiceoverName)
+                .joined(separator: ", ")
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.bottom, 16)
     }
 
     private var emptyFocusView: some View {

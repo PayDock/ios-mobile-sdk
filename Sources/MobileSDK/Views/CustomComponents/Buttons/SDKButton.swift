@@ -21,6 +21,7 @@ struct SDKButton: View {
     private let action: () -> Void
 
     @StateObject private var announcementManager = LoadingAnnouncementManager()
+    @ScaledMetric private var iconHeight: CGFloat = 20
 
     init(title: String?,
          backgroundImage: Image? = nil,
@@ -67,10 +68,11 @@ struct SDKButton: View {
                     }
                 } else if style.image == nil {
                     getTitle()
-                        .padding(4) // Adds padding between outer button edges and the title inside it
+                        .padding(16) // Adds padding between outer button edges and the title inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     getImageAndTitle()
+                        .padding(16) // Adds padding between outer button edges and the content inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -90,7 +92,7 @@ struct SDKButton: View {
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
                         .foregroundColor(style.imageColor)
-                        .frame(maxHeight: scaleToFit ? .infinity : 20)
+                        .frame(height: scaleToFit ? .infinity : iconHeight)
                         .font(.system(size: 32, weight: .light))
                         .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
@@ -116,7 +118,7 @@ struct SDKButton: View {
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
                         .foregroundColor(style.imageColor)
-                        .frame(maxHeight: 20)
+                        .frame(height: iconHeight)
                         .font(.system(size: 32, weight: .light))
                         .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
