@@ -34,7 +34,10 @@ struct CartView: View {
                 }
             }
             .fullScreenCover(isPresented: $showingCheckout) {
-                EnhancedCheckoutView()
+                EnhancedCheckoutView(onDismissParent: {
+                    // Dismiss the CartView when checkout is successful
+                    dismiss()
+                })
             }
             .sheet(isPresented: $showingGiftCardEntry) {
                 GiftCardEntryView()

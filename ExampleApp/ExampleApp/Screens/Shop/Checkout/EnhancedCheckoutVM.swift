@@ -631,7 +631,7 @@ extension EnhancedCheckoutVM {
                     paymentSource: .init(
                         gatewayID: applePayGatewayId,
                         vaultToken: vaultToken),
-                    phone: phone,
+                    phone: phone.trimmingCharacters(in: .whitespacesAndNewlines),
                     suspicious: false),
                 description: "Test transaction standalone",
                 reference: UUID().uuidString,
