@@ -197,7 +197,7 @@ class UserProfileManager: ObservableObject {
             firstName: "John",
             lastName: "Doe",
             email: "john.doe@example.com",
-            phone: "+61 412 345 678",
+            phone: "+61412345678",
             savedAddresses: [sampleAddress],
             defaultAddressId: sampleAddress.id
         )

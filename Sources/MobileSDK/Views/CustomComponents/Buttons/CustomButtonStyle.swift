@@ -20,9 +20,8 @@ struct CustomButtonStyle: ButtonStyle {
         return configuration.label
             .font(appearance.fonts.title.customFont.font)
             .imageScale(.small)
-            .lineLimit(1)
-            .minimumScaleFactor(0.1)
-            .frame(height: 48)
+            .lineLimit(nil)
+            .multilineTextAlignment(.center)
             .foregroundColor(currentForegroundColor)
             .background(isDisabled || configuration.isPressed ? appearance.colors.background.opacity(0.8) : appearance.colors.background)
             .cornerRadius(appearance.dimensions.cornerRadius)

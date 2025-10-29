@@ -11,6 +11,9 @@ import SwiftUI
 struct OutlineTextField: View {
 
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @ScaledMetric private var rightIconSize: CGFloat = 20
+    @ScaledMetric private var leftIconWidth: CGFloat = 28
+    @ScaledMetric private var leftIconHeight: CGFloat = 24
 
     // MARK: Properties
 
@@ -148,19 +151,27 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
+        .onChange(of: sizeCategory) { _ in
+            updateTitleLeadingPadding()
+            updateTitlePosition()
+            updateTitleFontSize()
+        }
         .onAppear {
             titleColor = appearance.colors.placeholder
             titleFontSize = appearance.fonts.title.customFont.size
             borderColor = appearance.colors.inactive
             borderWidth = appearance.dimensions.borderWidth
+            updateTitleLeadingPadding()
         }
     }
 
     private var textFieldView: some View {
         HStack {
             leftImage?
+                .resizable()
+                .scaledToFit()
+                .frame(width: leftIconWidth, height: leftIconHeight)
                 .foregroundColor(appearance.colors.placeholder)
-                .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
 
             CursorPositionTextField(
@@ -255,9 +266,14 @@ struct OutlineTextField: View {
             switch validationIconState {
             case .valid:
                 Image("tick-circle", bundle: Bundle.module)
+                    .resizable()
+                    .frame(width: rightIconSize, height: rightIconSize)
                     .foregroundColor(appearance.colors.success)
+
             case .invalid:
                 Image("exclamation-circle", bundle: Bundle.module)
+                    .resizable()
+                    .frame(width: rightIconSize, height: rightIconSize)
                     .foregroundColor(appearance.colors.error)
             case .none: EmptyView()
             }
@@ -342,7 +358,7 @@ private extension OutlineTextField {
 
         } else {
             titleBottomPadding = 0.0
-            titleLeadingPadding = (leftImage != nil) ? 52 : 14.0
+            titleLeadingPadding = (leftImage != nil) ? (leftIconWidth + 24) : 14.0
             titleVerticalPadding = 0
         }
     }
@@ -357,6 +373,10 @@ private extension OutlineTextField {
 // MARK: - Accessibility handling
 
 extension OutlineTextField {
+
+    private func updateTitleLeadingPadding() {
+        titleLeadingPadding = (leftImage != nil) ? (leftIconWidth + 24) : 12
+    }
 
     private func getTextFieldHeight() -> CGFloat {
         switch sizeCategory {
