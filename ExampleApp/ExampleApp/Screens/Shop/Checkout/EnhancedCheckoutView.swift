@@ -18,6 +18,13 @@ struct EnhancedCheckoutView: View {
     @State private var showingAddressWidget = false
     @State private var addressWidgetType: AddressWidgetType = .shipping
 
+    /// Optional closure to dismiss parent view (like CartView) after successful checkout
+    let onDismissParent: (() -> Void)?
+
+    init(onDismissParent: (() -> Void)? = nil) {
+        self.onDismissParent = onDismissParent
+    }
+
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -81,6 +88,8 @@ struct EnhancedCheckoutView: View {
                     if viewModel.orderCompleted {
                         cartManager.clearCart()
                         dismiss()
+                        // Also dismiss parent view (CartView) after successful checkout
+                        onDismissParent?()
                     }
                 }
             }, message: {
@@ -157,6 +166,8 @@ struct EnhancedCheckoutView: View {
                             if viewModel.resultIsSuccess {
                                 cartManager.clearCart()
                                 dismiss()
+                                // Also dismiss parent view (CartView) after successful checkout
+                                onDismissParent?()
                             } else {
                                 currentStep = .information
                             }
@@ -278,6 +289,6 @@ struct EnhancedCheckoutView: View {
 
 struct EnhancedCheckoutView_Previews: PreviewProvider {
     static var previews: some View {
-        EnhancedCheckoutView()
+        EnhancedCheckoutView(onDismissParent: nil)
     }
 }

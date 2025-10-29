@@ -29,6 +29,7 @@ struct ProfileView: View {
                 // Saved Addresses Section
                 savedAddressesSection
             }
+            .padding(.horizontal, 16)
         }
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.large)
@@ -126,7 +127,7 @@ struct ProfileView: View {
             .background(Color.defaultPrimary)
             .cornerRadius(8)
         }
-        .padding()
+        .padding(16)
         .background(Color(.systemGroupedBackground))
         .cornerRadius(12)
     }
@@ -191,7 +192,7 @@ struct ProfileView: View {
             .background(Color.gray.opacity(0.1))
             .cornerRadius(10.0)
         }
-        .padding()
+        .padding(16)
         .background(Color(.systemGroupedBackground))
         .cornerRadius(12)
     }
@@ -261,7 +262,7 @@ struct ProfileView: View {
                 }
             }
         }
-        .padding()
+        .padding(16)
         .background(Color(.systemGroupedBackground))
         .cornerRadius(12)
     }
