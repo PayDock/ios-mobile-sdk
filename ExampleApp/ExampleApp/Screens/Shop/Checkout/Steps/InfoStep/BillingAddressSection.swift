@@ -33,8 +33,9 @@ struct BillingAddressSection: View {
                         onSelectSavedAddress(address, .billing)
                     },
                     onEnterNewAddress: {
-                        viewModel.selectedBillingAddressId = nil
-                        onClearBillingAddress()
+                        // Open address input directly without deselecting current address
+                        addressWidgetType = .billing
+                        showingAddressWidget = true
                     }
                 )
             }

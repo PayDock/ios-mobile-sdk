@@ -34,16 +34,6 @@ struct AddressInputSection: View {
                     .font(.system(size: 14))
                     .foregroundColor(.defaultPrimary)
                 }
-            } else {
-                Button("Enter \(addressType) Address") {
-                    onEnterAddress()
-                }
-                .foregroundColor(.white)
-                .font(.system(size: 16, weight: .semibold))
-                .frame(height: 44)
-                .frame(maxWidth: .infinity)
-                .background(Color.defaultPrimary)
-                .cornerRadius(8)
             }
         }
     }
