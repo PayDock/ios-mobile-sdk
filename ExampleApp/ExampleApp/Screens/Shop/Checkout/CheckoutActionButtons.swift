@@ -47,9 +47,10 @@ struct CheckoutActionButtons: View {
                     .disabled(!canProceed)
                 }
             }
+            .ignoresSafeArea()
             .padding()
         }
-        .background(Color(.systemBackground))
+        .background(Color(.systemBackground).ignoresSafeArea())
     }
 
     private var actionButtonTitle: String {
