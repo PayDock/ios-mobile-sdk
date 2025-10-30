@@ -253,6 +253,8 @@ struct EnhancedCheckoutView: View {
             viewModel.state = result.state
             viewModel.postalCode = result.postcode
             viewModel.country = result.country
+            // Only deselect the saved address after new address is successfully set
+            viewModel.selectedShippingAddressId = nil
         case .billing:
             viewModel.billingAddress = result.addressLine1
             viewModel.billingAddressLine2 = result.addressLine2
@@ -260,6 +262,8 @@ struct EnhancedCheckoutView: View {
             viewModel.billingState = result.state
             viewModel.billingPostalCode = result.postcode
             viewModel.billingCountry = result.country
+            // Only deselect the saved address after new address is successfully set
+            viewModel.selectedBillingAddressId = nil
         }
     }
 

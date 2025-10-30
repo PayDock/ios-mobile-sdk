@@ -33,8 +33,9 @@ struct ShippingAddressSection: View {
                         onSelectSavedAddress(address, .shipping)
                     },
                     onEnterNewAddress: {
-                        viewModel.selectedShippingAddressId = nil
-                        onClearShippingAddress()
+                        // Open address input directly without deselecting current address
+                        addressWidgetType = .shipping
+                        showingAddressWidget = true
                     }
                 )
             }
