@@ -27,52 +27,61 @@ struct EnhancedCheckoutView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Progress Indicator
-                CheckoutProgressIndicator(currentStep: currentStep)
+            ZStack {
+                VStack(spacing: 0) {
+                    CheckoutProgressIndicator(currentStep: currentStep)
 
-                // Content
-                ScrollView {
-                    VStack(spacing: 20) {
-                        switch currentStep {
-                        case .information:
-                            CheckoutInformationStepView(
-                                viewModel: viewModel,
-                                profileManager: profileManager,
-                                showingAddressWidget: $showingAddressWidget,
-                                addressWidgetType: $addressWidgetType,
-                                onLoadProfileData: loadProfileData,
-                                onSelectSavedAddress: selectSavedAddress,
-                                onClearShippingAddress: clearShippingAddress,
-                                onClearBillingAddress: clearBillingAddress
-                            )
-                        case .paymentAndReview:
-                            CheckoutPaymentAndReviewStepView(
-                                viewModel: viewModel,
-                                cartManager: cartManager,
-                                currentStep: $currentStep
-                            )
+                    // Content
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            switch currentStep {
+                            case .information:
+                                CheckoutInformationStepView(
+                                    viewModel: viewModel,
+                                    profileManager: profileManager,
+                                    showingAddressWidget: $showingAddressWidget,
+                                    addressWidgetType: $addressWidgetType,
+                                    onLoadProfileData: loadProfileData,
+                                    onSelectSavedAddress: selectSavedAddress,
+                                    onClearShippingAddress: clearShippingAddress,
+                                    onClearBillingAddress: clearBillingAddress
+                                )
+                            case .paymentAndReview:
+                                CheckoutPaymentAndReviewStepView(
+                                    viewModel: viewModel,
+                                    cartManager: cartManager,
+                                    currentStep: $currentStep
+                                )
+                            }
+
+                            // Add bottom padding to account for fixed buttons
+                            Spacer()
+                                .frame(height: 100)
                         }
+                        .padding()
                     }
-                    .padding()
+                    .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
                 }
-                .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
 
-                // Action Buttons
-                CheckoutActionButtons(
-                    currentStep: currentStep,
-                    canProceed: canProceed,
-                    onBack: {
-                        withAnimation {
-                            goToPreviousStep()
+                // Fixed Action Buttons at bottom
+                VStack {
+                    Spacer()
+                    CheckoutActionButtons(
+                        currentStep: currentStep,
+                        canProceed: canProceed,
+                        onBack: {
+                            withAnimation {
+                                goToPreviousStep()
+                            }
+                        },
+                        onAction: {
+                            withAnimation {
+                                handleActionButton()
+                            }
                         }
-                    },
-                    onAction: {
-                        withAnimation {
-                            handleActionButton()
-                        }
-                    }
-                )
+                    )
+                }
+                .ignoresSafeArea(.keyboard, edges: .bottom)
             }
             .navigationTitle("Checkout")
             .navigationBarTitleDisplayMode(.inline)
