@@ -98,7 +98,7 @@ struct AutocompleteTextField: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             OutlineTextField(
                 appearance: appearance.textField,
                 text: $text,
@@ -116,74 +116,84 @@ struct AutocompleteTextField: View {
                 onTextChange: onTextChange,
                 onSubmit: onSubmit
             )
-            .overlay(content: {
+
+            // Display popup directly below the text field
+            if showPopup && editing {
                 autocompletePopup
-                    .offset(x: -1, y: 72)
                     .accessibilityElement(children: .contain)
-            })
+            }
         }
     }
 
     private var autocompletePopup: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .center) {
-                if showPopup && editing {
-                    Spacer()
-                        .frame(height: 50)
-                    VStack(alignment: .center) {
-                        if options.isEmpty {
-                            Spacer()
-                            Text("No results")
-                                .font(appearance.dropdown.text.listText.text.customFont.font)
-                                .foregroundColor(appearance.dropdown.text.listText.text.textColor)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .accessibilityLabel(Text("Dropdown menu has no results."))
-                            Spacer()
-                        } else {
-                            let filteredOptions = options.prefix(3)
-                            ForEach(filteredOptions, id: \.self) { option in
-                                HStack {
-                                    Text(option)
-                                        .applyAttributes(appearance.dropdown.text.listText.text)
-                                        .font(appearance.dropdown.text.listText.text.customFont.font)
-                                        .foregroundColor(appearance.dropdown.text.listText.text.textColor)
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, appearance.dropdown.dimensions.listSpacing)
-                                        .onTapGesture {
-                                            onSelection(getOptionIndex(option: option))
-                                        }
-                                        .accessibilityAddTraits(.isButton)
-                                    Spacer()
-                                }
-                            }
-                        }
-                        Spacer()
-                    }
-                    .customPadding(appearance.dropdown.dimensions.padding)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .foregroundColor(appearance.dropdown.colors.backgroundColor)
-                            .shadow(radius: 4)
-                    )
-                    .opacity(popupOpacity)
-                    .scaleEffect(popupScale)
-                    .frame(width: proxy.size.width + 2)
-                    .frame(minHeight: proxy.size.height + 10 + appearance.dropdown.dimensions.listSpacing * 6)
-                    .onAppear {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            popupOpacity = 1
-                            popupScale = 1
-                        }
-                    }
-                    .onDisappear {
-                        popupOpacity = 0
-                        popupScale = 0.7
-                    }
+        autocompletePopupContent
+            .opacity(popupOpacity)
+            .scaleEffect(popupScale, anchor: .top)
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.15)) {
+                    popupOpacity = 1
+                    popupScale = 1
                 }
             }
+            .onDisappear {
+                popupOpacity = 0
+                popupScale = 0.7
+            }
+    }
+
+    private var autocompletePopupContent: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if options.isEmpty {
+                emptyStateView
+            } else {
+                optionsListView
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: options)
+        .customPadding(appearance.dropdown.dimensions.padding)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(popupBackgroundView)
+    }
+
+    private var emptyStateView: some View {
+        Text("No results")
+            .font(appearance.dropdown.text.listText.text.customFont.font)
+            .foregroundColor(appearance.dropdown.text.listText.text.textColor)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .accessibilityLabel(Text("Dropdown menu has no results."))
+            .transition(.opacity)
+    }
+
+    private var optionsListView: some View {
+        ForEach(Array(options.prefix(3)), id: \.self) { option in
+            optionRowView(for: option)
+        }
+    }
+
+    private func optionRowView(for option: String) -> some View {
+        HStack(alignment: .top) {
+            Text(option)
+                .applyAttributes(appearance.dropdown.text.listText.text)
+                .font(appearance.dropdown.text.listText.text.customFont.font)
+                .foregroundColor(appearance.dropdown.text.listText.text.textColor)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 16)
+                .padding(.vertical, appearance.dropdown.dimensions.listSpacing)
+                .onTapGesture {
+                    onSelection(getOptionIndex(option: option))
+                }
+                .accessibilityAddTraits(.isButton)
+            Spacer(minLength: 0)
+        }
+        .transition(.opacity)
+    }
+
+    private var popupBackgroundView: some View {
+        RoundedRectangle(cornerRadius: 4)
+            .foregroundColor(appearance.dropdown.colors.backgroundColor)
+            .shadow(radius: 4)
     }
 
     private func getOptionIndex(option: String) -> Int? {

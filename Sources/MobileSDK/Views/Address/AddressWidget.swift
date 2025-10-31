@@ -14,7 +14,7 @@ public struct AddressWidget: View {
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
     @FocusState private var isViewFocused: Bool
     @State var appearance: AddressWidgetAppearance
-    @State private var keyboardHeight: CGFloat = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Initialisation
 
@@ -33,8 +33,6 @@ public struct AddressWidget: View {
                         VStack(spacing: 8.0) {
                             nameAndLastNameView
                             autocompleteTextFieldView
-                                .zIndex(100)
-                                .padding(.bottom, viewModel.addressFormManager.showAddressSearchPopup ? 140 : 0)
                             if viewModel.addressFormManager.isAddressFormExpanded {
                                 addressLine1View
                                 addressLine2View
@@ -42,8 +40,6 @@ public struct AddressWidget: View {
                                 stateView
                                 postcodeView
                                 countryView
-                                    .zIndex(100)
-                                    .padding(.bottom, viewModel.addressFormManager.showCountrySearchPopup ? 140 : 0)
                             } else {
                                 manualEntryButton
                             }
@@ -53,16 +49,18 @@ public struct AddressWidget: View {
                             .id("saveButton")
                         emptyFocusView
                     }
-                    .animation(.easeInOut, value: viewModel.addressFormManager.showAddressSearchPopup)
-                    .animation(.easeInOut, value: viewModel.addressFormManager.showCountrySearchPopup)
+                    .animation(.easeInOut(duration: 0.25), value: viewModel.addressFormManager.showAddressSearchPopup)
+                    .animation(.easeInOut(duration: 0.25), value: viewModel.countrySearchSuggestions)
+                    .animation(.easeInOut(duration: 0.25), value: viewModel.addressSearchSuggestions)
                     .padding(.horizontal, 16.0)
-                    .padding(.bottom, keyboardHeight > 0 ? keyboardHeight + 20 : 0)
                 }
                 .modifier(AddressAutoScrollModifier(textFieldInFocus: textFieldInFocus, proxy: proxy))
             }
             .onAppear {
                 viewModel.updateAddress()
-                observeKeyboard()
+            }
+            .onChange(of: dynamicTypeSize) { _ in
+                viewModel.addressFormManager.endEditing()
             }
         }
     }
@@ -71,29 +69,6 @@ public struct AddressWidget: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.easeInOut(duration: 0.3)) {
                 proxy.scrollTo(field, anchor: .center)
-            }
-        }
-    }
-
-    private func observeKeyboard() {
-        NotificationCenter.default.addObserver(
-            forName: UIResponder.keyboardWillShowNotification,
-            object: nil,
-            queue: .main
-        ) { notification in
-            guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-            withAnimation(.easeInOut(duration: 0.3)) {
-                keyboardHeight = keyboardFrame.height
-            }
-        }
-
-        NotificationCenter.default.addObserver(
-            forName: UIResponder.keyboardWillHideNotification,
-            object: nil,
-            queue: .main
-        ) { _ in
-            withAnimation(.easeInOut(duration: 0.3)) {
-                keyboardHeight = 0
             }
         }
     }
@@ -113,7 +88,11 @@ public struct AddressWidget: View {
         VStack(spacing: 0) {
             nameHeader
 
-            HStack(spacing: appearance.horizontalSpacing) {
+            let layout = shouldAlignVertically() ?
+            AnyLayout(VStackLayout(spacing: appearance.verticalSpacing)) :
+            AnyLayout(HStackLayout(spacing: appearance.horizontalSpacing))
+
+            layout {
                 OutlineTextField(
                     appearance: appearance.textField,
                     text: $viewModel.addressFormManager.firstNameText,
@@ -412,6 +391,8 @@ public struct AddressWidget: View {
         })
         .focused($textFieldInFocus, equals: .country)
         .id(AddressFormManager.AddressFocusable.country)
+        .animation(.easeInOut(duration: 0.25), value: viewModel.addressFormManager.showCountrySearchPopup)
+        .animation(.easeInOut(duration: 0.25), value: viewModel.countrySearchSuggestions.count)
     }
 
     private var saveButton: some View {
@@ -436,6 +417,14 @@ public struct AddressWidget: View {
             .onAppear {
                 isViewFocused = true
             }
+    }
+
+    private func shouldAlignVertically() -> Bool {
+        switch dynamicTypeSize {
+        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
+        @unknown default: return false
+        }
     }
 }
 
