@@ -90,7 +90,7 @@ class ApplePayVMTests: XCTestCase {
         XCTAssertNil(viewModel.error)
     }
 
-    func testHandleButtonTapWithFailedPaymentRequest() {
+    func testHandleButtonTapWithFailedPaymentRequest() async {
         // Given
         let error = ApplePayRequestError.initialisingWalletToken(reason: "Test error")
         createPaymentRequestResult = .failure(error)
@@ -98,6 +98,7 @@ class ApplePayVMTests: XCTestCase {
 
         // When
         viewModel.handleButtonTap()
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
         XCTAssertNil(viewModel.paymentController)
@@ -175,7 +176,7 @@ class ApplePayVMTests: XCTestCase {
         }
     }
 
-    func testPaymentAuthorizationControllerDidFinishWithSuccess() {
+    func testPaymentAuthorizationControllerDidFinishWithSuccess() async {
         // Given
         setupViewModelWithValidRequest()
         viewModel.paymentStatus = .success
@@ -187,6 +188,7 @@ class ApplePayVMTests: XCTestCase {
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
         // Now it should succeed since we have chargeData
@@ -199,7 +201,7 @@ class ApplePayVMTests: XCTestCase {
         }
     }
 
-    func testPaymentAuthorizationControllerDidFinishWithUserCancellation() {
+    func testPaymentAuthorizationControllerDidFinishWithUserCancellation() async {
         // Given
         setupViewModelWithValidRequest()
         viewModel.paymentStatus = .failure
@@ -207,6 +209,7 @@ class ApplePayVMTests: XCTestCase {
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
         if case .failure(let error) = completionResult {
@@ -220,7 +223,7 @@ class ApplePayVMTests: XCTestCase {
         }
     }
 
-    func testPaymentAuthorizationControllerDidFinishWithPaymentError() {
+    func testPaymentAuthorizationControllerDidFinishWithPaymentError() async {
         // Given
         setupViewModelWithValidRequest()
         viewModel.paymentStatus = .failure
@@ -228,6 +231,7 @@ class ApplePayVMTests: XCTestCase {
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
         if case .failure(let error) = completionResult {
@@ -241,7 +245,7 @@ class ApplePayVMTests: XCTestCase {
         }
     }
 
-    func testPaymentAuthorizationControllerDidFinishWithUnknownError() {
+    func testPaymentAuthorizationControllerDidFinishWithUnknownError() async {
         // Given
         setupViewModelWithValidRequest()
         viewModel.paymentStatus = .failure
@@ -249,6 +253,7 @@ class ApplePayVMTests: XCTestCase {
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
         if case .failure(let error) = completionResult {
