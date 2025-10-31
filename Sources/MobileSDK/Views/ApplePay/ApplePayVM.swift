@@ -10,6 +10,7 @@ import SwiftUI
 import PassKit
 import NetworkingLib
 
+@MainActor
 class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
@@ -71,7 +72,9 @@ class ApplePayVM: NSObject, ObservableObject {
         paymentController?.delegate = self
         paymentController?.present(completion: { [weak self] success in
             if !success {
-                self?.error = .unableToPresentPaymentSheet
+                Task { @MainActor in
+                    self?.error = .unableToPresentPaymentSheet
+                }
             }
         })
     }
@@ -112,7 +115,6 @@ class ApplePayVM: NSObject, ObservableObject {
         guard !isCompletionCalled else { return }
         self.completion(completion)
         isCompletionCalled = true
-
     }
 }
 
@@ -120,18 +122,22 @@ class ApplePayVM: NSObject, ObservableObject {
 
 extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
-    func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
-                                        didAuthorizePayment payment: PKPayment,
-                                        completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
-        captureCharge(payment: payment, completion: completion )
+    nonisolated func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
+                                                    didAuthorizePayment payment: PKPayment,
+                                                    completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
+        Task { @MainActor in
+            captureCharge(payment: payment, completion: completion)
+        }
     }
 
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
-            if self.paymentStatus == .success, let chargeData = self.chargeData {
-                self.callCompletion(.success(chargeData))
-            } else {
-                self.callCompletion(.failure(self.error ?? .userCanceledPayment))
+            Task { @MainActor in
+                if self.paymentStatus == .success, let chargeData = self.chargeData {
+                    self.callCompletion(.success(chargeData))
+                } else {
+                    self.callCompletion(.failure(self.error ?? .userCanceledPayment))
+                }
             }
         }
     }
