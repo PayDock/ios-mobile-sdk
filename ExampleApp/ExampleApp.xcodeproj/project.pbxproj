@@ -14,9 +14,9 @@
 		280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */; };
 		280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */; };
 		2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */; };
+		281859042EA280E6002D7CDE /* CaptureChargeStandaloneReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */; };
 		281859062EA29A64002D7CDE /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859052EA29A64002D7CDE /* IconPickerView.swift */; };
 		281859082EA29B24002D7CDE /* IconGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859072EA29B21002D7CDE /* IconGridView.swift */; };
-		281859042EA280E6002D7CDE /* CaptureChargeStandaloneReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */; };
 		281DECA32E70767E00C3DC0C /* PayPalStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */; };
 		281DECA52E70768400C3DC0C /* PayPalStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
@@ -203,9 +203,9 @@
 		280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetView.swift; sourceTree = "<group>"; };
 		280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetVM.swift; sourceTree = "<group>"; };
 		2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
+		281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeStandaloneReq.swift; sourceTree = "<group>"; };
 		281859052EA29A64002D7CDE /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		281859072EA29B21002D7CDE /* IconGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconGridView.swift; sourceTree = "<group>"; };
-		281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeStandaloneReq.swift; sourceTree = "<group>"; };
 		281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleView.swift; sourceTree = "<group>"; };
 		281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleVM.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -1514,7 +1514,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 14;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1675,7 +1675,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 14;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1829,7 +1829,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 14;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1983,7 +1983,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 14;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -2200,7 +2200,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 14;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -2247,7 +2247,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 14;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
