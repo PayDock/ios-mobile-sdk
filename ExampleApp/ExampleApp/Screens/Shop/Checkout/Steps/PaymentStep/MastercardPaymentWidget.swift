@@ -31,7 +31,7 @@ struct MastercardPaymentWidget: View {
                 VStack {
                     ClickToPayWidget(
                         config: .init(
-                            serviceId: ProjectEnvironment.shared.getMastercardServiceId() ?? "",
+                            serviceId: ProjectEnvironment.shared.getClickToPayServiceId() ?? "",
                             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                             meta: nil
                         )

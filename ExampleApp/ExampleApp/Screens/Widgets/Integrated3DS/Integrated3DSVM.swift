@@ -35,7 +35,7 @@ class Integrated3DSVM: NSObject, ObservableObject {
         isLoading = true
         Task {
             let req = TokeniseCardDetailsReq(
-                gatewayId: ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? "",
+                gatewayId: ProjectEnvironment.shared.getMPGSGatewayId() ?? "",
                 cardName: "Carlie Kuvalis",
                 cardNumber: "2223000000000007",
                 expireMonth: "08",

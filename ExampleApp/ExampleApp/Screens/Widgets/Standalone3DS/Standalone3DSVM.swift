@@ -35,7 +35,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
         Task {
             isLoading = true
             let req = TokeniseCardDetailsReq(
-                gatewayId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
+                gatewayId: ProjectEnvironment.shared.getGPaymentsServiceId() ?? "",
                 cardName: "Test Card",
                 cardNumber: "4100000000005000",
                 expireMonth: "08",
@@ -63,7 +63,7 @@ class Standalone3DSVM: NSObject, ObservableObject {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
-                    serviceId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
+                    serviceId: ProjectEnvironment.shared.getGPaymentsServiceId() ?? "",
                     authentication: .init(
                         type: "01",
                         date: "2023-06-01T13:00:00.521Z",

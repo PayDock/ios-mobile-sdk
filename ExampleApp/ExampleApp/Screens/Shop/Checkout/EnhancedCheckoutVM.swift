@@ -158,7 +158,7 @@ class EnhancedCheckoutVM: ObservableObject {
 
     // MARK: - Gateway IDs
     let applePayGatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
-    let threeDSGatewayId = ProjectEnvironment.shared.getIntegrated3dsGatewayId() ?? ""
+    let threeDSGatewayId = ProjectEnvironment.shared.getMPGSGatewayId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
 
     // MARK: - Initialization
@@ -421,7 +421,7 @@ extension EnhancedCheckoutVM {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
+            merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
 }
@@ -492,7 +492,7 @@ extension EnhancedCheckoutVM {
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(token: vaultToken)),
                 data: .init(
-                    serviceId: ProjectEnvironment.shared.getStandalone3dsGatewayId() ?? "",
+                    serviceId: ProjectEnvironment.shared.getGPaymentsServiceId() ?? "",
                     authentication: .init(
                         type: "01",
                         date: "2025-06-01T13:00:00.521Z",

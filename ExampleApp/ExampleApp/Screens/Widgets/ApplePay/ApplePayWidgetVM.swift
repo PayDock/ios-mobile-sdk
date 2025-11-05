@@ -87,7 +87,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
+            merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
 
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
