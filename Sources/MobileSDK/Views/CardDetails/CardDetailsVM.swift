@@ -19,30 +19,41 @@ class CardDetailsVM: ObservableObject {
     @Published var cardDetailsFormManager: CardDetailsFormManager
     private let cardService: CardService
     let config: CardDetailsWidgetConfig
+    let appearance: CardDetailsWidgetAppearance
 
     // MARK: - Properties
 
-    private let completion: (Result<CardResult, CardDetailsError>) -> Void
-
     @Published var isLoading = false
     @Published var showLoaders = true
-    @Published var policyAccepted = false
+    @Published var policyAccepted = false {
+        didSet {
+            handleToggleFlipAnalytics()
+        }
+    }
     var viewState: ViewState
-    private weak var loadingDelegate: WidgetLoadingDelegate?
-
     var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
+
+    // MARK: - Handlers
+
+    private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
+    private let completion: (Result<CardResult, CardDetailsError>) -> Void
 
     // MARK: - Initialisation
 
     init(cardService: CardService = CardServiceImpl(),
          viewState: ViewState,
          config: CardDetailsWidgetConfig,
+         appearance: CardDetailsWidgetAppearance,
          loadingDelegate: WidgetLoadingDelegate?,
+         eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.cardService = cardService
         self.viewState = viewState
         self.config = config
+        self.appearance = appearance
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.completion = completion
 
         self.cardDetailsFormManager = CardDetailsFormManager(
@@ -127,5 +138,30 @@ class CardDetailsVM: ObservableObject {
         } else {
             return CardResult(token: token, saveCard: nil)
         }
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleTokenisationTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(
+                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text)))
+        eventDelegate?.widgetEvent(event: event)
+    }
+
+    func handleToggleFlipAnalytics() {
+        let event = WidgetEvent(
+            type: .toggle,
+            properties: .toggle(WidgetEventToggleProperties(name: "SaveCardToggle", action: .click, state: policyAccepted)))
+        eventDelegate?.widgetEvent(event: event)
+    }
+
+    func handleLinkTapAnalytics(url: String) {
+        let event = WidgetEvent(
+            type: .linkText,
+            properties: .linkText(WidgetEventLinkTextProperties(name: "PrivacyPolicyLink", action: .click, url: url))
+        )
+        eventDelegate?.widgetEvent(event: event)
     }
 }

@@ -18,6 +18,7 @@ public struct AfterpayWidget: View {
                 configuration: AfterpaySdkConfig,
                 appearance: AfterpayWidgetAppearance = AfterpayWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                eventDelegate: WidgetEventDelegate? = nil,
                 tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 selectAddress: ((_ address: ShippingAddress, _ provideShippingOptions: ([ShippingOption]) -> Void) -> Void)?,
                 selectShippingOption: ((_ shippingOption: ShippingOption,
@@ -31,6 +32,7 @@ public struct AfterpayWidget: View {
                 selectAddress: selectAddress,
                 selectShippingOption: selectShippingOption,
                 loadingDelegate: loadingDelegate,
+                eventDelegate: eventDelegate,
                 completion: completion))
         self.appearance = appearance
     }

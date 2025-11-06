@@ -11,25 +11,26 @@ import MobileSDK
 
 struct GiftCardWidgetView: View {
 
-    @State var showAlert = false
-    @State var alertMessage = ""
+    @StateObject var viewModel = GiftCardWidgetVM()
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                GiftCardWidget(config: GiftCardWidgetConfig(accessToken: ProjectEnvironment.shared.getWidgetAccessToken(), storePin: false),
-                               appearance: getAppearance()) { result in
-                    switch result {
-                    case .success(let giftCardResult):
-                        handleSuccess(giftCardResult)
-                    case .failure(let error):
-                        handleError(error)
+                GiftCardWidget(
+                    config: viewModel.getConfig(),
+                    appearance: getAppearance(),
+                    eventDelegate: viewModel) { result in
+                        switch result {
+                        case .success(let giftCardResult):
+                            viewModel.handleSuccess(giftCardResult)
+                        case .failure(let error):
+                            viewModel.handleError(error)
+                        }
                     }
-                }
             }
-            .alert("Gift Card", isPresented: $showAlert, actions: {}, message: {
-                Text(alertMessage)
+            .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+                Text(viewModel.alertMessage)
             })
         }
     }
@@ -41,17 +42,6 @@ struct GiftCardWidgetView: View {
             as: GiftCardWidgetAppearance.self,
             shouldCreateDefaultIfNeeded: false)
         return appearance ?? GiftCardWidgetAppearance()
-    }
-
-    private func handleSuccess(_ result: GiftCardResult) {
-        alertMessage = result.token
-        showAlert = true
-    }
-
-    private func handleError(_ error: GiftCardError) {
-        alertMessage = error.customMessage
-        showAlert = true
-
     }
 }
 

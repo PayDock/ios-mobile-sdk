@@ -105,3 +105,12 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
         showAlert = true
     }
 }
+
+// MARK: - WidgetEventDelegate
+
+extension ApplePayWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        print(event)
+    }
+}

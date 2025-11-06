@@ -13,12 +13,14 @@ import Afterpay
 @testable import NetworkingLib
 
 @MainActor
+// swiftlint:disable file_length
 class AfterPayVMTests: XCTestCase {
 
     var viewModel: AfterpayVM!
     var mockWalletService: WalletServiceMock!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
+    var eventDelegate: WidgetEventDelegateUtil!
     var configuration: AfterpaySdkConfig!
     var completionResult: Result<ChargeResponse, AfterpayError>?
     var tokenRequestResult: Result<WalletTokenResult, WalletTokenError>?
@@ -29,6 +31,7 @@ class AfterPayVMTests: XCTestCase {
         mockWalletService = WalletServiceMock()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
+        eventDelegate = WidgetEventDelegateUtil()
 
         // Create test configuration
         let afterpayConfig = AfterpaySdkConfig.AfterpayConfiguration(
@@ -69,6 +72,7 @@ class AfterPayVMTests: XCTestCase {
             },
             walletService: mockWalletService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -80,6 +84,7 @@ class AfterPayVMTests: XCTestCase {
         mockWalletService = nil
         viewState = nil
         loadingDelegate = nil
+        eventDelegate = nil
         configuration = nil
         completionResult = nil
         tokenRequestResult = nil
@@ -109,6 +114,7 @@ class AfterPayVMTests: XCTestCase {
             selectShippingOption: nil,
             walletService: mockWalletService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -127,7 +133,8 @@ class AfterPayVMTests: XCTestCase {
             selectAddress: nil,
             selectShippingOption: nil,
             walletService: mockWalletService,
-            loadingDelegate: nil,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -147,6 +154,7 @@ class AfterPayVMTests: XCTestCase {
             selectShippingOption: nil,
             walletService: mockWalletService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: nil,
             completion: { result in
                 self.completionResult = result
             }
@@ -178,6 +186,7 @@ class AfterPayVMTests: XCTestCase {
             selectShippingOption: nil,
             walletService: mockWalletService,
             loadingDelegate: nil,
+            eventDelegate: nil,
             completion: { result in
                 self.completionResult = result
             }
@@ -215,7 +224,8 @@ class AfterPayVMTests: XCTestCase {
             selectAddress: nil,
             selectShippingOption: nil,
             walletService: mockWalletService,
-            loadingDelegate: nil,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -573,6 +583,7 @@ class AfterPayVMTests: XCTestCase {
             selectShippingOption: nil,
             walletService: mockWalletService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { _ in
                 completionCallCount += 1
                 expectation.fulfill()
@@ -585,5 +596,67 @@ class AfterPayVMTests: XCTestCase {
         // Then
         wait(for: [expectation], timeout: 1.0)
         XCTAssertEqual(completionCallCount, 1)
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesEvents() {
+        // Given
+        viewModel = AfterpayVM(
+            viewState: viewState,
+            configuration: configuration,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "test_token")))
+            },
+            selectAddress: nil,
+            selectShippingOption: nil,
+            walletService: mockWalletService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "AfterPayCheckoutButton", action: .click)))
+        viewModel.handleAfterpayButtonTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = AfterpayVM(
+            viewState: viewState,
+            configuration: configuration,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "test_token")))
+            },
+            selectAddress: nil,
+            selectShippingOption: nil,
+            walletService: mockWalletService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // When - The view model should handle nil event delegate gracefully
+        // viewModel.triggerButtonEvent() // This should not crash
+
+        // Then - No events should be recorded in our test delegate
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }

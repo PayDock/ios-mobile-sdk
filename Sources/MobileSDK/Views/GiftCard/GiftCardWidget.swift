@@ -13,28 +13,29 @@ public struct GiftCardWidget: View {
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
     @FocusState private var isViewFocused: Bool
-    @State var appearance: GiftCardWidgetAppearance
 
     public init(viewState: ViewState? = nil,
                 config: GiftCardWidgetConfig,
                 appearance: GiftCardWidgetAppearance = GiftCardWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                eventDelegate: WidgetEventDelegate? = nil,
                 completion: @escaping (Result<GiftCardResult, GiftCardError>) -> Void) {
-        self.appearance = appearance
         _viewModel = StateObject(wrappedValue: GiftCardVM(
+            appearance: appearance,
             viewState: viewState ?? ViewState(state: .none),
             config: config,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: completion))
     }
 
     public var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                VStack(spacing: appearance.verticalSpacing) {
+                VStack(spacing: viewModel.appearance.verticalSpacing) {
                     let layout = shouldAlignVertically() ?
-                    AnyLayout(VStackLayout(spacing: appearance.verticalSpacing)) :
-                    AnyLayout(HStackLayout(alignment: .top, spacing: appearance.horizontalSpacing))
+                    AnyLayout(VStackLayout(spacing: viewModel.appearance.verticalSpacing)) :
+                    AnyLayout(HStackLayout(alignment: .top, spacing: viewModel.appearance.horizontalSpacing))
                     layout {
                         cardNumberTextField
                         pinTextField
@@ -50,7 +51,7 @@ public struct GiftCardWidget: View {
 
     private var cardNumberTextField: some View {
         return OutlineTextField(
-            appearance: appearance.textField,
+            appearance: viewModel.appearance.textField,
             text: $viewModel.giftCardFormManager.cardNumberText,
             title: viewModel.giftCardFormManager.cardNumberTitle,
             placeholder: viewModel.giftCardFormManager.cardNumberPlaceholder,
@@ -72,9 +73,9 @@ public struct GiftCardWidget: View {
         )
         .customToolbar(
             buttonTitle: "Next",
-            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name,
-                         size: appearance.toolbarButton.fonts.title.customFont.size),
-            textColor: UIColor(appearance.toolbarButton.colors.text)
+            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                         size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = .pin
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
@@ -88,7 +89,7 @@ public struct GiftCardWidget: View {
 
     private var pinTextField: some View {
         return OutlineTextField(
-            appearance: appearance.textField,
+            appearance: viewModel.appearance.textField,
             text: $viewModel.giftCardFormManager.pinText,
             title: viewModel.giftCardFormManager.pinTitle,
             placeholder: viewModel.giftCardFormManager.pinPlaceholder,
@@ -108,9 +109,9 @@ public struct GiftCardWidget: View {
             })
         .customToolbar(
             buttonTitle: "Done",
-            font: UIFont(name: appearance.toolbarButton.fonts.title.customFont.name,
-                         size: appearance.toolbarButton.fonts.title.customFont.size),
-            textColor: UIColor(appearance.toolbarButton.colors.text)
+            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                         size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = nil
             viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
@@ -128,19 +129,20 @@ public struct GiftCardWidget: View {
     }
 
     private var primaryButton: some View {
-        return SDKButton(title: appearance.actionButton.text,
+        return SDKButton(title: viewModel.appearance.actionButton.text,
                          isLoading: viewModel.isLoading,
                          style: .custom(CustomButtonStyle(
-                            appearance: appearance.actionButton,
+                            appearance: viewModel.appearance.actionButton,
                             isDisabled: viewModel.isActionButtonDisabled())),
                          shouldTemplate: true) {
             viewModel.giftCardFormManager.endEditing()
             viewModel.tokeniseGiftCard()
+            viewModel.handleButtonTapAnalytics()
         }
-                         .padding(.top, appearance.actionButton.dimensions.padding.top)
-                         .padding(.leading, appearance.actionButton.dimensions.padding.leading)
-                         .padding(.bottom, appearance.actionButton.dimensions.padding.bottom)
-                         .padding(.trailing, appearance.actionButton.dimensions.padding.trailing)
+                         .padding(.top, viewModel.appearance.actionButton.dimensions.padding.top)
+                         .padding(.leading, viewModel.appearance.actionButton.dimensions.padding.leading)
+                         .padding(.bottom, viewModel.appearance.actionButton.dimensions.padding.bottom)
+                         .padding(.trailing, viewModel.appearance.actionButton.dimensions.padding.trailing)
     }
 
     private var emptyFocusView: some View {

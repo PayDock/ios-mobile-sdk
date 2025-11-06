@@ -15,6 +15,7 @@ class GiftCardVM: ObservableObject {
 
     // MARK: - Dependencies
 
+    let appearance: GiftCardWidgetAppearance
     @Published var giftCardFormManager: GiftCardFormManager
     private let cardService: CardService
     private let config: GiftCardWidgetConfig
@@ -28,22 +29,27 @@ class GiftCardVM: ObservableObject {
 
     @Published var isLoading = false
     private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
 
     var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
     // MARK: - Initialisation
 
-    init(viewState: ViewState,
+    init(appearance: GiftCardWidgetAppearance,
+         viewState: ViewState,
          giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
          cardService: CardService = CardServiceImpl(),
          config: GiftCardWidgetConfig,
          loadingDelegate: WidgetLoadingDelegate?,
+         eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<GiftCardResult, GiftCardError>) -> Void) {
+        self.appearance = appearance
         self.viewState = viewState
         self.giftCardFormManager = giftCardFormManager
         self.cardService = cardService
         self.config = config
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.completion = completion
 
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
@@ -96,5 +102,15 @@ class GiftCardVM: ObservableObject {
 
     func isActionButtonDisabled() -> Bool {
         return !giftCardFormManager.isFormValid() || viewState.isDisabled
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleButtonTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(
+                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text)))
+        eventDelegate?.widgetEvent(event: event)
     }
 }

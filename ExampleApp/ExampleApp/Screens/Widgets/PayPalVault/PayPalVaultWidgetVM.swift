@@ -46,12 +46,24 @@ class PayPalVaultWidgetVM: ObservableObject {
     }
 }
 
+// MARK: - WidgetLoadingDelegate
+
 extension PayPalVaultWidgetVM: WidgetLoadingDelegate {
+
     func loadingDidStart() {
         isLoading = true
     }
 
     func loadingDidFinish() {
         isLoading = false
+    }
+}
+
+// MARK: - WidgetEventDelegate
+
+extension PayPalVaultWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        print(event)
     }
 }

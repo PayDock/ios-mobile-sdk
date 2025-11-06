@@ -33,6 +33,7 @@ class ColesPayVM: ObservableObject {
 
     private var completion: (Result<String, ColesPayError>) -> Void
     private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
 
     // MARK: - Initialisation
 
@@ -41,12 +42,14 @@ class ColesPayVM: ObservableObject {
          walletService: WalletService = WalletServiceImpl(),
          viewState: ViewState,
          loadingDelegate: WidgetLoadingDelegate?,
+         eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<String, ColesPayError>) -> Void) {
         self.config = config
         self.tokenRequest = tokenRequest
         self.walletService = walletService
         self.viewState = viewState
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.completion = completion
 
         if loadingDelegate != nil {
@@ -120,5 +123,14 @@ class ColesPayVM: ObservableObject {
 
         self.isLoading = isLoading
         viewState.isDisabled = isLoading
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleaButtonTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "ColesPayCheckoutButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
     }
 }

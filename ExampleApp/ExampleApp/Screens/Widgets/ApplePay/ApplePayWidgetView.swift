@@ -18,16 +18,18 @@ struct ApplePayWidgetView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                ApplePayWidget(appearance: getAppearance()) { onApplePayButtonTap in
-                    viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
-                } completion: { result in
-                    switch result {
-                    case .success(let chargeResponse): viewModel.handleSuccess(charge: chargeResponse)
-                    case .failure(let error): viewModel.handleError(error: error)
+                ApplePayWidget(
+                    appearance: getAppearance(),
+                    eventDelegate: viewModel) { onApplePayButtonTap in
+                        viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
+                    } completion: { result in
+                        switch result {
+                        case .success(let chargeResponse): viewModel.handleSuccess(charge: chargeResponse)
+                        case .failure(let error): viewModel.handleError(error: error)
+                        }
                     }
-                }
-                .frame(height: 50)
-                .padding()
+                    .frame(height: 50)
+                    .padding()
             }
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
             .background(Color(hex: "#EAE0D7"))
