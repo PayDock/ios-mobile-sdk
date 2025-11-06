@@ -18,6 +18,7 @@ public struct PayPalWidget: View {
                 appearance: PayPalWidgetAppearance = PayPalWidgetAppearance(),
                 config: PayPalWidgetConfig,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                eventDelegate: WidgetEventDelegate? = nil,
                 tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalVM(
@@ -25,6 +26,7 @@ public struct PayPalWidget: View {
             viewState: viewState ?? ViewState(state: .none),
             tokenRequest: tokenRequest,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: completion))
         self.appearance = appearance
     }
@@ -39,6 +41,7 @@ public struct PayPalWidget: View {
             isDisabled: viewModel.viewState.isDisabled,
             action: {
                 viewModel.handleButtonTap()
+                viewModel.handleButtonTapAnalytics()
             }
         )
         .overlay {
@@ -84,5 +87,6 @@ public struct PayPalWidget: View {
         config: .init(
             accessToken: "",
             gatewayId: ""),
-        loadingDelegate: nil) { _ in } completion: { _ in }
+        loadingDelegate: nil,
+        eventDelegate: nil) { _ in } completion: { _ in }
 }

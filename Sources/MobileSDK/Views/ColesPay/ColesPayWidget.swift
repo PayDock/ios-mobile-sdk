@@ -15,6 +15,7 @@ public struct ColesPayWidget: View {
 
     public init(viewState: ViewState? = nil,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                eventDelegate: WidgetEventDelegate? = nil,
                 config: ColesPayConfig,
                 appearance: ColesPayWidgetAppearance = ColesPayWidgetAppearance(),
                 tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
@@ -24,6 +25,7 @@ public struct ColesPayWidget: View {
             tokenRequest: tokenRequest,
             viewState: viewState ?? ViewState(state: .none),
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: completion))
         self.appearance = appearance
     }
@@ -49,6 +51,7 @@ public struct ColesPayWidget: View {
             style: .image(ImageButtonStyle(appearance: appearance.loader, isDisabled: viewModel.viewState.isDisabled)),
             scaleToFit: true) {
                 viewModel.handleButtonTap()
+                viewModel.handleaButtonTapAnalytics()
             }
             .accessibilityHint("Initiates payment using Coles Pay.")
     }

@@ -129,3 +129,12 @@ class AfterpayWidgetVM: ObservableObject {
         self.showAlert = true
     }
 }
+
+// MARK: - WidgetEventDelegate
+
+extension AfterpayWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        print(event)
+    }
+}

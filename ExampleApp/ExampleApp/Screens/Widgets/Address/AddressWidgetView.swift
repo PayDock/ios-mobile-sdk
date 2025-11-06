@@ -10,28 +10,19 @@ import SwiftUI
 import MobileSDK
 
 struct AddressWidgetView: View {
-    @State var showAlert = false
-    @State var alertMessage = ""
+    @StateObject var viewModel = AddressWidgetVM()
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
             AddressWidget(
-                config: .init(),
-                appearance: getAppearance()) { address in
-                    alertMessage = """
-                        \(address.firstName) \(address.lastName)
-                        \(address.addressLine1)
-                        \(address.addressLine2)
-                        \(address.city)
-                        \(address.state)
-                        \(address.postcode)
-                        \(address.country)
-                    """
-                    showAlert = true
+                config: viewModel.getConfig(),
+                appearance: getAppearance(),
+                eventDelegate: viewModel) { address in
+                    viewModel.handleAddressCompletion(address)
                 }
-                .alert("Address", isPresented: $showAlert, actions: {}, message: {
-                    Text(alertMessage)
+                .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
+                    Text(viewModel.alertMessage)
                 })
         }
     }

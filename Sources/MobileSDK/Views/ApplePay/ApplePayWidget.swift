@@ -14,11 +14,13 @@ public struct ApplePayWidget: View {
     @State var appearance: ApplePayWidgetAppearance
 
     public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
+                eventDelegate: WidgetEventDelegate? = nil,
                 createPaymentRequest: @escaping (
                     _ createPaymentRequestResult: @escaping (
                         Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
                 completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
+            eventDelegate: eventDelegate,
             createPaymentRequest: createPaymentRequest,
             completion: completion))
         self.appearance = appearance
@@ -27,6 +29,7 @@ public struct ApplePayWidget: View {
     public var body: some View {
         ApplePayButton(appearance: appearance) {
             viewModel.handleButtonTap()
+            viewModel.handleApplePayTapAnalytics()
         }
     }
 }

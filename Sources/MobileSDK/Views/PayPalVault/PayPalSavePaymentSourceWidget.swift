@@ -15,12 +15,14 @@ public struct PayPalSavePaymentSourceWidget: View {
     public init(viewState: ViewState? = nil,
                 config: PayPalVaultConfig,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                eventDelegate: WidgetEventDelegate? = nil,
                 appearance: PayPalVaultAppearance = PayPalVaultAppearance(),
                 completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         _viewModel = StateObject(wrappedValue: PayPalSavePaymentSourceVM(
             viewState: viewState ?? ViewState(),
             config: config,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: completion))
         self.appearance = appearance
     }
@@ -32,6 +34,7 @@ public struct PayPalSavePaymentSourceWidget: View {
             style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.viewState.isDisabled)),
             shouldTemplate: true) {
                 viewModel.initializePayPalSDK()
+                viewModel.handleButtonTapAnalytics()
             }
     }
 }

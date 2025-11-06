@@ -95,11 +95,21 @@ class ColesPayWidgetVM: ObservableObject {
 // MARK: - WidgetLoadingDelegate
 
 extension ColesPayWidgetVM: WidgetLoadingDelegate {
+
     func loadingDidStart() {
         isLoading = true
     }
 
     func loadingDidFinish() {
         isLoading = false
+    }
+}
+
+// MARK: - WidgetEventDelegate
+
+extension ColesPayWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        print(event)
     }
 }

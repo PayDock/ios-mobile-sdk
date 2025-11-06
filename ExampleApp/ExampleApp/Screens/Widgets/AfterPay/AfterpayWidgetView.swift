@@ -20,6 +20,7 @@ struct AfterpayWidgetView: View {
                 AfterpayWidget(
                     configuration: viewModel.getAfterpayConfig(),
                     appearance: getAppearance(),
+                    eventDelegate: viewModel,
                     tokenRequest: { tokenResult in
                         viewModel.initializeWalletCharge(completion: tokenResult)
                     }, selectAddress: { _, provideShippingOptions in

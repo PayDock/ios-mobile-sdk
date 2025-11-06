@@ -16,6 +16,7 @@ class ApplePayVMTests: XCTestCase {
 
     var viewModel: ApplePayVM!
     var mockWalletService: WalletServiceMock!
+    var eventDelegate: WidgetEventDelegateUtil!
     var completionResult: Result<ChargeResponse, ApplePayError>?
     var createPaymentRequestResult: Result<ApplePayRequestResult, ApplePayRequestError>?
     var cancellables = Set<AnyCancellable>()
@@ -23,6 +24,7 @@ class ApplePayVMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         mockWalletService = WalletServiceMock()
+        eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
         createPaymentRequestResult = nil
         setupViewModel()
@@ -31,6 +33,7 @@ class ApplePayVMTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         mockWalletService = nil
+        eventDelegate = nil
         completionResult = nil
         createPaymentRequestResult = nil
         cancellables.removeAll()
@@ -39,6 +42,7 @@ class ApplePayVMTests: XCTestCase {
 
     private func setupViewModel() {
         viewModel = ApplePayVM(
+            eventDelegate: eventDelegate,
             createPaymentRequest: { completion in
                 if let result = self.createPaymentRequestResult {
                     completion(result)
@@ -265,6 +269,62 @@ class ApplePayVMTests: XCTestCase {
         } else {
             XCTFail("Expected failure completion result")
         }
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesEvents() {
+        // Given
+        viewModel = ApplePayVM(
+            eventDelegate: eventDelegate,
+            createPaymentRequest: { completion in
+                let mockPaymentRequest = PKPaymentRequest()
+                let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
+                completion(.success(result))
+            },
+            walletService: mockWalletService,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "ApplePayCheckoutButton", action: .click)))
+        viewModel.handleApplePayTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = ApplePayVM(
+            eventDelegate: nil,
+            createPaymentRequest: { completion in
+                let mockPaymentRequest = PKPaymentRequest()
+                let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
+                completion(.success(result))
+            },
+            walletService: mockWalletService,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // When
+        viewModel.handleButtonTap()
+
+        // Then - No events should be recorded in our test delegate
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 
     // MARK: - Helper Methods

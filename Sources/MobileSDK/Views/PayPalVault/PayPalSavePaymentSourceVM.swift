@@ -26,6 +26,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     @Published var showLoaders = true
     var viewState: ViewState
     private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
 
     // MARK: - Handlers
 
@@ -37,11 +38,13 @@ class PayPalSavePaymentSourceVM: ObservableObject {
          config: PayPalVaultConfig,
          payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
+         eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         self.viewState = viewState
         self.config = config
         self.payPalVaultService = payPalVaultService
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.completion = completion
 
         if loadingDelegate != nil {
@@ -154,5 +157,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
 
         updateLoadingState(isLoading: false)
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleButtonTapAnalytics() {
+        let event = WidgetEvent(type: .button, properties: .button(WidgetEventButtonProperties(name: "PayPalVaultButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
     }
 }

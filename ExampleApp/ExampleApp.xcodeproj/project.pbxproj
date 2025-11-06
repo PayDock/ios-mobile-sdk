@@ -19,6 +19,9 @@
 		281859082EA29B24002D7CDE /* IconGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859072EA29B21002D7CDE /* IconGridView.swift */; };
 		281DECA32E70767E00C3DC0C /* PayPalStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */; };
 		281DECA52E70768400C3DC0C /* PayPalStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */; };
+		28271E332EBC064F000EEEC1 /* GiftCardWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28271E322EBC064B000EEEC1 /* GiftCardWidgetVM.swift */; };
+		28271E352EBC084E000EEEC1 /* AddressWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28271E342EBC084E000EEEC1 /* AddressWidgetVM.swift */; };
+		28271E372EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28271E362EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
 		282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */; };
 		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
@@ -208,6 +211,9 @@
 		281859072EA29B21002D7CDE /* IconGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconGridView.swift; sourceTree = "<group>"; };
 		281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleView.swift; sourceTree = "<group>"; };
 		281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleVM.swift; sourceTree = "<group>"; };
+		28271E322EBC064B000EEEC1 /* GiftCardWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetVM.swift; sourceTree = "<group>"; };
+		28271E342EBC084E000EEEC1 /* AddressWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetVM.swift; sourceTree = "<group>"; };
+		28271E362EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailsWidgetVM.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
@@ -398,6 +404,7 @@
 			isa = PBXGroup;
 			children = (
 				2808B3412A7056F100E86C7E /* CardDetailsWidgetView.swift */,
+				28271E362EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift */,
 			);
 			path = CardDetails;
 			sourceTree = "<group>";
@@ -958,6 +965,7 @@
 			isa = PBXGroup;
 			children = (
 				28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */,
+				28271E342EBC084E000EEEC1 /* AddressWidgetVM.swift */,
 			);
 			path = Address;
 			sourceTree = "<group>";
@@ -1073,6 +1081,7 @@
 			isa = PBXGroup;
 			children = (
 				28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */,
+				28271E322EBC064B000EEEC1 /* GiftCardWidgetVM.swift */,
 			);
 			path = GiftCard;
 			sourceTree = "<group>";
@@ -1276,6 +1285,7 @@
 				285C14412E95D7A8007ECC80 /* ContactInformationSection.swift in Sources */,
 				285C14422E95D7A8007ECC80 /* ShippingAddressSection.swift in Sources */,
 				285C14432E95D7A8007ECC80 /* CheckoutPaymentStepView.swift in Sources */,
+				28271E352EBC084E000EEEC1 /* AddressWidgetVM.swift in Sources */,
 				285C14442E95D7A8007ECC80 /* ProfileWelcomeSection.swift in Sources */,
 				285C14452E95D7A8007ECC80 /* PaymentMethodSelectionView.swift in Sources */,
 				285C14472E95D7A8007ECC80 /* CartItemRowView.swift in Sources */,
@@ -1337,12 +1347,14 @@
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
+				28271E372EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift in Sources */,
 				2886AE872E55D6D10071BADC /* Integrated3DSResponseData.swift in Sources */,
 				28D51D582DFF619D0095CDE5 /* TextStyleVM.swift in Sources */,
 				287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */,
 				287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */,
+				28271E332EBC064F000EEEC1 /* GiftCardWidgetVM.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				2881BC442E55CDEB00390CD8 /* WalletChargeResource.swift in Sources */,

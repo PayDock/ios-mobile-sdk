@@ -18,6 +18,7 @@ struct ColesPayWidgetView: View {
         NavigationStack {
             ScrollView {
                 ColesPayWidget(
+                    eventDelegate: viewModel,
                     config: .init(clientId: ProjectEnvironment.shared.getColesPayClientId() ?? ""),
                     appearance: getAppearance()) { onColesPayButtonTap in
                         viewModel.initializeWalletCharge(completion: onColesPayButtonTap)

@@ -30,16 +30,19 @@ class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Handlers
 
+    private weak var eventDelegate: WidgetEventDelegate?
     private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
     private let createPaymentRequest: (
         _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void
 
     // MARK: - Initialisation
 
-    init(createPaymentRequest: @escaping (
-        _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
+    init(eventDelegate: WidgetEventDelegate?,
+         createPaymentRequest: @escaping (
+            _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
+        self.eventDelegate = eventDelegate
         self.createPaymentRequest = createPaymentRequest
         self.walletService = walletService
         self.completion = completion
@@ -48,6 +51,7 @@ class ApplePayVM: NSObject, ObservableObject {
     func handleButtonTap() {
         error = nil
         isCompletionCalled = false
+
         createPaymentRequest { [weak self] result in
             switch result {
             case .success(let response):
@@ -115,6 +119,15 @@ class ApplePayVM: NSObject, ObservableObject {
         guard !isCompletionCalled else { return }
         self.completion(completion)
         isCompletionCalled = true
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleApplePayTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "ApplePayCheckoutButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
     }
 }
 
