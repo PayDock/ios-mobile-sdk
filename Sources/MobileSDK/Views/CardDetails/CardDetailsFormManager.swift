@@ -145,6 +145,10 @@ class CardDetailsFormManager: ObservableObject {
             securityCodeTitle = "CID"
             securityCodePlaceholder = "XXX"
 
+        case .unionpay:
+            securityCodeTitle = "CVN"
+            securityCodePlaceholder = "XXX"
+
         case .none:
             securityCodeTitle = "CVV"
             securityCodePlaceholder = "XXX"
@@ -161,7 +165,8 @@ class CardDetailsFormManager: ObservableObject {
         case .mastercard: return Image("mastercard", bundle: Bundle.module)
         case .visa: return Image("visa", bundle: Bundle.module)
         case .solo: return Image("solo", bundle: Bundle.module)
-        default: return Image("credit-card", bundle: Bundle.module)
+        case .unionpay: return Image("unionpay", bundle: Bundle.module)
+        case .none: return Image("credit-card", bundle: Bundle.module)
         }
     }
 

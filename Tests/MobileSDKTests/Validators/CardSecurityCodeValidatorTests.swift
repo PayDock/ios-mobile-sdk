@@ -126,4 +126,16 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testInvalidAusbcSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .ausbc))
     }
+
+    func testValidUnionpaySecurityCode() {
+        XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .unionpay))
+    }
+
+    func testInvalidUnionpaySecurityCode_LenghtTooLong() {
+        XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .unionpay))
+    }
+
+    func testInvalidUnionpaySecurityCode_LenghtTooShort() {
+        XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .unionpay))
+    }
 }
