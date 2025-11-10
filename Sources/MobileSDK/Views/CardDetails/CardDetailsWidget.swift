@@ -303,6 +303,7 @@ public struct CardDetailsWidget: View {
         case .mastercard: Image("mastercard", bundle: Bundle.module)
         case .solo: Image("solo", bundle: Bundle.module)
         case .visa: Image("visa", bundle: Bundle.module)
+        case .unionpay: Image("unionpay", bundle: Bundle.module)
         }
     }
 

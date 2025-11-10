@@ -124,7 +124,7 @@ class CardSchemeValidator {
         switch scheme {
         case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
         case .diners: return try? NSRegularExpression(pattern: "^\\d{14}$")
-        case .visa, .discover: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
+        case .visa, .discover, .unionpay: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
         case .mastercard, .japcb: return try? NSRegularExpression(pattern: "^\\d{16}$")
         case .solo, .ausbc: return try? NSRegularExpression(pattern: "^\\d{12,19}$")
         }

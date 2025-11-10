@@ -18,6 +18,7 @@ public enum CardScheme: String, CaseIterable {
     case mastercard
     case solo
     case visa
+    case unionpay
 
     var voiceoverName: String {
         switch self {
@@ -29,11 +30,12 @@ public enum CardScheme: String, CaseIterable {
         case .mastercard: return "Mastercard"
         case .solo: return "Solo"
         case .visa: return "Visa"
+        case .unionpay: return "UnionPay International"
         }
     }
 
     static let preferredOrder: [CardScheme] = [
-        .visa, .mastercard, .amex, .ausbc, .diners, .discover, .japcb, .solo
+        .visa, .mastercard, .amex, .ausbc, .diners, .discover, .japcb, .solo, .unionpay
     ]
 
     static func sortedArray(from set: Set<CardScheme>) -> [CardScheme] {
