@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import OSLog
 
 @MainActor
 class AddressWidgetVM: ObservableObject {
@@ -45,6 +46,6 @@ class AddressWidgetVM: ObservableObject {
 
 extension AddressWidgetVM: WidgetEventDelegate {
     func widgetEvent(event: WidgetEvent) {
-        print(event)
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

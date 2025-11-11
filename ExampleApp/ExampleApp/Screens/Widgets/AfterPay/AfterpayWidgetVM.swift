@@ -10,6 +10,7 @@ import Foundation
 import MobileSDK
 import Afterpay
 import NetworkingLib
+import OSLog
 
 @MainActor
 class AfterpayWidgetVM: ObservableObject {
@@ -135,6 +136,6 @@ class AfterpayWidgetVM: ObservableObject {
 extension AfterpayWidgetVM: WidgetEventDelegate {
 
     func widgetEvent(event: WidgetEvent) {
-        print(event)
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

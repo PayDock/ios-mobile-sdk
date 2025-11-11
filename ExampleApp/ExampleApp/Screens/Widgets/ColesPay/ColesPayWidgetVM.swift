@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import NetworkingLib
+import OSLog
 
 @MainActor
 class ColesPayWidgetVM: ObservableObject {
@@ -110,6 +111,6 @@ extension ColesPayWidgetVM: WidgetLoadingDelegate {
 extension ColesPayWidgetVM: WidgetEventDelegate {
 
     func widgetEvent(event: WidgetEvent) {
-        print(event)
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import NetworkingLib
+import OSLog
 
 @MainActor
 class PayPalWidgetVM: ObservableObject {
@@ -115,6 +116,6 @@ extension PayPalWidgetVM: WidgetLoadingDelegate {
 extension PayPalWidgetVM: WidgetEventDelegate {
 
     func widgetEvent(event: WidgetEvent) {
-        print(event)
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }
