@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import NetworkingLib
+import OSLog
 
 @MainActor
 class ApplePayWidgetVM: NSObject, ObservableObject {
@@ -111,6 +112,6 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
 extension ApplePayWidgetVM: WidgetEventDelegate {
 
     func widgetEvent(event: WidgetEvent) {
-        print(event)
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

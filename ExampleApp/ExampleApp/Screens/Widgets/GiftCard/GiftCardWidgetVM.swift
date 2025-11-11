@@ -8,6 +8,7 @@
 
 import Foundation
 import MobileSDK
+import OSLog
 
 @MainActor
 class GiftCardWidgetVM: ObservableObject {
@@ -46,6 +47,6 @@ class GiftCardWidgetVM: ObservableObject {
 extension GiftCardWidgetVM: WidgetEventDelegate {
 
     func widgetEvent(event: WidgetEvent) {
-        print(event)
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }
