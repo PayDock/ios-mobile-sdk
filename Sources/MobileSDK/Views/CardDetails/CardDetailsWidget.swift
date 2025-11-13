@@ -40,196 +40,220 @@ public struct CardDetailsWidget: View {
     public var body: some View {
         VStack(spacing: viewModel.appearance.verticalSpacing) {
             if viewModel.config.showCardTitle {
-                HStack {
-                    Text("Card information")
-                        .font(viewModel.appearance.title.text.customFont.font)
-                        .foregroundColor(viewModel.appearance.title.text.textColor)
-                        .accessibilityAddTraits(.isHeader)
-                    Spacer()
-                }
-                .customPadding(viewModel.appearance.title.padding)
+                cardTitleView
             }
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 getCardSchemeIconList(supportedSchemes: supportedSchemes)
             }
 
-            VStack(spacing: 8) {
+            VStack(spacing: viewModel.appearance.textFieldVerticalSpacing) {
                 if viewModel.config.collectCardholderName {
-                    OutlineTextField(
-                        appearance: viewModel.appearance.textField,
-                        text: $viewModel.cardDetailsFormManager.cardholderNameText,
-                        title: viewModel.cardDetailsFormManager.cardholderNameTitle,
-                        placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
-                        errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
-                        editing: $viewModel.cardDetailsFormManager.editingCardholderName,
-                        valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
-                        disabled: $viewModel.viewState.isDisabled,
-                        textContentType: getCreditCardName(),
-                        returnKeyType: .next,
-                        onTapGesture: {
-                            if !viewModel.viewState.isDisabled {
-                                self.textFieldInFocus = .cardholderName
-                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
-                            }
-                        }, onSubmit: {
-                            textFieldInFocus = .cardNumber
-                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-                        }
-                    )
-                    .onConditionalKeyPress(key: .tab, action: {
-                        textFieldInFocus = .cardNumber
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-                    })
-                    .focused($textFieldInFocus, equals: .cardholderName)
+                    cardholderNameTextField
                 }
-
-                OutlineTextField(
-                    appearance: viewModel.appearance.textField,
-                    text: $viewModel.cardDetailsFormManager.cardNumberText,
-                    title: viewModel.cardDetailsFormManager.cardNumberTitle,
-                    placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
-                    errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
-                    leftImage: $viewModel.cardDetailsFormManager.cardImage,
-                    editing: $viewModel.cardDetailsFormManager.editingCardNumber,
-                    valid: $viewModel.cardDetailsFormManager.cardNumberValid,
-                    disabled: $viewModel.viewState.isDisabled,
-                    textContentType: .creditCardNumber,
-                    keyboardType: .numberPad,
-                    onTapGesture: {
-                        if !viewModel.viewState.isDisabled {
-                            self.textFieldInFocus = .cardNumber
-                            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-                        }
-                    },
-                    onTextChange: { text, cursorPosition in
-                        return viewModel.cardDetailsFormManager.formatCardNumber(updatedText: text, cursorPosition: cursorPosition)
-                    }
-                )
-                .customToolbar(
-                    buttonTitle: "Next",
-                    font: UIFont(
-                        name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
-                        size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
-                    textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
-                ) {
-                    textFieldInFocus = .expiryDate
-                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-                }
-                .onConditionalKeyPress(key: .tab, action: {
-                    textFieldInFocus = .expiryDate
-                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-                })
-                .focused($textFieldInFocus, equals: .cardNumber)
-
-                let layout = shouldAlignVertically() ?
-                AnyLayout(VStackLayout(spacing: viewModel.appearance.verticalSpacing)) :
-                AnyLayout(HStackLayout(alignment: .top, spacing: viewModel.appearance.horizontalSpacing))
-                layout {
-                    OutlineTextField(
-                        appearance: viewModel.appearance.textField,
-                        text: $viewModel.cardDetailsFormManager.expiryDateText,
-                        title: viewModel.cardDetailsFormManager.expiryDateTitle,
-                        placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
-                        errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
-                        editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
-                        valid: $viewModel.cardDetailsFormManager.expiryDateValid,
-                        disabled: $viewModel.viewState.isDisabled,
-                        textContentType: getCreditCardExpiryDate(),
-                        keyboardType: .numberPad,
-                        onTapGesture: {
-                            if !viewModel.viewState.isDisabled {
-                                self.textFieldInFocus = .expiryDate
-                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-                            }
-                        },
-                        onTextChange: { text, cursorPosition in
-                            return viewModel.cardDetailsFormManager.formatExpiryDate(updatedText: text, cursorPosition: cursorPosition)
-                        })
-                    .keyboardType(.numberPad)
-                    .customToolbar(
-                        buttonTitle: "Next",
-                        font: UIFont(
-                            name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
-                            size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
-                        textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
-                    ) {
-                        textFieldInFocus = .securityCode
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-                    }
-                    .onConditionalKeyPress(key: .tab, action: {
-                        textFieldInFocus = .securityCode
-                        viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-                    })
-                    .focused($textFieldInFocus, equals: .expiryDate)
-
-                    OutlineTextField(
-                        appearance: viewModel.appearance.textField,
-                        text: $viewModel.cardDetailsFormManager.securityCodeText,
-                        title: viewModel.cardDetailsFormManager.securityCodeTitle,
-                        placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
-                        errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
-                        editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
-                        valid: $viewModel.cardDetailsFormManager.securityCodeValid,
-                        disabled: $viewModel.viewState.isDisabled,
-                        textContentType: getCreditCardSecurityCode(),
-                        keyboardType: .numberPad,
-                        onTapGesture: {
-                            if !viewModel.viewState.isDisabled {
-                                self.textFieldInFocus = .securityCode
-                                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-                            }
-                        },
-                        onTextChange: { text, cursorPosition in
-                            return viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: text, cursorPosition: cursorPosition)
-                        })
-                    .keyboardType(.numberPad)
-                    .customToolbar(
-                        buttonTitle: "Done",
-                        font: UIFont(
-                            name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
-                            size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
-                        textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
-                    ) {
-                        textFieldInFocus = nil
-                        viewModel.cardDetailsFormManager.endEditing()
-                    }
-                    .onConditionalKeyPress(key: .tab, action: {
-                        let collectCardholderName = viewModel.config.collectCardholderName
-                        textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
-                        viewModel.cardDetailsFormManager.setEditingTextField(
-                            focusedField: collectCardholderName ? .cardholderName : .cardNumber)
-                    })
-                    .focused($textFieldInFocus, equals: .securityCode)
-                }
+                cardNumberTextField
+                expiryDateAndSecurityCodeLayout
             }
 
             if viewModel.config.allowSaveCard != nil {
                 privacyView
             }
 
-            SDKButton(title: viewModel.appearance.actionButton.text,
-                      isLoading: viewModel.isLoading && viewModel.showLoaders,
-                      style: .custom(
-                        CustomButtonStyle(
-                            appearance: viewModel.appearance.actionButton,
-                            isDisabled: viewModel.isActionButtonDisabled())),
-                      shouldTemplate: true) {
-                textFieldInFocus = nil
-                viewModel.cardDetailsFormManager.endEditing()
-                viewModel.tokeniseCardDetails()
-                viewModel.handleTokenisationTapAnalytics()
-            }
-                      .customPadding(viewModel.appearance.actionButton.dimensions.padding)
-                      .accessibilityHint("Submits card details information.")
-
+            primaryButton
             emptyFocusView
         }
         .padding(.horizontal, viewModel.appearance.horizontalSpacing)
     }
 
+    private var cardTitleView: some View {
+        HStack {
+            Text("Card information")
+                .font(viewModel.appearance.title.text.customFont.font)
+                .foregroundColor(viewModel.appearance.title.text.textColor)
+                .accessibilityAddTraits(.isHeader)
+            Spacer()
+        }
+        .customPadding(viewModel.appearance.title.padding)
+    }
+
+    private var cardholderNameTextField: some View {
+        OutlineTextField(
+            appearance: viewModel.appearance.textField,
+            text: $viewModel.cardDetailsFormManager.cardholderNameText,
+            title: viewModel.cardDetailsFormManager.cardholderNameTitle,
+            placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
+            errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
+            editing: $viewModel.cardDetailsFormManager.editingCardholderName,
+            valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
+            disabled: $viewModel.viewState.isDisabled,
+            textContentType: getCreditCardName(),
+            returnKeyType: .next,
+            onTapGesture: {
+                if !viewModel.viewState.isDisabled {
+                    self.textFieldInFocus = .cardholderName
+                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardholderName)
+                }
+            }, onSubmit: {
+                textFieldInFocus = .cardNumber
+                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+            }
+        )
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .cardNumber
+            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+        })
+        .focused($textFieldInFocus, equals: .cardholderName)
+    }
+
+    private var cardNumberTextField: some View {
+        OutlineTextField(
+            appearance: viewModel.appearance.textField,
+            text: $viewModel.cardDetailsFormManager.cardNumberText,
+            title: viewModel.cardDetailsFormManager.cardNumberTitle,
+            placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
+            errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
+            leftImage: $viewModel.cardDetailsFormManager.cardImage,
+            editing: $viewModel.cardDetailsFormManager.editingCardNumber,
+            valid: $viewModel.cardDetailsFormManager.cardNumberValid,
+            disabled: $viewModel.viewState.isDisabled,
+            textContentType: .creditCardNumber,
+            keyboardType: .numberPad,
+            onTapGesture: {
+                if !viewModel.viewState.isDisabled {
+                    self.textFieldInFocus = .cardNumber
+                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+                }
+            },
+            onTextChange: { text, cursorPosition in
+                return viewModel.cardDetailsFormManager.formatCardNumber(updatedText: text, cursorPosition: cursorPosition)
+            }
+        )
+        .customToolbar(
+            buttonTitle: "Next",
+            font: UIFont(
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
+        ) {
+            textFieldInFocus = .expiryDate
+            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .expiryDate
+            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+        })
+        .focused($textFieldInFocus, equals: .cardNumber)
+    }
+
+    private var expiryDateTextField: some View {
+        OutlineTextField(
+            appearance: viewModel.appearance.textField,
+            text: $viewModel.cardDetailsFormManager.expiryDateText,
+            title: viewModel.cardDetailsFormManager.expiryDateTitle,
+            placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
+            errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
+            editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
+            valid: $viewModel.cardDetailsFormManager.expiryDateValid,
+            disabled: $viewModel.viewState.isDisabled,
+            textContentType: getCreditCardExpiryDate(),
+            keyboardType: .numberPad,
+            onTapGesture: {
+                if !viewModel.viewState.isDisabled {
+                    self.textFieldInFocus = .expiryDate
+                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
+                }
+            },
+            onTextChange: { text, cursorPosition in
+                return viewModel.cardDetailsFormManager.formatExpiryDate(updatedText: text, cursorPosition: cursorPosition)
+            })
+        .keyboardType(.numberPad)
+        .customToolbar(
+            buttonTitle: "Next",
+            font: UIFont(
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
+        ) {
+            textFieldInFocus = .securityCode
+            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            textFieldInFocus = .securityCode
+            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+        })
+        .focused($textFieldInFocus, equals: .expiryDate)
+    }
+
+    private var securityCodeTextField: some View {
+        OutlineTextField(
+            appearance: viewModel.appearance.textField,
+            text: $viewModel.cardDetailsFormManager.securityCodeText,
+            title: viewModel.cardDetailsFormManager.securityCodeTitle,
+            placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
+            errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
+            editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
+            valid: $viewModel.cardDetailsFormManager.securityCodeValid,
+            disabled: $viewModel.viewState.isDisabled,
+            textContentType: getCreditCardSecurityCode(),
+            keyboardType: .numberPad,
+            onTapGesture: {
+                if !viewModel.viewState.isDisabled {
+                    self.textFieldInFocus = .securityCode
+                    viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
+                }
+            },
+            onTextChange: { text, cursorPosition in
+                return viewModel.cardDetailsFormManager.formatSecurityCode(updatedText: text, cursorPosition: cursorPosition)
+            })
+        .keyboardType(.numberPad)
+        .customToolbar(
+            buttonTitle: "Done",
+            font: UIFont(
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
+        ) {
+            textFieldInFocus = nil
+            viewModel.cardDetailsFormManager.endEditing()
+        }
+        .onConditionalKeyPress(key: .tab, action: {
+            let collectCardholderName = viewModel.config.collectCardholderName
+            textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
+            viewModel.cardDetailsFormManager.setEditingTextField(
+                focusedField: collectCardholderName ? .cardholderName : .cardNumber)
+        })
+        .focused($textFieldInFocus, equals: .securityCode)
+    }
+
+    private var expiryDateAndSecurityCodeLayout: some View {
+        let layout = shouldAlignVertically() ?
+            AnyLayout(VStackLayout(spacing: viewModel.appearance.verticalSpacing)) :
+            AnyLayout(HStackLayout(alignment: .top, spacing: viewModel.appearance.horizontalSpacing))
+        return layout {
+            expiryDateTextField
+            securityCodeTextField
+        }
+    }
+
+    private var primaryButton: some View {
+        SDKButton(title: viewModel.appearance.actionButton.text,
+                  isLoading: viewModel.isLoading && viewModel.showLoaders,
+                  style: .custom(
+                    CustomButtonStyle(
+                        appearance: viewModel.appearance.actionButton,
+                        isDisabled: viewModel.isActionButtonDisabled())),
+                  shouldTemplate: true) {
+            textFieldInFocus = nil
+            viewModel.cardDetailsFormManager.endEditing()
+            viewModel.tokeniseCardDetails()
+            viewModel.handleTokenisationTapAnalytics()
+        }
+                  .customPadding(viewModel.appearance.actionButton.dimensions.padding)
+                  .accessibilityHint("Submits card details information.")
+    }
+
     private var privacyView: some View {
         HStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
                     .applyAttributes(viewModel.appearance.toggleText.text)
                     .customPadding(viewModel.appearance.toggleText.padding)
@@ -262,7 +286,7 @@ public struct CardDetailsWidget: View {
             GridItem(.adaptive(minimum: cardIconWidth + 4), spacing: 0)
         ], spacing: 8.0) {
             ForEach(CardScheme.sortedArray(from: supportedSchemes), id: \.self) { scheme in
-                getSchemeIcon(for: scheme)
+                viewModel.getSchemeIcon(for: scheme)
                     .resizable()
                     .scaledToFit()
                     .frame(width: cardIconWidth)
@@ -276,7 +300,6 @@ public struct CardDetailsWidget: View {
                 .joined(separator: ", ")
         )
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 16)
     }
 
     private var emptyFocusView: some View {
@@ -291,20 +314,6 @@ public struct CardDetailsWidget: View {
             .onAppear {
                 isViewFocused = true
             }
-    }
-
-    private func getSchemeIcon(for scheme: CardScheme) -> Image {
-        switch scheme {
-        case .amex: Image("american-express", bundle: Bundle.module)
-        case .ausbc: Image("australian-commonwealth-bank", bundle: Bundle.module)
-        case .diners: Image("diners", bundle: Bundle.module)
-        case .discover: Image("discover", bundle: Bundle.module)
-        case .japcb: Image("jcb", bundle: Bundle.module)
-        case .mastercard: Image("mastercard", bundle: Bundle.module)
-        case .solo: Image("solo", bundle: Bundle.module)
-        case .visa: Image("visa", bundle: Bundle.module)
-        case .unionpay: Image("unionpay", bundle: Bundle.module)
-        }
     }
 
     private func shouldAlignVertically() -> Bool {
@@ -341,6 +350,8 @@ public struct CardDetailsWidget: View {
         }
     }
 }
+
+// MARK: - Preview
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {

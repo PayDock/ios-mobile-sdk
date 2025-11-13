@@ -31,6 +31,8 @@ public struct GiftCardWidget: View {
 
     public var body: some View {
         ScrollView {
+            Spacer()
+                .frame(height: 6.0) /// Adds a bit of inset to start of the scrollview
             VStack(spacing: 0) {
                 VStack(spacing: viewModel.appearance.verticalSpacing) {
                     let layout = shouldAlignVertically() ?
@@ -45,7 +47,7 @@ public struct GiftCardWidget: View {
                     emptyFocusView
                 }
             }
-            .padding(16.0)
+            .padding(.horizontal, viewModel.appearance.horizontalSpacing)
         }
     }
 
@@ -125,24 +127,27 @@ public struct GiftCardWidget: View {
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
         })
         .focused($textFieldInFocus, equals: .pin)
-        .frame(width: shouldAlignVertically() ? UIScreen.main.bounds.width - 32.0 : UIScreen.main.bounds.width * 0.30)
+        .frame(width: shouldAlignVertically() ?
+               UIScreen.main.bounds.width - viewModel.appearance.horizontalSpacing * 2 :
+                UIScreen.main.bounds.width * 0.30)
     }
 
     private var primaryButton: some View {
-        return SDKButton(title: viewModel.appearance.actionButton.text,
-                         isLoading: viewModel.isLoading,
-                         style: .custom(CustomButtonStyle(
-                            appearance: viewModel.appearance.actionButton,
-                            isDisabled: viewModel.isActionButtonDisabled())),
-                         shouldTemplate: true) {
-            viewModel.giftCardFormManager.endEditing()
-            viewModel.tokeniseGiftCard()
-            viewModel.handleButtonTapAnalytics()
-        }
-                         .padding(.top, viewModel.appearance.actionButton.dimensions.padding.top)
-                         .padding(.leading, viewModel.appearance.actionButton.dimensions.padding.leading)
-                         .padding(.bottom, viewModel.appearance.actionButton.dimensions.padding.bottom)
-                         .padding(.trailing, viewModel.appearance.actionButton.dimensions.padding.trailing)
+        return SDKButton(
+            title: viewModel.appearance.actionButton.text,
+            isLoading: viewModel.isLoading,
+            style: .custom(CustomButtonStyle(
+                appearance: viewModel.appearance.actionButton,
+                isDisabled: viewModel.isActionButtonDisabled())),
+            shouldTemplate: true) {
+                viewModel.giftCardFormManager.endEditing()
+                viewModel.tokeniseGiftCard()
+                viewModel.handleButtonTapAnalytics()
+            }
+            .padding(.top, viewModel.appearance.actionButton.dimensions.padding.top)
+            .padding(.leading, viewModel.appearance.actionButton.dimensions.padding.leading)
+            .padding(.bottom, viewModel.appearance.actionButton.dimensions.padding.bottom)
+            .padding(.trailing, viewModel.appearance.actionButton.dimensions.padding.trailing)
     }
 
     private var emptyFocusView: some View {

@@ -54,6 +54,12 @@ struct SpacingsStyleView: View {
                 text: Binding(
                     get: { "\(viewModel.verticalSpacing)" },
                     set: { viewModel.verticalSpacing = CGFloat(Double($0) ?? 0) }))
+
+            DimensionsFieldView(
+                title: "Text Field vertical spacing",
+                text: Binding(
+                    get: { "\(viewModel.textFieldVerticalSpacing)" },
+                    set: { viewModel.textFieldVerticalSpacing = CGFloat(Double($0) ?? 0) }))
         }
     }
 }

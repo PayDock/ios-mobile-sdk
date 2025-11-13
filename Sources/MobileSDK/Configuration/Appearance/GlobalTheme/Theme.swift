@@ -48,7 +48,7 @@ public struct Theme:
                         .init(font: .init(size: 14), textColor: .defaultPrimary, isUnderlined: true, underlineColor: .defaultPrimary)),
                 toggleText: TextAppearance = TextAppearance(text: .init(textColor: .defaultText)),
                 description: TextAppearance = TextAppearance(),
-                title: TextAppearance = TextAppearance(text: TextAttributes(font: .init(size: 16.0)), padding: .init(bottom: 20.0))) {
+                title: TextAppearance = TextAppearance(text: TextAttributes(font: .init(size: 16.0)))) {
         self.textField = textField
         self.searchDropdown = searchDropdown
         self.actionButton = actionButton

@@ -35,7 +35,7 @@ public struct AddressWidget: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(spacing: viewModel.appearance.verticalSpacing) {
-                        VStack(spacing: 8.0) {
+                        VStack(spacing: viewModel.appearance.textFieldVerticalSpacing) {
                             nameAndLastNameView
                             autocompleteTextFieldView
                             if viewModel.addressFormManager.isAddressFormExpanded {
@@ -57,7 +57,7 @@ public struct AddressWidget: View {
                     .animation(.easeInOut(duration: 0.25), value: viewModel.addressFormManager.showAddressSearchPopup)
                     .animation(.easeInOut(duration: 0.25), value: viewModel.countrySearchSuggestions)
                     .animation(.easeInOut(duration: 0.25), value: viewModel.addressSearchSuggestions)
-                    .padding(.horizontal, 16.0)
+                    .padding(.horizontal, viewModel.appearance.horizontalSpacing)
                 }
                 .modifier(AddressAutoScrollModifier(textFieldInFocus: textFieldInFocus, proxy: proxy))
             }
@@ -90,7 +90,7 @@ public struct AddressWidget: View {
     }
 
     private var nameAndLastNameView: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: viewModel.appearance.verticalSpacing) {
             nameHeader
 
             let layout = shouldAlignVertically() ?
@@ -165,7 +165,7 @@ public struct AddressWidget: View {
     }
 
     private var autocompleteTextFieldView: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: viewModel.appearance.verticalSpacing) {
             findAnAddressHeader
 
             AutocompleteTextField(
@@ -207,7 +207,6 @@ public struct AddressWidget: View {
             })
             .focused($textFieldInFocus, equals: .searchAddress)
             .id(AddressFormManager.AddressFocusable.searchAddress)
-            .padding(.bottom, 6)
         }
     }
 
