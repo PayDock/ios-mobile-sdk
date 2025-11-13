@@ -278,7 +278,6 @@ struct ProfileView: View {
                 viewModel.handleError(error: error)
             }
         }
-        .frame(height: 48.0)
         .padding()
         .padding(.bottom, 8)
     }
