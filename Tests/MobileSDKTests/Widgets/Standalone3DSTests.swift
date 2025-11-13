@@ -11,6 +11,7 @@ import WebKit
 import SwiftUI
 @testable import MobileSDK
 
+@MainActor
 class Standalone3DSTests: XCTestCase {
     var coordinator: Standalone3DSWidget.Coordinator!
     var receivedResult: Result<Standalone3DSResult, Standalone3DSError>?

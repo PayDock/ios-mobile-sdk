@@ -10,6 +10,7 @@ import SwiftUI
 @preconcurrency import WebKit
 import AuthenticationServices
 
+@MainActor
 public struct Standalone3DSWidget: UIViewRepresentable {
     private let config: ThreeDSConfig
     private let appearance: ThreeDSWidgetAppearance

@@ -10,6 +10,7 @@ import XCTest
 import WebKit
 @testable import MobileSDK
 
+@MainActor
 class Integrated3DSTests: XCTestCase {
     var coordinator: Integrated3DSWidget.Coordinator!
     var receivedResult: Result<Integrated3DSResult, Integrated3DSError>?
