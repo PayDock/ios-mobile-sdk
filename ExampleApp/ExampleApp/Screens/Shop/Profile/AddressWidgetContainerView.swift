@@ -26,6 +26,7 @@ struct AddressWidgetContainerView: View {
                     config: AddressWidgetConfig(
                         address: address
                     ),
+                    appearance: getAppearance(),
                     completion: { result in
                         onAddressSelected(result)
                     }
@@ -43,5 +44,14 @@ struct AddressWidgetContainerView: View {
                 }
             }
         }
+    }
+
+    private func getAppearance() -> AddressWidgetAppearance {
+        let text = address == nil ? "Add" : "Save"
+        let icon = address == nil ? Image(systemName: "plus.circle") : nil
+
+        var appearance = AddressWidgetAppearance()
+        appearance.actionButton = .init(icon: icon, text: text)
+        return appearance
     }
 }
