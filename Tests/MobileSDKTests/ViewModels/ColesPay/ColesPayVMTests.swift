@@ -179,8 +179,10 @@ class ColesPayVMTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
 
-    func testHandleButtonTap_CompletesWithInitialisingWalletToken_OnTokenFailure() {
+    func testHandleButtonTap_CompletesWithInitialisingWalletToken_OnTokenFailure() async {
         // Given: token request fails
+        let expectation = expectation(description: "Completion called with token failure")
+        
         viewModel = ColesPayVM(
             config: config,
             tokenRequest: { completion in
@@ -191,12 +193,15 @@ class ColesPayVMTests: XCTestCase {
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
                 self.completionResult = result
+                expectation.fulfill()
             }
 
         // When
         viewModel.handleButtonTap()
 
-        // Then
+        // Then - Wait for the async task to complete
+        await fulfillment(of: [expectation], timeout: 1.0)
+        
         switch completionResult {
         case .failure(let error):
             switch error {
