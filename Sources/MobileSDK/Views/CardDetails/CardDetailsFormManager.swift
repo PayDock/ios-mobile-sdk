@@ -99,7 +99,7 @@ class CardDetailsFormManager: ObservableObject {
          cardNameValidator: CardNameValidator = CardNameValidator()) {
         self.shouldValidateCardholderName = shouldValidateCardholderName
         self.supportedSchemes = supportedSchemes
-        self.enableCardValidation = enableCardValidation
+        self.enableCardValidation = enableCardValidation && (supportedSchemes != nil && !(supportedSchemes?.isEmpty ?? true))
         self.cardSchemeValidator = cardIssuerValidator
         self.cardExpiryDateValidator = cardExpiryDateValidator
         self.cardSecurityCodeValidator = cardSecurityCodeValidator
@@ -277,14 +277,26 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Validate security code
 
     private func validateSecurityCode() {
-        let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) ?? .visa // Default to 3 digit CVV validation
+        if enableCardValidation {
+            // When card validation is enabled, use the detected card scheme
+            let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) ?? .visa
 
-        if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, cardScheme: cardScheme) {
-            securityCodeValid = true
-            securityCodeError = ""
+            if cardSecurityCodeValidator.isSecurityCodeValid(code: securityCodeText, cardScheme: cardScheme) {
+                securityCodeValid = true
+                securityCodeError = ""
+            } else {
+                securityCodeValid = false
+                securityCodeError = "Invalid security code"
+            }
         } else {
-            securityCodeValid = false
-            securityCodeError = "Invalid security code"
+            // When card validation is disabled, allow both 3 and 4 digit codes
+            if cardSecurityCodeValidator.isSecurityCodeValidForDisabledValidation(code: securityCodeText) {
+                securityCodeValid = true
+                securityCodeError = ""
+            } else {
+                securityCodeValid = false
+                securityCodeError = "Invalid security code"
+            }
         }
     }
 
@@ -297,10 +309,15 @@ class CardDetailsFormManager: ObservableObject {
             : cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText)
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
 
-        let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
-        let securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(
-            code: securityCodeText,
-            cardScheme: cardScheme ?? .visa) // Default to 3 digit CVV validation
+        let securityCodeValidation: Bool
+        if enableCardValidation {
+            let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
+            securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(
+                code: securityCodeText,
+                cardScheme: cardScheme ?? .visa) // Default to 3 digit CVV validation
+        } else {
+            securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValidForDisabledValidation(code: securityCodeText)
+        }
 
         return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
     }
@@ -320,8 +337,15 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     func formatSecurityCode(updatedText: String, cursorPosition: Int) -> Int {
-        let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) ?? .visa
-        let maxDigits = cardSecurityCodeValidator.requiredDigits(cardScheme: cardScheme)
+        let maxDigits: Int
+        if enableCardValidation {
+            let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) ?? .visa
+            maxDigits = cardSecurityCodeValidator.requiredDigits(cardScheme: cardScheme)
+        } else {
+            // When validation is disabled, allow up to 4 digits
+            maxDigits = 4
+        }
+
         let result = cardDetailsFormatter.formatSecurityCode(updatedText: updatedText, cursorPosition: cursorPosition, maxDigits: maxDigits)
         securityCodeText = result.formattedText
         return result.newCursorPosition
