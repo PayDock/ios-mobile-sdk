@@ -42,6 +42,7 @@ public struct AfterpayWidget: View {
             colorScheme: appearance.colorScheme,
             type: appearance.type,
             action: {
+                viewModel.handleAfterpayButtonTapAnalytics()
                 viewModel.handleButtonTap()
             })
         .modifier(ActivityIndicatorModifier(appearance: appearance.loader, isLoading: viewModel.isLoading))

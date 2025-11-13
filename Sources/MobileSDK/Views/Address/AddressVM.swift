@@ -214,7 +214,7 @@ class AddressVM: NSObject, ObservableObject {
     func handleSaveAddresTapAnalytics() {
         let event = WidgetEvent(
             type: .button,
-            properties: .button(WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text))
+            properties: .button(WidgetEventButtonProperties(name: "SaveButton", action: .click, text: appearance.actionButton.text))
         )
         eventDelegate?.widgetEvent(event: event)
     }
