@@ -13,9 +13,15 @@ extension Theme {
 
     public struct ToggleAppearance {
         public var activeColor: Color
+        public var inactiveColor: Color?
+        public var toggleColor: Color?
 
-        public init(activeColor: Color = .defaultPrimary) {
+        public init(activeColor: Color = .defaultPrimary,
+                    inactiveColor: Color? = nil,
+                    toggleColor: Color? = nil) {
             self.activeColor = activeColor
+            self.inactiveColor = inactiveColor
+            self.toggleColor = toggleColor
         }
     }
 }
