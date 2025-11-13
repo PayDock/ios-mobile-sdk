@@ -13,6 +13,24 @@ import Foundation
  */
 class CardSecurityCodeValidator {
 
+    /**
+     Checks if the security code input between 3 or 4 digits.
+
+     - Parameters:
+     - code: The security code input string to validate.
+
+     - Returns: True if the security code input is valid, false otherwise.
+     */
+    func isSecurityCodeValidForDisabledValidation(code: String) -> Bool {
+        guard !code.isEmpty,
+              code.range(of: "^[0-9]+$", options: .regularExpression) != nil,
+              code.count >= 3,
+              code.count <= 4 else {
+            return false
+        }
+        return true
+    }
+
     func isSecurityCodeValid(code: String, cardScheme: CardScheme) -> Bool {
         return checkSecurityCode(code: code, cardScheme: cardScheme) && code.count ==  requiredDigits(cardScheme: cardScheme)
     }
