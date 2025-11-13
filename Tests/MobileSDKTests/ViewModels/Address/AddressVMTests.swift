@@ -238,7 +238,7 @@ final class AddressVMTests: XCTestCase {
         let event = WidgetEvent(
             type: .button,
             properties: .button(
-                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text)))
+                WidgetEventButtonProperties(name: "SaveButton", action: .click, text: appearance.actionButton.text)))
         viewModel.handleSaveAddresTapAnalytics()
 
         // Then
