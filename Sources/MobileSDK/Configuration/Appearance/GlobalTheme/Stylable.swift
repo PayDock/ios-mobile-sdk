@@ -51,6 +51,7 @@ public protocol LinkTextStylableAppearance {
 public protocol SpacingStylableAppearance {
     var horizontalSpacing: CGFloat { get set }
     var verticalSpacing: CGFloat { get set }
+    var textFieldVerticalSpacing: CGFloat { get set }
 }
 
 public protocol ActionButtonLoaderStylableAppearance {

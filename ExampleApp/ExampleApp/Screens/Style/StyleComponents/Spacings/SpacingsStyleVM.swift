@@ -22,6 +22,7 @@ class SpacingsStyleVM: ObservableObject {
     @Published var showResetConfirmation = false
     @Published var horizontalSpacing: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var verticalSpacing: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var textFieldVerticalSpacing: CGFloat = 0.0 { didSet { updateAppearance() }}
 
     // MARK: - Initialization
 
@@ -39,6 +40,7 @@ class SpacingsStyleVM: ObservableObject {
     private func syncUIToAppearance() {
         self.horizontalSpacing = appearance?.horizontalSpacing ?? 0.0
         self.verticalSpacing = appearance?.verticalSpacing ?? 0.0
+        self.textFieldVerticalSpacing = appearance?.textFieldVerticalSpacing ?? 0.0
     }
 
     private func updateAppearance() {
@@ -46,6 +48,7 @@ class SpacingsStyleVM: ObservableObject {
 
         appearance.horizontalSpacing = horizontalSpacing
         appearance.verticalSpacing = verticalSpacing
+        appearance.textFieldVerticalSpacing = textFieldVerticalSpacing
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
     }

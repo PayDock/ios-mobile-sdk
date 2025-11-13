@@ -21,6 +21,7 @@ public struct CardDetailsWidgetAppearance:
 
     public var verticalSpacing: CGFloat
     public var horizontalSpacing: CGFloat
+    public var textFieldVerticalSpacing: CGFloat
     public var title: Theme.TextAppearance
     public var textField: Theme.TextFieldAppearance
     public var actionButton: Theme.ButtonAppearance
@@ -29,8 +30,9 @@ public struct CardDetailsWidgetAppearance:
     public var toggleText: Theme.TextAppearance
     public var linkText: Theme.TextAppearance
 
-    public init(verticalSpacing: CGFloat = 6,
+    public init(verticalSpacing: CGFloat = 16,
                 horizontalSpacing: CGFloat = 16,
+                textFieldVerticalSpacing: CGFloat = 8,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
                 actionButton: Theme.ButtonAppearance = .init(
@@ -41,6 +43,7 @@ public struct CardDetailsWidgetAppearance:
                 linkText: Theme.TextAppearance = GlobalTheme.shared.globalTheme.linkText) {
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing
+        self.textFieldVerticalSpacing = textFieldVerticalSpacing
         self.title = title
         self.textField = textField
         self.actionButton = actionButton
