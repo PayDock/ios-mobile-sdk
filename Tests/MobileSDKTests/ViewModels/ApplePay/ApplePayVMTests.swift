@@ -98,11 +98,15 @@ class ApplePayVMTests: XCTestCase {
         // Given
         let error = ApplePayRequestError.initialisingWalletToken(reason: "Test error")
         createPaymentRequestResult = .failure(error)
-        setupViewModel()
+
+        let expectation = XCTestExpectation(description: "Payment request failure completion")
+        setupViewModelWithExpectation(expectation: expectation)
 
         // When
         viewModel.handleButtonTap()
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Wait for completion
+        await fulfillment(of: [expectation], timeout: 2.0)
 
         // Then
         XCTAssertNil(viewModel.paymentController)
@@ -132,7 +136,7 @@ class ApplePayVMTests: XCTestCase {
         // The controller is created but presentation fails
         XCTAssertNotNil(viewModel.paymentController)
 
-        // Wait for the async presentation to complete
+        // Wait a bit for the async presentation to complete
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // After presentation failure, error should be set
@@ -182,20 +186,19 @@ class ApplePayVMTests: XCTestCase {
 
     func testPaymentAuthorizationControllerDidFinishWithSuccess() async {
         // Given
-        setupViewModelWithValidRequest()
-        viewModel.paymentStatus = .success
-        // Set chargeData to simulate successful payment
-        viewModel.chargeData = ChargeResponse(status: "success", amount: 100.0, currency: "USD")
+        let expectation = XCTestExpectation(description: "Success completion")
+        setupViewModelForDidFinishTest(expectation: expectation)
 
-        // Reset completion result to test didFinish behavior
-        completionResult = nil
+        viewModel.paymentStatus = .success
+        viewModel.chargeData = ChargeResponse(status: "success", amount: 100.0, currency: "USD")
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Wait for completion
+        await fulfillment(of: [expectation], timeout: 2.0)
 
         // Then
-        // Now it should succeed since we have chargeData
         if case .success(let result) = completionResult {
             XCTAssertEqual(result.status, "success")
             XCTAssertEqual(result.amount, 100.0)
@@ -207,13 +210,17 @@ class ApplePayVMTests: XCTestCase {
 
     func testPaymentAuthorizationControllerDidFinishWithUserCancellation() async {
         // Given
-        setupViewModelWithValidRequest()
+        let expectation = XCTestExpectation(description: "User cancellation completion")
+        setupViewModelForDidFinishTest(expectation: expectation)
+
         viewModel.paymentStatus = .failure
         viewModel.error = .userCanceledPayment
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Wait for completion
+        await fulfillment(of: [expectation], timeout: 2.0)
 
         // Then
         if case .failure(let error) = completionResult {
@@ -229,13 +236,17 @@ class ApplePayVMTests: XCTestCase {
 
     func testPaymentAuthorizationControllerDidFinishWithPaymentError() async {
         // Given
-        setupViewModelWithValidRequest()
+        let expectation = XCTestExpectation(description: "Payment error completion")
+        setupViewModelWithExpectation(expectation: expectation)
+
         viewModel.paymentStatus = .failure
         viewModel.error = .unknownError(.connectionError(URLError(.networkConnectionLost)))
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Wait for completion with proper timeout
+        await fulfillment(of: [expectation], timeout: 2.0)
 
         // Then
         if case .failure(let error) = completionResult {
@@ -251,13 +262,17 @@ class ApplePayVMTests: XCTestCase {
 
     func testPaymentAuthorizationControllerDidFinishWithUnknownError() async {
         // Given
-        setupViewModelWithValidRequest()
+        let expectation = XCTestExpectation(description: "Unknown error completion")
+        setupViewModelForDidFinishTest(expectation: expectation)
+
         viewModel.paymentStatus = .failure
         viewModel.error = nil
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Wait for completion
+        await fulfillment(of: [expectation], timeout: 2.0)
 
         // Then
         if case .failure(let error) = completionResult {
@@ -341,6 +356,42 @@ class ApplePayVMTests: XCTestCase {
         createPaymentRequestResult = .success(successResult)
         setupViewModel()
         viewModel.handleButtonTap()
+    }
+
+    private func setupViewModelWithExpectation(expectation: XCTestExpectation) {
+        viewModel = ApplePayVM(
+            eventDelegate: eventDelegate,
+            createPaymentRequest: { completion in
+                if let result = self.createPaymentRequestResult {
+                    completion(result)
+                } else {
+                    // Default success case
+                    let mockPaymentRequest = PKPaymentRequest()
+                    let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
+                    completion(.success(result))
+                }
+            },
+            walletService: mockWalletService,
+            completion: { result in
+                self.completionResult = result
+                expectation.fulfill()
+            })
+    }
+
+    private func setupViewModelForDidFinishTest(expectation: XCTestExpectation) {
+        viewModel = ApplePayVM(
+            eventDelegate: eventDelegate,
+            createPaymentRequest: { completion in
+                let mockPaymentRequest = PKPaymentRequest()
+                let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
+                completion(.success(result))
+            },
+            walletService: mockWalletService,
+            completion: { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        )
     }
 
     private func createMockPayment() -> PKPayment {

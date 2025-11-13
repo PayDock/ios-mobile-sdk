@@ -274,8 +274,7 @@ public struct CardDetailsWidget: View {
             }
             Spacer()
             Toggle(isOn: $viewModel.policyAccepted) {}
-                .tint(viewModel.appearance.toggle.activeColor)
-                .frame(width: 64, height: 44)
+                .conditionalToggleStyle(appearance: viewModel.appearance.toggle)
                 .disabled(viewModel.viewState.isDisabled)
                 .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
         }
