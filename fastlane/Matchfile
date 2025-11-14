@@ -1,0 +1,12 @@
+gitlab_project("paydock/bounded-contexts/mobile/mobile-sdk-ios")
+storage_mode("gitlab_secure_files")
+team_id("4DX7V3HMRJ")
+
+username("appledevelopment@paydock.com")
+
+# App bundle identifiers
+app_identifier([
+  "com.paydock.multitenant.staging",
+  "com.paydock.multitenant.sandbox",
+  "com.paydock.multitenant.prod"
+])

@@ -82,6 +82,14 @@ Dependencies/
 **/fastlane/screenshots/**/*.png
 **/fastlane/test_output
 **/fastlane/derived_data
+**/fastlane/builds
+
+# Build number tracking (committed to track build numbers per version)
+# **/fastlane/build_numbers.json is intentionally NOT ignored
+
+# App Store Connect API Keys
+**/app_store_connect_api_key.json
+**/*_api_key.json
 
 # Code Injection
 #
@@ -94,3 +102,6 @@ iOSInjectionProject/
 **/xcuserdata/*
 .DS_Store
 NetworkingLib/
+Gemfile.lock
+config
+vendor/bundle
