@@ -11,8 +11,6 @@ import SwiftUI
 struct CheckoutInformationStepView: View {
     @ObservedObject var viewModel: EnhancedCheckoutVM
     @ObservedObject var profileManager: UserProfileManager
-    @Binding var showingAddressWidget: Bool
-    @Binding var addressWidgetType: AddressWidgetType
 
     @StateObject private var cartManager = CartManager.shared
     @State private var showingGiftCardEntry = false
@@ -21,6 +19,8 @@ struct CheckoutInformationStepView: View {
     let onSelectSavedAddress: (SavedAddress, AddressWidgetType) -> Void
     let onClearShippingAddress: () -> Void
     let onClearBillingAddress: () -> Void
+    let onEnterNewAddress: (AddressWidgetType) -> Void
+    let onEditExistingAddress: (AddressWidgetType) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -44,10 +44,10 @@ struct CheckoutInformationStepView: View {
             ShippingAddressSection(
                 viewModel: viewModel,
                 profileManager: profileManager,
-                showingAddressWidget: $showingAddressWidget,
-                addressWidgetType: $addressWidgetType,
                 onSelectSavedAddress: onSelectSavedAddress,
-                onClearShippingAddress: onClearShippingAddress
+                onClearShippingAddress: onClearShippingAddress,
+                onEnterNewAddress: { onEnterNewAddress(.shipping) },
+                onEditExistingAddress: { onEditExistingAddress(.shipping) }
             )
 
             // Use as billing address toggle
@@ -59,10 +59,10 @@ struct CheckoutInformationStepView: View {
                 BillingAddressSection(
                     viewModel: viewModel,
                     profileManager: profileManager,
-                    showingAddressWidget: $showingAddressWidget,
-                    addressWidgetType: $addressWidgetType,
                     onSelectSavedAddress: onSelectSavedAddress,
-                    onClearBillingAddress: onClearBillingAddress
+                    onClearBillingAddress: onClearBillingAddress,
+                    onEnterNewAddress: { onEnterNewAddress(.billing) },
+                    onEditExistingAddress: { onEditExistingAddress(.billing) }
                 )
             }
 

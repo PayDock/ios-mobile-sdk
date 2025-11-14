@@ -17,6 +17,7 @@ struct EnhancedCheckoutView: View {
     @State private var currentStep: CheckoutStep = .information
     @State private var showingAddressWidget = false
     @State private var addressWidgetType: AddressWidgetType = .shipping
+    @State private var isEditingExistingAddress = false
 
     /// Optional closure to dismiss parent view (like CartView) after successful checkout
     let onDismissParent: (() -> Void)?
@@ -39,12 +40,12 @@ struct EnhancedCheckoutView: View {
                                 CheckoutInformationStepView(
                                     viewModel: viewModel,
                                     profileManager: profileManager,
-                                    showingAddressWidget: $showingAddressWidget,
-                                    addressWidgetType: $addressWidgetType,
                                     onLoadProfileData: loadProfileData,
                                     onSelectSavedAddress: selectSavedAddress,
                                     onClearShippingAddress: clearShippingAddress,
-                                    onClearBillingAddress: clearBillingAddress
+                                    onClearBillingAddress: clearBillingAddress,
+                                    onEnterNewAddress: enterNewAddress,
+                                    onEditExistingAddress: editExistingAddress
                                 )
                             case .paymentAndReview:
                                 CheckoutPaymentAndReviewStepView(
@@ -107,6 +108,7 @@ struct EnhancedCheckoutView: View {
             .sheet(isPresented: $showingAddressWidget) {
                 CheckoutAddressWidgetView(
                     type: addressWidgetType,
+                    existingAddress: isEditingExistingAddress ? getExistingAddress(for: addressWidgetType) : nil,
                     onAddressSelected: { result in
                         handleAddressResult(result, for: addressWidgetType)
                         showingAddressWidget = false
@@ -253,9 +255,32 @@ struct EnhancedCheckoutView: View {
         viewModel.billingCountry = ""
     }
 
+    private func getExistingAddress(for type: AddressWidgetType) -> Address? {
+        switch type {
+        case .shipping:
+            return viewModel.getCurrentShippingAddress()
+        case .billing:
+            return viewModel.getCurrentBillingAddress()
+        }
+    }
+
+    private func enterNewAddress(_ type: AddressWidgetType) {
+        addressWidgetType = type
+        isEditingExistingAddress = false
+        showingAddressWidget = true
+    }
+
+    private func editExistingAddress(_ type: AddressWidgetType) {
+        addressWidgetType = type
+        isEditingExistingAddress = true
+        showingAddressWidget = true
+    }
+
     private func handleAddressResult(_ result: Address, for type: AddressWidgetType) {
         switch type {
         case .shipping:
+            viewModel.shippingFirstName = result.firstName
+            viewModel.shippingLastName = result.lastName
             viewModel.address = result.addressLine1
             viewModel.addressLine2 = result.addressLine2
             viewModel.city = result.city
@@ -265,6 +290,8 @@ struct EnhancedCheckoutView: View {
             // Only deselect the saved address after new address is successfully set
             viewModel.selectedShippingAddressId = nil
         case .billing:
+            viewModel.billingFirstName = result.firstName
+            viewModel.billingLastName = result.lastName
             viewModel.billingAddress = result.addressLine1
             viewModel.billingAddressLine2 = result.addressLine2
             viewModel.billingCity = result.city

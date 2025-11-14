@@ -11,6 +11,7 @@ import MobileSDK
 
 struct CheckoutAddressWidgetView: View {
     let type: AddressWidgetType
+    let existingAddress: Address?
     let onAddressSelected: (Address) -> Void
     let onCancel: () -> Void
 
@@ -31,8 +32,9 @@ struct CheckoutAddressWidgetView: View {
 
                 AddressWidget(
                     config: AddressWidgetConfig(
-                        address: nil
+                        address: existingAddress
                     ),
+                    appearance: getAppearance(),
                     completion: { result in
                         onAddressSelected(result)
                     }
@@ -51,5 +53,14 @@ struct CheckoutAddressWidgetView: View {
                 }
             }
         }
+    }
+
+    private func getAppearance() -> AddressWidgetAppearance {
+        let text = existingAddress == nil ? "Add" : "Save"
+        let icon = existingAddress == nil ? Image(systemName: "plus.circle") : nil
+
+        var appearance = AddressWidgetAppearance()
+        appearance.actionButton = .init(icon: icon, text: text)
+        return appearance
     }
 }
