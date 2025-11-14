@@ -11,11 +11,11 @@ import SwiftUI
 struct BillingAddressSection: View {
     @ObservedObject var viewModel: EnhancedCheckoutVM
     @ObservedObject var profileManager: UserProfileManager
-    @Binding var showingAddressWidget: Bool
-    @Binding var addressWidgetType: AddressWidgetType
 
     let onSelectSavedAddress: (SavedAddress, AddressWidgetType) -> Void
     let onClearBillingAddress: () -> Void
+    let onEnterNewAddress: () -> Void
+    let onEditExistingAddress: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -34,8 +34,7 @@ struct BillingAddressSection: View {
                     },
                     onEnterNewAddress: {
                         // Open address input directly without deselecting current address
-                        addressWidgetType = .billing
-                        showingAddressWidget = true
+                        onEnterNewAddress()
                     }
                 )
             }
@@ -47,8 +46,11 @@ struct BillingAddressSection: View {
                     formattedAddress: viewModel.formattedBillingAddress,
                     addressType: "Billing",
                     onEnterAddress: {
-                        addressWidgetType = .billing
-                        showingAddressWidget = true
+                        if viewModel.billingAddressComplete {
+                            onEditExistingAddress()
+                        } else {
+                            onEnterNewAddress()
+                        }
                     }
                 )
             }

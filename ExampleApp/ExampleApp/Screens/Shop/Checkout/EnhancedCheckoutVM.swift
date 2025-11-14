@@ -29,6 +29,8 @@ class EnhancedCheckoutVM: ObservableObject {
     @Published var phone = ""
 
     // Shipping Address
+    @Published var shippingFirstName = ""
+    @Published var shippingLastName = ""
     @Published var address = ""
     @Published var addressLine2 = ""
     @Published var city = ""
@@ -39,6 +41,8 @@ class EnhancedCheckoutVM: ObservableObject {
 
     // Billing Information
     @Published var useShippingAsBilling = true
+    @Published var billingFirstName = ""
+    @Published var billingLastName = ""
     @Published var billingAddress = ""
     @Published var billingAddressLine2 = ""
     @Published var billingCity = ""
@@ -83,6 +87,9 @@ class EnhancedCheckoutVM: ObservableObject {
     var formattedShippingAddress: String {
         var components: [String] = []
 
+        if !shippingFirstName.isEmpty && !shippingLastName.isEmpty {
+            components.append("\(shippingFirstName) \(shippingLastName)")
+        }
         if !address.isEmpty {
             components.append(address)
         }
@@ -107,6 +114,9 @@ class EnhancedCheckoutVM: ObservableObject {
     var formattedBillingAddress: String {
         var components: [String] = []
 
+        if !billingFirstName.isEmpty && !billingLastName.isEmpty {
+            components.append("\(billingFirstName) \(billingLastName)")
+        }
         if !billingAddress.isEmpty {
             components.append(billingAddress)
         }
@@ -372,6 +382,38 @@ extension EnhancedCheckoutVM {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
         return emailPred.evaluate(with: email)
+    }
+
+    /// Creates an Address object from the current shipping address data
+    func getCurrentShippingAddress() -> Address? {
+        guard shippingAddressComplete else { return nil }
+
+        return Address(
+            firstName: shippingFirstName,
+            lastName: shippingLastName,
+            addressLine1: address,
+            addressLine2: addressLine2,
+            city: city,
+            state: state,
+            postcode: postalCode,
+            country: country
+        )
+    }
+
+    /// Creates an Address object from the current billing address data
+    func getCurrentBillingAddress() -> Address? {
+        guard billingAddressComplete else { return nil }
+
+        return Address(
+            firstName: billingFirstName,
+            lastName: billingLastName,
+            addressLine1: billingAddress,
+            addressLine2: billingAddressLine2,
+            city: billingCity,
+            state: billingState,
+            postcode: billingPostalCode,
+            country: billingCountry
+        )
     }
 
     /// Shows the result overlay with success or error state
