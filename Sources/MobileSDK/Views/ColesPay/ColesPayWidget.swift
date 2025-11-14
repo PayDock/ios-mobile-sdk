@@ -66,7 +66,11 @@ public struct ColesPayWidget: View {
                 },
                 onFailure: { error in
                     viewModel.handleFailure(error: error)
-                })
+                },
+                onClose: {
+                    viewModel.handleFailure(error: .transactionCanceled)
+                }
+            )
             .navigationTitle("Checkout with Coles Pay")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
