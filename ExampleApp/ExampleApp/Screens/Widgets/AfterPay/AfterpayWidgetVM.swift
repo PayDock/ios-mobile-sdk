@@ -35,6 +35,7 @@ class AfterpayWidgetVM: ObservableObject {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: "123 Test Street",
+                addressLine2: nil,
                 addressPostcode: "BN3 5SL",
                 addressCity: "Test City",
                 addressState: "Test State",

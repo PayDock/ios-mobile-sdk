@@ -36,6 +36,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: nil,
+                addressLine2: nil,
                 addressPostcode: nil,
                 addressCity: nil,
                 addressState: nil,

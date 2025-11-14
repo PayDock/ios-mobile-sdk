@@ -29,18 +29,78 @@ class EnhancedCheckoutVM: ObservableObject {
     @Published var phone = ""
 
     // Shipping Address
-    @Published var shippingFirstName = ""
-    @Published var shippingLastName = ""
-    @Published var address = ""
-    @Published var addressLine2 = ""
-    @Published var city = ""
-    @Published var state = ""
-    @Published var postalCode = ""
-    @Published var country = ""
-    @Published var selectedShippingAddressId: String?
+    @Published var shippingFirstName = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingFirstName = shippingFirstName
+            }
+        }
+    }
+    @Published var shippingLastName = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingLastName = shippingLastName
+            }
+        }
+    }
+    @Published var address = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingAddress = address
+            }
+        }
+    }
+    @Published var addressLine2 = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingAddressLine2 = addressLine2
+            }
+        }
+    }
+    @Published var city = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingCity = city
+            }
+        }
+    }
+    @Published var state = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingState = state
+            }
+        }
+    }
+    @Published var postalCode = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingPostalCode = postalCode
+            }
+        }
+    }
+    @Published var country = "" {
+        didSet {
+            if useShippingAsBilling {
+                billingCountry = country
+            }
+        }
+    }
+    @Published var selectedShippingAddressId: String? {
+        didSet {
+            if useShippingAsBilling {
+                selectedBillingAddressId = selectedShippingAddressId
+            }
+        }
+    }
 
     // Billing Information
-    @Published var useShippingAsBilling = true
+    @Published var useShippingAsBilling = true {
+        didSet {
+            if useShippingAsBilling {
+                syncBillingWithShipping()
+            }
+        }
+    }
     @Published var billingFirstName = ""
     @Published var billingLastName = ""
     @Published var billingAddress = ""
@@ -423,13 +483,27 @@ extension EnhancedCheckoutVM {
         showResultOverlay = true
     }
 
+    /// Syncs billing address fields with shipping address fields
+    private func syncBillingWithShipping() {
+        billingFirstName = shippingFirstName
+        billingLastName = shippingLastName
+        billingAddress = address
+        billingAddressLine2 = addressLine2
+        billingCity = city
+        billingState = state
+        billingPostalCode = postalCode
+        billingCountry = country
+        selectedBillingAddressId = selectedShippingAddressId
+    }
+
     private func createWalletChargeRequest(gatewayId: String, walletType: String?) -> InitialiseWalletChargeReq {
         let paymentSource = InitialiseWalletChargePaymentSource(
             addressLine1: billingAddress,
+            addressLine2: billingAddressLine2,
             addressPostcode: billingPostalCode,
             addressCity: billingCity,
             addressState: billingState,
-            addressCountry: billingCountry,
+            addressCountry: countryCode(from: billingCountry),
             gatewayId: gatewayId,
             walletType: walletType
         )
@@ -468,6 +542,17 @@ extension EnhancedCheckoutVM {
             currencyCode: "AUD",
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)
+    }
+
+    private func countryCode(from countryName: String) -> String? {
+        for code in Locale.Region.isoRegions {
+            let locale = Locale(identifier: "en")   // or use Locale.current
+            if let name = locale.localizedString(forRegionCode: code.identifier),
+               name.lowercased() == countryName.lowercased() {
+                return code.identifier
+            }
+        }
+        return nil
     }
 }
 

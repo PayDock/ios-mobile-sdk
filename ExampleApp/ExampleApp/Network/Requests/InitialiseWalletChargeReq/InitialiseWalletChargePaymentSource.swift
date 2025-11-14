@@ -10,6 +10,7 @@ import Foundation
 
 struct InitialiseWalletChargePaymentSource: Codable {
     let addressLine1: String?
+    let addressLine2: String?
     let addressPostcode: String?
     let addressCity: String?
     let addressState: String?
