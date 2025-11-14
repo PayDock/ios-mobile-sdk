@@ -14,45 +14,79 @@ struct ColesPayWebView: UIViewRepresentable {
 
     typealias OnApprove = () -> Void
     typealias OnFailure = (ColesPayError) -> Void
+    typealias OnClose = () -> Void
 
     let clientId: String
     private let colesPayOrderId: String
     private let onApprove: OnApprove
     private let onFailure: OnFailure
+    private let onClose: OnClose
 
     /**
      Javascript to intercept push, replace and pop states in the window to identify window location changes.
+     Also intercepts window.close() calls to detect close button taps.
      */
     private let historyAPIScript = """
-         ;(function() {
-           var pushState = history.pushState;
-           var replaceState = history.replaceState;
+      ;(function() {
+        var initialHost = window.location.host;
 
-           history.pushState = function() {
-             pushState.apply(history, arguments);
-             window.dispatchEvent(new Event('locationchange'));
-           };
+        var pushState = history.pushState;
+        var replaceState = history.replaceState;
 
-           history.replaceState = function() {
-             replaceState.apply(history, arguments);
-             window.dispatchEvent(new Event('locationchange'));
-           };
+        history.pushState = function() {
+          pushState.apply(history, arguments);
+          window.dispatchEvent(new Event('locationchange'));
+        };
 
-           window.addEventListener('popstate', function() {
-             window.dispatchEvent(new Event('locationchange'))
-           });
-         })();
+        history.replaceState = function() {
+          replaceState.apply(history, arguments);
+          window.dispatchEvent(new Event('locationchange'));
+        };
 
-         window.addEventListener('locationchange', function(){
-           webkit.messageHandlers.PayDockMobileSDK.postMessage(window.location.href)
-         })
+        window.addEventListener('popstate', function() {
+          window.dispatchEvent(new Event('locationchange'));
+        });
+
+        window.addEventListener('locationchange', function() {
+          try {
+            var href = window.location.href;
+            var currentHost = window.location.host;
+
+            // If we left the original checkout host, treat it as a close
+            if (currentHost !== initialHost) {
+              webkit.messageHandlers.PayDockMobileSDK.postMessage('paydock://close');
+            } else {
+              webkit.messageHandlers.PayDockMobileSDK.postMessage(href);
+            }
+          } catch (e) {
+            console.log('locationchange handler error', e);
+          }
+        });
+
+        (function(){
+          try {
+            var __origClose = window.close;
+            window.close = function() {
+              webkit.messageHandlers.PayDockMobileSDK.postMessage('paydock://close');
+              // optionally: __origClose.apply(window, arguments);
+            };
+          } catch(e) {
+            console.log('Failed to override window.close:', e);
+          }
+        })();
+      })();
     """
 
-    init(clientId: String, colesPayOrderId: String, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
+    init(clientId: String,
+         colesPayOrderId: String,
+         onApprove: @escaping OnApprove,
+         onFailure: @escaping OnFailure,
+         onClose: @escaping OnClose) {
         self.clientId = clientId
         self.colesPayOrderId = colesPayOrderId
         self.onApprove = onApprove
         self.onFailure = onFailure
+        self.onClose = onClose
     }
 
     func makeUIView(context: Context) -> WKWebView {
@@ -64,6 +98,11 @@ struct ColesPayWebView: UIViewRepresentable {
 
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        } else {
+            // Fallback on earlier versions
+        }
         return webView
     }
 
@@ -101,19 +140,22 @@ struct ColesPayWebView: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        .init(onApprove: onApprove, onFailure: onFailure)
+        .init(onApprove: onApprove, onFailure: onFailure, onClose: onClose)
     }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         var onApprove: OnApprove
         var onFailure: OnFailure
+        var onClose: OnClose
         var isLoaded = false
         private let redirectUrlString = "https://paydock.com/"
 
         init(onApprove: @escaping OnApprove,
-             onFailure: @escaping OnFailure) {
+             onFailure: @escaping OnFailure,
+             onClose: @escaping OnClose) {
             self.onApprove = onApprove
             self.onFailure = onFailure
+            self.onClose = onClose
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -146,6 +188,11 @@ struct ColesPayWebView: UIViewRepresentable {
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
             guard let messageString = message.body as? String else { return }
+
+            if messageString == "paydock://close" {
+                onClose()
+                return
+            }
 
             if messageString.contains("/payment-confirmed") {
                 onApprove()
