@@ -37,6 +37,9 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: nil,
                 addressPostcode: nil,
+                addressCity: nil,
+                addressState: nil,
+                addressCountry: nil,
                 gatewayId: ProjectEnvironment.shared.getApplePayGatewayId() ?? "",
                 walletType: "apple")
 
