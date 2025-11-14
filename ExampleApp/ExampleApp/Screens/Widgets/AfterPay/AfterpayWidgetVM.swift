@@ -36,6 +36,9 @@ class AfterpayWidgetVM: ObservableObject {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: "123 Test Street",
                 addressPostcode: "BN3 5SL",
+                addressCity: "Test City",
+                addressState: "Test State",
+                addressCountry: "Test Country",
                 gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "",
                 walletType: nil)
 

@@ -383,8 +383,11 @@ extension EnhancedCheckoutVM {
 
     private func createWalletChargeRequest(gatewayId: String, walletType: String?) -> InitialiseWalletChargeReq {
         let paymentSource = InitialiseWalletChargePaymentSource(
-            addressLine1: address,
-            addressPostcode: postalCode,
+            addressLine1: billingAddress,
+            addressPostcode: billingPostalCode,
+            addressCity: billingCity,
+            addressState: billingState,
+            addressCountry: billingCountry,
             gatewayId: gatewayId,
             walletType: walletType
         )
