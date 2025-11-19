@@ -163,15 +163,9 @@ prepareStaging:
       echo "Build numbers are stored in GitLab CI/CD variable BUILD_NUMBERS_STAGING"
       echo "The variable will be available to subsequent jobs in this pipeline"
   rules:
-    # Automatically run when merge request is merged to main (push event to main branch)
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      when: on_success
     # Automatically run on merge requests targeting protected branches (main or release)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release")'
-      when: on_success
-    # Allow manual trigger for other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: manual
+      when: on_success
 
 # Prepare build number for sandbox (shared between Firebase and TestFlight)
 prepareSandbox:
@@ -196,26 +190,20 @@ prepareSandbox:
       echo "Build numbers are stored in GitLab CI/CD variable BUILD_NUMBERS_SANDBOX"
       echo "The variable will be available to subsequent jobs in this pipeline"
   rules:
-    # Run on main/master branch commits
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-      when: manual
-    # Automatically run on merge requests targeting protected branches (main or release)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release")'
-      when: on_success
-    # Allow manual trigger for other merge requests
+    # Manually run on merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
+    # Automatically run on merge requests from "deploy/*" branches targeting "release"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^deploy\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
+      when: on_success
+      allow_failure: false
+  allow_failure: true
    
 buildStagingFirebase:
   extends:
     - .macos_saas_runners
     - .setup_bundler
   stage: build
-  dependencies:
-    - prepareStaging
-  needs:
-    - job: prepareStaging
-      artifacts: true
   script:
     # Create temporary keychain for code signing
     - security create-keychain -p ci_password ci_keychain.keychain
@@ -236,23 +224,20 @@ buildStagingFirebase:
     # Automatically run when merge request is merged to main (push event to main branch)
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: on_success
-    # Automatically run on merge requests targeting protected branches (main or release)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release")'
-      when: on_success
-    # Allow manual trigger for other merge requests
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # Manual on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
       when: manual
+    # Automatically runs on merge request change
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: on_success
+      allow_failure: false
+  allow_failure: true
 
 buildStagingTestflight:
   extends:
     - .macos_saas_runners
     - .setup_bundler
   stage: build
-  dependencies:
-    - prepareStaging
-  needs:
-    - job: prepareStaging
-      artifacts: true
   script:
     # Create temporary keychain for code signing
     - security create-keychain -p ci_password ci_keychain.keychain
@@ -270,26 +255,22 @@ buildStagingTestflight:
       - fastlane/builds/staging/testflight
     expire_in: 30 days
   rules:
-    # Run on main/master branch commits
+    # Manual on main branch commits
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: manual
-    # Automatically run on merge requests targeting protected branches (main or release)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release")'
-      when: on_success
+    # Manual on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
+      when: manual
     # Allow manual trigger for other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
+  allow_failure: true
 
 buildSandboxFirebase:
   extends:
     - .macos_saas_runners
     - .setup_bundler
   stage: build
-  dependencies:
-    - prepareSandbox
-  needs:
-    - job: prepareSandbox
-      artifacts: true
   script:
     # Create temporary keychain for code signing
     - security create-keychain -p ci_password ci_keychain.keychain
@@ -307,26 +288,22 @@ buildSandboxFirebase:
       - fastlane/builds/sandbox/firebase
     expire_in: 30 days
   rules:
-    # Run on main/master branch commits
+    # Manual on main branch commits
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: manual
-    # Automatically run on merge requests targeting protected branches (main or release)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release")'
-      when: on_success
+    # Manual on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
+      when: manual
     # Allow manual trigger for other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
+  allow_failure: true
 
 buildSandboxTestflight:
   extends:
     - .macos_saas_runners
     - .setup_bundler
   stage: build
-  dependencies:
-    - prepareSandbox
-  needs:
-    - job: prepareSandbox
-      artifacts: true
   script:
     # Create temporary keychain for code signing
     - security create-keychain -p ci_password ci_keychain.keychain
@@ -344,15 +321,20 @@ buildSandboxTestflight:
       - fastlane/builds/sandbox/testflight
     expire_in: 30 days
   rules:
-    # Run on main/master branch commits
+    # Automatic on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
+      when: on_success
+    # Manual on main branch commits
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: manual
-    # Automatically run on merge requests targeting protected branches (main or release)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release")'
+    # Automatically run on merge requests from "deploy/*" branches targeting "release"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^deploy\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
-    # Allow manual trigger for other merge requests
+      allow_failure: false
+    # Manual trigger for other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
+  allow_failure: true
 
 deployStagingFirebase:
   extends:
@@ -376,10 +358,12 @@ deployStagingFirebase:
     # Deploy to Firebase App Distribution
     - bundle exec fastlane deployStagingFirebase
   rules:
-    # Automatically run when merge request is merged to main (push event to main branch)
-    # Requires buildStagingFirebase to run first
+    # Automatic on main branch commits
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: on_success
+    # Manual on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
+      when: manual
     # Allow manual trigger from merge requests (before merge)
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
@@ -401,8 +385,11 @@ deployStagingTestflight:
     # Deploy to TestFlight
     - bundle exec fastlane deployStagingTestflight
   rules:
-    # Run on main/master branch commits (requires buildStagingTestflight to run first)
+    # Manual on main branch commits
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+    # Manual on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
       when: manual
     # Allow manual trigger from merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -455,12 +442,16 @@ deploySandboxTestflight:
     # Deploy to TestFlight
     - bundle exec fastlane deploySandboxTestflight
   rules:
-    # Run on main/master branch commits (requires buildSandboxTestflight to run first)
+    # Manual on main branch commits
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+    # Automatic on release branch commits
+    - if: '$CI_COMMIT_BRANCH == "release"'
       when: manual
     # Automatically run on merge requests from "deploy/*" branches targeting "release"
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^deploy\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
+      allow_failure: false
     # Allow manual trigger from other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual

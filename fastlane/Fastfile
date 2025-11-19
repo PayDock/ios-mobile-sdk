@@ -1418,6 +1418,7 @@ def inject_env_vars_to_xcconfig(options)
         "ACCESS_TOKEN_API",
         "ACCESS_TOKEN_WIDGET",
         "SERVICE_ID_MPGS",
+        "SERVICE_ID_MPGS_TEST",
         "SERVICE_ID_AFTERPAY",
         "SERVICE_ID_APPLE_PAY_MPGS",
         "SERVICE_ID_CLICK_TO_PAY",

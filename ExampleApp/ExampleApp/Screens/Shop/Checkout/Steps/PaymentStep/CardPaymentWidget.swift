@@ -17,7 +17,7 @@ struct CardPaymentWidget: View {
         CardDetailsWidget(
             viewState: viewModel.viewState,
             config: CardDetailsWidgetConfig(
-                gatewayId: nil,
+                gatewayId: ProjectEnvironment.shared.getMPGSGatewayId(),
                 accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
                 showCardTitle: false,
                 collectCardholderName: false,

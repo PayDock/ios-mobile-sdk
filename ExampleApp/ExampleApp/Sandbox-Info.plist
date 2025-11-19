@@ -18,6 +18,8 @@
 	<string>$(SERVICE_ID_COLES_PAY)</string>
 	<key>SERVICE_ID_MPGS</key>
 	<string>$(SERVICE_ID_MPGS)</string>
+	<key>SERVICE_ID_MPGS_TEST</key>
+	<string>$(SERVICE_ID_MPGS_TEST)</string>
 	<key>SERVICE_ID_CLICK_TO_PAY</key>
 	<string>$(SERVICE_ID_CLICK_TO_PAY)</string>
 	<key>SERVICE_ID_PAYPAL</key>

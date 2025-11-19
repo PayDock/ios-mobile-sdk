@@ -23,7 +23,7 @@ class CardDetailsWidgetVM: ObservableObject {
 
     func getConfig() -> CardDetailsWidgetConfig {
         return CardDetailsWidgetConfig(
-            gatewayId: nil,
+            gatewayId: ProjectEnvironment.shared.getMPGSGatewayId(),
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
             allowSaveCard: SaveCardConfig(
                 consentText: "Remember this card for next time.",
