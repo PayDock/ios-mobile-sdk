@@ -60,6 +60,7 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 *   **`WALLET_ID_COLES_PAY`:** The client ID provided by Coles Pay. This ID is required for tagging the Wallet type and using the Coles Pay service.
 *   **`SERVICE_ID_CLICK_TO_PAY`:** Your Paydock service ID for using Click To Pay service. This ID is required to enable Click To Pay as a payment method.
 *   **`SERVICE_ID_MPGS`:** Your Paydock service ID for the MPGS gateway. This ID is required for 3DS check and transactions.
+*   **`SERVICE_ID_MPGS_TEST`:** Your Paydock service ID for the MPGS gateway. This ID should use an MPGS merchant id starting with "TEST" for using MPGS supported test cards and 3ds challenge emulator.
 *   **`SERVICE_ID_GPAYMENTS`:** Your Paydock service ID for the GPayments 3DS service. This ID is required to enable 3DS check.
 *   **`MERCHANT_ID_APPLE_PAY`:** Your Apple Pay merchant ID. This ID is required to enable Apple Pay test payments in sample app.
 
@@ -70,6 +71,7 @@ ACCESS_TOKEN_API=your_api_access_token
 ACCESS_TOKEN_WIDGET=your_widget_access_token
 // MPGS
 SERVICE_ID_MPGS=your_gateway_id_mpgs
+SERVICE_ID_MPGS_TEST=your_gateway_id_mpgs_test
 // AFTERPAY
 SERVICE_ID_AFTERPAY=your_gateway_id_afterpay
 // APPLE PAY

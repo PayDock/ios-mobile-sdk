@@ -19,6 +19,7 @@ struct ProjectEnvironment {
         static let applePayGatewayId = "SERVICE_ID_APPLE_PAY_MPGS"
         static let payPalGatewayId = "SERVICE_ID_PAYPAL"
         static let mpgsGatewayId = "SERVICE_ID_MPGS"
+        static let mpgsTestGatewayId = "SERVICE_ID_MPGS_TEST"
         static let gpaymentsServiceId = "SERVICE_ID_GPAYMENTS"
         static let colesPayGatewayId = "SERVICE_ID_COLES_PAY"
         static let afterpayGatewayId = "SERVICE_ID_AFTERPAY"
@@ -96,6 +97,14 @@ struct ProjectEnvironment {
 
     func getMPGSGatewayId() -> String? {
         guard let gatewayId = Self.infoDictionary[Keys.mpgsGatewayId] as? String else {
+            print("Integrated 3DS gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
+    func getMPGSTestGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.mpgsTestGatewayId] as? String else {
             print("Integrated 3DS gateway ID not found in .plist!")
             return nil
         }
