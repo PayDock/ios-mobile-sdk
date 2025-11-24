@@ -175,9 +175,6 @@ class PayPalVM: ObservableObject {
     private func handlePayPalError(_ error: Error) {
         if PayPalWebPayments.PayPalError.isCheckoutCanceled(error) {
             completion(.failure(.userCancelled))
-        // temporary workaround until PayPal SDK resolves invalid cancelation errors
-        } else if let coreError = error as? CoreSDKError, coreError.code == 3 {
-            completion(.failure(.userCancelled))
         } else if let coreError = error as? CoreSDKError {
             let errorDescription = coreError.errorDescription ?? ""
             completion(.failure(.sdkException(description: errorDescription)))
