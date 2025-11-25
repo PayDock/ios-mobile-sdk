@@ -1,5 +1,30 @@
 # Changelog
 
+## [4.2.0] - 2025-11-25
+
+### Added
+
+- UnionPay support for card schemes
+- Callbacks for info events to enable analytical collection
+- Customisation options: spacing control for input form widgets (widget + input spacing)
+- Updated checkout implementation for ExampleApp (demo app - E2E flows)
+- CardDetailsWidget toggle enhanced styling options
+
+### Changed
+
+- Updated PayPal SDK from version 2.0.0 to 2.0.1
+- Text and Icon customisation moved into appearance objects for SDK button widgets (ie. PayPalSavePaymentSourceWidget, CardDetailsWidget, AddressDetailsWidget and GiftCardWidget)
+- Updated logic for no card scheme detection - applying default validation
+- Search address popup positioning
+
+### Fixed
+- Accessibility improvements: Large Text support across widgets, scalable button and text field sizes,
+- Payment methods: PayPal cancellation not being detected
+- ColesPay widget closing and back to store cancellation
+- Apple Pay infinite loader for some errors
+- UI/UX: input field text vertical centering, disabled button styling, Click to Pay WebView session management, and app theme persistence on device rotation
+- Hardcoded paddings to various UI elements
+
 ## [4.1.0] - 2025-10-03
 
 ### Changed
