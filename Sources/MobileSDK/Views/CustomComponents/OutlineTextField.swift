@@ -23,11 +23,36 @@ struct OutlineTextField: View {
     @State private var borderWidth: CGFloat = 0.0
 
     @State private var titleBackgroundOpacity = 0.0
-    @State private var titleBottomPadding = 0.0
     @State private var titleColor = Color.clear
     @State private var titleFontSize = 0.0
-    @State private var titleVerticalPadding: CGFloat = 0
-    @State private var titleLeadingPadding: Double
+    @State private var animatableEditingState = false
+
+    private var titleLeadingPadding: Double {
+        let isActive = animatableEditingState || !text.isEmpty
+        if isActive {
+            return 14.0
+        } else {
+            return (leftImage != nil) ? (leftIconWidth + 24) : 14.0
+        }
+    }
+
+    private var titleBottomPadding: Double {
+        let isActive = animatableEditingState || !text.isEmpty
+        if isActive {
+            return 48.0 + getTitleExtraPadding()
+        } else {
+            return 0.0
+        }
+    }
+
+    private var titleVerticalPadding: CGFloat {
+        let isActive = animatableEditingState || !text.isEmpty
+        if isActive {
+            return -10.0
+        } else {
+            return 0.0
+        }
+    }
 
     @State private var validationIconState: ValidationIconState = .none
 
@@ -85,8 +110,7 @@ struct OutlineTextField: View {
                 returnKeyType: UIReturnKeyType = .default,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
-                onSubmit: (() -> Void)? = nil
-    ) {
+                onSubmit: (() -> Void)? = nil) {
         self.appearance = appearance
         self._text = text
         self.title = title
@@ -103,8 +127,6 @@ struct OutlineTextField: View {
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
-
-        titleLeadingPadding = (leftImage != nil) ? 52 : 12
     }
 
     // MARK: - View protocol properties
@@ -132,6 +154,7 @@ struct OutlineTextField: View {
         }
         .onChange(of: editing) { _ in
             withAnimation(.easeOut(duration: 0.15)) {
+                animatableEditingState = editing
                 updateBorder()
                 updateTitle()
             }
@@ -152,8 +175,6 @@ struct OutlineTextField: View {
             updateTitle()
         }
         .onChange(of: sizeCategory) { _ in
-            updateTitleLeadingPadding()
-            updateTitlePosition()
             updateTitleFontSize()
         }
         .onAppear {
@@ -161,7 +182,6 @@ struct OutlineTextField: View {
             titleFontSize = appearance.fonts.title.customFont.size
             borderColor = appearance.colors.inactive
             borderWidth = appearance.dimensions.borderWidth
-            updateTitleLeadingPadding()
         }
     }
 
@@ -317,7 +337,6 @@ private extension OutlineTextField {
         updateTitleBackground()
         updateTitleColor()
         updateTitleFontSize()
-        updateTitlePosition()
     }
 
     func updateTitleBackground() {
@@ -350,19 +369,6 @@ private extension OutlineTextField {
         }
     }
 
-    func updateTitlePosition() {
-        if editing || !text.isEmpty {
-            titleBottomPadding = 48.0 + getTitleExtraPadding()
-            titleLeadingPadding = 14.0
-            titleVerticalPadding = -10
-
-        } else {
-            titleBottomPadding = 0.0
-            titleLeadingPadding = (leftImage != nil) ? (leftIconWidth + 24) : 14.0
-            titleVerticalPadding = 0
-        }
-    }
-
     enum ValidationIconState {
         case valid
         case invalid
@@ -373,10 +379,6 @@ private extension OutlineTextField {
 // MARK: - Accessibility handling
 
 extension OutlineTextField {
-
-    private func updateTitleLeadingPadding() {
-        titleLeadingPadding = (leftImage != nil) ? (leftIconWidth + 24) : 12
-    }
 
     private func getTextFieldHeight() -> CGFloat {
         switch sizeCategory {
