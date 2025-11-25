@@ -44,7 +44,7 @@ class CardDetailsFormManager: ObservableObject {
     let cardholderNameTitle = "Cardholder name"
     let cardNumberTitle = "Card number"
     let expiryDateTitle = "Expiry"
-    @Published var securityCodeTitle = "CVC"
+    @Published var securityCodeTitle = "CVV"
 
     var cardholderNamePlaceholder = ""
     var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"

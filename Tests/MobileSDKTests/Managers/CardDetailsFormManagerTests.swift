@@ -76,7 +76,7 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.cardholderNameTitle, "Cardholder name")
         XCTAssertEqual(sut.cardNumberTitle, "Card number")
         XCTAssertEqual(sut.expiryDateTitle, "Expiry")
-        XCTAssertEqual(sut.securityCodeTitle, "CVC")
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
 
         XCTAssertEqual(sut.cardholderNamePlaceholder, "")
         XCTAssertEqual(sut.cardNumberPlaceholder, "XXXX XXXX XXXX XXXX")
