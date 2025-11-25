@@ -216,6 +216,7 @@ public struct AddressWidget: View {
                 title: "Or enter address manually",
                 style: .custom(CustomButtonStyle(appearance: viewModel.appearance.expandSectionButton)),
                 isLeftAligned: true,
+                contentPadding: 0.0,
                 action: {
                     viewModel.expandAddressForm()
                     viewModel.handleExpandAddressFormTapAnalytics()

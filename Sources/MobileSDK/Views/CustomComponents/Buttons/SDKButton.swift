@@ -18,6 +18,7 @@ struct SDKButton: View {
     private let scaleToFit: Bool
     private let isLeftAligned: Bool
     private let shouldTemplate: Bool
+    private let contentPadding: CGFloat
     private let action: () -> Void
 
     @StateObject private var announcementManager = LoadingAnnouncementManager()
@@ -31,6 +32,7 @@ struct SDKButton: View {
          scaleToFit: Bool = false,
          isLeftAligned: Bool = false,
          shouldTemplate: Bool = false,
+         contentPadding: CGFloat = 16.0,
          action: @escaping () -> Void) {
         self.title = title
         self.backgroundImage = backgroundImage
@@ -40,6 +42,7 @@ struct SDKButton: View {
         self.scaleToFit = scaleToFit
         self.isLeftAligned = isLeftAligned
         self.shouldTemplate = shouldTemplate
+        self.contentPadding = contentPadding
         self.action = action
     }
 
@@ -68,11 +71,11 @@ struct SDKButton: View {
                     }
                 } else if style.image == nil {
                     getTitle()
-                        .padding(16) // Adds padding between outer button edges and the title inside it
+                        .padding(contentPadding) // Adds padding between outer button edges and the title inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     getImageAndTitle()
-                        .padding(16) // Adds padding between outer button edges and the content inside it
+                        .padding(contentPadding) // Adds padding between outer button edges and the content inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
