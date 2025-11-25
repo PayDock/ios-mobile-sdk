@@ -282,11 +282,13 @@ public struct CardDetailsWidget: View {
                         viewModel.handleLinkTapAnalytics(url: url)
                     })
             }
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
+
             Toggle(isOn: $viewModel.policyAccepted) {}
                 .conditionalToggleStyle(appearance: viewModel.appearance.toggle)
                 .disabled(viewModel.viewState.isDisabled)
                 .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
+                .fixedSize()
         }
     }
 
