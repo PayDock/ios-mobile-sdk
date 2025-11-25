@@ -39,7 +39,7 @@ class AfterpayWidgetVM: ObservableObject {
                 addressPostcode: "BN3 5SL",
                 addressCity: "Test City",
                 addressState: "Test State",
-                addressCountry: "Test Country",
+                addressCountry: "AU",
                 gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "",
                 walletType: nil)
 

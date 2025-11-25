@@ -38,7 +38,7 @@ class ColesPayWidgetVM: ObservableObject {
                 addressPostcode: "BN3 5SL",
                 addressCity: "Test City",
                 addressState: "Test State",
-                addressCountry: "Test Country",
+                addressCountry: "AU",
                 gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "",
                 walletType: nil)
 
