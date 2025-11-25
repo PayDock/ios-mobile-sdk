@@ -97,6 +97,16 @@ public struct CardDetailsWidget: View {
                 viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
             }
         )
+        .customToolbar(
+            buttonTitle: "Next",
+            font: UIFont(
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
+            textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
+        ) {
+            textFieldInFocus = .cardNumber
+            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
+        }
         .onConditionalKeyPress(key: .tab, action: {
             textFieldInFocus = .cardNumber
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
