@@ -69,6 +69,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
             updateLoadingState(isLoading: false)
 
+            // Check if app is in foreground before proceeding
+            guard UIApplication.shared.applicationState == .active else {
+                completion(.failure(.userCancelled))
+                return
+            }
+
             do {
                 let vaultResult = try await payPalClient.vault(vaultRequest)
                 await createPaymentToken(setupToken: vaultResult.tokenID)

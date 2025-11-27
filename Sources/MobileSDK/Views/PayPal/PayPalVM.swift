@@ -90,6 +90,12 @@ class PayPalVM: ObservableObject {
 
             updateLoadingState(isLoading: false)
 
+            // Check if app is in foreground before proceeding
+            guard UIApplication.shared.applicationState == .active else {
+                completion(.failure(.userCancelled))
+                return
+            }
+
             payPalClient.start(request: payPalWebRequest) { [weak self] result in
                 guard let self else { return }
                 updateLoadingState(isLoading: true)
