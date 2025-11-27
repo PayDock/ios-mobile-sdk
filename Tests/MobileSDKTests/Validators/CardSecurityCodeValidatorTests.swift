@@ -142,82 +142,82 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     // MARK: - Tests for isSecurityCodeValidForDisabledValidation
 
     func testIsSecurityCodeValidForDisabledValidation_Valid3DigitCode() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "123"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "123"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_Valid4DigitCode() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "1234"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "1234"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_EmptyCode() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: ""))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: ""))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_TooShort_1Digit() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "1"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "1"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_TooShort_2Digits() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_TooLong_5Digits() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12345"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12345"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_TooLong_6Digits() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "123456"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "123456"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_Letters() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12a"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12a"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_SpecialChars() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12#"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12#"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_Spaces() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12 3"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12 3"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_Mixed() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "1a3"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "1a3"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_AllZeros_3Digits() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "000"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "000"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_AllZeros_4Digits() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "0000"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "0000"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_LeadingZeros_3Digits() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "012"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "012"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_LeadingZeros_4Digits() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "0123"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "0123"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_AllNines_3Digits() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "999"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "999"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_AllNines_4Digits() {
-        XCTAssertTrue(validator.isSecurityCodeValidForDisabledValidation(code: "9999"))
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "9999"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_WhitespaceOnly() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "   "))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "   "))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_HyphenSeparated() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12-3"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12-3"))
     }
 
     func testIsSecurityCodeValidForDisabledValidation_DotSeparated() {
-        XCTAssertFalse(validator.isSecurityCodeValidForDisabledValidation(code: "12.3"))
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12.3"))
     }
 }

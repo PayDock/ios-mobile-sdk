@@ -709,7 +709,7 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(mockFormatter.formatSecurityCodeCallCount, 1)
         XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.updatedText, "123")
         XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.cursorPosition, 3)
-        XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.maxDigits, 4)
+        XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.maxDigits, 3)
     }
 
     func testFormatSecurityCode_WithCardValidationDisabled() {
@@ -918,7 +918,7 @@ class MockCardSecurityCodeValidator: CardSecurityCodeValidator {
         return isSecurityCodeValidResult
     }
 
-    override func isSecurityCodeValidForDisabledValidation(code: String) -> Bool {
+    override func isSecurityCodeValidForUnknownScheme(code: String) -> Bool {
         isSecurityCodeValidCalled = true
         lastCode = code
         return isSecurityCodeValidResult
