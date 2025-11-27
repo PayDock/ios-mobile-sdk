@@ -201,38 +201,34 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Validate card number
 
     private func validateCardNumber() {
-        if enableCardValidation {
-            validateCardNumberForEnabledCardValidation()
+        // if card scheme is detected, base validation on the scheme
+        if let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText),
+           cardSchemeValidator.isCardNumberValid(number: cardNumberText) {
+            if enableCardValidation {
+                validateAgainstSupportedSchemes(detectedScheme: scheme)
+            } else {
+                updateCardNumberValidationState(isValid: true, errorMessage: nil)
+            }
+
+        // if no card scheme is detected, base validation on default values if allowed
         } else {
-            validateCardNumberForDisabledCardValidation()
+            if enableCardValidation {
+                // Only supported schemes are allowed, detect the reason of failure
+                let isLuhnValid = cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText)
+                let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
+                let errorMessage = (isLuhnValid && scheme == nil) ? "Card type not accepted" : "Invalid card number"
+                updateCardNumberValidationState(isValid: false, errorMessage: errorMessage)
+            } else {
+                // Use generic validation if the scheme was not detected
+                validateCardNumberForUnknownScheme()
+            }
         }
     }
 
-    private func validateCardNumberForDisabledCardValidation() {
+    private func validateCardNumberForUnknownScheme() {
         guard cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText),
               cardSchemeValidator.isUnknownCardNumberLengthValid(number: cardNumberText) else {
             updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
-            return
-        }
-
-        // If all validations pass, clear any errors
-        updateCardNumberValidationState(isValid: true, errorMessage: nil)
-    }
-
-    private func validateCardNumberForEnabledCardValidation() {
-        guard let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText),
-              cardSchemeValidator.isCardNumberValid(number: cardNumberText) else {
-            // Card number is not valid. Check for the reason below.
-            let isLuhnValid = cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText)
-            let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
-            let errorMessage = (isLuhnValid && scheme == nil) ? "Card type not accepted" : "Invalid card number"
-            updateCardNumberValidationState(isValid: false, errorMessage: errorMessage)
-            return
-        }
-
-        // If card validation is enabled, validate against supported schemes
-        guard !enableCardValidation else {
-            validateAgainstSupportedSchemes(detectedScheme: scheme)
             return
         }
 
@@ -277,7 +273,7 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Validate security code
 
     private func validateSecurityCode() {
-        if let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText), enableCardValidation {
+        if let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) {
             validateSecurityCodeForDetectedScheme(scheme: cardScheme)
         } else {
             validateSecurityCodeForNoScheme()
@@ -295,7 +291,7 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateSecurityCodeForNoScheme() {
-        if cardSecurityCodeValidator.isSecurityCodeValidForDisabledValidation(code: securityCodeText) {
+        if cardSecurityCodeValidator.isSecurityCodeValidForUnknownScheme(code: securityCodeText) {
             securityCodeValid = true
             securityCodeError = ""
         } else {
@@ -319,7 +315,7 @@ class CardDetailsFormManager: ObservableObject {
                 code: securityCodeText,
                 cardScheme: cardScheme ?? .visa) // Default to 3 digit CVV validation
         } else {
-            securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValidForDisabledValidation(code: securityCodeText)
+            securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValidForUnknownScheme(code: securityCodeText)
         }
 
         return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
@@ -341,7 +337,7 @@ class CardDetailsFormManager: ObservableObject {
 
     func formatSecurityCode(updatedText: String, cursorPosition: Int) -> Int {
         let maxDigits: Int
-        if let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText), enableCardValidation {
+        if let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) {
             maxDigits = cardSecurityCodeValidator.requiredDigits(cardScheme: cardScheme)
         } else {
             // When validation is disabled or card not detected, allow up to 4 digits

@@ -21,7 +21,7 @@ class CardSecurityCodeValidator {
 
      - Returns: True if the security code input is valid, false otherwise.
      */
-    func isSecurityCodeValidForDisabledValidation(code: String) -> Bool {
+    func isSecurityCodeValidForUnknownScheme(code: String) -> Bool {
         guard !code.isEmpty,
               code.range(of: "^[0-9]+$", options: .regularExpression) != nil,
               code.count >= 3,
