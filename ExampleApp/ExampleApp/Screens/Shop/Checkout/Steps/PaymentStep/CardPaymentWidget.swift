@@ -22,7 +22,6 @@ struct CardPaymentWidget: View {
                 showCardTitle: false,
                 collectCardholderName: false,
                 allowSaveCard: SaveCardConfig(
-                    consentText: "Save payment details",
                     privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
                         privacyPolicyText: "Read our privacy policy",
                         privacyPolicyURL: "https://www.paydock.com/privacy"
