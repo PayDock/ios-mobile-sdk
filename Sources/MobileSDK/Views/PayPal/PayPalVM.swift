@@ -17,7 +17,7 @@ class PayPalVM: ObservableObject {
     // MARK: - Dependencies
 
     private let walletService: WalletService
-    private let payPalVaultService: PayPalVaultService
+    private let gatewayService: GatewayService
     private let config: PayPalWidgetConfig
 
     // MARK: - Properties
@@ -41,7 +41,7 @@ class PayPalVM: ObservableObject {
          viewState: ViewState,
          tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
-         payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
+         gatewayService: GatewayService = GatewayServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
@@ -49,7 +49,7 @@ class PayPalVM: ObservableObject {
         self.viewState = viewState
         self.tokenRequest = tokenRequest
         self.walletService = walletService
-        self.payPalVaultService = payPalVaultService
+        self.gatewayService = gatewayService
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
         self.completion = completion
@@ -122,7 +122,7 @@ class PayPalVM: ObservableObject {
     func getClientId() async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+            return try await gatewayService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.getPayPalClientId(error: errorResponse)))

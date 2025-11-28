@@ -22,7 +22,6 @@ enum WalletEndpoints {
     case captureCharge(request: CaptureChargeReq)
     case captureChargeForStandalone(request: CaptureChargeStandaloneReq)
     case captureChargeColesPay(chargeId: String)
-
 }
 
 extension WalletEndpoints: Endpoint {
@@ -101,5 +100,4 @@ extension WalletEndpoints: Endpoint {
     var bundle: Bundle? {
         return nil
     }
-
 }

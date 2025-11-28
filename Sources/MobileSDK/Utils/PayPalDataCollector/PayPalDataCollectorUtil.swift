@@ -26,11 +26,11 @@ public class PayPalDataCollectorUtil {
     }
 
     public static func initialise(config: PayPalDataCollectorConfig) async throws -> PayPalDataCollectorUtil {
-        return try await initialise(config: config, service: PayPalVaultServiceImpl())
+        return try await initialise(config: config, service: GatewayServiceImpl())
     }
 
     static func initialise(config: PayPalDataCollectorConfig,
-                           service: PayPalVaultService = PayPalVaultServiceImpl()) async throws -> PayPalDataCollectorUtil {
+                           service: GatewayService = GatewayServiceImpl()) async throws -> PayPalDataCollectorUtil {
         do {
             let clientId = try await service.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
             return PayPalDataCollectorUtil(config: config, clientId: clientId)

@@ -17,7 +17,8 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     // MARK: - Dependencies
 
     let config: PayPalVaultConfig
-    private let payPalVaultService: PayPalVaultService
+    private let paymentSourcesService: PaymentSourcesService
+    private let gatewayService: GatewayService
 
     // MARK: - Properties
 
@@ -36,13 +37,15 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
     init(viewState: ViewState,
          config: PayPalVaultConfig,
-         payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
+         paymentSourcesService: PaymentSourcesService = PaymentSourcesServiceImpl(),
+         gatewayService: GatewayService = GatewayServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         self.viewState = viewState
         self.config = config
-        self.payPalVaultService = payPalVaultService
+        self.paymentSourcesService = paymentSourcesService
+        self.gatewayService = gatewayService
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
         self.completion = completion
@@ -81,7 +84,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     func getClientId() async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+            return try await gatewayService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.getPayPalClientId(error: errorResponse)))
             updateLoadingState(isLoading: false)
@@ -96,7 +99,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         updateLoadingState(isLoading: true)
         do {
             let request = PayPalVaultSetupTokenReq(gatewayId: config.gatewayId)
-            return try await payPalVaultService.createSetupTokenData(req: request, accessToken: config.accessToken)
+            return try await paymentSourcesService.createSetupTokenData(req: request, accessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.createSetupToken(error: errorResponse)))
             updateLoadingState(isLoading: false)
@@ -111,7 +114,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         updateLoadingState(isLoading: true)
         do {
             let request = PayPalVaultPaymentTokenReq(gatewayId: config.gatewayId)
-            let tokenData = try await payPalVaultService.createPaymentToken(
+            let tokenData = try await paymentSourcesService.createPaymentToken(
                 request: request,
                 setupToken: setupToken,
                 accessToken: config.accessToken)

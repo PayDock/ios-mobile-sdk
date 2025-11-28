@@ -17,7 +17,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Dependencies
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
-    private let cardService: CardService
+    private let paymentSourcesService: PaymentSourcesService
     let config: CardDetailsWidgetConfig
     let appearance: CardDetailsWidgetAppearance
 
@@ -41,14 +41,14 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(cardService: CardService = CardServiceImpl(),
+    init(paymentSourcesService: PaymentSourcesService = PaymentSourcesServiceImpl(),
          viewState: ViewState,
          config: CardDetailsWidgetConfig,
          appearance: CardDetailsWidgetAppearance,
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
-        self.cardService = cardService
+        self.paymentSourcesService = paymentSourcesService
         self.viewState = viewState
         self.config = config
         self.appearance = appearance
@@ -93,7 +93,7 @@ class CardDetailsVM: ObservableObject {
 
             do {
                 updateLoadingState(isLoading: true)
-                let cardToken = try await cardService.createToken(
+                let cardToken = try await paymentSourcesService.createToken(
                     tokeniseCardDetailsReq: tokeniseCardDetailsReq,
                     accessToken: config.accessToken)
 

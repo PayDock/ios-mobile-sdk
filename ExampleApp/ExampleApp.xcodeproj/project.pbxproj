@@ -175,6 +175,8 @@
 		587458292E4B397E00A24A35 /* AddressWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458252E4B397E00A24A35 /* AddressWidgetUITests.swift */; };
 		5874582A2E4B397E00A24A35 /* CardDetailsWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458262E4B397E00A24A35 /* CardDetailsWidgetUITests.swift */; };
 		5874582C2E5370B700A24A35 /* PayPalWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5874582B2E5370B700A24A35 /* PayPalWidgetUITests.swift */; };
+		587C10782ECCDEF800D8FCBE /* ZipWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587C10752ECCDEF800D8FCBE /* ZipWidgetView.swift */; };
+		587C10792ECCDEF800D8FCBE /* ZipWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587C10762ECCDEF800D8FCBE /* ZipWidgetVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -372,6 +374,8 @@
 		587458262E4B397E00A24A35 /* CardDetailsWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailsWidgetUITests.swift; sourceTree = "<group>"; };
 		587458272E4B397E00A24A35 /* GiftCardWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetUITests.swift; sourceTree = "<group>"; };
 		5874582B2E5370B700A24A35 /* PayPalWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetUITests.swift; sourceTree = "<group>"; };
+		587C10752ECCDEF800D8FCBE /* ZipWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipWidgetView.swift; sourceTree = "<group>"; };
+		587C10762ECCDEF800D8FCBE /* ZipWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipWidgetVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -469,6 +473,7 @@
 				28F19D2B2B029F2E002F5526 /* GiftCard */,
 				28A81F492B14DAD60068FE75 /* Integrated3DS */,
 				280E96302B176EB600BE8C3E /* Standalone3DS */,
+				587C10772ECCDEF800D8FCBE /* Zip */,
 				2867ADD82ACEE54200DB5319 /* WidgetList */,
 			);
 			path = Widgets;
@@ -1095,6 +1100,15 @@
 			path = AfterPay;
 			sourceTree = "<group>";
 		};
+		587C10772ECCDEF800D8FCBE /* Zip */ = {
+			isa = PBXGroup;
+			children = (
+				587C10752ECCDEF800D8FCBE /* ZipWidgetView.swift */,
+				587C10762ECCDEF800D8FCBE /* ZipWidgetVM.swift */,
+			);
+			path = Zip;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1394,6 +1408,8 @@
 				2886AE602E55D1F60071BADC /* CreateCustomerTokenResource.swift in Sources */,
 				2886AE612E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift in Sources */,
 				2886AE812E55D6270071BADC /* Integrated3DSVaultPaymentSource.swift in Sources */,
+				587C10782ECCDEF800D8FCBE /* ZipWidgetView.swift in Sources */,
+				587C10792ECCDEF800D8FCBE /* ZipWidgetVM.swift in Sources */,
 				287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */,
 				2881BC462E55CDFC00390CD8 /* WalletData.swift in Sources */,
 				280E96362B1798DC00BE8C3E /* VaultTokenRes.swift in Sources */,

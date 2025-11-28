@@ -9,7 +9,6 @@
 import Foundation
 
 struct TokeniseGiftCardReq: Codable {
-
     let cardNumber: String
     let pin: String
     let storePin: Bool
