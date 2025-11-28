@@ -25,6 +25,7 @@ class AfterpayVM: ObservableObject {
     @Published var showWebView = false
     @Published var isLoading = false
     private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
     private var token = ""
     private(set) var afterPayOrderId = ""
 
@@ -54,6 +55,7 @@ class AfterpayVM: ObservableObject {
         ) -> Void)?,
         walletService: WalletService = WalletServiceImpl(),
         loadingDelegate: WidgetLoadingDelegate?,
+        eventDelegate: WidgetEventDelegate?,
         completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void
     ) {
         self.viewState = viewState
@@ -64,6 +66,7 @@ class AfterpayVM: ObservableObject {
         self.walletService = walletService
         self.completion = completion
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.setupConfig()
     }
 
@@ -211,6 +214,15 @@ class AfterpayVM: ObservableObject {
             self.isLoading = isLoading
         }
         viewState.isDisabled = isLoading
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleAfterpayButtonTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "AfterPayCheckoutButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
     }
 }
 

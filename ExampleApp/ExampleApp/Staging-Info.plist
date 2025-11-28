@@ -2,29 +2,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>API_ACCESS_TOKEN</key>
-	<string>$(API_ACCESS_TOKEN)</string>
-	<key>WIDGET_ACCESS_TOKEN</key>
-	<string>$(WIDGET_ACCESS_TOKEN)</string>
-	<key>AFTERPAY_GATEWAY_ID</key>
-	<string>$(AFTERPAY_GATEWAY_ID)</string>
-	<key>APPLE_PAY_GATEWAY_ID</key>
-	<string>$(APPLE_PAY_GATEWAY_ID)</string>
+	<key>ACCESS_TOKEN_API</key>
+	<string>$(ACCESS_TOKEN_API)</string>
+	<key>ACCESS_TOKEN_WIDGET</key>
+	<string>$(ACCESS_TOKEN_WIDGET)</string>
+	<key>SERVICE_ID_AFTERPAY</key>
+	<string>$(SERVICE_ID_AFTERPAY)</string>
+	<key>SERVICE_ID_APPLE_PAY_MPGS</key>
+	<string>$(SERVICE_ID_APPLE_PAY_MPGS)</string>
 	<key>CONFIGURATION</key>
 	<string>$(CONFIGURATION)</string>
-	<key>COLES_PAY_CLIENT_ID</key>
-	<string>$(COLES_PAY_CLIENT_ID)</string>
-	<key>COLES_PAY_GATEWAY_ID</key>
-	<string>$(COLES_PAY_GATEWAY_ID)</string>
-	<key>INTEGRATED_3DS_GATEWAY_ID</key>
-	<string>$(INTEGRATED_3DS_GATEWAY_ID)</string>
-	<key>MASTERCARD_SERVICE_ID</key>
-	<string>$(MASTERCARD_SERVICE_ID)</string>
-	<key>PAY_PAL_GATEWAY_ID</key>
-	<string>$(PAY_PAL_GATEWAY_ID)</string>
-	<key>STANDALONE_3DS_GATEWAY_ID</key>
-	<string>$(STANDALONE_3DS_GATEWAY_ID)</string>
-	<key>MERCHANT_ID</key>
-	<string>$(MERCHANT_ID)</string>
+	<key>WALLET_ID_COLES_PAY</key>
+	<string>$(WALLET_ID_COLES_PAY)</string>
+	<key>SERVICE_ID_COLES_PAY</key>
+	<string>$(SERVICE_ID_COLES_PAY)</string>
+	<key>SERVICE_ID_MPGS</key>
+	<string>$(SERVICE_ID_MPGS)</string>
+	<key>SERVICE_ID_MPGS_TEST</key>
+	<string>$(SERVICE_ID_MPGS_TEST)</string>
+	<key>SERVICE_ID_CLICK_TO_PAY</key>
+	<string>$(SERVICE_ID_CLICK_TO_PAY)</string>
+	<key>SERVICE_ID_PAYPAL</key>
+	<string>$(SERVICE_ID_PAYPAL)</string>
+	<key>SERVICE_ID_GPAYMENTS</key>
+	<string>$(SERVICE_ID_GPAYMENTS)</string>
+	<key>MERCHANT_ID_APPLE_PAY</key>
+	<string>$(MERCHANT_ID_APPLE_PAY)</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon-Staging</string>
 </dict>
 </plist>

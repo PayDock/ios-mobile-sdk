@@ -19,6 +19,7 @@ class AddressVM: NSObject, ObservableObject {
     var addressFormManager: AddressFormManager
     private let localSearchCompleter: MKLocalSearchCompleter
     private let config: AddressWidgetConfig
+    let appearance: AddressWidgetAppearance
 
     // MARK: - Properties
 
@@ -27,7 +28,11 @@ class AddressVM: NSObject, ObservableObject {
     @Published var isDisabled = false // not used currently as there's no need for ViewState
     var mkLocalSearchCompletions: [MKLocalSearchCompletion] = []
     var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
-    let completion: (Address) -> Void
+
+    // MARK: - Completion Handlers
+
+    private weak var eventDelegate: WidgetEventDelegate?
+    private let completion: (Address) -> Void
 
     // MARK: - Custom bindings
 
@@ -57,10 +62,14 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Initialisation
 
     init(config: AddressWidgetConfig,
+         appearance: AddressWidgetAppearance,
+         eventDelegate: WidgetEventDelegate?,
          addressFormManager: AddressFormManager = AddressFormManager(),
          localSearchCompleter: MKLocalSearchCompleter = MKLocalSearchCompleter(),
          completion: @escaping (Address) -> Void) {
         self.config = config
+        self.appearance = appearance
+        self.eventDelegate = eventDelegate
         self.addressFormManager = addressFormManager
         self.localSearchCompleter = localSearchCompleter
         self.completion = completion
@@ -185,10 +194,29 @@ class AddressVM: NSObject, ObservableObject {
         addressFormManager.updateFormWith(address: config.address)
     }
 
+    func expandAddressForm() {
+        addressFormManager.isAddressFormExpanded = true
+    }
+
     // MARK: - Validation
 
     func isActionButtonDisabled() -> Bool {
         return !addressFormManager.isFormValid()
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleExpandAddressFormTapAnalytics() {
+        let event = WidgetEvent(type: .button, properties: .button(WidgetEventButtonProperties(name: "ManualEntryButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
+    }
+
+    func handleSaveAddresTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "SaveButton", action: .click, text: appearance.actionButton.text))
+        )
+        eventDelegate?.widgetEvent(event: event)
     }
 }
 

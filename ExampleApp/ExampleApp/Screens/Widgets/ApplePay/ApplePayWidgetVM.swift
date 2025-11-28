@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import NetworkingLib
+import OSLog
 
 @MainActor
 class ApplePayWidgetVM: NSObject, ObservableObject {
@@ -35,7 +36,11 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: nil,
+                addressLine2: nil,
                 addressPostcode: nil,
+                addressCity: nil,
+                addressState: nil,
+                addressCountry: nil,
                 gatewayId: ProjectEnvironment.shared.getApplePayGatewayId() ?? "",
                 walletType: "apple")
 
@@ -66,6 +71,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
                 let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
                 let applePayRequestResult = self.getApplePayRequestResult(walletToken: token)
                 completion(.success(applePayRequestResult))
+                isLoading = false
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
@@ -86,7 +92,7 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: "AUD",
-            merchantIdentifier: ProjectEnvironment.shared.getMerchantId() ?? "")
+            merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
 
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
@@ -95,16 +101,21 @@ class ApplePayWidgetVM: NSObject, ObservableObject {
         isLoading = false
         alertTitle = "Error"
         alertMessage = "\(error.customMessage)"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.showAlert = true
-        }
+        showAlert = true
     }
 
     func handleSuccess(charge: ChargeResponse) {
         alertTitle = "Success"
         alertMessage = "\(charge.amount) \(charge.currency) charged!"
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.showAlert = true
-        }
+        showAlert = true
+    }
+}
+
+// MARK: - WidgetEventDelegate
+
+extension ApplePayWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

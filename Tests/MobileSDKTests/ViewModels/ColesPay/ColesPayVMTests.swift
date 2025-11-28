@@ -19,6 +19,7 @@ class ColesPayVMTests: XCTestCase {
     private var walletService: ColesWalletServiceMock!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
+    var eventDelegate: WidgetEventDelegateUtil!
     var config: ColesPayConfig!
 
     var completionResult: Result<String, ColesPayError>?
@@ -28,6 +29,7 @@ class ColesPayVMTests: XCTestCase {
         walletService = ColesWalletServiceMock()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
+        eventDelegate = WidgetEventDelegateUtil()
         config = ColesPayConfig(clientId: "client_123")
         completionResult = nil
 
@@ -39,9 +41,10 @@ class ColesPayVMTests: XCTestCase {
             walletService: walletService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
-        })
+            })
     }
 
     override func tearDown() {
@@ -49,6 +52,7 @@ class ColesPayVMTests: XCTestCase {
         walletService = nil
         viewState = nil
         loadingDelegate = nil
+        eventDelegate = nil
         config = nil
         completionResult = nil
         super.tearDown()
@@ -68,10 +72,10 @@ class ColesPayVMTests: XCTestCase {
             },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: nil
-        ) { result in
-            self.completionResult = result
-        }
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+            }
 
         XCTAssertEqual(viewModel.showLoaders, true)
     }
@@ -97,10 +101,10 @@ class ColesPayVMTests: XCTestCase {
             },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: nil
-        ) { result in
-            self.completionResult = result
-        }
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+            }
         viewModel.isLoading = false
         loadingDelegate.isLoading = false
 
@@ -136,10 +140,10 @@ class ColesPayVMTests: XCTestCase {
             },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: nil
-        ) { result in
-            self.completionResult = result
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+            }
         viewModel.isLoading = true
         loadingDelegate.isLoading = false
 
@@ -175,8 +179,10 @@ class ColesPayVMTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
 
-    func testHandleButtonTap_CompletesWithInitialisingWalletToken_OnTokenFailure() {
+    func testHandleButtonTap_CompletesWithInitialisingWalletToken_OnTokenFailure() async {
         // Given: token request fails
+        let expectation = expectation(description: "Completion called with token failure")
+        
         viewModel = ColesPayVM(
             config: config,
             tokenRequest: { completion in
@@ -184,15 +190,18 @@ class ColesPayVMTests: XCTestCase {
             },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
 
         // When
         viewModel.handleButtonTap()
 
-        // Then
+        // Then - Wait for the async task to complete
+        await fulfillment(of: [expectation], timeout: 1.0)
+        
         switch completionResult {
         case .failure(let error):
             switch error {
@@ -221,11 +230,11 @@ class ColesPayVMTests: XCTestCase {
             },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-            exp.fulfill()
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+                exp.fulfill()
+            }
 
         // When
         viewModel.getColesPayURL(token: "wallet_token")
@@ -268,11 +277,11 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-            completionExp.fulfill()
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+                completionExp.fulfill()
+            }
         // Manually set order id to simulate fetched state
         viewModel.getColesPayURL(token: "wallet_token")
         let exp2 = expectation(description: "URL fetched 2")
@@ -303,11 +312,11 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-            exp.fulfill()
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+                exp.fulfill()
+            }
 
         // When
         viewModel.handleFailure(error: error)
@@ -337,11 +346,11 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
             walletService: walletService,
             viewState: viewState,
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-            exp.fulfill()
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+                exp.fulfill()
+            }
 
         // When
         viewModel.handleSheetCancellation()
@@ -358,6 +367,63 @@ class ColesPayVMTests: XCTestCase {
             XCTFail("Expected failure result")
         }
         XCTAssertEqual(viewModel.isLoading, false)
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesEvents() {
+        // Given
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "ColesPayCheckoutButton", action: .click)))
+        viewModel.handleaButtonTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = ColesPayVM(
+            config: config,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "wallet_token")))
+            },
+            walletService: walletService,
+            viewState: viewState,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        viewModel.handleButtonTap()
+
+        // Then - No events should be recorded in our test delegate
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }
 

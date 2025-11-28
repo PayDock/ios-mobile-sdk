@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import NetworkingLib
+import OSLog
 
 @MainActor
 class ColesPayWidgetVM: ObservableObject {
@@ -33,7 +34,11 @@ class ColesPayWidgetVM: ObservableObject {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: "123 Test Street",
+                addressLine2: nil,
                 addressPostcode: "BN3 5SL",
+                addressCity: "Test City",
+                addressState: "Test State",
+                addressCountry: "AU",
                 gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "",
                 walletType: nil)
 
@@ -95,11 +100,21 @@ class ColesPayWidgetVM: ObservableObject {
 // MARK: - WidgetLoadingDelegate
 
 extension ColesPayWidgetVM: WidgetLoadingDelegate {
+
     func loadingDidStart() {
         isLoading = true
     }
 
     func loadingDidFinish() {
         isLoading = false
+    }
+}
+
+// MARK: - WidgetEventDelegate
+
+extension ColesPayWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

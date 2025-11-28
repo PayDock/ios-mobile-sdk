@@ -17,6 +17,23 @@ class ButtonStyleVM<T>: ObservableObject {
     private let stylingDarkMode: Bool
     private let buttonKeyPath: WritableKeyPath<T, Theme.ButtonAppearance>
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
+    let allSystemIconNames = [
+        "heart", "heart.fill", "star", "star.fill", "bookmark", "bookmark.fill",
+        "house", "house.fill", "person", "person.fill", "envelope", "envelope.fill",
+        "phone", "phone.fill", "message", "message.fill", "calendar", "calendar.circle.fill",
+        "camera", "camera.fill", "photo", "photo.fill", "video", "video.fill",
+        "music.note", "headphones", "speaker.wave.2", "speaker.wave.3",
+        "gamecontroller", "gamecontroller.fill", "car", "car.fill", "airplane", "airplane.circle.fill",
+        "mappin", "mappin.and.ellipse", "location", "location.fill",
+        "bag", "bag.fill", "cart", "cart.fill", "creditcard", "creditcard.fill",
+        "gift", "gift.fill", "alarm", "alarm.fill", "timer", "stopwatch",
+        "plus", "minus", "multiply", "divide", "equal", "checkmark",
+        "xmark", "exclamationmark", "questionmark", "info", "gear", "wrench",
+        "lock", "lock.fill", "key", "key.fill", "shield", "shield.fill",
+        "eye", "eye.fill", "eye.slash", "eye.slash.fill", "hand.thumbsup", "hand.thumbsdown",
+        "paperplane", "paperplane.fill", "tray", "tray.fill", "folder", "folder.fill",
+        "doc", "doc.fill", "pencil", "pencil.circle", "trash", "trash.fill"
+    ]
 
     // MARK: - Variables
 
@@ -40,6 +57,9 @@ class ButtonStyleVM<T>: ObservableObject {
     @Published var strikethroughColor: Color = .clear { didSet { updateAppearance() }}
     @Published var fontName: String = "" { didSet { updateAppearance() }}
     @Published var fontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
+
+    @Published var icon: Image? { didSet { updateAppearance() }}
+    @Published var buttonText: String = "" { didSet { updateAppearance() }}
 
     // MARK: - Initialization
 
@@ -72,6 +92,9 @@ class ButtonStyleVM<T>: ObservableObject {
         self.strikethroughColor = buttonAppearance?.fonts.title.strikethroughColor ?? .clear
         self.fontName = buttonAppearance?.fonts.title.customFont.name ?? ""
         self.fontSize = buttonAppearance?.fonts.title.customFont.size ?? 0
+
+        self.icon = buttonAppearance?.icon
+        self.buttonText = buttonAppearance?.text ?? ""
     }
 
     private func updateAppearance() {
@@ -94,6 +117,9 @@ class ButtonStyleVM<T>: ObservableObject {
         appearance[keyPath: buttonKeyPath].fonts.title.strikethroughColor = strikethroughColor
         appearance[keyPath: buttonKeyPath].fonts.title.customFont.name = fontName
         appearance[keyPath: buttonKeyPath].fonts.title.customFont.size = fontSize
+
+        appearance[keyPath: buttonKeyPath].icon = icon
+        appearance[keyPath: buttonKeyPath].text = buttonText
 
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)

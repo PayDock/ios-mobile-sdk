@@ -12,15 +12,11 @@ struct MainView: View {
 
     @State private var selection: Int = 0
 
-    init() {
-        UITabBar.appearance().backgroundColor = .white
-    }
-
     var body: some View {
         TabView(selection: $selection) {
-            CheckoutView()
+            ProductListView()
                 .tabItem {
-                    Label("Checkout", image: selection == 0 ? "cart-active" : "cart")
+                    Label("Shop", image: selection == 0 ? "cart-active" : "cart")
                 }
                 .tag(0)
 

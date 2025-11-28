@@ -19,6 +19,7 @@ struct PayPalVaultWidgetView: View {
             ScrollView {
                 PayPalSavePaymentSourceWidget(
                     config: viewModel.getConfig(),
+                    eventDelegate: viewModel,
                     appearance: getAppearance()) { result in
                         switch result {
                         case let .success(payPalVaultResult):

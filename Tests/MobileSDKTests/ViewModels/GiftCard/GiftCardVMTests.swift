@@ -19,6 +19,7 @@ class GiftCardVMTests: XCTestCase {
     var viewState: ViewState!
     var config: GiftCardWidgetConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
+    var eventDelegate: WidgetEventDelegateUtil!
     var completionResult: Result<GiftCardResult, GiftCardError>?
     var cancellables = Set<AnyCancellable>()
 
@@ -28,11 +29,14 @@ class GiftCardVMTests: XCTestCase {
         viewState = ViewState()
         config = GiftCardWidgetConfig(accessToken: "")
         loadingDelegate = WidgetLoadingDelegateUtil()
+        eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
-        viewModel = GiftCardVM(viewState: viewState,
+        viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                               viewState: viewState,
                                cardService: mockService,
                                config: config,
-                               loadingDelegate: loadingDelegate) { result in
+                               loadingDelegate: loadingDelegate,
+                               eventDelegate: nil) { result in
             self.completionResult = result
         }
     }
@@ -40,6 +44,8 @@ class GiftCardVMTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         mockService = nil
+        loadingDelegate = nil
+        eventDelegate = nil
         completionResult = nil
         cancellables.removeAll()
         super.tearDown()
@@ -47,10 +53,12 @@ class GiftCardVMTests: XCTestCase {
 
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
-        viewModel = GiftCardVM(viewState: viewState,
+        viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                               viewState: viewState,
                                cardService: mockService,
                                config: config,
-                               loadingDelegate: loadingDelegate) { result in
+                               loadingDelegate: loadingDelegate,
+                               eventDelegate: nil) { result in
             self.completionResult = result
         }
 
@@ -64,10 +72,12 @@ class GiftCardVMTests: XCTestCase {
 
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
-        viewModel = GiftCardVM(viewState: viewState,
+        viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                               viewState: viewState,
                                cardService: mockService,
                                config: config,
-                               loadingDelegate: nil) { result in
+                               loadingDelegate: nil,
+                               eventDelegate: nil) { result in
             self.completionResult = result
         }
         viewModel.isLoading = false
@@ -83,10 +93,12 @@ class GiftCardVMTests: XCTestCase {
 
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
-        viewModel = GiftCardVM(viewState: viewState,
+        viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                               viewState: viewState,
                                cardService: mockService,
                                config: config,
-                               loadingDelegate: loadingDelegate) { result in
+                               loadingDelegate: loadingDelegate,
+                               eventDelegate: nil) { result in
             self.completionResult = result
         }
         viewModel.isLoading = false
@@ -102,10 +114,12 @@ class GiftCardVMTests: XCTestCase {
 
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
-        viewModel = GiftCardVM(viewState: viewState,
+        viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                               viewState: viewState,
                                cardService: mockService,
                                config: config,
-                               loadingDelegate: nil) { result in
+                               loadingDelegate: nil,
+                               eventDelegate: nil) { result in
             self.completionResult = result
         }
         viewModel.isLoading = true
@@ -168,14 +182,15 @@ class GiftCardVMTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Completion called with unknownError")
 
         viewModel = GiftCardVM(
+            appearance: GiftCardWidgetAppearance(),
             viewState: viewState,
             cardService: failingService,
             config: config,
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-            expectation.fulfill()
-        }
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
 
         populateValidFormFields()
 
@@ -199,6 +214,61 @@ class GiftCardVMTests: XCTestCase {
         // Loading state should be reset
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(viewModel.viewState.isDisabled, false)
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesEvents() {
+        // Given
+        let appearance = GiftCardWidgetAppearance()
+        viewModel = GiftCardVM(
+            appearance: appearance,
+            viewState: viewState,
+            cardService: mockService,
+            config: config,
+            loadingDelegate: nil,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+            }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text))
+        )
+        viewModel.handleButtonTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = GiftCardVM(
+            appearance: GiftCardWidgetAppearance(),
+            viewState: viewState,
+            cardService: mockService,
+            config: config,
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+            }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // For demonstration, we'll simulate what the view model would do:
+        viewModel.tokeniseGiftCard()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }
 // swiftlint:enable all

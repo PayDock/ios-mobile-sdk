@@ -33,6 +33,7 @@ class PayPalVM: ObservableObject {
 
     private var completion: (Result<ChargeResponse, PayPalError>) -> Void
     private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
 
     // MARK: - Initialisation
 
@@ -42,6 +43,7 @@ class PayPalVM: ObservableObject {
          walletService: WalletService = WalletServiceImpl(),
          payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
+         eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self.config = config
         self.viewState = viewState
@@ -49,6 +51,7 @@ class PayPalVM: ObservableObject {
         self.walletService = walletService
         self.payPalVaultService = payPalVaultService
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.completion = completion
 
         if loadingDelegate != nil {
@@ -86,6 +89,12 @@ class PayPalVM: ObservableObject {
             let payPalWebRequest = PayPalWebCheckoutRequest(orderID: orderId, fundingSource: config.fundingSource)
 
             updateLoadingState(isLoading: false)
+
+            // Check if app is in foreground before proceeding
+            guard UIApplication.shared.applicationState == .active else {
+                completion(.failure(.userCancelled))
+                return
+            }
 
             payPalClient.start(request: payPalWebRequest) { [weak self] result in
                 guard let self else { return }
@@ -180,6 +189,15 @@ class PayPalVM: ObservableObject {
         }
 
         updateLoadingState(isLoading: false)
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleButtonTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "PayPalCheckoutButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
     }
 
     // MARK: - Helpers

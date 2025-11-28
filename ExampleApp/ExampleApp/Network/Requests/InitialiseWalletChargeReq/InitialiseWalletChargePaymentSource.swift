@@ -10,14 +10,11 @@ import Foundation
 
 struct InitialiseWalletChargePaymentSource: Codable {
     let addressLine1: String?
+    let addressLine2: String?
     let addressPostcode: String?
+    let addressCity: String?
+    let addressState: String?
+    let addressCountry: String?
     let gatewayId: String
     let walletType: String?
-
-    enum CodingKeys: String, CodingKey {
-        case addressLine1 = "address_line1"
-        case addressPostcode = "address_postcode"
-        case gatewayId = "gateway_id"
-        case walletType = "wallet_type"
-    }
 }

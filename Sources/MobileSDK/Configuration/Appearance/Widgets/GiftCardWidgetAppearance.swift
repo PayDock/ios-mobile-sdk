@@ -18,19 +18,24 @@ public struct GiftCardWidgetAppearance:
 
     public var verticalSpacing: CGFloat
     public var horizontalSpacing: CGFloat
+    public var textFieldVerticalSpacing: CGFloat = 8.0
     public var title: Theme.TextAppearance
     public var textField: Theme.TextFieldAppearance
     public var actionButton: Theme.ButtonAppearance
     public var toolbarButton: Theme.ButtonAppearance
 
-    public init(verticalSpacing: CGFloat = 6,
+    public init(verticalSpacing: CGFloat = 16,
                 horizontalSpacing: CGFloat = 16,
+                textFieldVerticalSpacing: CGFloat = 8,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                actionButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                actionButton: Theme.ButtonAppearance = .init(
+                    icon: Image(systemName: "plus.circle"),
+                    text: "Add"),
                 toolbarButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.toolbarButton) {
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing
+        self.textFieldVerticalSpacing = textFieldVerticalSpacing
         self.title = title
         self.textField = textField
         self.actionButton = actionButton

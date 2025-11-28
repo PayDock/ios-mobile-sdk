@@ -33,7 +33,12 @@ let testCases: [CardTestCase] = [
     // AUSBC
     CardTestCase(cardNumber: "6771892573677360", expectedIssuer: .ausbc, isValid: false),
     CardTestCase(cardNumber: "5610591081018250989", expectedIssuer: .ausbc, isValid: false),
-    CardTestCase(cardNumber: "5610591081018250", expectedIssuer: .ausbc, isValid: true)
+    CardTestCase(cardNumber: "5610591081018250", expectedIssuer: .ausbc, isValid: true),
+    // Unionpay
+    CardTestCase(cardNumber: "6229293072324646", expectedIssuer: .unionpay, isValid: true),
+    CardTestCase(cardNumber: "561059108101850", expectedIssuer: .unionpay, isValid: false),
+    CardTestCase(cardNumber: "353442987149385", expectedIssuer: .unionpay, isValid: false)
+
 ]
 
 class CardSchemeValidatorTests: XCTestCase {
@@ -87,6 +92,9 @@ class CardSchemeValidatorTests: XCTestCase {
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "644000123123"), .discover)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "5610"), .ausbc)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "213100"), .japcb)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "622956"), .unionpay)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "622970"), .unionpay)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "626256"), .unionpay)
     }
 
     func testGetCardSchemeFromBIN_InvalidBIN() {
@@ -119,6 +127,10 @@ class CardSchemeValidatorTests: XCTestCase {
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 111", scheme: .ausbc))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .ausbc))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .ausbc))
+
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 1111 1111", scheme: .unionpay))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 444", scheme: .unionpay))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 33", scheme: .unionpay))
     }
 
     func testIsCardNumberLengthValid_InvalidLength() {
@@ -143,5 +155,9 @@ class CardSchemeValidatorTests: XCTestCase {
 
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5", scheme: .ausbc))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .ausbc))
+
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 1111 111", scheme: .unionpay))
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 4444", scheme: .unionpay))
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 32", scheme: .unionpay))
     }
 }

@@ -68,5 +68,10 @@ extension MobileSDK {
             paymentRequest.shippingMethods = shippingOptions
             return paymentRequest
     }
+}
 
+// MARK: - Helpers
+
+extension MobileSDK {
+    public static let bundle: Bundle = .module
 }

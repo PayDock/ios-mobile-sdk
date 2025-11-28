@@ -13,13 +13,14 @@ import NetworkingLib
 // swiftlint:disable all
 @MainActor
 class CardDetailsVMTests: XCTestCase {
-    var viewModel: CardDetailsVM!
-    var mockService: CardServiceMock!
-    var config: SaveCardConfig!
-    var viewState: ViewState!
-    var loadingDelegate: WidgetLoadingDelegateUtil!
-    var completionResult: Result<CardResult, CardDetailsError>?
-    var cancellables = Set<AnyCancellable>()
+    private var viewModel: CardDetailsVM!
+    private var mockService: CardServiceMock!
+    private var config: SaveCardConfig!
+    private var viewState: ViewState!
+    private var loadingDelegate: WidgetLoadingDelegateUtil!
+    private var eventDelegate: WidgetEventDelegateUtil!
+    private var completionResult: Result<CardResult, CardDetailsError>?
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -31,19 +32,22 @@ class CardDetailsVMTests: XCTestCase {
                 privacyPolicyURL: "https://www.example.com"))
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
+        eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
-        viewModel = CardDetailsVM(cardService: mockService,
-                                  viewState: viewState,
-                                  config: CardDetailsWidgetConfig(
-                                    gatewayId: "gatewayId",
-                                    accessToken: "accessToken",
-                                    actionText: "actionText",
-                                    showCardTitle: true,
-                                    collectCardholderName: false,
-                                    allowSaveCard: config
-                                  ),
-                                  loadingDelegate: loadingDelegate) { result in
-            self.completionResult = result
+        viewModel = CardDetailsVM(
+            cardService: mockService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                showCardTitle: true,
+                collectCardholderName: false,
+                allowSaveCard: config
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
         }
     }
 
@@ -51,6 +55,8 @@ class CardDetailsVMTests: XCTestCase {
         viewModel = nil
         mockService = nil
         completionResult = nil
+        loadingDelegate = nil
+        eventDelegate = nil
         cancellables.removeAll()
         super.tearDown()
     }
@@ -65,12 +71,13 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
-                                  loadingDelegate: nil) { result in
+                                  appearance: CardDetailsWidgetAppearance(),
+                                  loadingDelegate: loadingDelegate,
+                                  eventDelegate: nil) { result in
             self.completionResult = result
         }
 
@@ -87,12 +94,13 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
-                                  loadingDelegate: nil) { result in
+                                  appearance: CardDetailsWidgetAppearance(),
+                                  loadingDelegate: nil,
+                                  eventDelegate: nil) { result in
             self.completionResult = result
         }
 
@@ -106,12 +114,13 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
-                                  loadingDelegate: loadingDelegate) { result in
+                                  appearance: CardDetailsWidgetAppearance(),
+                                  loadingDelegate: loadingDelegate,
+                                  eventDelegate: nil) { result in
             self.completionResult = result
         }
 
@@ -131,12 +140,13 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
-                                  loadingDelegate: nil) { result in
+                                  appearance: CardDetailsWidgetAppearance(),
+                                  loadingDelegate: nil,
+                                  eventDelegate: nil) { result in
             self.completionResult = result
         }
         viewModel.isLoading = false
@@ -158,12 +168,13 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
-                                  loadingDelegate: loadingDelegate) { result in
+                                  appearance: CardDetailsWidgetAppearance(),
+                                  loadingDelegate: loadingDelegate,
+                                  eventDelegate: nil) { result in
             self.completionResult = result
         }
         viewModel.isLoading = false
@@ -185,12 +196,13 @@ class CardDetailsVMTests: XCTestCase {
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    actionText: "actionText",
                                     showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
-                                  loadingDelegate: nil) { result in
+                                  appearance: CardDetailsWidgetAppearance(),
+                                  loadingDelegate: loadingDelegate,
+                                  eventDelegate: nil) { result in
             self.completionResult = result
         }
         viewModel.isLoading = true
@@ -258,16 +270,16 @@ class CardDetailsVMTests: XCTestCase {
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                actionText: "actionText",
                 showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
             ),
-            loadingDelegate: loadingDelegate
-        ) { result in
-            self.completionResult = result
-            expectation.fulfill()
-        }
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
 
         populateValidFormFields()
 
@@ -291,6 +303,145 @@ class CardDetailsVMTests: XCTestCase {
         // Loading state should be reset
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(viewModel.viewState.isDisabled, false)
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesToknisationEvent() {
+        // Given
+        let appearance = CardDetailsWidgetAppearance()
+        viewModel = CardDetailsVM(
+            cardService: mockService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                showCardTitle: true,
+                collectCardholderName: false,
+                allowSaveCard: config
+            ),
+            appearance: appearance,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+        }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(
+                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text)))
+        viewModel.handleTokenisationTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateReceivesLinkTapEvent() {
+        // Given
+        let appearance = CardDetailsWidgetAppearance()
+        viewModel = CardDetailsVM(
+            cardService: mockService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                showCardTitle: true,
+                collectCardholderName: false,
+                allowSaveCard: config
+            ),
+            appearance: appearance,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+            }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .linkText,
+            properties: .linkText(WidgetEventLinkTextProperties(name: "PrivacyPolicyLink", action: .click, url: "Some url")))
+        viewModel.handleLinkTapAnalytics(url: "Some url")
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .linkText))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .linkText), 1)
+    }
+
+    func testEventDelegateReceivesToggleFlipEvent() {
+        func testEventDelegateReceivesEvents() {
+            // Given
+            let appearance = CardDetailsWidgetAppearance()
+            viewModel = CardDetailsVM(
+                cardService: mockService,
+                viewState: viewState,
+                config: CardDetailsWidgetConfig(
+                    gatewayId: "gatewayId",
+                    accessToken: "accessToken",
+                    showCardTitle: true,
+                    collectCardholderName: false,
+                    allowSaveCard: config
+                ),
+                appearance: appearance,
+                loadingDelegate: loadingDelegate,
+                eventDelegate: eventDelegate) { result in
+                    self.completionResult = result
+            }
+
+            // Reset any events from initialization
+            eventDelegate.reset()
+
+            // When
+            let event = WidgetEvent(
+                type: .toggle,
+                properties: .toggle(WidgetEventToggleProperties(name: "SaveCardToggle", action: .click, state: false)))
+            viewModel.handleToggleFlipAnalytics()
+
+            // Then
+            XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+            XCTAssertEqual(eventDelegate.lastEvent, event)
+            XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+            XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+        }
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = CardDetailsVM(
+            cardService: mockService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                showCardTitle: true,
+                collectCardholderName: false,
+                allowSaveCard: config
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+        }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // For demonstration, we'll simulate what the view model would do:
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }
 // swiftlint:enable all

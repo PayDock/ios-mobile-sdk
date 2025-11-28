@@ -14,18 +14,68 @@
 		280EB39D2AFE42AD0036E575 /* PayPalWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */; };
 		280EB39F2AFE42BC0036E575 /* PayPalWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */; };
 		2816F7D72B480A9F00EEC5C3 /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */; };
+		281859042EA280E6002D7CDE /* CaptureChargeStandaloneReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */; };
+		281859062EA29A64002D7CDE /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859052EA29A64002D7CDE /* IconPickerView.swift */; };
+		281859082EA29B24002D7CDE /* IconGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281859072EA29B21002D7CDE /* IconGridView.swift */; };
 		281DECA32E70767E00C3DC0C /* PayPalStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */; };
 		281DECA52E70768400C3DC0C /* PayPalStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */; };
+		28271E332EBC064F000EEEC1 /* GiftCardWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28271E322EBC064B000EEEC1 /* GiftCardWidgetVM.swift */; };
+		28271E352EBC084E000EEEC1 /* AddressWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28271E342EBC084E000EEEC1 /* AddressWidgetVM.swift */; };
+		28271E372EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28271E362EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift */; };
 		282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D315E2A66ADF500E3ECAD /* MainView.swift */; };
-		282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D31632A66B81C00E3ECAD /* CheckoutView.swift */; };
-		282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */; };
 		282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */; };
 		282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */; };
-		282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */; };
 		283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */; };
+		28386A902E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28386A8F2E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift */; };
+		28386A922E9DB22C00D941DC /* CheckoutResultOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28386A912E9DB22C00D941DC /* CheckoutResultOverlay.swift */; };
 		2838F0472ACEF584006B23E2 /* ApplePayWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */; };
 		284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */; };
 		28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */; };
+		285C14342E95D7A8007ECC80 /* GiftCardEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F62E95D7A8007ECC80 /* GiftCardEntryView.swift */; };
+		285C14352E95D7A8007ECC80 /* PaymentMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14212E95D7A8007ECC80 /* PaymentMethod.swift */; };
+		285C14372E95D7A8007ECC80 /* SavedAddressCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14302E95D7A8007ECC80 /* SavedAddressCardView.swift */; };
+		285C14382E95D7A8007ECC80 /* EnhancedCheckoutVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C141D2E95D7A8007ECC80 /* EnhancedCheckoutVM.swift */; };
+		285C14392E95D7A8007ECC80 /* CategoryChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14262E95D7A8007ECC80 /* CategoryChip.swift */; };
+		285C143A2E95D7A8007ECC80 /* ColesPayPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C140D2E95D7A8007ECC80 /* ColesPayPaymentWidget.swift */; };
+		285C143B2E95D7A8007ECC80 /* CartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F42E95D7A8007ECC80 /* CartManager.swift */; };
+		285C143C2E95D7A8007ECC80 /* CheckoutStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14202E95D7A8007ECC80 /* CheckoutStep.swift */; };
+		285C143D2E95D7A8007ECC80 /* ProductListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14282E95D7A8007ECC80 /* ProductListView.swift */; };
+		285C143E2E95D7A8007ECC80 /* GiftCardRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F72E95D7A8007ECC80 /* GiftCardRowView.swift */; };
+		285C143F2E95D7A8007ECC80 /* PaymentMethodRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C140F2E95D7A8007ECC80 /* PaymentMethodRow.swift */; };
+		285C14402E95D7A8007ECC80 /* AddressWidgetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C141F2E95D7A8007ECC80 /* AddressWidgetType.swift */; };
+		285C14412E95D7A8007ECC80 /* ContactInformationSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14042E95D7A8007ECC80 /* ContactInformationSection.swift */; };
+		285C14422E95D7A8007ECC80 /* ShippingAddressSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14072E95D7A8007ECC80 /* ShippingAddressSection.swift */; };
+		285C14432E95D7A8007ECC80 /* CheckoutPaymentStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C140C2E95D7A8007ECC80 /* CheckoutPaymentStepView.swift */; };
+		285C14442E95D7A8007ECC80 /* ProfileWelcomeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14052E95D7A8007ECC80 /* ProfileWelcomeSection.swift */; };
+		285C14452E95D7A8007ECC80 /* PaymentMethodSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14102E95D7A8007ECC80 /* PaymentMethodSelectionView.swift */; };
+		285C14472E95D7A8007ECC80 /* CartItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F32E95D7A8007ECC80 /* CartItemRowView.swift */; };
+		285C14482E95D7A8007ECC80 /* CheckoutProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C141B2E95D7A8007ECC80 /* CheckoutProgressIndicator.swift */; };
+		285C14492E95D7A8007ECC80 /* AddressWidgetFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C142D2E95D7A8007ECC80 /* AddressWidgetFormView.swift */; };
+		285C144A2E95D7A8007ECC80 /* SavedAddressSelectionGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14062E95D7A8007ECC80 /* SavedAddressSelectionGroup.swift */; };
+		285C144B2E95D7A8007ECC80 /* ApplePayPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C140A2E95D7A8007ECC80 /* ApplePayPaymentWidget.swift */; };
+		285C144C2E95D7A8007ECC80 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F52E95D7A8007ECC80 /* CartView.swift */; };
+		285C144E2E95D7A8007ECC80 /* MastercardPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C140E2E95D7A8007ECC80 /* MastercardPaymentWidget.swift */; };
+		285C144F2E95D7A8007ECC80 /* AddressWidgetContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C142C2E95D7A8007ECC80 /* AddressWidgetContainerView.swift */; };
+		285C14502E95D7A8007ECC80 /* OrderSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14152E95D7A8007ECC80 /* OrderSummaryView.swift */; };
+		285C14512E95D7A8007ECC80 /* ProductCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14272E95D7A8007ECC80 /* ProductCardView.swift */; };
+		285C14522E95D7A8007ECC80 /* RoundedCornerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C142A2E95D7A8007ECC80 /* RoundedCornerExtension.swift */; };
+		285C14542E95D7A8007ECC80 /* AfterpayPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14092E95D7A8007ECC80 /* AfterpayPaymentWidget.swift */; };
+		285C14552E95D7A8007ECC80 /* CardPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C140B2E95D7A8007ECC80 /* CardPaymentWidget.swift */; };
+		285C14562E95D7A8007ECC80 /* PayPalPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14122E95D7A8007ECC80 /* PayPalPaymentWidget.swift */; };
+		285C14572E95D7A8007ECC80 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C142E2E95D7A8007ECC80 /* ProfileView.swift */; };
+		285C14582E95D7A8007ECC80 /* AddressInputSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14012E95D7A8007ECC80 /* AddressInputSection.swift */; };
+		285C14592E95D7A8007ECC80 /* ShippingOptionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F82E95D7A8007ECC80 /* ShippingOptionRow.swift */; };
+		285C145B2E95D7A8007ECC80 /* SavedAddressSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13FB2E95D7A8007ECC80 /* SavedAddressSelectionView.swift */; };
+		285C145C2E95D7A8007ECC80 /* CheckoutInformationStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14032E95D7A8007ECC80 /* CheckoutInformationStepView.swift */; };
+		285C145D2E95D7A8007ECC80 /* PaymentWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14112E95D7A8007ECC80 /* PaymentWidgetView.swift */; };
+		285C145E2E95D7A8007ECC80 /* ProductService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14292E95D7A8007ECC80 /* ProductService.swift */; };
+		285C145F2E95D7A8007ECC80 /* CheckoutAddressWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13FA2E95D7A8007ECC80 /* CheckoutAddressWidgetView.swift */; };
+		285C14602E95D7A8007ECC80 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14232E95D7A8007ECC80 /* Product.swift */; };
+		285C14612E95D7A8007ECC80 /* ProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C142F2E95D7A8007ECC80 /* ProfileVM.swift */; };
+		285C14622E95D7A8007ECC80 /* CheckoutActionButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C141A2E95D7A8007ECC80 /* CheckoutActionButtons.swift */; };
+		285C14632E95D7A8007ECC80 /* UserProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14312E95D7A8007ECC80 /* UserProfileManager.swift */; };
+		285C14642E95D7A8007ECC80 /* EnhancedCheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C141C2E95D7A8007ECC80 /* EnhancedCheckoutView.swift */; };
+		285C14652E95D7A8007ECC80 /* BillingAddressSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C14022E95D7A8007ECC80 /* BillingAddressSection.swift */; };
 		2867ADD62ACEE52200DB5319 /* ApplePayWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */; };
 		287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39372DF259A000F4D771 /* StyleWidgetListView.swift */; };
 		287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F39392DF259A900F4D771 /* StyleComponentListView.swift */; };
@@ -101,8 +151,6 @@
 		28AD05F62CF7766C00B12FB4 /* CreateCustomerTokenReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */; };
 		28AD05FA2CF7793500B12FB4 /* CustomersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05F92CF7792100B12FB4 /* CustomersService.swift */; };
 		28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */; };
-		28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF542D00951E004C0672 /* AccountProfileView.swift */; };
-		28B2FF572D009526004C0672 /* AccountProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28B2FF562D009526004C0672 /* AccountProfileVM.swift */; };
 		28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */; };
 		28D51D4E2DFC70070095CDE5 /* TextFieldStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */; };
 		28D51D512DFF30C00095CDE5 /* DropdownStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D51D502DFF30BB0095CDE5 /* DropdownStyleView.swift */; };
@@ -158,18 +206,68 @@
 		280EB39C2AFE42AD0036E575 /* PayPalWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetView.swift; sourceTree = "<group>"; };
 		280EB39E2AFE42BC0036E575 /* PayPalWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetVM.swift; sourceTree = "<group>"; };
 		2816F7D62B480A9F00EEC5C3 /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
+		281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureChargeStandaloneReq.swift; sourceTree = "<group>"; };
+		281859052EA29A64002D7CDE /* IconPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
+		281859072EA29B21002D7CDE /* IconGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconGridView.swift; sourceTree = "<group>"; };
 		281DECA22E70767B00C3DC0C /* PayPalStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleView.swift; sourceTree = "<group>"; };
 		281DECA42E70768100C3DC0C /* PayPalStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalStyleVM.swift; sourceTree = "<group>"; };
+		28271E322EBC064B000EEEC1 /* GiftCardWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetVM.swift; sourceTree = "<group>"; };
+		28271E342EBC084E000EEEC1 /* AddressWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetVM.swift; sourceTree = "<group>"; };
+		28271E362EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailsWidgetVM.swift; sourceTree = "<group>"; };
 		282D315E2A66ADF500E3ECAD /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		282D31632A66B81C00E3ECAD /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
-		282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentSheet.swift; sourceTree = "<group>"; };
 		282D3A802B3B78BC00C4ABC6 /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		282D3A822B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerHeightPreferenceKey.swift; sourceTree = "<group>"; };
-		282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentVM.swift; sourceTree = "<group>"; };
 		283825882CBFDC32005BE050 /* PayPalVaultWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultWidgetView.swift; sourceTree = "<group>"; };
+		28386A8F2E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentAndReviewStepView.swift; sourceTree = "<group>"; };
+		28386A912E9DB22C00D941DC /* CheckoutResultOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutResultOverlay.swift; sourceTree = "<group>"; };
 		2838F0462ACEF584006B23E2 /* ApplePayWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetVM.swift; sourceTree = "<group>"; };
 		2842632F2B45DA7200DADE7F /* Integrated3DSVaultReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integrated3DSVaultReq.swift; sourceTree = "<group>"; };
 		28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultWidgetVM.swift; sourceTree = "<group>"; };
+		285C13F32E95D7A8007ECC80 /* CartItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemRowView.swift; sourceTree = "<group>"; };
+		285C13F42E95D7A8007ECC80 /* CartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartManager.swift; sourceTree = "<group>"; };
+		285C13F52E95D7A8007ECC80 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		285C13F62E95D7A8007ECC80 /* GiftCardEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardEntryView.swift; sourceTree = "<group>"; };
+		285C13F72E95D7A8007ECC80 /* GiftCardRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardRowView.swift; sourceTree = "<group>"; };
+		285C13F82E95D7A8007ECC80 /* ShippingOptionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShippingOptionRow.swift; sourceTree = "<group>"; };
+		285C13FA2E95D7A8007ECC80 /* CheckoutAddressWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutAddressWidgetView.swift; sourceTree = "<group>"; };
+		285C13FB2E95D7A8007ECC80 /* SavedAddressSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddressSelectionView.swift; sourceTree = "<group>"; };
+		285C14012E95D7A8007ECC80 /* AddressInputSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressInputSection.swift; sourceTree = "<group>"; };
+		285C14022E95D7A8007ECC80 /* BillingAddressSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillingAddressSection.swift; sourceTree = "<group>"; };
+		285C14032E95D7A8007ECC80 /* CheckoutInformationStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutInformationStepView.swift; sourceTree = "<group>"; };
+		285C14042E95D7A8007ECC80 /* ContactInformationSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactInformationSection.swift; sourceTree = "<group>"; };
+		285C14052E95D7A8007ECC80 /* ProfileWelcomeSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileWelcomeSection.swift; sourceTree = "<group>"; };
+		285C14062E95D7A8007ECC80 /* SavedAddressSelectionGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddressSelectionGroup.swift; sourceTree = "<group>"; };
+		285C14072E95D7A8007ECC80 /* ShippingAddressSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShippingAddressSection.swift; sourceTree = "<group>"; };
+		285C14092E95D7A8007ECC80 /* AfterpayPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AfterpayPaymentWidget.swift; sourceTree = "<group>"; };
+		285C140A2E95D7A8007ECC80 /* ApplePayPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayPaymentWidget.swift; sourceTree = "<group>"; };
+		285C140B2E95D7A8007ECC80 /* CardPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardPaymentWidget.swift; sourceTree = "<group>"; };
+		285C140C2E95D7A8007ECC80 /* CheckoutPaymentStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentStepView.swift; sourceTree = "<group>"; };
+		285C140D2E95D7A8007ECC80 /* ColesPayPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColesPayPaymentWidget.swift; sourceTree = "<group>"; };
+		285C140E2E95D7A8007ECC80 /* MastercardPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MastercardPaymentWidget.swift; sourceTree = "<group>"; };
+		285C140F2E95D7A8007ECC80 /* PaymentMethodRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodRow.swift; sourceTree = "<group>"; };
+		285C14102E95D7A8007ECC80 /* PaymentMethodSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSelectionView.swift; sourceTree = "<group>"; };
+		285C14112E95D7A8007ECC80 /* PaymentWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentWidgetView.swift; sourceTree = "<group>"; };
+		285C14122E95D7A8007ECC80 /* PayPalPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalPaymentWidget.swift; sourceTree = "<group>"; };
+		285C14152E95D7A8007ECC80 /* OrderSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderSummaryView.swift; sourceTree = "<group>"; };
+		285C141A2E95D7A8007ECC80 /* CheckoutActionButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutActionButtons.swift; sourceTree = "<group>"; };
+		285C141B2E95D7A8007ECC80 /* CheckoutProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutProgressIndicator.swift; sourceTree = "<group>"; };
+		285C141C2E95D7A8007ECC80 /* EnhancedCheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedCheckoutView.swift; sourceTree = "<group>"; };
+		285C141D2E95D7A8007ECC80 /* EnhancedCheckoutVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnhancedCheckoutVM.swift; sourceTree = "<group>"; };
+		285C141F2E95D7A8007ECC80 /* AddressWidgetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetType.swift; sourceTree = "<group>"; };
+		285C14202E95D7A8007ECC80 /* CheckoutStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutStep.swift; sourceTree = "<group>"; };
+		285C14212E95D7A8007ECC80 /* PaymentMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethod.swift; sourceTree = "<group>"; };
+		285C14232E95D7A8007ECC80 /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
+		285C14262E95D7A8007ECC80 /* CategoryChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryChip.swift; sourceTree = "<group>"; };
+		285C14272E95D7A8007ECC80 /* ProductCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCardView.swift; sourceTree = "<group>"; };
+		285C14282E95D7A8007ECC80 /* ProductListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListView.swift; sourceTree = "<group>"; };
+		285C14292E95D7A8007ECC80 /* ProductService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductService.swift; sourceTree = "<group>"; };
+		285C142A2E95D7A8007ECC80 /* RoundedCornerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCornerExtension.swift; sourceTree = "<group>"; };
+		285C142C2E95D7A8007ECC80 /* AddressWidgetContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetContainerView.swift; sourceTree = "<group>"; };
+		285C142D2E95D7A8007ECC80 /* AddressWidgetFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetFormView.swift; sourceTree = "<group>"; };
+		285C142E2E95D7A8007ECC80 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		285C142F2E95D7A8007ECC80 /* ProfileVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVM.swift; sourceTree = "<group>"; };
+		285C14302E95D7A8007ECC80 /* SavedAddressCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddressCardView.swift; sourceTree = "<group>"; };
+		285C14312E95D7A8007ECC80 /* UserProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileManager.swift; sourceTree = "<group>"; };
 		2867ADD52ACEE52200DB5319 /* ApplePayWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetView.swift; sourceTree = "<group>"; };
 		287F39372DF259A000F4D771 /* StyleWidgetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleWidgetListView.swift; sourceTree = "<group>"; };
 		287F39392DF259A900F4D771 /* StyleComponentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleComponentListView.swift; sourceTree = "<group>"; };
@@ -250,8 +348,6 @@
 		28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomerTokenReq.swift; sourceTree = "<group>"; };
 		28AD05F92CF7792100B12FB4 /* CustomersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersService.swift; sourceTree = "<group>"; };
 		28AD05FB2CF77A9E00B12FB4 /* CustomersEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersEndpoints.swift; sourceTree = "<group>"; };
-		28B2FF542D00951E004C0672 /* AccountProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileView.swift; sourceTree = "<group>"; };
-		28B2FF562D009526004C0672 /* AccountProfileVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileVM.swift; sourceTree = "<group>"; };
 		28BF0E982B7A87C500ACF513 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		28D51D4B2DFC6FF70095CDE5 /* TextFieldStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldStyleView.swift; sourceTree = "<group>"; };
 		28D51D4D2DFC6FFD0095CDE5 /* TextFieldStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldStyleVM.swift; sourceTree = "<group>"; };
@@ -308,6 +404,7 @@
 			isa = PBXGroup;
 			children = (
 				2808B3412A7056F100E86C7E /* CardDetailsWidgetView.swift */,
+				28271E362EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift */,
 			);
 			path = CardDetails;
 			sourceTree = "<group>";
@@ -330,6 +427,14 @@
 			path = PayPal;
 			sourceTree = "<group>";
 		};
+		281859022EA280D5002D7CDE /* CaptureChargeStandaloneReq */ = {
+			isa = PBXGroup;
+			children = (
+				281859032EA280DF002D7CDE /* CaptureChargeStandaloneReq.swift */,
+			);
+			path = CaptureChargeStandaloneReq;
+			sourceTree = "<group>";
+		};
 		281DECA12E70766900C3DC0C /* PayPal */ = {
 			isa = PBXGroup;
 			children = (
@@ -343,9 +448,9 @@
 			isa = PBXGroup;
 			children = (
 				282D315D2A66ADCF00E3ECAD /* TabView */,
-				282D31602A66B7EB00E3ECAD /* Checkout */,
 				282D315C2A66A64900E3ECAD /* Widgets */,
 				282D31612A66B7F600E3ECAD /* Style */,
+				285C14332E95D7A8007ECC80 /* Shop */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -377,17 +482,6 @@
 			path = TabView;
 			sourceTree = "<group>";
 		};
-		282D31602A66B7EB00E3ECAD /* Checkout */ = {
-			isa = PBXGroup;
-			children = (
-				28B2FF532D009516004C0672 /* AccountProfile */,
-				282D31632A66B81C00E3ECAD /* CheckoutView.swift */,
-				282D3A7E2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift */,
-				282D3A8C2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift */,
-			);
-			path = Checkout;
-			sourceTree = "<group>";
-		};
 		282D31612A66B7F600E3ECAD /* Style */ = {
 			isa = PBXGroup;
 			children = (
@@ -412,6 +506,148 @@
 				28552E6D2CCBB068004C93CA /* PayPalVaultWidgetVM.swift */,
 			);
 			path = PayPalVault;
+			sourceTree = "<group>";
+		};
+		285C13F92E95D7A8007ECC80 /* Cart */ = {
+			isa = PBXGroup;
+			children = (
+				285C13F32E95D7A8007ECC80 /* CartItemRowView.swift */,
+				285C13F42E95D7A8007ECC80 /* CartManager.swift */,
+				285C13F52E95D7A8007ECC80 /* CartView.swift */,
+				285C13F62E95D7A8007ECC80 /* GiftCardEntryView.swift */,
+				285C13F72E95D7A8007ECC80 /* GiftCardRowView.swift */,
+				285C13F82E95D7A8007ECC80 /* ShippingOptionRow.swift */,
+			);
+			path = Cart;
+			sourceTree = "<group>";
+		};
+		285C13FC2E95D7A8007ECC80 /* Address */ = {
+			isa = PBXGroup;
+			children = (
+				285C13FA2E95D7A8007ECC80 /* CheckoutAddressWidgetView.swift */,
+				285C13FB2E95D7A8007ECC80 /* SavedAddressSelectionView.swift */,
+			);
+			path = Address;
+			sourceTree = "<group>";
+		};
+		285C14082E95D7A8007ECC80 /* InfoStep */ = {
+			isa = PBXGroup;
+			children = (
+				285C14012E95D7A8007ECC80 /* AddressInputSection.swift */,
+				285C14022E95D7A8007ECC80 /* BillingAddressSection.swift */,
+				285C14032E95D7A8007ECC80 /* CheckoutInformationStepView.swift */,
+				285C14042E95D7A8007ECC80 /* ContactInformationSection.swift */,
+				285C14052E95D7A8007ECC80 /* ProfileWelcomeSection.swift */,
+				285C14062E95D7A8007ECC80 /* SavedAddressSelectionGroup.swift */,
+				285C14072E95D7A8007ECC80 /* ShippingAddressSection.swift */,
+				285C14152E95D7A8007ECC80 /* OrderSummaryView.swift */,
+			);
+			path = InfoStep;
+			sourceTree = "<group>";
+		};
+		285C14132E95D7A8007ECC80 /* PaymentStep */ = {
+			isa = PBXGroup;
+			children = (
+				285C14092E95D7A8007ECC80 /* AfterpayPaymentWidget.swift */,
+				285C140A2E95D7A8007ECC80 /* ApplePayPaymentWidget.swift */,
+				285C140B2E95D7A8007ECC80 /* CardPaymentWidget.swift */,
+				285C140C2E95D7A8007ECC80 /* CheckoutPaymentStepView.swift */,
+				285C140D2E95D7A8007ECC80 /* ColesPayPaymentWidget.swift */,
+				285C140E2E95D7A8007ECC80 /* MastercardPaymentWidget.swift */,
+				285C140F2E95D7A8007ECC80 /* PaymentMethodRow.swift */,
+				285C14102E95D7A8007ECC80 /* PaymentMethodSelectionView.swift */,
+				285C14112E95D7A8007ECC80 /* PaymentWidgetView.swift */,
+				285C14122E95D7A8007ECC80 /* PayPalPaymentWidget.swift */,
+			);
+			path = PaymentStep;
+			sourceTree = "<group>";
+		};
+		285C14192E95D7A8007ECC80 /* Steps */ = {
+			isa = PBXGroup;
+			children = (
+				285C14082E95D7A8007ECC80 /* InfoStep */,
+				285C14132E95D7A8007ECC80 /* PaymentStep */,
+			);
+			path = Steps;
+			sourceTree = "<group>";
+		};
+		285C141E2E95D7A8007ECC80 /* Checkout */ = {
+			isa = PBXGroup;
+			children = (
+				285C13FC2E95D7A8007ECC80 /* Address */,
+				285C14192E95D7A8007ECC80 /* Steps */,
+				285C141A2E95D7A8007ECC80 /* CheckoutActionButtons.swift */,
+				285C141B2E95D7A8007ECC80 /* CheckoutProgressIndicator.swift */,
+				285C141C2E95D7A8007ECC80 /* EnhancedCheckoutView.swift */,
+				285C141D2E95D7A8007ECC80 /* EnhancedCheckoutVM.swift */,
+				28386A8F2E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift */,
+				28386A912E9DB22C00D941DC /* CheckoutResultOverlay.swift */,
+			);
+			path = Checkout;
+			sourceTree = "<group>";
+		};
+		285C14222E95D7A8007ECC80 /* Checkout */ = {
+			isa = PBXGroup;
+			children = (
+				285C141F2E95D7A8007ECC80 /* AddressWidgetType.swift */,
+				285C14202E95D7A8007ECC80 /* CheckoutStep.swift */,
+				285C14212E95D7A8007ECC80 /* PaymentMethod.swift */,
+			);
+			path = Checkout;
+			sourceTree = "<group>";
+		};
+		285C14242E95D7A8007ECC80 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				285C14232E95D7A8007ECC80 /* Product.swift */,
+			);
+			path = Products;
+			sourceTree = "<group>";
+		};
+		285C14252E95D7A8007ECC80 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				285C14222E95D7A8007ECC80 /* Checkout */,
+				285C14242E95D7A8007ECC80 /* Products */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		285C142B2E95D7A8007ECC80 /* Product */ = {
+			isa = PBXGroup;
+			children = (
+				285C14262E95D7A8007ECC80 /* CategoryChip.swift */,
+				285C14272E95D7A8007ECC80 /* ProductCardView.swift */,
+				285C14282E95D7A8007ECC80 /* ProductListView.swift */,
+				285C14292E95D7A8007ECC80 /* ProductService.swift */,
+				285C142A2E95D7A8007ECC80 /* RoundedCornerExtension.swift */,
+			);
+			path = Product;
+			sourceTree = "<group>";
+		};
+		285C14322E95D7A8007ECC80 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				285C142C2E95D7A8007ECC80 /* AddressWidgetContainerView.swift */,
+				285C142D2E95D7A8007ECC80 /* AddressWidgetFormView.swift */,
+				285C142E2E95D7A8007ECC80 /* ProfileView.swift */,
+				285C142F2E95D7A8007ECC80 /* ProfileVM.swift */,
+				285C14302E95D7A8007ECC80 /* SavedAddressCardView.swift */,
+				285C14312E95D7A8007ECC80 /* UserProfileManager.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		285C14332E95D7A8007ECC80 /* Shop */ = {
+			isa = PBXGroup;
+			children = (
+				285C13F92E95D7A8007ECC80 /* Cart */,
+				285C141E2E95D7A8007ECC80 /* Checkout */,
+				285C14252E95D7A8007ECC80 /* Models */,
+				285C142B2E95D7A8007ECC80 /* Product */,
+				285C14322E95D7A8007ECC80 /* Profile */,
+			);
+			path = Shop;
 			sourceTree = "<group>";
 		};
 		2865B22B2B56E4C700EBE2DD /* ColesPay */ = {
@@ -450,6 +686,8 @@
 				28D8BA602E006AB900EDD422 /* ResetStyleButton.swift */,
 				28D8BA622E00706400EDD422 /* ResetConfirmationModifier.swift */,
 				28D541F72A6FF0690041BAE0 /* PickerView.swift */,
+				281859052EA29A64002D7CDE /* IconPickerView.swift */,
+				281859072EA29B21002D7CDE /* IconGridView.swift */,
 				287F399C2DF8CCFA00F4D771 /* DimensionsFieldView.swift */,
 				287F39792DF76C6F00F4D771 /* Loader */,
 				287F39882DF88DFB00F4D771 /* Toggle */,
@@ -727,6 +965,7 @@
 			isa = PBXGroup;
 			children = (
 				28A65CA22A94CE60002A04CA /* AddressWidgetView.swift */,
+				28271E342EBC084E000EEEC1 /* AddressWidgetVM.swift */,
 			);
 			path = Address;
 			sourceTree = "<group>";
@@ -745,15 +984,6 @@
 			children = (
 			);
 			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		28B2FF532D009516004C0672 /* AccountProfile */ = {
-			isa = PBXGroup;
-			children = (
-				28B2FF562D009526004C0672 /* AccountProfileVM.swift */,
-				28B2FF542D00951E004C0672 /* AccountProfileView.swift */,
-			);
-			path = AccountProfile;
 			sourceTree = "<group>";
 		};
 		28D51D4A2DFC6FE50095CDE5 /* TextField */ = {
@@ -806,6 +1036,7 @@
 		28E86F682ACC1399008E827E /* Requests */ = {
 			isa = PBXGroup;
 			children = (
+				281859022EA280D5002D7CDE /* CaptureChargeStandaloneReq */,
 				28AD05F52CF7765800B12FB4 /* CreateCustomerTokenReq.swift */,
 				2886AE622E55D20D0071BADC /* InitialiseWalletChargeReq */,
 				28A81F502B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift */,
@@ -850,6 +1081,7 @@
 			isa = PBXGroup;
 			children = (
 				28F19D2C2B029F46002F5526 /* GiftCardWidgetView.swift */,
+				28271E322EBC064B000EEEC1 /* GiftCardWidgetVM.swift */,
 			);
 			path = GiftCard;
 			sourceTree = "<group>";
@@ -1038,9 +1270,54 @@
 				28E86F702ACC243F008E827E /* InitialiseWalletChargeRes.swift in Sources */,
 				287F393D2DF259D500F4D771 /* StyleVM.swift in Sources */,
 				2886AE712E55D3DB0071BADC /* Standalone3DSAuthentication.swift in Sources */,
+				285C14342E95D7A8007ECC80 /* GiftCardEntryView.swift in Sources */,
+				285C14352E95D7A8007ECC80 /* PaymentMethod.swift in Sources */,
+				285C14372E95D7A8007ECC80 /* SavedAddressCardView.swift in Sources */,
+				285C14382E95D7A8007ECC80 /* EnhancedCheckoutVM.swift in Sources */,
+				285C14392E95D7A8007ECC80 /* CategoryChip.swift in Sources */,
+				285C143A2E95D7A8007ECC80 /* ColesPayPaymentWidget.swift in Sources */,
+				285C143B2E95D7A8007ECC80 /* CartManager.swift in Sources */,
+				285C143C2E95D7A8007ECC80 /* CheckoutStep.swift in Sources */,
+				285C143D2E95D7A8007ECC80 /* ProductListView.swift in Sources */,
+				285C143E2E95D7A8007ECC80 /* GiftCardRowView.swift in Sources */,
+				285C143F2E95D7A8007ECC80 /* PaymentMethodRow.swift in Sources */,
+				285C14402E95D7A8007ECC80 /* AddressWidgetType.swift in Sources */,
+				285C14412E95D7A8007ECC80 /* ContactInformationSection.swift in Sources */,
+				285C14422E95D7A8007ECC80 /* ShippingAddressSection.swift in Sources */,
+				285C14432E95D7A8007ECC80 /* CheckoutPaymentStepView.swift in Sources */,
+				28271E352EBC084E000EEEC1 /* AddressWidgetVM.swift in Sources */,
+				285C14442E95D7A8007ECC80 /* ProfileWelcomeSection.swift in Sources */,
+				285C14452E95D7A8007ECC80 /* PaymentMethodSelectionView.swift in Sources */,
+				285C14472E95D7A8007ECC80 /* CartItemRowView.swift in Sources */,
+				285C14482E95D7A8007ECC80 /* CheckoutProgressIndicator.swift in Sources */,
+				285C14492E95D7A8007ECC80 /* AddressWidgetFormView.swift in Sources */,
+				285C144A2E95D7A8007ECC80 /* SavedAddressSelectionGroup.swift in Sources */,
+				285C144B2E95D7A8007ECC80 /* ApplePayPaymentWidget.swift in Sources */,
+				285C144C2E95D7A8007ECC80 /* CartView.swift in Sources */,
+				285C144E2E95D7A8007ECC80 /* MastercardPaymentWidget.swift in Sources */,
+				285C144F2E95D7A8007ECC80 /* AddressWidgetContainerView.swift in Sources */,
+				285C14502E95D7A8007ECC80 /* OrderSummaryView.swift in Sources */,
+				285C14512E95D7A8007ECC80 /* ProductCardView.swift in Sources */,
+				285C14522E95D7A8007ECC80 /* RoundedCornerExtension.swift in Sources */,
+				285C14542E95D7A8007ECC80 /* AfterpayPaymentWidget.swift in Sources */,
+				285C14552E95D7A8007ECC80 /* CardPaymentWidget.swift in Sources */,
+				285C14562E95D7A8007ECC80 /* PayPalPaymentWidget.swift in Sources */,
+				285C14572E95D7A8007ECC80 /* ProfileView.swift in Sources */,
+				285C14582E95D7A8007ECC80 /* AddressInputSection.swift in Sources */,
+				285C14592E95D7A8007ECC80 /* ShippingOptionRow.swift in Sources */,
+				285C145B2E95D7A8007ECC80 /* SavedAddressSelectionView.swift in Sources */,
+				285C145C2E95D7A8007ECC80 /* CheckoutInformationStepView.swift in Sources */,
+				285C145D2E95D7A8007ECC80 /* PaymentWidgetView.swift in Sources */,
+				285C145E2E95D7A8007ECC80 /* ProductService.swift in Sources */,
+				285C145F2E95D7A8007ECC80 /* CheckoutAddressWidgetView.swift in Sources */,
+				285C14602E95D7A8007ECC80 /* Product.swift in Sources */,
+				285C14612E95D7A8007ECC80 /* ProfileVM.swift in Sources */,
+				285C14622E95D7A8007ECC80 /* CheckoutActionButtons.swift in Sources */,
+				285C14632E95D7A8007ECC80 /* UserProfileManager.swift in Sources */,
+				285C14642E95D7A8007ECC80 /* EnhancedCheckoutView.swift in Sources */,
+				285C14652E95D7A8007ECC80 /* BillingAddressSection.swift in Sources */,
 				28A81F552B160ECB0068FE75 /* Standalone3DSReq.swift in Sources */,
 				287F39992DF8C03100F4D771 /* ButtonStyleView.swift in Sources */,
-				282D31642A66B81C00E3ECAD /* CheckoutView.swift in Sources */,
 				28A81F4D2B14DB040068FE75 /* Integrated3DSVM.swift in Sources */,
 				287F398C2DF88E1C00F4D771 /* ToggleStyleVM.swift in Sources */,
 				28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */,
@@ -1056,9 +1333,8 @@
 				28A65CA32A94CE60002A04CA /* AddressWidgetView.swift in Sources */,
 				28D8BA612E006ABE00EDD422 /* ResetStyleButton.swift in Sources */,
 				28A81F532B14E13E0068FE75 /* CardTokenRes.swift in Sources */,
-				282D3A7F2B389A4D00C4ABC6 /* CheckoutPaymentSheet.swift in Sources */,
 				287F399D2DF8CD0300F4D771 /* DimensionsFieldView.swift in Sources */,
-				282D3A8D2B3E0CC300C4ABC6 /* CheckoutPaymentVM.swift in Sources */,
+				28386A902E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift in Sources */,
 				28A2DB3F2E0AE5BB00A94753 /* ApplePayStyleView.swift in Sources */,
 				2886AE772E55D4BA0071BADC /* Standalone3DSSource.swift in Sources */,
 				2886AE662E55D2690071BADC /* InitialiseWalletChargeMetaData.swift in Sources */,
@@ -1071,12 +1347,14 @@
 				28E86F672ACC1361008E827E /* WalletEndpoints.swift in Sources */,
 				280E96342B176FD600BE8C3E /* Standalone3DSVM.swift in Sources */,
 				28A81F592B16388B0068FE75 /* Integrated3DSReq.swift in Sources */,
+				28271E372EBC0DCF000EEEC1 /* CardDetailsWidgetVM.swift in Sources */,
 				2886AE872E55D6D10071BADC /* Integrated3DSResponseData.swift in Sources */,
 				28D51D582DFF619D0095CDE5 /* TextStyleVM.swift in Sources */,
 				287F397F2DF786A800F4D771 /* StyleThemeManager.swift in Sources */,
 				282D315F2A66ADF500E3ECAD /* MainView.swift in Sources */,
 				287F39382DF259A600F4D771 /* StyleWidgetListView.swift in Sources */,
 				287F39782DF76C6600F4D771 /* LoaderStyleView.swift in Sources */,
+				28271E332EBC064F000EEEC1 /* GiftCardWidgetVM.swift in Sources */,
 				28A27BE92B4478EA00196822 /* ConvertToVaultTokenReq.swift in Sources */,
 				28A3A9C42A696341004A8D34 /* View+Extensions.swift in Sources */,
 				2881BC442E55CDEB00390CD8 /* WalletChargeResource.swift in Sources */,
@@ -1084,6 +1362,7 @@
 				28AD05FC2CF77AA200B12FB4 /* CustomersEndpoints.swift in Sources */,
 				28552E6E2CCBB073004C93CA /* PayPalVaultWidgetVM.swift in Sources */,
 				28E34C682DD4D7D800A356A0 /* ColesPayWidgetVM.swift in Sources */,
+				28386A922E9DB22C00D941DC /* CheckoutResultOverlay.swift in Sources */,
 				28E34C692DD4D7D800A356A0 /* ColesPayWidgetView.swift in Sources */,
 				2886AE682E55D2980071BADC /* InitialiseWalletChargePaymentSource.swift in Sources */,
 				2886AE7F2E55D6180071BADC /* Integrated3DSVaultCustomer.swift in Sources */,
@@ -1111,6 +1390,7 @@
 				28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */,
 				2886AE5E2E55D1F60071BADC /* CreateCustomerTokenCustomerData.swift in Sources */,
 				2886AE5F2E55D1F60071BADC /* CreateCustomerTokenRes.swift in Sources */,
+				281859082EA29B24002D7CDE /* IconGridView.swift in Sources */,
 				2886AE602E55D1F60071BADC /* CreateCustomerTokenResource.swift in Sources */,
 				2886AE612E55D1F60071BADC /* CreateCustomerTokenPaymentSource.swift in Sources */,
 				2886AE812E55D6270071BADC /* Integrated3DSVaultPaymentSource.swift in Sources */,
@@ -1120,17 +1400,17 @@
 				289D76C12B45FABA002601BB /* CaptureChargeReq.swift in Sources */,
 				28A2DB512E0B54C600A94753 /* ButtonLoaderStyleView.swift in Sources */,
 				287F39432DF259F500F4D771 /* StyleComponentsEnum.swift in Sources */,
-				28B2FF552D009522004C0672 /* AccountProfileView.swift in Sources */,
 				2886AE7C2E55D53C0071BADC /* Integrated3DSBrowserDetails.swift in Sources */,
 				28F4E3262B83922100C73065 /* AfterpayWidgetVM.swift in Sources */,
 				287F393A2DF259B100F4D771 /* StyleComponentListView.swift in Sources */,
 				2886AE642E55D2570071BADC /* InitialiseWalletChargeCustomer.swift in Sources */,
 				28A2DB482E0B2EA900A94753 /* SubsectionTitleView.swift in Sources */,
+				281859062EA29A64002D7CDE /* IconPickerView.swift in Sources */,
 				2881BC482E55CE1500390CD8 /* ChargeData.swift in Sources */,
 				283825892CBFDC42005BE050 /* PayPalVaultWidgetView.swift in Sources */,
+				281859042EA280E6002D7CDE /* CaptureChargeStandaloneReq.swift in Sources */,
 				289B83842B9E382500CEA8B4 /* ClickToPayWidgetView.swift in Sources */,
 				28A81F512B14E0FA0068FE75 /* TokeniseCardDetailsReq.swift in Sources */,
-				28B2FF572D009526004C0672 /* AccountProfileVM.swift in Sources */,
 				284263302B45DA7200DADE7F /* Integrated3DSVaultReq.swift in Sources */,
 				282D3A832B3B7AAE00C4ABC6 /* InnerHeightPreferenceKey.swift in Sources */,
 				282D3A812B3B78BC00C4ABC6 /* BottomSheetView.swift in Sources */,
@@ -1246,7 +1526,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1269,7 +1549,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1407,7 +1687,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1430,7 +1710,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1561,7 +1841,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1584,7 +1864,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1715,7 +1995,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1738,7 +2018,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1932,7 +2212,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -1955,7 +2235,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1979,7 +2259,7 @@
 				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"ExampleApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 4DX7V3HMRJ;
@@ -2002,7 +2282,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.1.0;
+				MARKETING_VERSION = 4.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

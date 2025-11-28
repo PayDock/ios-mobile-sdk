@@ -11,6 +11,9 @@ import SwiftUI
 struct OutlineTextField: View {
 
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @ScaledMetric private var rightIconSize: CGFloat = 20
+    @ScaledMetric private var leftIconWidth: CGFloat = 28
+    @ScaledMetric private var leftIconHeight: CGFloat = 24
 
     // MARK: Properties
 
@@ -20,11 +23,36 @@ struct OutlineTextField: View {
     @State private var borderWidth: CGFloat = 0.0
 
     @State private var titleBackgroundOpacity = 0.0
-    @State private var titleBottomPadding = 0.0
     @State private var titleColor = Color.clear
     @State private var titleFontSize = 0.0
-    @State private var titleVerticalPadding: CGFloat = 0
-    @State private var titleLeadingPadding: Double
+    @State private var animatableEditingState = false
+
+    private var titleLeadingPadding: Double {
+        let isActive = animatableEditingState || !text.isEmpty
+        if isActive {
+            return 14.0
+        } else {
+            return (leftImage != nil) ? (leftIconWidth + 24) : 14.0
+        }
+    }
+
+    private var titleBottomPadding: Double {
+        let isActive = animatableEditingState || !text.isEmpty
+        if isActive {
+            return 48.0 + getTitleExtraPadding()
+        } else {
+            return 0.0
+        }
+    }
+
+    private var titleVerticalPadding: CGFloat {
+        let isActive = animatableEditingState || !text.isEmpty
+        if isActive {
+            return -10.0
+        } else {
+            return 0.0
+        }
+    }
 
     @State private var validationIconState: ValidationIconState = .none
 
@@ -82,8 +110,7 @@ struct OutlineTextField: View {
                 returnKeyType: UIReturnKeyType = .default,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
-                onSubmit: (() -> Void)? = nil
-    ) {
+                onSubmit: (() -> Void)? = nil) {
         self.appearance = appearance
         self._text = text
         self.title = title
@@ -100,8 +127,6 @@ struct OutlineTextField: View {
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
-
-        titleLeadingPadding = (leftImage != nil) ? 52 : 12
     }
 
     // MARK: - View protocol properties
@@ -129,6 +154,7 @@ struct OutlineTextField: View {
         }
         .onChange(of: editing) { _ in
             withAnimation(.easeOut(duration: 0.15)) {
+                animatableEditingState = editing
                 updateBorder()
                 updateTitle()
             }
@@ -148,6 +174,9 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
+        .onChange(of: sizeCategory) { _ in
+            updateTitleFontSize()
+        }
         .onAppear {
             titleColor = appearance.colors.placeholder
             titleFontSize = appearance.fonts.title.customFont.size
@@ -159,8 +188,10 @@ struct OutlineTextField: View {
     private var textFieldView: some View {
         HStack {
             leftImage?
+                .resizable()
+                .scaledToFit()
+                .frame(width: leftIconWidth, height: leftIconHeight)
                 .foregroundColor(appearance.colors.placeholder)
-                .frame(width: 28, height: 24)
                 .accessibilityHidden(true)
 
             CursorPositionTextField(
@@ -255,9 +286,14 @@ struct OutlineTextField: View {
             switch validationIconState {
             case .valid:
                 Image("tick-circle", bundle: Bundle.module)
+                    .resizable()
+                    .frame(width: rightIconSize, height: rightIconSize)
                     .foregroundColor(appearance.colors.success)
+
             case .invalid:
                 Image("exclamation-circle", bundle: Bundle.module)
+                    .resizable()
+                    .frame(width: rightIconSize, height: rightIconSize)
                     .foregroundColor(appearance.colors.error)
             case .none: EmptyView()
             }
@@ -301,7 +337,6 @@ private extension OutlineTextField {
         updateTitleBackground()
         updateTitleColor()
         updateTitleFontSize()
-        updateTitlePosition()
     }
 
     func updateTitleBackground() {
@@ -331,19 +366,6 @@ private extension OutlineTextField {
             titleFontSize = appearance.fonts.title.customFont.size / 1.4
         } else {
             titleFontSize = appearance.fonts.title.customFont.size
-        }
-    }
-
-    func updateTitlePosition() {
-        if editing || !text.isEmpty {
-            titleBottomPadding = 48.0 + getTitleExtraPadding()
-            titleLeadingPadding = 14.0
-            titleVerticalPadding = -10
-
-        } else {
-            titleBottomPadding = 0.0
-            titleLeadingPadding = (leftImage != nil) ? 52 : 14.0
-            titleVerticalPadding = 0
         }
     }
 
