@@ -28,7 +28,8 @@ struct WidgetsView: View {
         WidgetItem(destination: AnyView(AfterpayWidgetView()), title: "Afterpay", subtitle: "Standalone Afterpay widget"),
         WidgetItem(destination: AnyView(ClickToPayWidgetView()), title: "Click to Pay", subtitle: "ClickToPay flow"),
         WidgetItem(destination:
-                    AnyView(PayPalVaultWidgetView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout")
+                    AnyView(PayPalVaultWidgetView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout"),
+        WidgetItem(destination: AnyView(ZipWidgetView()), title: "Zip", subtitle: "Standalone Zip payment button")
     ].sorted { $0.title < $1.title }
 
     var body: some View {

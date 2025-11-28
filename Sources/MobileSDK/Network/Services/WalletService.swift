@@ -9,6 +9,7 @@
 import Foundation
 import NetworkingLib
 
+/// Service for all `/v1/charges/wallet/*` endpoints
 protocol WalletService {
 
     func captureCharge(token: String, paymentMethodId: String?, payerId: String?, refToken: String?) async throws -> ChargeResponse
@@ -16,7 +17,6 @@ protocol WalletService {
     func getColesPayCallback(token: String) async throws -> String
     func getAfterpayCallback(token: String) async throws -> String
     func declineWalletTransaction(token: String, chargeId: String) async throws -> String
-
 }
 
 struct WalletServiceImpl: HTTPClient, WalletService {
@@ -73,7 +73,5 @@ struct WalletServiceImpl: HTTPClient, WalletService {
         let endpoint = WalletEndpoints.declineWalletTransaction(token: token, chargeId: chargeId)
         let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self)
         return response.resource.data.status
-
     }
-
 }

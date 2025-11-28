@@ -15,7 +15,7 @@ class PayPalVMTests: XCTestCase {
 
     var viewModel: PayPalVM!
     var mockWalletService: WalletServiceMock!
-    var mockPayPalVaultService: PayPalVaultServiceMock!
+    var mockGatewayService: GatewayServiceMock!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -27,7 +27,7 @@ class PayPalVMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         mockWalletService = WalletServiceMock()
-        mockPayPalVaultService = PayPalVaultServiceMock()
+        mockGatewayService = GatewayServiceMock()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
@@ -46,7 +46,7 @@ class PayPalVMTests: XCTestCase {
                 }
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -58,7 +58,7 @@ class PayPalVMTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         mockWalletService = nil
-        mockPayPalVaultService = nil
+        mockGatewayService = nil
         viewState = nil
         loadingDelegate = nil
         eventDelegate = nil
@@ -83,7 +83,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -106,7 +106,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: nil,
             eventDelegate: nil,
             completion: { result in
@@ -128,7 +128,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -153,7 +153,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: nil,
             eventDelegate: nil,
             completion: { result in
@@ -181,7 +181,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -209,7 +209,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: nil,
             eventDelegate: nil,
             completion: { result in
@@ -235,7 +235,7 @@ class PayPalVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "success_token"))
 
         // Mock successful services
-        mockPayPalVaultService.sendError = false
+        mockGatewayService.shouldReturnError = false
 
         // When
         viewModel.handleButtonTap()
@@ -273,7 +273,7 @@ class PayPalVMTests: XCTestCase {
 
     func testGetClientIdSuccess() async {
         // Given
-        mockPayPalVaultService.sendError = false
+        mockGatewayService.shouldReturnError = false
 
         // When
         let clientId = await viewModel.getClientId()
@@ -285,8 +285,14 @@ class PayPalVMTests: XCTestCase {
 
     func testGetClientIdFailureWithRequestError() async {
         // Given
-        mockPayPalVaultService.sendError = true
-        mockPayPalVaultService.responseFilename = .authFail
+        mockGatewayService.shouldReturnError = true
+        mockGatewayService.errorToReturn = ErrorRes(
+            status: 500,
+            error: ErrorRes.ErrorObj(message: "Test Error", code: "TEST"),
+            resource: nil,
+            errorSummary: nil
+        )
+        // Error response is configured through shouldReturnError and errorToReturn
 
         // When
         let clientId = await viewModel.getClientId()
@@ -333,7 +339,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -370,7 +376,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -409,7 +415,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -442,7 +448,7 @@ class PayPalVMTests: XCTestCase {
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
             walletService: mockWalletService,
-            payPalVaultService: mockPayPalVaultService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,
             completion: { result in

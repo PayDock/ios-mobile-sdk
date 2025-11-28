@@ -30,6 +30,7 @@ class ColesPayWidgetVM: ObservableObject {
     init(walletService: WalletService = WalletServiceImpl()) {
         self.walletService = walletService
     }
+
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(

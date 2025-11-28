@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import MobileSDK
+@testable import NetworkingLib
 
 class WalletServiceMock: Mockable, WalletService {
 

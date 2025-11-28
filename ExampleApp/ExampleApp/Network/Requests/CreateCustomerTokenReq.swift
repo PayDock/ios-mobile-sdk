@@ -7,7 +7,5 @@
 //
 
 struct CreateCustomerTokenReq: Codable {
-
     let token: String
-
 }

@@ -9,7 +9,6 @@
 import Foundation
 
 struct ConvertToVaultTokenReq: Codable {
-
     let token: String
     let vaultType: String
 
@@ -17,5 +16,4 @@ struct ConvertToVaultTokenReq: Codable {
         case token
         case vaultType = "vault_type"
     }
-
 }

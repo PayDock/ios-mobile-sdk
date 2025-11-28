@@ -17,7 +17,7 @@ class GiftCardVM: ObservableObject {
 
     let appearance: GiftCardWidgetAppearance
     @Published var giftCardFormManager: GiftCardFormManager
-    private let cardService: CardService
+    private let paymentSourcesService: PaymentSourcesService
     private let config: GiftCardWidgetConfig
     var viewState: ViewState
 
@@ -38,7 +38,7 @@ class GiftCardVM: ObservableObject {
     init(appearance: GiftCardWidgetAppearance,
          viewState: ViewState,
          giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
-         cardService: CardService = CardServiceImpl(),
+         paymentSourcesService: PaymentSourcesService = PaymentSourcesServiceImpl(),
          config: GiftCardWidgetConfig,
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
@@ -46,7 +46,7 @@ class GiftCardVM: ObservableObject {
         self.appearance = appearance
         self.viewState = viewState
         self.giftCardFormManager = giftCardFormManager
-        self.cardService = cardService
+        self.paymentSourcesService = paymentSourcesService
         self.config = config
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
@@ -68,7 +68,7 @@ class GiftCardVM: ObservableObject {
                 storePin: config.storePin)
 
             do {
-                let cardToken = try await cardService.createGiftCardToken(
+                let cardToken = try await paymentSourcesService.createGiftCardToken(
                     tokeniseGiftCardReq: tokeniseGiftCardReq,
                     accessToken: config.accessToken)
                 updateLoadingState(isLoading: false)

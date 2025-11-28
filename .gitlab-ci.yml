@@ -20,7 +20,8 @@ variables:
   LC_ALL: "en_US.UTF-8"
   LANG: "en_US.UTF-8"
   GIT_STRATEGY: clone
-  RUBYOPT: "-rkconv" # Ensure kconv is loaded for Ruby 3.4+ compatibility (required by CFPropertyList and native extensions)
+  # Note: RUBYOPT for kconv is not set here because nkf gem needs to be installed first
+  # The setup_bundler.sh script handles this properly
   
 .macos_saas_runners:
   tags:

@@ -4,7 +4,6 @@
 //
 //  Created by Domagoj Grizelj on 01.09.2025..
 //  Copyright © 2025 Paydock Ltd.
-//
 
 import XCTest
 @testable import MobileSDK

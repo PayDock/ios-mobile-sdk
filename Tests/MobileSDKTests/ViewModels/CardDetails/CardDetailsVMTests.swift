@@ -14,7 +14,7 @@ import NetworkingLib
 @MainActor
 class CardDetailsVMTests: XCTestCase {
     private var viewModel: CardDetailsVM!
-    private var mockService: CardServiceMock!
+    private var mockService: PaymentSourcesServiceMock!
     private var config: SaveCardConfig!
     private var viewState: ViewState!
     private var loadingDelegate: WidgetLoadingDelegateUtil!
@@ -24,7 +24,7 @@ class CardDetailsVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockService = CardServiceMock()
+        mockService = PaymentSourcesServiceMock()
         config = SaveCardConfig(
             consentText: "Remember",
             privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
@@ -35,7 +35,7 @@ class CardDetailsVMTests: XCTestCase {
         eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
@@ -66,7 +66,7 @@ class CardDetailsVMTests: XCTestCase {
     }
 
     func testInitialisationWithOptionsStateDisabled() {
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: ViewState(state: .disabled),
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
@@ -89,7 +89,7 @@ class CardDetailsVMTests: XCTestCase {
     }
 
     func testInitialisationWithoutDelegateShowLoader() {
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
@@ -109,7 +109,7 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
@@ -135,7 +135,7 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
@@ -163,7 +163,7 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
@@ -191,7 +191,7 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
@@ -226,7 +226,7 @@ class CardDetailsVMTests: XCTestCase {
     }
 
     
-    private class ErroringCardServiceMock: CardService {
+    private class ErroringPaymentSourcesServiceMock: PaymentSourcesService {
         enum FailureType {
             case requestError(message: String, code: String)
             case connectionError(URLError)
@@ -256,16 +256,32 @@ class CardDetailsVMTests: XCTestCase {
         func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
             return ""
         }
+
+        func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: PayPalVaultPaymentTokenReq, setupToken: String, accessToken: String) async throws -> PayPalVaultPaymentTokenRes.PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(accessToken: String, config: ZipConfig) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, accessToken: String) async throws -> String {
+            fatalError("Not implemented")
+        }
     }
 
     func testTokeniseCardDetails_CompletesWithUnknownError_OnConnectionError() async {
         // Given
         let urlError = URLError(.notConnectedToInternet)
-        let failingService = ErroringCardServiceMock(failure: .connectionError(urlError))
+        let failingService = ErroringPaymentSourcesServiceMock(failure: .connectionError(urlError))
         let expectation = XCTestExpectation(description: "Completion called with unknownError")
 
         viewModel = CardDetailsVM(
-            cardService: failingService,
+            paymentSourcesService: failingService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
@@ -311,7 +327,7 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         let appearance = CardDetailsWidgetAppearance()
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
@@ -347,7 +363,7 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         let appearance = CardDetailsWidgetAppearance()
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
@@ -383,7 +399,7 @@ class CardDetailsVMTests: XCTestCase {
             // Given
             let appearance = CardDetailsWidgetAppearance()
             viewModel = CardDetailsVM(
-                cardService: mockService,
+                paymentSourcesService: mockService,
                 viewState: viewState,
                 config: CardDetailsWidgetConfig(
                     gatewayId: "gatewayId",
@@ -418,7 +434,7 @@ class CardDetailsVMTests: XCTestCase {
     func testEventDelegateWithoutDelegate() {
         // Given
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
