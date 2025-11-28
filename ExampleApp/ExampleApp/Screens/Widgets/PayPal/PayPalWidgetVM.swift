@@ -9,6 +9,7 @@
 import Foundation
 import MobileSDK
 import NetworkingLib
+import OSLog
 
 @MainActor
 class PayPalWidgetVM: ObservableObject {
@@ -34,7 +35,11 @@ class PayPalWidgetVM: ObservableObject {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: nil,
+                addressLine2: nil,
                 addressPostcode: nil,
+                addressCity: nil,
+                addressState: nil,
+                addressCountry: nil,
                 gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "",
                 walletType: nil)
 
@@ -97,12 +102,24 @@ class PayPalWidgetVM: ObservableObject {
     }
 }
 
+// MARK: - WidgetLoadingDelegate
+
 extension PayPalWidgetVM: WidgetLoadingDelegate {
+
     func loadingDidStart() {
         isLoading = true
     }
 
     func loadingDidFinish() {
         isLoading = false
+    }
+}
+
+// MARK: - WidgetEventDelegate
+
+extension PayPalWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

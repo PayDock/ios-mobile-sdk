@@ -25,9 +25,15 @@ struct ToggleStyleView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack {
+                VStack(alignment: .leading) {
                     SectionTitleView(title: "Colors")
                     colorListView
+                    SectionTitleView(title: "Custom Style")
+                    Text("Modifying these properties applies a custom toggle style that overrides the native toggle appearance.")
+                        .font(.caption)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
+                    customStyleList
                     ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
@@ -50,6 +56,24 @@ struct ToggleStyleView: View {
                     get: { viewModel.activeColor.toHex() },
                     set: { viewModel.activeColor = Color(hex: $0) }),
                 pickedColor: $viewModel.activeColor)
+        }
+    }
+
+    private var customStyleList: some View {
+        VStack {
+            ColorPickerView(
+                title: "Inactive color",
+                text: Binding(
+                    get: { viewModel.inactiveColor.toHex() },
+                    set: { viewModel.inactiveColor = Color(hex: $0) }),
+                pickedColor: $viewModel.inactiveColor)
+
+            ColorPickerView(
+                title: "Toggle color",
+                text: Binding(
+                    get: { viewModel.toggleColor.toHex() },
+                    set: { viewModel.toggleColor = Color(hex: $0) }),
+                pickedColor: $viewModel.toggleColor)
         }
     }
 }

@@ -18,6 +18,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     var viewState: ViewState!
     var config: PayPalVaultConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
+    var eventDelegate: WidgetEventDelegateUtil!
     var completionResult: Result<PayPalVaultResult, PayPalVaultError>?
     var cancellables = Set<AnyCancellable>()
 
@@ -25,16 +26,18 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         super.setUp()
         mockService = PayPalVaultServiceMock()
         viewState = ViewState()
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: "Custom Action Text")
+        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway")
         loadingDelegate = WidgetLoadingDelegateUtil()
+        eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
         viewModel = PayPalSavePaymentSourceVM(
             viewState: ViewState(),
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: nil) { result in
+            loadingDelegate: nil,
+            eventDelegate: eventDelegate) { result in
                 self.completionResult = result
-        }
+            }
     }
 
     override func tearDown() {
@@ -42,6 +45,8 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         mockService = nil
         viewState = nil
         completionResult = nil
+        loadingDelegate = nil
+        eventDelegate = nil
         cancellables.removeAll()
         super.tearDown()
     }
@@ -55,9 +60,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             viewState: ViewState(state: .disabled),
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: loadingDelegate) { result in
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
                 self.completionResult = result
-        }
+            }
 
         XCTAssertEqual(viewModel.viewState.isDisabled, true)
     }
@@ -71,27 +77,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             viewState: viewState,
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: loadingDelegate) { result in
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
                 self.completionResult = result
-        }
+            }
 
         XCTAssertEqual(viewModel.showLoaders, false)
-    }
-
-    func testInitializationSetsActionText() {
-        XCTAssertEqual(viewModel.actionText, "Custom Action Text", "The actionText should match the provided config value.")
-    }
-
-    func testDefaultActionTextIfNil() {
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway", actionText: nil)
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: viewState,
-            config: config,
-            payPalVaultService: mockService,
-            loadingDelegate: nil
-        ) { _ in }
-
-        XCTAssertEqual(viewModel.actionText, "Link PayPal account", "The actionText should default to 'Link PayPal account' when nil.")
     }
 
     // MARK: - Positive service interaction
@@ -191,9 +182,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             viewState: viewState,
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: loadingDelegate) { result in
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
                 self.completionResult = result
-        }
+            }
 
         // When
         viewModel.updateLoadingState(isLoading: true)
@@ -210,9 +202,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             viewState: viewState,
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: nil) { result in
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
                 self.completionResult = result
-        }
+            }
         viewModel.isLoading = false
         loadingDelegate.isLoading = false
 
@@ -231,9 +224,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             viewState: viewState,
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: loadingDelegate) { result in
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
                 self.completionResult = result
-        }
+            }
         viewModel.isLoading = false
         loadingDelegate.isLoading = true
 
@@ -252,9 +246,10 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
             viewState: viewState,
             config: config,
             payPalVaultService: mockService,
-            loadingDelegate: nil) { result in
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
                 self.completionResult = result
-        }
+            }
         viewModel.isLoading = true
         loadingDelegate.isLoading = false
 
@@ -265,5 +260,51 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         XCTAssertEqual(viewModel.isLoading, false)
         XCTAssertEqual(loadingDelegate.isLoading, false)
         XCTAssertEqual(viewModel.viewState.isDisabled, false)
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesEvents() {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            payPalVaultService: mockService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+            }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(type: .button, properties: .button(WidgetEventButtonProperties(name: "PayPalVaultButton", action: .click)))
+        viewModel.handleButtonTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            payPalVaultService: mockService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+            }
+
+        // When - The view model should handle nil event delegate gracefully
+        viewModel.initializePayPalSDK()
+
+        // Then - No events should be recorded in our test delegate
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }

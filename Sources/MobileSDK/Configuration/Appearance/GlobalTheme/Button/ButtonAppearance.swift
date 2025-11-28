@@ -16,15 +16,21 @@ extension Theme {
         public var dimensions: ButtonDimensions
         public var fonts: ButtonFonts
         public var loader: ButtonLoader
+        public var icon: Image?
+        public var text: String
 
         public init(colors: ButtonColors = ButtonColors(),
                     dimensions: ButtonDimensions = ButtonDimensions(),
                     fonts: ButtonFonts = ButtonFonts(),
-                    loader: ButtonLoader = ButtonLoader()) {
+                    loader: ButtonLoader = ButtonLoader(),
+                    icon: Image? = nil,
+                    text: String = "") {
             self.colors = colors
             self.dimensions = dimensions
             self.fonts = fonts
             self.loader = loader
+            self.icon = icon
+            self.text = text
         }
     }
 }

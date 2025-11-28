@@ -11,34 +11,38 @@ import SwiftUI
 struct SDKButton: View {
 
     private let title: String?
-    private let image: Image?
+    private let backgroundImage: Image?
     private let imageLocation: ImageLocation
     private let isLoading: Bool
     private let style: SDKButtonStyle
     private let scaleToFit: Bool
     private let isLeftAligned: Bool
     private let shouldTemplate: Bool
+    private let contentPadding: CGFloat
     private let action: () -> Void
 
     @StateObject private var announcementManager = LoadingAnnouncementManager()
+    @ScaledMetric private var iconHeight: CGFloat = 20
 
     init(title: String?,
-         image: Image? = nil,
+         backgroundImage: Image? = nil,
          imageLocation: ImageLocation = .left,
          isLoading: Bool = false,
          style: SDKButtonStyle,
          scaleToFit: Bool = false,
          isLeftAligned: Bool = false,
          shouldTemplate: Bool = false,
+         contentPadding: CGFloat = 16.0,
          action: @escaping () -> Void) {
         self.title = title
-        self.image = image
+        self.backgroundImage = backgroundImage
         self.imageLocation = imageLocation
         self.isLoading = isLoading
         self.style = style
         self.scaleToFit = scaleToFit
         self.isLeftAligned = isLeftAligned
         self.shouldTemplate = shouldTemplate
+        self.contentPadding = contentPadding
         self.action = action
     }
 
@@ -47,7 +51,7 @@ struct SDKButton: View {
             Button(action: self.action) {
                 if scaleToFit {
                     ZStack {
-                        image?
+                        (style.image ?? backgroundImage)?
                             .resizable()
                             .renderingMode(shouldTemplate ? .template : .original)
                             .scaledToFit()
@@ -65,12 +69,13 @@ struct SDKButton: View {
                                 announcementManager.stop()
                             }
                     }
-                } else if image != nil && title != nil {
-                    getImageAndTitle()
+                } else if style.image == nil {
+                    getTitle()
+                        .padding(contentPadding) // Adds padding between outer button edges and the title inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    getTitle()
-                        .padding(4)
+                    getImageAndTitle()
+                        .padding(contentPadding) // Adds padding between outer button edges and the content inside it
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -85,12 +90,12 @@ struct SDKButton: View {
         HStack {
             if imageLocation == .left {
                 if !isLoading {
-                    image?
+                    style.image?
                         .resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
                         .foregroundColor(style.imageColor)
-                        .frame(maxHeight: scaleToFit ? .infinity : 20)
+                        .frame(height: scaleToFit ? .infinity : iconHeight)
                         .font(.system(size: 32, weight: .light))
                         .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
@@ -103,15 +108,20 @@ struct SDKButton: View {
                             announcementManager.stop()
                         }
                 }
-                Text(self.title ?? "")
+                if let title = title, !title.isEmpty {
+                    Text(title)
+                }
             } else {
-                Text(self.title ?? "")
+                if let title = title, !title.isEmpty {
+                    Text(title)
+                }
+
                 if !isLoading {
-                    image?.resizable()
+                    style.image?.resizable()
                         .renderingMode(shouldTemplate ? .template : .original)
                         .scaledToFit()
                         .foregroundColor(style.imageColor)
-                        .frame(maxHeight: 20)
+                        .frame(height: iconHeight)
                         .font(.system(size: 32, weight: .light))
                         .opacity(style.isDisabled ? 0.3 : 1.0)
                 } else {
@@ -160,6 +170,6 @@ struct SDKButton: View {
 struct LargeButton_Previews: PreviewProvider {
 
     static var previews: some View {
-        SDKButton(title: "asdf", style: .outline(OutlineButtonStyle())) { }
+        SDKButton(title: "asdf", style: .custom(CustomButtonStyle(appearance: .init()))) { }
     }
 }

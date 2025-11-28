@@ -23,12 +23,12 @@ desc "Runs all the unit tests and UI Tests"
 desc "Configure the .env.default file in this directory before you run the test or build lanes."
 desc "Info on the .env files and how to use them can be found here: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#environment-variables"
 lane :test do
-  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "240"
   run_tests(
     project: "ExampleApp/ExampleApp.xcodeproj",
     scheme: "ExampleApp",
     configuration: "Debug (Staging)",
-    devices: ["iPhone 15"],
+    devices: ["iPhone 16"],
         only_testing: [
         "ExampleAppTests"
     ],
@@ -44,7 +44,7 @@ lane :testPackage do
   run_tests(
     package_path: ".",
     scheme: "MobileSDK",
-    destination: "platform=iOS Simulator,name=iPhone 15",
+    destination: "platform=iOS Simulator,name=iPhone 16",
     xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     code_coverage: true,
@@ -274,14 +274,329 @@ lane :buildDebugStaging do
   # upload_to_testflight(changelog: "Add rocket emoji")
 end
 
-lane :buildReleaseStaging do
+# Prepares build number for staging environment (shared between Firebase and TestFlight)
+lane :prepareStaging do
   ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Get current version from project
+  current_version = get_version_number(
+    xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    configuration: "Release (Staging)"
+  )
+  
+  # Manage build number (increments per version) - shared for both Firebase and TestFlight
+  build_info = manage_build_number(
+    version: current_version,
+    environment: "staging"
+  )
+  
+  UI.success("✅ Staging build number prepared: #{build_info[:version]} (#{build_info[:build_number]})")
+  UI.message("This build number will be used for both Firebase and TestFlight builds")
+end
+
+# Prepares build number for sandbox environment (shared between Firebase and TestFlight)
+lane :prepareSandbox do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Get current version from project
+  current_version = get_version_number(
+    xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    configuration: "Release (Sandbox)"
+  )
+  
+  # Manage build number (increments per version) - shared for both Firebase and TestFlight
+  build_info = manage_build_number(
+    version: current_version,
+    environment: "sandbox"
+  )
+  
+  UI.success("✅ Sandbox build number prepared: #{build_info[:version]} (#{build_info[:build_number]})")
+  UI.message("This build number will be used for both Firebase and TestFlight builds")
+end
+
+lane :buildReleaseStagingFirebase do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Get current version from project
+  current_version = get_version_number(
+    xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    configuration: "Release (Staging)"
+  )
+  
+  # Read build number from file (shared with TestFlight build)
+  # Build number should have been set by prepareStaging lane
+  build_number = get_build_number_from_file(
+    version: current_version,
+    environment: "staging"
+  )
+  
+  if build_number.nil?
+    UI.user_error!("Build number not found for version #{current_version} (staging). Please run prepareStaging first.")
+  end
+  
+  build_info = { version: current_version, build_number: build_number }
+  
+  # Update version and build number in Xcode project
+  update_version_and_build_number(
+    project: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    version: build_info[:version],
+    build_number: build_info[:build_number]
+  )
+  
+  # Inject environment variables from GitLab into Staging.xcconfig
+  # Use absolute path since Fastlane runs from fastlane/ directory
+  xcconfig_path = File.expand_path("../ExampleApp/ExampleApp/Configs/Staging.xcconfig", __dir__)
+  inject_env_vars_to_xcconfig(
+    xcconfig_path: xcconfig_path,
+    env_suffix: "_STAGING"
+  )
+  
+  # Disable automatic code signing and configure manual signing for Release (Staging) only
+  # Using Ad Hoc profiles for Firebase App Distribution (allows direct download)
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: "ExampleApp/ExampleApp.xcodeproj",
+    targets: ["ExampleApp"],
+    build_configurations: ["Release (Staging)"],
+    code_sign_identity: "iPhone Distribution",
+    bundle_identifier: "com.paydock.multitenant.staging",
+    profile_name: "match AdHoc com.paydock.multitenant.staging",
+    team_id: "4DX7V3HMRJ"
+  )
+  
+  # Build the app only (no deployment)
+  # Using ad-hoc export method for Firebase App Distribution
+  # Note: TestFlight requires app-store export method, so TestFlight uploads will fail with this build
   build_app(
 	project: "ExampleApp/ExampleApp.xcodeproj",
 	scheme: "ExampleApp Staging", 
-	configuration: "Release (Staging)"
+	configuration: "Release (Staging)",
+	export_method: "ad-hoc",
+	output_directory: "fastlane/builds/staging/firebase",
+	output_name: "ExampleApp-Staging",
+	skip_build_archive: false,
+	xcargs: "-skipPackagePluginValidation -skipMacroValidation DEVELOPMENT_TEAM=4DX7V3HMRJ",
+	export_options: {
+	  method: "ad-hoc",
+	  provisioningProfiles: {
+		"com.paydock.multitenant.staging" => "match AdHoc com.paydock.multitenant.staging"
+	  }
+	}
   )
-  # upload_to_testflight(changelog: "Add rocket emoji")
+  
+  UI.success("✅ Staging Firebase build completed successfully!")
+  UI.message("Build artifact: fastlane/builds/staging/firebase/ExampleApp-Staging.ipa")
+  UI.message("Version: #{build_info[:version]} (#{build_info[:build_number]})")
+end
+
+lane :buildReleaseStagingTestflight do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Get current version from project
+  current_version = get_version_number(
+    xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    configuration: "Release (Staging)"
+  )
+  
+  # Read build number from file (shared with Firebase build)
+  # Build number should have been set by prepareStaging lane
+  build_number = get_build_number_from_file(
+    version: current_version,
+    environment: "staging"
+  )
+  
+  if build_number.nil?
+    UI.user_error!("Build number not found for version #{current_version} (staging). Please run prepareStaging first.")
+  end
+  
+  build_info = { version: current_version, build_number: build_number }
+  
+  # Update version and build number in Xcode project
+  update_version_and_build_number(
+    project: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    version: build_info[:version],
+    build_number: build_info[:build_number]
+  )
+  
+  # Inject environment variables from GitLab into Staging.xcconfig
+  # Use absolute path since Fastlane runs from fastlane/ directory
+  xcconfig_path = File.expand_path("../ExampleApp/ExampleApp/Configs/Staging.xcconfig", __dir__)
+  inject_env_vars_to_xcconfig(
+    xcconfig_path: xcconfig_path,
+    env_suffix: "_STAGING"
+  )
+  
+  # Disable automatic code signing and configure manual signing for Release (Staging) only
+  # Using App Store profiles for TestFlight distribution
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: "ExampleApp/ExampleApp.xcodeproj",
+    targets: ["ExampleApp"],
+    build_configurations: ["Release (Staging)"],
+    code_sign_identity: "iPhone Distribution",
+    bundle_identifier: "com.paydock.multitenant.staging",
+    profile_name: "match AppStore com.paydock.multitenant.staging",
+    team_id: "4DX7V3HMRJ"
+  )
+  
+  # Build the app only (no deployment)
+  # Using app-store export method for TestFlight
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp Staging", 
+	configuration: "Release (Staging)",
+	export_method: "app-store",
+	output_directory: "fastlane/builds/staging/testflight",
+	output_name: "ExampleApp-Staging",
+	skip_build_archive: false,
+	xcargs: "-skipPackagePluginValidation -skipMacroValidation DEVELOPMENT_TEAM=4DX7V3HMRJ",
+	export_options: {
+	  method: "app-store",
+	  provisioningProfiles: {
+		"com.paydock.multitenant.staging" => "match AppStore com.paydock.multitenant.staging"
+	  }
+	}
+  )
+  
+  UI.success("✅ Staging TestFlight build completed successfully!")
+  UI.message("Build artifact: fastlane/builds/staging/testflight/ExampleApp-Staging.ipa")
+  UI.message("Version: #{build_info[:version]} (#{build_info[:build_number]})")
+end
+
+lane :deployStagingFirebase do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Verify build artifact exists (path relative to fastlane/ directory)
+  ipa_path = "builds/staging/firebase/ExampleApp-Staging.ipa"
+  unless File.exist?(ipa_path)
+    UI.user_error!("Build artifact not found at #{ipa_path}. Please run buildReleaseStagingFirebase first.")
+  end
+  
+  # Convert to absolute path for upload actions
+  ipa_absolute_path = File.absolute_path(ipa_path)
+  
+  # Get version from project and build number from build_numbers.json
+  # Use absolute path since get_version_number doesn't handle relative paths with .. well
+  xcodeproj_path = File.expand_path("../ExampleApp/ExampleApp.xcodeproj", __dir__)
+  version = get_version_number(
+    xcodeproj: xcodeproj_path,
+    target: "ExampleApp",
+    configuration: "Release (Staging)"
+  )
+  # Read build number from build_numbers.json (source of truth)
+  build_number = get_build_number_from_file(
+    version: version,
+    environment: "staging"
+  ) || get_build_number(xcodeproj: xcodeproj_path) # Fallback to project if not found
+  
+  UI.message("📦 Deploying Staging Firebase build: #{ipa_absolute_path}")
+  UI.message("Version: #{version} (#{build_number})")
+  
+  # Prepare release notes with version info
+  commit_message = ENV["CI_COMMIT_MESSAGE"] || "Staging Firebase build from CI/CD"
+  release_notes = "Version: #{version} (Build #{build_number})\n\n#{commit_message}"
+  
+  # Upload to Firebase App Distribution using service account (recommended, doesn't expire)
+  # Fallback to CLI token for backward compatibility (deprecated)
+  if ENV["FIREBASE_APP_ID_STAGING"]
+    UI.message("🔥 Uploading to Firebase App Distribution...")
+    
+    # Prefer service account file (recommended method)
+    if ENV["FIREBASE_SERVICE_ACCOUNT_FILE"]
+      service_account_file = ensure_firebase_service_account_file("FIREBASE_SERVICE_ACCOUNT_FILE")
+      unless service_account_file
+        UI.user_error!("FIREBASE_SERVICE_ACCOUNT_FILE is set but could not be resolved to a file path")
+      end
+      
+      firebase_app_distribution(
+        app: ENV["FIREBASE_APP_ID_STAGING"],
+        ipa_path: ipa_absolute_path,
+        groups: ENV["FIREBASE_TESTER_GROUPS"] || "internal-testers",
+        release_notes: release_notes,
+        service_credentials_file: service_account_file
+      )
+      UI.success("✅ Successfully uploaded to Firebase App Distribution (using service account)")
+    # Fallback to CLI token (deprecated, expires after ~1 day)
+    elsif ENV["FIREBASE_TOKEN"]
+      UI.important("⚠️ Using deprecated FIREBASE_TOKEN. Consider migrating to FIREBASE_SERVICE_ACCOUNT_FILE")
+      firebase_app_distribution(
+        app: ENV["FIREBASE_APP_ID_STAGING"],
+        ipa_path: ipa_absolute_path,
+        groups: ENV["FIREBASE_TESTER_GROUPS"] || "internal-testers",
+        release_notes: release_notes,
+        firebase_cli_token: ENV["FIREBASE_TOKEN"]
+      )
+      UI.success("✅ Successfully uploaded to Firebase App Distribution (using CLI token)")
+    else
+      UI.user_error!("Neither FIREBASE_SERVICE_ACCOUNT_FILE nor FIREBASE_TOKEN is set. Please configure Firebase authentication.")
+    end
+  else
+    UI.user_error!("FIREBASE_APP_ID_STAGING not set, cannot deploy to Firebase")
+  end
+  
+  UI.success("🚀 Staging Firebase deployment completed successfully!")
+  UI.message("Deployed version: #{version} (#{build_number})")
+end
+
+lane :deployStagingTestflight do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Verify build artifact exists (path relative to fastlane/ directory)
+  ipa_path = "builds/staging/testflight/ExampleApp-Staging.ipa"
+  unless File.exist?(ipa_path)
+    UI.user_error!("Build artifact not found at #{ipa_path}. Please run buildReleaseStagingTestflight first.")
+  end
+  
+  # Convert to absolute path for upload actions
+  ipa_absolute_path = File.absolute_path(ipa_path)
+  
+  # Get version from project and build number from build_numbers.json
+  # Use absolute path since get_version_number doesn't handle relative paths with .. well
+  xcodeproj_path = File.expand_path("../ExampleApp/ExampleApp.xcodeproj", __dir__)
+  version = get_version_number(
+    xcodeproj: xcodeproj_path,
+    target: "ExampleApp",
+    configuration: "Release (Staging)"
+  )
+  # Read build number from build_numbers.json (source of truth)
+  build_number = get_build_number_from_file(
+    version: version,
+    environment: "staging"
+  ) || get_build_number(xcodeproj: xcodeproj_path) # Fallback to project if not found
+  
+  UI.message("📦 Deploying Staging TestFlight build: #{ipa_absolute_path}")
+  UI.message("Version: #{version} (#{build_number})")
+  
+  # Prepare release notes with version info
+  commit_message = ENV["CI_COMMIT_MESSAGE"] || "Staging TestFlight build from CI/CD"
+  release_notes = "Version: #{version} (Build #{build_number})\n\n#{commit_message}"
+  
+  # Upload to TestFlight
+  if ENV["UPLOAD_TO_TESTFLIGHT"] == "true" && ENV["TESTFLIGHT_API_KEY"]
+    UI.message("✈️ Uploading to TestFlight...")
+    upload_to_testflight(
+      ipa: ipa_absolute_path,
+      api_key_path: ENV["TESTFLIGHT_API_KEY"],  # GitLab creates temp file
+      skip_waiting_for_build_processing: true,
+      changelog: release_notes
+    )
+    UI.success("✅ Successfully uploaded to TestFlight")
+  else
+    if ENV["UPLOAD_TO_TESTFLIGHT"] == "true" && !ENV["TESTFLIGHT_API_KEY"]
+      UI.user_error!("TESTFLIGHT_API_KEY not set, cannot deploy to TestFlight")
+    else
+      UI.user_error!("UPLOAD_TO_TESTFLIGHT not set to 'true', cannot deploy to TestFlight")
+    end
+  end
+  
+  UI.success("🚀 Staging TestFlight deployment completed successfully!")
+  UI.message("Deployed version: #{version} (#{build_number})")
 end
 
 lane :buildDebugSandbox do
@@ -294,14 +609,287 @@ lane :buildDebugSandbox do
   # upload_to_testflight(changelog: "Add rocket emoji")
 end
 
-lane :buildReleaseSandbox do
+lane :buildReleaseSandboxFirebase do
   ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Get current version from project
+  current_version = get_version_number(
+    xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    configuration: "Release (Sandbox)"
+  )
+  
+  # Read build number from file (shared with TestFlight build)
+  # Build number should have been set by prepareSandbox lane
+  build_number = get_build_number_from_file(
+    version: current_version,
+    environment: "sandbox"
+  )
+  
+  if build_number.nil?
+    UI.user_error!("Build number not found for version #{current_version} (sandbox). Please run prepareSandbox first.")
+  end
+  
+  build_info = { version: current_version, build_number: build_number }
+  
+  # Update version and build number in Xcode project
+  update_version_and_build_number(
+    project: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    version: build_info[:version],
+    build_number: build_info[:build_number]
+  )
+  
+  # Inject environment variables from GitLab into Sandbox.xcconfig
+  # Use absolute path since Fastlane runs from fastlane/ directory
+  xcconfig_path = File.expand_path("../ExampleApp/ExampleApp/Configs/Sandbox.xcconfig", __dir__)
+  inject_env_vars_to_xcconfig(
+    xcconfig_path: xcconfig_path,
+    env_suffix: "_SANDBOX"
+  )
+  
+  # Disable automatic code signing and configure manual signing for Release (Sandbox) only
+  # Using Ad Hoc profiles for Firebase App Distribution (allows direct download)
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: "ExampleApp/ExampleApp.xcodeproj",
+    targets: ["ExampleApp"],
+    build_configurations: ["Release (Sandbox)"],
+    code_sign_identity: "iPhone Distribution",
+    bundle_identifier: "com.paydock.multitenant.sandbox",
+    profile_name: "match AdHoc com.paydock.multitenant.sandbox",
+    team_id: "4DX7V3HMRJ"
+  )
+  
+  # Build the app only (no deployment)
+  # Using ad-hoc export method for Firebase App Distribution
+  # Note: TestFlight requires app-store export method, so TestFlight uploads will fail with this build
   build_app(
 	project: "ExampleApp/ExampleApp.xcodeproj",
 	scheme: "ExampleApp Sandbox", 
-	configuration: "Release (Sandbox)"
+	configuration: "Release (Sandbox)",
+	export_method: "ad-hoc",
+	output_directory: "fastlane/builds/sandbox/firebase",
+	output_name: "ExampleApp-Sandbox",
+	skip_build_archive: false,
+	xcargs: "-skipPackagePluginValidation -skipMacroValidation DEVELOPMENT_TEAM=4DX7V3HMRJ",
+	export_options: {
+	  method: "ad-hoc",
+	  provisioningProfiles: {
+	    "com.paydock.multitenant.sandbox" => "match AdHoc com.paydock.multitenant.sandbox"
+	  }
+	}
   )
-  # upload_to_testflight(changelog: "Add rocket emoji")
+  
+  UI.success("✅ Sandbox Firebase build completed successfully!")
+  UI.message("Build artifact: fastlane/builds/sandbox/firebase/ExampleApp-Sandbox.ipa")
+  UI.message("Version: #{build_info[:version]} (#{build_info[:build_number]})")
+end
+
+lane :buildReleaseSandboxTestflight do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Get current version from project
+  current_version = get_version_number(
+    xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    configuration: "Release (Sandbox)"
+  )
+  
+  # Read build number from file (shared with Firebase build)
+  # Build number should have been set by prepareSandbox lane
+  build_number = get_build_number_from_file(
+    version: current_version,
+    environment: "sandbox"
+  )
+  
+  if build_number.nil?
+    UI.user_error!("Build number not found for version #{current_version} (sandbox). Please run prepareSandbox first.")
+  end
+  
+  build_info = { version: current_version, build_number: build_number }
+  
+  # Update version and build number in Xcode project
+  update_version_and_build_number(
+    project: "ExampleApp/ExampleApp.xcodeproj",
+    target: "ExampleApp",
+    version: build_info[:version],
+    build_number: build_info[:build_number]
+  )
+  
+  # Inject environment variables from GitLab into Sandbox.xcconfig
+  # Use absolute path since Fastlane runs from fastlane/ directory
+  xcconfig_path = File.expand_path("../ExampleApp/ExampleApp/Configs/Sandbox.xcconfig", __dir__)
+  inject_env_vars_to_xcconfig(
+    xcconfig_path: xcconfig_path,
+    env_suffix: "_SANDBOX"
+  )
+  
+  # Disable automatic code signing and configure manual signing for Release (Sandbox) only
+  # Using App Store profiles for TestFlight distribution
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: "ExampleApp/ExampleApp.xcodeproj",
+    targets: ["ExampleApp"],
+    build_configurations: ["Release (Sandbox)"],
+    code_sign_identity: "iPhone Distribution",
+    bundle_identifier: "com.paydock.multitenant.sandbox",
+    profile_name: "match AppStore com.paydock.multitenant.sandbox",
+    team_id: "4DX7V3HMRJ"
+  )
+  
+  # Build the app only (no deployment)
+  # Using app-store export method for TestFlight
+  build_app(
+	project: "ExampleApp/ExampleApp.xcodeproj",
+	scheme: "ExampleApp Sandbox", 
+	configuration: "Release (Sandbox)",
+	export_method: "app-store",
+	output_directory: "fastlane/builds/sandbox/testflight",
+	output_name: "ExampleApp-Sandbox",
+	skip_build_archive: false,
+	xcargs: "-skipPackagePluginValidation -skipMacroValidation DEVELOPMENT_TEAM=4DX7V3HMRJ",
+	export_options: {
+	  method: "app-store",
+	  provisioningProfiles: {
+	    "com.paydock.multitenant.sandbox" => "match AppStore com.paydock.multitenant.sandbox"
+	  }
+	}
+  )
+  
+  UI.success("✅ Sandbox TestFlight build completed successfully!")
+  UI.message("Build artifact: fastlane/builds/sandbox/testflight/ExampleApp-Sandbox.ipa")
+  UI.message("Version: #{build_info[:version]} (#{build_info[:build_number]})")
+end
+
+lane :deploySandboxFirebase do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Verify build artifact exists (path relative to fastlane/ directory)
+  ipa_path = "builds/sandbox/firebase/ExampleApp-Sandbox.ipa"
+  unless File.exist?(ipa_path)
+    UI.user_error!("Build artifact not found at #{ipa_path}. Please run buildReleaseSandboxFirebase first.")
+  end
+  
+  # Convert to absolute path for upload actions
+  ipa_absolute_path = File.absolute_path(ipa_path)
+  
+  # Get version from project and build number from build_numbers.json
+  # Use absolute path since get_version_number doesn't handle relative paths with .. well
+  xcodeproj_path = File.expand_path("../ExampleApp/ExampleApp.xcodeproj", __dir__)
+  version = get_version_number(
+    xcodeproj: xcodeproj_path,
+    target: "ExampleApp",
+    configuration: "Release (Sandbox)"
+  )
+  # Read build number from build_numbers.json (source of truth)
+  build_number = get_build_number_from_file(
+    version: version,
+    environment: "sandbox"
+  ) || get_build_number(xcodeproj: xcodeproj_path) # Fallback to project if not found
+  
+  UI.message("📦 Deploying Sandbox Firebase build: #{ipa_absolute_path}")
+  UI.message("Version: #{version} (#{build_number})")
+  
+  # Prepare release notes with version info
+  commit_message = ENV["CI_COMMIT_MESSAGE"] || "Sandbox Firebase build from CI/CD"
+  release_notes = "Version: #{version} (Build #{build_number})\n\n#{commit_message}"
+  
+  # Upload to Firebase App Distribution using service account (recommended, doesn't expire)
+  # Fallback to CLI token for backward compatibility (deprecated)
+  if ENV["FIREBASE_APP_ID_SANDBOX"]
+    UI.message("🔥 Uploading to Firebase App Distribution...")
+    
+    # Prefer service account file (recommended method)
+    if ENV["FIREBASE_SERVICE_ACCOUNT_FILE"]
+      service_account_file = ensure_firebase_service_account_file("FIREBASE_SERVICE_ACCOUNT_FILE")
+      unless service_account_file
+        UI.user_error!("FIREBASE_SERVICE_ACCOUNT_FILE is set but could not be resolved to a file path")
+      end
+      
+      firebase_app_distribution(
+        app: ENV["FIREBASE_APP_ID_SANDBOX"],
+        ipa_path: ipa_absolute_path,
+        groups: ENV["FIREBASE_TESTER_GROUPS"] || "internal-testers",
+        release_notes: release_notes,
+        service_credentials_file: service_account_file
+      )
+      UI.success("✅ Successfully uploaded to Firebase App Distribution (using service account)")
+    # Fallback to CLI token (deprecated, expires after ~1 day)
+    elsif ENV["FIREBASE_TOKEN"]
+      UI.important("⚠️ Using deprecated FIREBASE_TOKEN. Consider migrating to FIREBASE_SERVICE_ACCOUNT_FILE")
+      firebase_app_distribution(
+        app: ENV["FIREBASE_APP_ID_SANDBOX"],
+        ipa_path: ipa_absolute_path,
+        groups: ENV["FIREBASE_TESTER_GROUPS"] || "internal-testers",
+        release_notes: release_notes,
+        firebase_cli_token: ENV["FIREBASE_TOKEN"]
+      )
+      UI.success("✅ Successfully uploaded to Firebase App Distribution (using CLI token)")
+    else
+      UI.user_error!("Neither FIREBASE_SERVICE_ACCOUNT_FILE nor FIREBASE_TOKEN is set. Please configure Firebase authentication.")
+    end
+  else
+    UI.user_error!("FIREBASE_APP_ID_SANDBOX not set, cannot deploy to Firebase")
+  end
+  
+  UI.success("🚀 Sandbox Firebase deployment completed successfully!")
+  UI.message("Deployed version: #{version} (#{build_number})")
+end
+
+lane :deploySandboxTestflight do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  # Verify build artifact exists (path relative to fastlane/ directory)
+  ipa_path = "builds/sandbox/testflight/ExampleApp-Sandbox.ipa"
+  unless File.exist?(ipa_path)
+    UI.user_error!("Build artifact not found at #{ipa_path}. Please run buildReleaseSandboxTestflight first.")
+  end
+  
+  # Convert to absolute path for upload actions
+  ipa_absolute_path = File.absolute_path(ipa_path)
+  
+  # Get version from project and build number from build_numbers.json
+  # Use absolute path since get_version_number doesn't handle relative paths with .. well
+  xcodeproj_path = File.expand_path("../ExampleApp/ExampleApp.xcodeproj", __dir__)
+  version = get_version_number(
+    xcodeproj: xcodeproj_path,
+    target: "ExampleApp",
+    configuration: "Release (Sandbox)"
+  )
+  # Read build number from build_numbers.json (source of truth)
+  build_number = get_build_number_from_file(
+    version: version,
+    environment: "sandbox"
+  ) || get_build_number(xcodeproj: xcodeproj_path) # Fallback to project if not found
+  
+  UI.message("📦 Deploying Sandbox TestFlight build: #{ipa_absolute_path}")
+  UI.message("Version: #{version} (#{build_number})")
+  
+  # Prepare release notes with version info
+  commit_message = ENV["CI_COMMIT_MESSAGE"] || "Sandbox TestFlight build from CI/CD"
+  release_notes = "Version: #{version} (Build #{build_number})\n\n#{commit_message}"
+  
+  # Upload to TestFlight
+  if ENV["UPLOAD_TO_TESTFLIGHT"] == "true" && ENV["TESTFLIGHT_API_KEY"]
+    UI.message("✈️ Uploading to TestFlight...")
+    upload_to_testflight(
+      ipa: ipa_absolute_path,
+      api_key_path: ENV["TESTFLIGHT_API_KEY"],  # GitLab creates temp file
+      skip_waiting_for_build_processing: true,
+      changelog: release_notes
+    )
+    UI.success("✅ Successfully uploaded to TestFlight")
+  else
+    if ENV["UPLOAD_TO_TESTFLIGHT"] == "true" && !ENV["TESTFLIGHT_API_KEY"]
+      UI.user_error!("TESTFLIGHT_API_KEY not set, cannot deploy to TestFlight")
+    else
+      UI.user_error!("UPLOAD_TO_TESTFLIGHT not set to 'true', cannot deploy to TestFlight")
+    end
+  end
+  
+  UI.success("🚀 Sandbox TestFlight deployment completed successfully!")
+  UI.message("Deployed version: #{version} (#{build_number})")
 end
 
 lane :buildDebugProduction do
@@ -506,7 +1094,8 @@ def get_version_tag(options = {})
         begin
             version_tag = get_version_number(
                 xcodeproj: "ExampleApp/ExampleApp.xcodeproj",
-                target: "ExampleApp"
+                target: "ExampleApp",
+                configuration: "Release (Sandbox)"
             )
             return version_tag.gsub(/^v/, '') if version_tag && !version_tag.empty?
         rescue => xcode_ex
@@ -563,5 +1152,342 @@ def extract_changelog_for_version(changelog_content, version)
       return match[1].strip
     else
       return "No changelog entry found for version #{version}"
+    end
+end
+
+# Ensures Firebase service account credentials are available as a file path.
+# If the environment variable contains JSON content (not a file path), writes it to a temp file.
+#
+# @param env_var_name [String] The environment variable name (e.g., "FIREBASE_SERVICE_ACCOUNT_FILE")
+# @return [String, nil] Path to the service account file, or nil if not set
+def ensure_firebase_service_account_file(env_var_name)
+  service_account_data = ENV[env_var_name]
+  return nil unless service_account_data
+  
+  # Check if it's already a file path (exists and is a file)
+  if File.exist?(service_account_data) && File.file?(service_account_data)
+    UI.message("📄 Using Firebase service account file: #{service_account_data}")
+    return service_account_data
+  end
+  
+  # If it's not a file path, it's likely JSON content (from GitLab CI/CD variable)
+  # Check if it looks like JSON (starts with { or [)
+  if service_account_data.strip.start_with?("{") || service_account_data.strip.start_with?("[")
+    UI.message("📝 Detected JSON content in #{env_var_name}, writing to temporary file...")
+    
+    # Create a temporary file
+    require 'tempfile'
+    temp_file = Tempfile.new(['firebase-service-account', '.json'])
+    temp_file.write(service_account_data)
+    temp_file.close
+    
+    file_path = temp_file.path
+    UI.message("✅ Created temporary service account file: #{file_path}")
+    
+    # Store reference so file isn't garbage collected too early
+    # Note: File will be cleaned up when process exits
+    return file_path
+  end
+  
+  # If it's neither a file nor JSON, return as-is (might be a path that doesn't exist yet)
+  UI.important("⚠️ #{env_var_name} doesn't appear to be a file path or JSON content")
+  return service_account_data
+end
+
+# Updates a GitLab CI/CD variable using the GitLab API
+#
+# @param options [Hash] Options hash containing:
+#   - variable_key [String] The variable key (e.g., "BUILD_NUMBERS_STAGING")
+#   - variable_value [String] The variable value (JSON string)
+# @return [Boolean] True if successful, false otherwise
+def update_gitlab_variable(options)
+    variable_key = options[:variable_key]
+    variable_value = options[:variable_value]
+    
+    # Check if we're in CI and have required environment variables
+    unless ENV["CI"] && ENV["CI_PROJECT_ID"] && ENV["CI_SERVER_HOST"]
+        UI.important("⚠️ Not in CI environment or missing CI variables, skipping GitLab variable update")
+        return false
+    end
+    
+    unless ENV["GITLAB_TOKEN"]
+        UI.important("⚠️ GITLAB_TOKEN not set, skipping GitLab variable update")
+        return false
+    end
+    
+    project_id = ENV["CI_PROJECT_ID"]
+    server_host = ENV["CI_SERVER_HOST"]
+    api_token = ENV["GITLAB_TOKEN"]
+    
+    # GitLab API endpoint: PUT /projects/:id/variables/:key
+    # URL-encode the variable key for the API path
+    require 'net/http'
+    require 'uri'
+    require 'json'
+    
+    encoded_key = URI.encode_www_form_component(variable_key)
+    api_url = "https://#{server_host}/api/v4/projects/#{project_id}/variables/#{encoded_key}"
+    
+    begin
+        
+        uri = URI(api_url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        
+        request = Net::HTTP::Put.new(uri.path)
+        request['PRIVATE-TOKEN'] = api_token
+        request['Content-Type'] = 'application/json'
+        request.body = {
+            value: variable_value,
+            protected: false
+        }.to_json
+        
+        response = http.request(request)
+        
+        if response.code.to_i == 200 || response.code.to_i == 201
+            UI.success("✅ Successfully updated GitLab CI/CD variable: #{variable_key}")
+            return true
+        else
+            UI.important("⚠️ Failed to update GitLab variable #{variable_key}: #{response.code} #{response.message}")
+            UI.important("Response: #{response.body}")
+            return false
+        end
+    rescue => e
+        UI.important("⚠️ Error updating GitLab variable #{variable_key}: #{e.message}")
+        return false
+    end
+end
+
+# Manages build numbers per version for iOS builds.
+# Reads only from GitLab CI/CD variables (BUILD_NUMBERS_{ENVIRONMENT}).
+# When a new version is detected, the build number resets to 1.
+# For existing versions, the build number is incremented.
+# Updates GitLab CI/CD variable BUILD_NUMBERS_{ENVIRONMENT}.
+#
+# @param options [Hash] Options hash containing:
+#   - version [String] The version string (e.g., "2.0.0")
+#   - environment [String] The environment name (e.g., "staging", "sandbox")
+# @return [Hash] Hash with :version and :build_number
+def manage_build_number(options)
+    version = options[:version]
+    environment = options[:environment]
+    
+    # Read existing build numbers from GitLab CI/CD variable
+    build_numbers = {}
+    gitlab_var_key = "BUILD_NUMBERS_#{environment.upcase}"
+    if ENV[gitlab_var_key]
+        begin
+            gitlab_build_numbers = JSON.parse(ENV[gitlab_var_key])
+            # Extract build numbers for this environment
+            gitlab_build_numbers.each do |env, versions|
+                if env == environment
+                    build_numbers[environment] = versions.dup
+                    UI.message("📥 Loaded build numbers from GitLab CI/CD variable: #{gitlab_var_key}")
+                    break
+                end
+            end
+        rescue JSON::ParserError => e
+            UI.important("⚠️ Could not parse GitLab variable #{gitlab_var_key}: #{e.message}")
+            UI.important("Starting with empty build numbers")
+        end
+    else
+        UI.important("⚠️ GitLab variable #{gitlab_var_key} not found, starting with empty build numbers")
+    end
+    
+    # Create environment key if it doesn't exist
+    build_numbers[environment] ||= {}
+    
+    # Get or initialize build number for this version
+    if build_numbers[environment][version]
+        # Increment build number for existing version
+        current_build = build_numbers[environment][version].to_i
+        new_build = current_build + 1
+        build_numbers[environment][version] = new_build
+        UI.message("📦 Version #{version} (#{environment}): Incrementing build number #{current_build} → #{new_build}")
+    else
+        # New version, start at build number 1
+        new_build = 1
+        build_numbers[environment][version] = new_build
+        UI.message("🆕 New version #{version} (#{environment}): Setting build number to #{new_build}")
+    end
+    
+    # Update GitLab CI/CD variable
+    environment_build_numbers = { environment => build_numbers[environment] }
+    gitlab_var_value = JSON.generate(environment_build_numbers)
+    update_gitlab_variable(
+        variable_key: gitlab_var_key,
+        variable_value: gitlab_var_value
+    )
+    
+    UI.success("✅ Build number #{new_build} assigned to version #{version} (#{environment})")
+    
+    return { version: version, build_number: new_build }
+end
+
+# Reads the build number for a specific version and environment.
+# Reads only from GitLab CI/CD variables (BUILD_NUMBERS_{ENVIRONMENT}).
+#
+# @param options [Hash] Options hash containing:
+#   - version [String] The version string (e.g., "2.0.0")
+#   - environment [String] The environment name (e.g., "staging", "sandbox")
+# @return [Integer] The build number, or nil if not found
+def get_build_number_from_file(options)
+    version = options[:version]
+    environment = options[:environment]
+    
+    # Read from GitLab CI/CD variable (source of truth)
+    gitlab_var_key = "BUILD_NUMBERS_#{environment.upcase}"
+    if ENV[gitlab_var_key]
+        begin
+            gitlab_build_numbers = JSON.parse(ENV[gitlab_var_key])
+            build_number = gitlab_build_numbers.dig(environment, version)&.to_i
+            if build_number
+                UI.message("📥 Read build number from GitLab CI/CD variable: #{version} (#{build_number})")
+                return build_number
+            else
+                UI.important("⚠️ Build number not found for version #{version} in #{gitlab_var_key}")
+            end
+        rescue JSON::ParserError => e
+            UI.important("⚠️ Could not parse GitLab variable #{gitlab_var_key}: #{e.message}")
+        end
+    else
+        UI.important("⚠️ GitLab variable #{gitlab_var_key} not found")
+    end
+    
+    return nil
+end
+
+# Updates the Xcode project with the specified version and build number.
+#
+# @param options [Hash] Options hash containing:
+#   - project [String] Path to the Xcode project
+#   - target [String] Target name
+#   - version [String] Version string
+#   - build_number [Integer] Build number
+def update_version_and_build_number(options)
+    project = options[:project]
+    target = options[:target]
+    version = options[:version]
+    build_number = options[:build_number]
+    
+    UI.message("📝 Updating #{target} to version #{version} build #{build_number}")
+    
+    # Update version number (CFBundleShortVersionString)
+    increment_version_number(
+        version_number: version,
+        xcodeproj: project
+    )
+    
+    # Update build number (CFBundleVersion)
+    increment_build_number(
+        build_number: build_number.to_s,
+        xcodeproj: project
+    )
+    
+    UI.success("✅ Updated to version #{version} (#{build_number})")
+end
+
+# Injects environment variables from GitLab CI/CD into an xcconfig file.
+#
+# This function reads environment variables with a specific suffix (e.g., _STAGING or _SANDBOX)
+# and updates the corresponding variables in the xcconfig file.
+#
+# @param options [Hash] Options hash containing:
+#   - xcconfig_path [String] Path to the xcconfig file to update
+#   - env_suffix [String] Suffix to append to variable names when looking for environment variables
+def inject_env_vars_to_xcconfig(options)
+    xcconfig_path = options[:xcconfig_path]
+    env_suffix = options[:env_suffix]
+    
+    # Check if file exists and initialize if needed
+    unless File.exist?(xcconfig_path)
+        UI.important("⚠️  xcconfig file not found at path: #{xcconfig_path}")
+        UI.important("Creating xcconfig file with environment variables...")
+        # Ensure directory exists
+        FileUtils.mkdir_p(File.dirname(xcconfig_path))
+        # Create empty file
+        File.write(xcconfig_path, "// Auto-generated configuration file\n")
+    end
+    
+    UI.message("Reading xcconfig file: #{xcconfig_path}")
+    xcconfig_content = File.read(xcconfig_path)
+    
+    # Define the variables we want to inject from GitLab environment
+    # Variables with environment-specific suffixes
+    variables_with_suffix = [
+        "ACCESS_TOKEN_API",
+        "ACCESS_TOKEN_WIDGET",
+        "SERVICE_ID_MPGS",
+        "SERVICE_ID_MPGS_TEST",
+        "SERVICE_ID_AFTERPAY",
+        "SERVICE_ID_APPLE_PAY_MPGS",
+        "SERVICE_ID_CLICK_TO_PAY",
+        "SERVICE_ID_COLES_PAY",
+        "SERVICE_ID_GPAYMENTS",
+        "SERVICE_ID_PAYPAL",
+        "SERVICE_ID_ZIP"
+    ]
+    
+    # Generic variables that don't use environment suffixes
+    generic_variables = [
+        "MERCHANT_ID_APPLE_PAY",
+        "WALLET_ID_COLES_PAY"
+    ]
+    
+    updated = false
+    
+    # Process variables that need suffix
+    variables_with_suffix.each do |var_name|
+        # Look for environment variable with suffix (e.g., ACCESS_TOKEN_API_STAGING)
+        env_var_name = "#{var_name}#{env_suffix}"
+        env_value = ENV[env_var_name]
+        
+        if env_value && !env_value.empty?
+            UI.message("Injecting #{env_var_name} -> #{var_name}")
+            
+            # Update or add the variable in xcconfig
+            old_pattern = /^#{Regexp.escape(var_name)}=.*$/
+            if xcconfig_content.match?(old_pattern)
+                xcconfig_content.gsub!(old_pattern, "#{var_name}=#{env_value}")
+                updated = true
+            else
+                # If variable doesn't exist, add it
+                xcconfig_content += "\n#{var_name}=#{env_value}"
+                updated = true
+            end
+        else
+            UI.message("⚠️ Environment variable #{env_var_name} not found, skipping")
+        end
+    end
+    
+    # Process generic variables (without suffix)
+    generic_variables.each do |var_name|
+        # Look for environment variable without suffix (e.g., MERCHANT_ID_APPLE_PAY)
+        env_value = ENV[var_name]
+        
+        if env_value && !env_value.empty?
+            UI.message("Injecting #{var_name} -> #{var_name} (generic, no suffix)")
+            
+            # Update or add the variable in xcconfig
+            old_pattern = /^#{Regexp.escape(var_name)}=.*$/
+            if xcconfig_content.match?(old_pattern)
+                xcconfig_content.gsub!(old_pattern, "#{var_name}=#{env_value}")
+                updated = true
+            else
+                # If variable doesn't exist, add it
+                xcconfig_content += "\n#{var_name}=#{env_value}"
+                updated = true
+            end
+        else
+            UI.message("⚠️ Environment variable #{var_name} not found, skipping")
+        end
+    end
+    
+    if updated
+        UI.message("Writing updated xcconfig file: #{xcconfig_path}")
+        File.write(xcconfig_path, xcconfig_content)
+        UI.success("✅ Successfully injected environment variables into #{xcconfig_path}")
+    else
+        UI.message("No environment variables found to inject")
     end
 end

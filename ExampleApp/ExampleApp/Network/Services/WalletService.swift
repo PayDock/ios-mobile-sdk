@@ -22,6 +22,7 @@ protocol WalletService {
     func convertCardTokenToVaultToken(request: ConvertToVaultTokenReq) async throws -> String
     func createStandalone3DSToken(request: Standalone3DSReq) async throws -> String?
     func captureCharge(request: CaptureChargeReq) async throws -> ChargeResponse
+    func captureChargeForStandaloneFlow(request: CaptureChargeStandaloneReq) async throws -> ChargeResponse
     func captureChargeColesPay(chargeId: String) async throws -> ChargeResponse
 }
 
@@ -88,6 +89,13 @@ struct WalletServiceImpl: HTTPClient, WalletService {
     func captureCharge(request: CaptureChargeReq) async throws -> ChargeResponse {
         let response = try await sendRequest(
             endpoint: WalletEndpoints.captureCharge(request: request),
+            responseModel: WalletCaptureRes.self)
+        return response.resource.data
+    }
+
+    func captureChargeForStandaloneFlow(request: CaptureChargeStandaloneReq) async throws -> ChargeResponse {
+        let response = try await sendRequest(
+            endpoint: WalletEndpoints.captureChargeForStandalone(request: request),
             responseModel: WalletCaptureRes.self)
         return response.resource.data
     }

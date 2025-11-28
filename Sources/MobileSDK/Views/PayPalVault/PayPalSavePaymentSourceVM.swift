@@ -26,6 +26,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     @Published var showLoaders = true
     var viewState: ViewState
     private weak var loadingDelegate: WidgetLoadingDelegate?
+    private weak var eventDelegate: WidgetEventDelegate?
 
     // MARK: - Handlers
 
@@ -37,22 +38,18 @@ class PayPalSavePaymentSourceVM: ObservableObject {
          config: PayPalVaultConfig,
          payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
+         eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<PayPalVaultResult, PayPalVaultError>) -> Void) {
         self.viewState = viewState
         self.config = config
         self.payPalVaultService = payPalVaultService
         self.loadingDelegate = loadingDelegate
+        self.eventDelegate = eventDelegate
         self.completion = completion
 
         if loadingDelegate != nil {
             showLoaders = false
         }
-
-        setUp()
-    }
-
-    private func setUp() {
-        actionText = config.actionText ?? "Link PayPal account"
     }
 
     // MARK: - PayPal Initialization
@@ -71,6 +68,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             let payPalClient = PayPalWebCheckoutClient(config: payPalConfig)
 
             updateLoadingState(isLoading: false)
+
+            // Check if app is in foreground before proceeding
+            guard UIApplication.shared.applicationState == .active else {
+                completion(.failure(.userCancelled))
+                return
+            }
 
             do {
                 let vaultResult = try await payPalClient.vault(vaultRequest)
@@ -147,16 +150,6 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         self.viewState.isDisabled = isLoading
     }
 
-    // MARK: - Helpers
-
-    func getButtonIcon() -> Image? {
-        switch config.icon {
-        case .none: return nil
-        case .defaultIcon: return Image("link", bundle: Bundle.module)
-        case .customIcon(let image): return image
-        }
-    }
-
     // MARK: - Error Handling
 
     private func handleVaultError(_ error: Error) {
@@ -170,5 +163,12 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         }
 
         updateLoadingState(isLoading: false)
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleButtonTapAnalytics() {
+        let event = WidgetEvent(type: .button, properties: .button(WidgetEventButtonProperties(name: "PayPalVaultButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
     }
 }

@@ -126,4 +126,98 @@ class CardSecurityCodeValidatorTests: XCTestCase {
     func testInvalidAusbcSecurityCode_LenghtTooLong() {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .ausbc))
     }
+
+    func testValidUnionpaySecurityCode() {
+        XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .unionpay))
+    }
+
+    func testInvalidUnionpaySecurityCode_LenghtTooLong() {
+        XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .unionpay))
+    }
+
+    func testInvalidUnionpaySecurityCode_LenghtTooShort() {
+        XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .unionpay))
+    }
+
+    // MARK: - Tests for isSecurityCodeValidForDisabledValidation
+
+    func testIsSecurityCodeValidForDisabledValidation_Valid3DigitCode() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "123"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_Valid4DigitCode() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "1234"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_EmptyCode() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: ""))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_TooShort_1Digit() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "1"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_TooShort_2Digits() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_TooLong_5Digits() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12345"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_TooLong_6Digits() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "123456"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_Letters() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12a"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_SpecialChars() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12#"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_Spaces() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12 3"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_NonNumericCharacters_Mixed() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "1a3"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_AllZeros_3Digits() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "000"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_AllZeros_4Digits() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "0000"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_LeadingZeros_3Digits() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "012"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_LeadingZeros_4Digits() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "0123"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_AllNines_3Digits() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "999"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_AllNines_4Digits() {
+        XCTAssertTrue(validator.isSecurityCodeValidForUnknownScheme(code: "9999"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_WhitespaceOnly() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "   "))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_HyphenSeparated() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12-3"))
+    }
+
+    func testIsSecurityCodeValidForDisabledValidation_DotSeparated() {
+        XCTAssertFalse(validator.isSecurityCodeValidForUnknownScheme(code: "12.3"))
+    }
 }

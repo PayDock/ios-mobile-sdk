@@ -15,6 +15,7 @@ public struct ColesPayWidget: View {
 
     public init(viewState: ViewState? = nil,
                 loadingDelegate: WidgetLoadingDelegate? = nil,
+                eventDelegate: WidgetEventDelegate? = nil,
                 config: ColesPayConfig,
                 appearance: ColesPayWidgetAppearance = ColesPayWidgetAppearance(),
                 tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
@@ -24,6 +25,7 @@ public struct ColesPayWidget: View {
             tokenRequest: tokenRequest,
             viewState: viewState ?? ViewState(state: .none),
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: completion))
         self.appearance = appearance
     }
@@ -38,7 +40,7 @@ public struct ColesPayWidget: View {
     private var colesPayButton: some View {
         SDKButton(
             title: nil,
-            image: Image(
+            backgroundImage: Image(
                 (viewModel.isLoading && viewModel.showLoaders)
                     ? "coles-pay-button-blank"
                     : "coles-pay-button",
@@ -49,6 +51,7 @@ public struct ColesPayWidget: View {
             style: .image(ImageButtonStyle(appearance: appearance.loader, isDisabled: viewModel.viewState.isDisabled)),
             scaleToFit: true) {
                 viewModel.handleButtonTap()
+                viewModel.handleaButtonTapAnalytics()
             }
             .accessibilityHint("Initiates payment using Coles Pay.")
     }
@@ -63,7 +66,11 @@ public struct ColesPayWidget: View {
                 },
                 onFailure: { error in
                     viewModel.handleFailure(error: error)
-                })
+                },
+                onClose: {
+                    viewModel.handleFailure(error: .transactionCanceled)
+                }
+            )
             .navigationTitle("Checkout with Coles Pay")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

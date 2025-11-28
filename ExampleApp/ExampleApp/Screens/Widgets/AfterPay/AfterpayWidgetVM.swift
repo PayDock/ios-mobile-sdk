@@ -10,6 +10,7 @@ import Foundation
 import MobileSDK
 import Afterpay
 import NetworkingLib
+import OSLog
 
 @MainActor
 class AfterpayWidgetVM: ObservableObject {
@@ -34,7 +35,11 @@ class AfterpayWidgetVM: ObservableObject {
         Task {
             let paymentSource = InitialiseWalletChargePaymentSource(
                 addressLine1: "123 Test Street",
+                addressLine2: nil,
                 addressPostcode: "BN3 5SL",
+                addressCity: "Test City",
+                addressState: "Test State",
+                addressCountry: "AU",
                 gatewayId: ProjectEnvironment.shared.getAfterpayGatewayId() ?? "",
                 walletType: nil)
 
@@ -127,5 +132,14 @@ class AfterpayWidgetVM: ObservableObject {
         alertTitle = "Success"
         alertMessage = "Charged \(chargeData.amount) \(chargeData.currency)"
         self.showAlert = true
+    }
+}
+
+// MARK: - WidgetEventDelegate
+
+extension AfterpayWidgetVM: WidgetEventDelegate {
+
+    func widgetEvent(event: WidgetEvent) {
+        os_log(.info, "Widget event received: \(event.jsonDescription)")
     }
 }

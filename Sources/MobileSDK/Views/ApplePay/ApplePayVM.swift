@@ -10,6 +10,7 @@ import SwiftUI
 import PassKit
 import NetworkingLib
 
+@MainActor
 class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
@@ -25,18 +26,23 @@ class ApplePayVM: NSObject, ObservableObject {
     var chargeData: ChargeResponse?
     var error: ApplePayError?
 
+    private var isCompletionCalled = false
+
     // MARK: - Handlers
 
+    private weak var eventDelegate: WidgetEventDelegate?
     private let completion: (Result<ChargeResponse, ApplePayError>) -> Void
     private let createPaymentRequest: (
         _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void
 
     // MARK: - Initialisation
 
-    init(createPaymentRequest: @escaping (
-        _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
+    init(eventDelegate: WidgetEventDelegate?,
+         createPaymentRequest: @escaping (
+            _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
          walletService: WalletService = WalletServiceImpl(),
          completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
+        self.eventDelegate = eventDelegate
         self.createPaymentRequest = createPaymentRequest
         self.walletService = walletService
         self.completion = completion
@@ -44,6 +50,8 @@ class ApplePayVM: NSObject, ObservableObject {
 
     func handleButtonTap() {
         error = nil
+        isCompletionCalled = false
+
         createPaymentRequest { [weak self] result in
             switch result {
             case .success(let response):
@@ -51,7 +59,7 @@ class ApplePayVM: NSObject, ObservableObject {
                 self?.startPayment()
 
             case .failure(let failure):
-                self?.completion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+                self?.callCompletion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
             }
         }
     }
@@ -59,7 +67,7 @@ class ApplePayVM: NSObject, ObservableObject {
     private func startPayment() {
         guard let applePayRequest = applePayRequest else {
             error = .invalidApplePayRequest
-            completion(.failure(.invalidApplePayRequest))
+            callCompletion(.failure(.invalidApplePayRequest))
             return
         }
 
@@ -68,7 +76,9 @@ class ApplePayVM: NSObject, ObservableObject {
         paymentController?.delegate = self
         paymentController?.present(completion: { [weak self] success in
             if !success {
-                self?.error = .unableToPresentPaymentSheet
+                Task { @MainActor in
+                    self?.error = .unableToPresentPaymentSheet
+                }
             }
         })
     }
@@ -76,7 +86,7 @@ class ApplePayVM: NSObject, ObservableObject {
     private func captureCharge(payment: PKPayment, completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
         guard let applePayRequest = applePayRequest else {
             error = .invalidApplePayRequest
-            self.completion(.failure(.invalidApplePayRequest))
+            callCompletion(.failure(.invalidApplePayRequest))
             return
         }
 
@@ -89,7 +99,7 @@ class ApplePayVM: NSObject, ObservableObject {
                     payerId: nil,
                     refToken: refToken)
                 paymentStatus = .success
-                self.completion(.success(chargeResponse))
+                self.callCompletion(.success(chargeResponse))
                 completion(paymentStatus)
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
@@ -104,24 +114,43 @@ class ApplePayVM: NSObject, ObservableObject {
             }
         }
     }
+
+    private func callCompletion(_ completion: (Result<ChargeResponse, ApplePayError>)) {
+        guard !isCompletionCalled else { return }
+        self.completion(completion)
+        isCompletionCalled = true
+    }
+
+    // MARK: - Analytics Handling
+
+    func handleApplePayTapAnalytics() {
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "ApplePayCheckoutButton", action: .click)))
+        eventDelegate?.widgetEvent(event: event)
+    }
 }
 
 // MARK: - PKPaymentAuthorizationControllerDelegate
 
 extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
-    func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
-                                        didAuthorizePayment payment: PKPayment,
-                                        completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
-        captureCharge(payment: payment, completion: completion )
+    nonisolated func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
+                                                    didAuthorizePayment payment: PKPayment,
+                                                    completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
+        Task { @MainActor in
+            captureCharge(payment: payment, completion: completion)
+        }
     }
 
     func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
-            if self.paymentStatus == .success, let chargeData = self.chargeData {
-                self.completion(.success(chargeData))
-            } else {
-                self.completion(.failure(self.error ?? .userCanceledPayment))
+            Task { @MainActor in
+                if self.paymentStatus == .success, let chargeData = self.chargeData {
+                    self.callCompletion(.success(chargeData))
+                } else {
+                    self.callCompletion(.failure(self.error ?? .userCanceledPayment))
+                }
             }
         }
     }

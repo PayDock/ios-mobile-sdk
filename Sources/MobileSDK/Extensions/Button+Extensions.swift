@@ -13,10 +13,6 @@ extension Button {
     @ViewBuilder
     func myStyle(_ style: SDKButtonStyle) -> some View {
         switch style {
-        case .fill(let style):
-            self.buttonStyle(style)
-        case .outline(let style):
-            self.buttonStyle(style)
         case .image(let style):
             self.buttonStyle(style)
         case .custom(let style):

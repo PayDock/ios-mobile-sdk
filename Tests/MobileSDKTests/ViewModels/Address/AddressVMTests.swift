@@ -16,6 +16,7 @@ final class AddressVMTests: XCTestCase {
     private var viewModel: AddressVM!
     private var formManager: TestAddressFormManager!
     private var config: AddressWidgetConfig!
+    private var eventDelegate: WidgetEventDelegateUtil!
     private var completionAddress: Address?
 
     override func setUp() {
@@ -23,20 +24,23 @@ final class AddressVMTests: XCTestCase {
         completionAddress = nil
         formManager = TestAddressFormManager()
         config = AddressWidgetConfig(address: nil)
+        eventDelegate = WidgetEventDelegateUtil()
         viewModel = AddressVM(
             config: config,
+            appearance: AddressWidgetAppearance(),
+            eventDelegate: nil,
             addressFormManager: formManager,
             localSearchCompleter: MKLocalSearchCompleter(),
             completion: { [weak self] address in
                 self?.completionAddress = address
-            }
-        )
+            })
     }
 
     override func tearDown() {
         viewModel = nil
         formManager = nil
         config = nil
+        eventDelegate = nil
         completionAddress = nil
         super.tearDown()
     }
@@ -148,7 +152,7 @@ final class AddressVMTests: XCTestCase {
         XCTAssertEqual(formManager.addressSearchText, "")
     }
 
-    func testUpdateAddressLoadsFromConfig() {
+    func testUpdateAddressLoadsFromConfig() async throws {
         // Given
         let prefilled = Address(
             firstName: "Alice",
@@ -163,6 +167,8 @@ final class AddressVMTests: XCTestCase {
         config = AddressWidgetConfig(address: prefilled)
         viewModel = AddressVM(
             config: config,
+            appearance: AddressWidgetAppearance(),
+            eventDelegate: nil,
             addressFormManager: formManager,
             localSearchCompleter: MKLocalSearchCompleter(),
             completion: { [weak self] address in
@@ -173,6 +179,7 @@ final class AddressVMTests: XCTestCase {
         // When
         viewModel.updateAddress()
 
+        try await Task.sleep(nanoseconds: 500_000_000)
         // Then
         XCTAssertEqual(formManager.firstNameText, "Alice")
         XCTAssertEqual(formManager.lastNameText, "Wonder")
@@ -207,5 +214,87 @@ final class AddressVMTests: XCTestCase {
                 "United States"
             ]
         }
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesSaveEvent() {
+        // Given
+        let appearance = AddressWidgetAppearance()
+        viewModel = AddressVM(
+            config: config,
+            appearance: appearance,
+            eventDelegate: eventDelegate,
+            addressFormManager: formManager,
+            localSearchCompleter: MKLocalSearchCompleter(),
+            completion: { [weak self] address in
+                self?.completionAddress = address
+            })
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(
+                WidgetEventButtonProperties(name: "SaveButton", action: .click, text: appearance.actionButton.text)))
+        viewModel.handleSaveAddresTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateExpandEvent() {
+        // Given
+        let appearance = AddressWidgetAppearance()
+        viewModel = AddressVM(
+            config: config,
+            appearance: appearance,
+            eventDelegate: eventDelegate,
+            addressFormManager: formManager,
+            localSearchCompleter: MKLocalSearchCompleter(),
+            completion: { [weak self] address in
+                self?.completionAddress = address
+            })
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(type: .button, properties: .button(WidgetEventButtonProperties(name: "ManualEntryButton", action: .click)))
+        viewModel.handleExpandAddressFormTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = AddressVM(
+            config: config,
+            appearance: AddressWidgetAppearance(),
+            eventDelegate: nil,
+            addressFormManager: formManager,
+            localSearchCompleter: MKLocalSearchCompleter(),
+            completion: { [weak self] address in
+                self?.completionAddress = address
+            })
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // For demonstration, we'll simulate what the view model would do:
+        viewModel.saveAddress()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }

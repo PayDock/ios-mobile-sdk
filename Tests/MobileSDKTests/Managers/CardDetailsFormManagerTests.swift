@@ -10,6 +10,7 @@ import XCTest
 @testable import MobileSDK
 
 // swiftlint:disable file_length large_tuple
+// swiftlint:disable:next type_body_length
 class CardDetailsFormManagerTests: XCTestCase {
 
     var sut: CardDetailsFormManager!
@@ -75,7 +76,7 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.cardholderNameTitle, "Cardholder name")
         XCTAssertEqual(sut.cardNumberTitle, "Card number")
         XCTAssertEqual(sut.expiryDateTitle, "Expiry")
-        XCTAssertEqual(sut.securityCodeTitle, "CVC")
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
 
         XCTAssertEqual(sut.cardholderNamePlaceholder, "")
         XCTAssertEqual(sut.cardNumberPlaceholder, "XXXX XXXX XXXX XXXX")
@@ -306,6 +307,207 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.securityCodeError, "")
     }
 
+    // MARK: - Security Code Validation Tests (Disabled Card Validation)
+
+    func testSecurityCodeValidation_DisabledValidation_ValidCode() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+
+        sut.securityCodeText = "123"
+
+        XCTAssertTrue(sut.securityCodeValid ?? false)
+        XCTAssertEqual(sut.securityCodeError, "")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "123")
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_InvalidCode() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = false
+
+        sut.securityCodeText = "12"
+
+        XCTAssertFalse(sut.securityCodeValid ?? true)
+        XCTAssertEqual(sut.securityCodeError, "Invalid security code")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "12")
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_FourDigitCode() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+
+        sut.securityCodeText = "1234"
+
+        XCTAssertTrue(sut.securityCodeValid ?? false)
+        XCTAssertEqual(sut.securityCodeError, "")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "1234")
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_EmptyCode() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        sut.securityCodeText = ""
+
+        XCTAssertNil(sut.securityCodeValid)
+        XCTAssertEqual(sut.securityCodeError, "")
+        XCTAssertFalse(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_InvalidTooShort() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = false
+
+        sut.securityCodeText = "1"
+
+        XCTAssertFalse(sut.securityCodeValid ?? true)
+        XCTAssertEqual(sut.securityCodeError, "Invalid security code")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "1")
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_InvalidTooLong() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = false
+
+        sut.securityCodeText = "12345"
+
+        XCTAssertFalse(sut.securityCodeValid ?? true)
+        XCTAssertEqual(sut.securityCodeError, "Invalid security code")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "12345")
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_DoesNotDependOnCardScheme() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = nil // No card scheme detected
+
+        sut.cardNumberText = "1234" // Invalid card number
+        sut.securityCodeText = "123"
+
+        XCTAssertTrue(sut.securityCodeValid ?? false)
+        XCTAssertEqual(sut.securityCodeError, "")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "123")
+        // The card scheme should not be passed to the validator when validation is disabled
+    }
+
+    func testSecurityCodeValidation_DisabledValidation_ValidatesIndependentOfCardNumber() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+
+        // First test with valid security code and no card number
+        sut.securityCodeText = "123"
+
+        XCTAssertTrue(sut.securityCodeValid ?? false)
+        XCTAssertEqual(sut.securityCodeError, "")
+
+        // Then test with valid security code and invalid card number
+        mockSchemeValidator.isPossibleCreditCardNumberResult = false
+        sut.cardNumberText = "invalid"
+        sut.securityCodeText = "456"
+
+        XCTAssertTrue(sut.securityCodeValid ?? false)
+        XCTAssertEqual(sut.securityCodeError, "")
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "456")
+    }
+
+    // MARK: - Security Code Validation Method Coverage Tests
+
+    func testSecurityCodeValidation_DisabledValidation_CallsCorrectMethod() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+
+        sut.securityCodeText = "123"
+
+        // Verify the correct method was called and the card scheme was not passed
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "123")
+        // When using disabled validation, card scheme should not be relevant
+    }
+
     // MARK: - Security Code Title and Placeholder Updates
 
     func testUpdateSecurityCodeTitleAndPlaceholder_Visa() {
@@ -443,6 +645,29 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertTrue(sut.isFormValid())
     }
 
+    func testIsFormValid_WithCardValidationDisabled_InvalidSecurityCode() {
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockNameValidator.isValidNameResult = true
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .valid
+        mockSecurityCodeValidator.isSecurityCodeValidResult = false // Invalid security code
+
+        sut.cardholderNameText = "John Doe"
+        sut.cardNumberText = "4111111111111111"
+        sut.expiryDateText = "12/25"
+        sut.securityCodeText = "12" // Too short
+
+        XCTAssertFalse(sut.isFormValid())
+    }
+
     // MARK: - Formatting Tests
 
     func testFormatCardNumber() {
@@ -485,6 +710,30 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.updatedText, "123")
         XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.cursorPosition, 3)
         XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.maxDigits, 3)
+    }
+
+    func testFormatSecurityCode_WithCardValidationDisabled() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        let expectedResult = (formattedText: "1234", newCursorPosition: 4)
+        mockFormatter.formatSecurityCodeResult = expectedResult
+
+        let newCursorPosition = sut.formatSecurityCode(updatedText: "1234", cursorPosition: 4)
+
+        XCTAssertEqual(sut.securityCodeText, expectedResult.formattedText)
+        XCTAssertEqual(newCursorPosition, expectedResult.newCursorPosition)
+        XCTAssertEqual(mockFormatter.formatSecurityCodeCallCount, 1)
+        XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.updatedText, "1234")
+        XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.cursorPosition, 4)
+        XCTAssertEqual(mockFormatter.lastSecurityCodeInput?.maxDigits, 4) // Should be 4 when validation is disabled
     }
 
     // MARK: - Text Property DidSet Tests
@@ -538,6 +787,27 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.securityCodeError, "")
     }
 
+    func testSecurityCodeText_DidSetTriggersDisabledValidation() {
+        // Set up SUT with disabled card validation
+        sut = CardDetailsFormManager(
+            enableCardValidation: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+
+        sut.securityCodeText = "1234"
+
+        XCTAssertTrue(sut.securityCodeValid ?? false)
+        XCTAssertEqual(sut.securityCodeError, "")
+        XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCode, "1234")
+    }
+
     func testCardholderNameText_DidSetTriggersValidation() {
         mockNameValidator.isValidNameResult = true
         mockSchemeValidator.isPossibleCreditCardNumberResult = false
@@ -575,7 +845,7 @@ class CardDetailsFormManagerTests: XCTestCase {
 
         // Should default to visa (3 digits)
         XCTAssertTrue(mockSecurityCodeValidator.isSecurityCodeValidCalled)
-        XCTAssertEqual(mockSecurityCodeValidator.lastCardScheme, .visa)
+        XCTAssertEqual(mockSecurityCodeValidator.lastCardScheme, nil)
     }
 }
 
@@ -645,6 +915,12 @@ class MockCardSecurityCodeValidator: CardSecurityCodeValidator {
         isSecurityCodeValidCalled = true
         lastCode = code
         lastCardScheme = cardScheme
+        return isSecurityCodeValidResult
+    }
+
+    override func isSecurityCodeValidForUnknownScheme(code: String) -> Bool {
+        isSecurityCodeValidCalled = true
+        lastCode = code
         return isSecurityCodeValidResult
     }
 

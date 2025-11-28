@@ -51,34 +51,42 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 3.  **Structure:** The `*.xcconfig` file should contain key-value pairs for each configuration setting.
 4.  **Required Fields:** The following fields are used in the `config.properties` file:
 
-*   **`API_ACCESS_TOKEN`:** The Paydock API access token for the specified environment (e.g., Sandbox, Staging, Production). This token is used by the sample app to make direct calls to the Paydock API for tasks like creating customers or managing transactions.
-*   **`WIDGET_ACCESS_TOKEN`:** The Paydock Widget/UI access token for the specified environment. This token is used by the Paydock Mobile SDK to authenticate and authorize the use of the pre-built UI widgets for payment processing.
-*   **`APPLE_PAY_GATEWAY_ID`:** Your Paydock service ID for the MPGS (Mastercard Payment Gateway Services) gateway. This ID is required to process card payments, handle 3D Secure (3DS) authentication, ApplePay and manage other card-related transactions.
-*   **`PAY_PAL_GATEWAY_I`:** Your Paydock service ID for the PayPal gateway. This ID is necessary to enable PayPal as a payment method within the sample app.
-*   **`AFTERPAY_GATEWAY_ID`:** Your Paydock service ID for the Afterpay gateway. This ID is required to enable Afterpay as a payment method.
-*   **`COLES_PAY_GATEWAY_ID`:** Your Paydock service ID for the ColesPay gateway. This ID is required to enable ColesPay as a payment method.
-*   **`COLES_PAY_CLIENT_ID`:** The client ID provided by ColesPay. This ID is required for authenticating and using the ColesPay service.
-*   **`MASTERCARD_SERVICE_ID`:** Your Paydock service ID for the ClickToPay gateway. This ID is required to enable ClickToPay as a payment method.
-*   **`INTEGRATED_3DS_GATEWAY_ID`:** Your Paydock service ID for the Integrated 3DS service. This ID is required to enable 3DS check.
-*   **`STANDALONE_3DS_GATEWAY_ID`:** Your Paydock service ID for the Standalone 3DS service. This ID is required to enable 3DS check.
-*   **`MERCHANT_ID`:** Your ApplePay merchant ID. This ID is required to enable ApplePay test payments in sample app.
+*   **`ACCESS_TOKEN_API`:** The Paydock API access token for the specified environment (e.g., Sandbox, Staging, Production). This token is used by the sample app to make direct calls to the Paydock API for tasks like creating customers or managing transactions.
+*   **`ACCESS_TOKEN_WIDGET`:** The Paydock Widget/UI access token for the specified environment. This token is used by the Paydock Mobile SDK to authenticate and authorize the use of the pre-built UI widgets for payment processing.
+*   **`SERVICE_ID_APPLE_PAY_MPGS`:** Your Paydock service ID for the MPGS (Mastercard Payment Gateway Services) gateway. This ID is required to process card payments, handle 3D Secure (3DS) authentication, ApplePay and manage other card-related transactions.
+*   **`SERVICE_ID_PAYPAL`:** Your Paydock service ID for the PayPal gateway. This ID is necessary to enable PayPal as a payment method within the sample app.
+*   **`SERVICE_ID_AFTERPAY`:** Your Paydock service ID for the Afterpay gateway. This ID is required to enable Afterpay as a payment method.
+*   **`SERVICE_ID_COLES_PAY`:** Your Paydock service ID for the Coles Pay gateway. This ID is required to enable Coles Pay as a payment method.
+*   **`WALLET_ID_COLES_PAY`:** The client ID provided by Coles Pay. This ID is required for tagging the Wallet type and using the Coles Pay service.
+*   **`SERVICE_ID_CLICK_TO_PAY`:** Your Paydock service ID for using Click To Pay service. This ID is required to enable Click To Pay as a payment method.
+*   **`SERVICE_ID_MPGS`:** Your Paydock service ID for the MPGS gateway. This ID is required for 3DS check and transactions.
+*   **`SERVICE_ID_MPGS_TEST`:** Your Paydock service ID for the MPGS gateway. This ID should use an MPGS merchant id starting with "TEST" for using MPGS supported test cards and 3ds challenge emulator.
+*   **`SERVICE_ID_GPAYMENTS`:** Your Paydock service ID for the GPayments 3DS service. This ID is required to enable 3DS check.
+*   **`MERCHANT_ID_APPLE_PAY`:** Your Apple Pay merchant ID. This ID is required to enable Apple Pay test payments in sample app.
 
 **Example `*.xcconfig`:**
 ```
-// Authentication keys
-API_ACCESS_TOKEN = your_api_access_token
-WIDGET_ACCESS_TOKEN = your_widget_access_token 
+// Authentication
+ACCESS_TOKEN_API=your_api_access_token
+ACCESS_TOKEN_WIDGET=your_widget_access_token
+// MPGS
+SERVICE_ID_MPGS=your_gateway_id_mpgs
+SERVICE_ID_MPGS_TEST=your_gateway_id_mpgs_test
+// AFTERPAY
+SERVICE_ID_AFTERPAY=your_gateway_id_afterpay
+// APPLE PAY
+SERVICE_ID_APPLE_PAY_MPGS=your_gateway_id_applepay
+MERCHANT_ID_APPLE_PAY=your_merchant_id_applepay
+// CLICK TO PAY
+SERVICE_ID_CLICK_TO_PAY=your_gateway_id_click_to_pay
+// COLES PAY
+SERVICE_ID_COLES_PAY=your_gateway_id_coles_pay
+WALLET_ID_COLES_PAY=your_wallet_id_coles_pay
+// GPAYMENTS (Standalone 3ds)
+SERVICE_ID_GPAYMENTS=your_gpayments_3ds_gateway_id
+// PAYPAL
+SERVICE_ID_PAYPAL=your_gateway_id_paypal
 
-// Gateway keys
-APPLE_PAY_GATEWAY_ID = your_gateway_id_mpgs
-PAY_PAL_GATEWAY_ID = your_gateway_id_pay_pal
-INTEGRATED_3DS_GATEWAY_ID = your_integrated_3ds_gateway_id
-STANDALONE_3DS_GATEWAY_ID = your_standalone_3ds_gateway_id
-MASTERCARD_SERVICE_ID = your_gateway_id_click_to_pay
-AFTERPAY_GATEWAY_ID = your_gateway_id_after_pay
-COLES_PAY_GATEWAY_ID = your_gateway_id_coles_pay
-COLES_PAY_CLIENT_ID = your_coles_Pat_client_id
-MERCHANT_ID = your_merchant_id
 ```
 
 **Note:**

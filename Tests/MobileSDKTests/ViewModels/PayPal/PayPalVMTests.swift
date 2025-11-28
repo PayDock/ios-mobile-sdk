@@ -18,6 +18,7 @@ class PayPalVMTests: XCTestCase {
     var mockPayPalVaultService: PayPalVaultServiceMock!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
+    var eventDelegate: WidgetEventDelegateUtil!
     var config: PayPalWidgetConfig!
     var completionResult: Result<ChargeResponse, PayPalError>?
     var tokenRequestResult: Result<WalletTokenResult, WalletTokenError>?
@@ -29,6 +30,7 @@ class PayPalVMTests: XCTestCase {
         mockPayPalVaultService = PayPalVaultServiceMock()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
+        eventDelegate = WidgetEventDelegateUtil()
         config = PayPalWidgetConfig(accessToken: "test_token", gatewayId: "test_gateway_id")
         completionResult = nil
         tokenRequestResult = nil
@@ -46,6 +48,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -58,6 +61,7 @@ class PayPalVMTests: XCTestCase {
         mockPayPalVaultService = nil
         viewState = nil
         loadingDelegate = nil
+        eventDelegate = nil
         config = nil
         completionResult = nil
         tokenRequestResult = nil
@@ -81,6 +85,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -103,6 +108,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: nil,
+            eventDelegate: nil,
             completion: { result in
                 self.completionResult = result
             }
@@ -124,6 +130,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -148,6 +155,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: nil,
+            eventDelegate: nil,
             completion: { result in
                 self.completionResult = result
             }
@@ -175,6 +183,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
             }
@@ -202,6 +211,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: nil,
+            eventDelegate: nil,
             completion: { result in
                 self.completionResult = result
             }
@@ -325,6 +335,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
                 expectation.fulfill()
@@ -361,6 +372,7 @@ class PayPalVMTests: XCTestCase {
             walletService: mockWalletService,
             payPalVaultService: mockPayPalVaultService,
             loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
             completion: { result in
                 self.completionResult = result
                 expectation.fulfill()
@@ -384,5 +396,65 @@ class PayPalVMTests: XCTestCase {
         default:
             XCTFail("Expected failure result")
         }
+    }
+
+    // MARK: - WidgetEventDelegate Tests
+
+    func testEventDelegateReceivesEvents() {
+        // Given
+        viewModel = PayPalVM(
+            config: config,
+            viewState: viewState,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "test_token")))
+            },
+            walletService: mockWalletService,
+            payPalVaultService: mockPayPalVaultService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(WidgetEventButtonProperties(name: "PayPalCheckoutButton", action: .click)))
+        viewModel.handleButtonTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateWithoutDelegate() {
+        // Given
+        viewModel = PayPalVM(
+            config: config,
+            viewState: viewState,
+            tokenRequest: { completion in
+                completion(.success(WalletTokenResult(token: "test_token")))
+            },
+            walletService: mockWalletService,
+            payPalVaultService: mockPayPalVaultService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // When
+        viewModel.handleButtonTap()
+
+        // Then - No events should be recorded in our test delegate
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
+        XCTAssertNil(eventDelegate.lastEvent)
     }
 }
