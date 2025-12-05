@@ -90,7 +90,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
         self.underlineColor = buttonAppearance?.fonts.title.underlineColor ?? .clear
         self.strikethroughColor = buttonAppearance?.fonts.title.strikethroughColor ?? .clear
-        self.fontName = buttonAppearance?.fonts.title.customFont.name ?? ""
+        self.fontName = buttonAppearance?.fonts.title.customFont.fontName ?? ""
         self.fontSize = buttonAppearance?.fonts.title.customFont.size ?? 0
 
         self.icon = buttonAppearance?.icon
@@ -115,7 +115,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
         appearance[keyPath: buttonKeyPath].fonts.title.underlineColor = underlineColor
         appearance[keyPath: buttonKeyPath].fonts.title.strikethroughColor = strikethroughColor
-        appearance[keyPath: buttonKeyPath].fonts.title.customFont.name = fontName
+        appearance[keyPath: buttonKeyPath].fonts.title.customFont.type = .custom(name: fontName)
         appearance[keyPath: buttonKeyPath].fonts.title.customFont.size = fontSize
 
         appearance[keyPath: buttonKeyPath].icon = icon

@@ -100,7 +100,7 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
@@ -140,7 +140,7 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
@@ -179,7 +179,7 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
@@ -218,7 +218,7 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Done",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {

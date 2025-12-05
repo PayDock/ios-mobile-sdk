@@ -75,7 +75,7 @@ public struct GiftCardWidget: View {
         )
         .customToolbar(
             buttonTitle: "Next",
-            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                          size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
@@ -111,7 +111,7 @@ public struct GiftCardWidget: View {
             })
         .customToolbar(
             buttonTitle: "Done",
-            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                          size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
