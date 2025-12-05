@@ -93,22 +93,22 @@ class TextFieldStyleVM: ObservableObject {
 
         self.textUnderlineColor = appearance?.textField.fonts.text.underlineColor ?? .clear
         self.textStrikethroughColor = appearance?.textField.fonts.text.strikethroughColor ?? .clear
-        self.textFont = appearance?.textField.fonts.text.customFont.name ?? ""
+        self.textFont = appearance?.textField.fonts.text.customFont.fontName ?? ""
         self.textFontSize = appearance?.textField.fonts.text.customFont.size ?? 0.0
 
         self.titleUnderlineColor = appearance?.textField.fonts.title.underlineColor ?? .clear
         self.titleStrikethroughColor = appearance?.textField.fonts.title.strikethroughColor ?? .clear
-        self.titleFont = appearance?.textField.fonts.title.customFont.name ?? ""
+        self.titleFont = appearance?.textField.fonts.title.customFont.fontName ?? ""
         self.titleFontSize = appearance?.textField.fonts.title.customFont.size ?? 0.0
 
         self.placeholderUnderlineColor = appearance?.textField.fonts.placeholder.underlineColor ?? .clear
         self.placeholderStrikethroughColor = appearance?.textField.fonts.placeholder.strikethroughColor ?? .clear
-        self.placeholderFont = appearance?.textField.fonts.placeholder.customFont.name ?? ""
+        self.placeholderFont = appearance?.textField.fonts.placeholder.customFont.fontName ?? ""
         self.placeholderFontSize = appearance?.textField.fonts.placeholder.customFont.size ?? 0.0
 
         self.errorUnderlineColor = appearance?.textField.fonts.error.underlineColor ?? .clear
         self.errorStrikethroughColor = appearance?.textField.fonts.error.strikethroughColor ?? .clear
-        self.errorFont = appearance?.textField.fonts.error.customFont.name ?? ""
+        self.errorFont = appearance?.textField.fonts.error.customFont.fontName ?? ""
         self.errorFontSize = appearance?.textField.fonts.error.customFont.size ?? 0.0
     }
 
@@ -133,22 +133,23 @@ class TextFieldStyleVM: ObservableObject {
 
         appearance.textField.fonts.text.underlineColor = textUnderlineColor
         appearance.textField.fonts.text.strikethroughColor = textStrikethroughColor
-        appearance.textField.fonts.text.customFont.name = textFont
+        appearance.textField.fonts.text.customFont.type = .custom(name: textFont)
+
         appearance.textField.fonts.text.customFont.size = textFontSize
 
         appearance.textField.fonts.title.underlineColor = titleUnderlineColor
         appearance.textField.fonts.title.strikethroughColor = titleStrikethroughColor
-        appearance.textField.fonts.title.customFont.name = titleFont
+        appearance.textField.fonts.title.customFont.type = .custom(name: titleFont)
         appearance.textField.fonts.title.customFont.size = titleFontSize
 
         appearance.textField.fonts.placeholder.underlineColor = placeholderUnderlineColor
         appearance.textField.fonts.placeholder.strikethroughColor = placeholderStrikethroughColor
-        appearance.textField.fonts.placeholder.customFont.name = placeholderFont
+        appearance.textField.fonts.placeholder.customFont.type = .custom(name: placeholderFont)
         appearance.textField.fonts.placeholder.customFont.size = placeholderFontSize
 
         appearance.textField.fonts.error.underlineColor = errorUnderlineColor
         appearance.textField.fonts.error.strikethroughColor = errorStrikethroughColor
-        appearance.textField.fonts.error.customFont.name = errorFont
+        appearance.textField.fonts.error.customFont.type = .custom(name: errorFont)
         appearance.textField.fonts.error.customFont.size = errorFontSize
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)

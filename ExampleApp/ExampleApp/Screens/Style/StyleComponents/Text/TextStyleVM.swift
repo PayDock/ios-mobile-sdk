@@ -62,7 +62,7 @@ class TextStyleVM<T>: ObservableObject {
         self.bottomPadding = textAppearance?.padding.bottom ?? 0
         self.trailingPadding = textAppearance?.padding.trailing ?? 0
 
-        self.fontName = textAppearance?.text.customFont.name ?? ""
+        self.fontName = textAppearance?.text.customFont.fontName ?? ""
         self.fontSize = textAppearance?.text.customFont.size ?? 0
     }
 
@@ -78,7 +78,7 @@ class TextStyleVM<T>: ObservableObject {
         appearance[keyPath: textKeyPath].padding.bottom = bottomPadding
         appearance[keyPath: textKeyPath].padding.trailing = trailingPadding
 
-        appearance[keyPath: textKeyPath].text.customFont.name = fontName
+        appearance[keyPath: textKeyPath].text.customFont.type = .custom(name: fontName)
         appearance[keyPath: textKeyPath].text.customFont.size = fontSize
 
         self.appearance = appearance

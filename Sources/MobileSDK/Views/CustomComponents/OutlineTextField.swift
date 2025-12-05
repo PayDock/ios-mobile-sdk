@@ -48,7 +48,7 @@ struct OutlineTextField: View {
     private var titleVerticalPadding: CGFloat {
         let isActive = animatableEditingState || !text.isEmpty
         if isActive {
-            return -10.0
+            return -11.0
         } else {
             return 0.0
         }
@@ -200,7 +200,7 @@ struct OutlineTextField: View {
                 keyboardType: keyboardType,
                 textContentType: textContentType,
                 returnKeyType: returnKeyType,
-                font: UIFont(name: appearance.fonts.text.customFont.name, size: appearance.fonts.text.customFont.size),
+                font: UIFont.init(descriptor: appearance.fonts.text.customFont.fontDescriptor, size: appearance.fonts.text.customFont.size),
                 textColor: UIColor(appearance.colors.text),
                 tintColor: UIColor(appearance.colors.active),
                 isUnderlined: appearance.fonts.text.isUnderlined,
@@ -246,7 +246,7 @@ struct OutlineTextField: View {
                     .strikethrough(appearance.fonts.title.isStrikethrough, color: appearance.fonts.title.strikethroughColor)
                     .underline(appearance.fonts.title.isUnderlined, color: appearance.fonts.title.underlineColor)
                     .italic(appearance.fonts.title.isItalic)
-                    .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.name)
+                    .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.fontName)
                     .padding([.leading, .trailing], 4.0)
                     .layoutPriority(1)
             }
