@@ -499,7 +499,7 @@ extension EnhancedCheckoutVM {
     private func createWalletChargeRequest(gatewayId: String, walletType: String?) -> InitialiseWalletChargeReq {
         let paymentSource = InitialiseWalletChargePaymentSource(
             addressLine1: billingAddress,
-            addressLine2: billingAddressLine2,
+            addressLine2: billingAddressLine2.isEmpty ? nil : billingAddressLine2,
             addressPostcode: billingPostalCode,
             addressCity: billingCity,
             addressState: billingState,
