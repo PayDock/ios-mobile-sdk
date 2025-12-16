@@ -30,7 +30,7 @@ extension CustomersEndpoints: Endpoint {
     }
 
     var header: [String: String]? {
-        let accessToken =  ProjectEnvironment.shared.getApiAccessToken()
+        let accessToken =  ConfigManager.shared.getGlobalConfig().apiAccessToken
         switch self {
         case .createCustomer:
             return [

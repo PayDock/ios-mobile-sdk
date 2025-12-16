@@ -313,7 +313,7 @@ class CardDetailsFormManager: ObservableObject {
         if let cardScheme =  cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText), enableCardValidation {
             securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValid(
                 code: securityCodeText,
-                cardScheme: cardScheme ?? .visa) // Default to 3 digit CVV validation
+                cardScheme: cardScheme)
         } else {
             securityCodeValidation = cardSecurityCodeValidator.isSecurityCodeValidForUnknownScheme(code: securityCodeText)
         }
