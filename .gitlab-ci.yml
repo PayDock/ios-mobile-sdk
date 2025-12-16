@@ -496,7 +496,7 @@ create_github_release:
     #   - Authenticating with GitHub using a personal access token.
     #   - Creating a new release on GitHub with the specified tag name.
     #   - Adding release notes or a description to the release.
-    #   - Potentially uploading release assets (e.g., APKs) to the release.
+    #   - Potentially uploading release assets (e.g., IPAs) to the release.
   rules:
     - if: $CI_COMMIT_BRANCH == "release" # Run on commit is made to the 'release' branch.
       when: on_success

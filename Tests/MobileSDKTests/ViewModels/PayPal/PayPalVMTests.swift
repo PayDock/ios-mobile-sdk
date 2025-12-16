@@ -26,6 +26,7 @@ class PayPalVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        MobileSDK.shared.configureMobileSDK(config: .init(environment: .sandbox))
         mockWalletService = WalletServiceMock()
         mockGatewayService = GatewayServiceMock()
         viewState = ViewState()

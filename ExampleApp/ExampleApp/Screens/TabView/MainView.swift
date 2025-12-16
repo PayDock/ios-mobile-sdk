@@ -32,6 +32,13 @@ struct MainView: View {
                 }
                 .tag(2)
                 .toolbarBackground(Color.white, for: .tabBar)
+
+            ConfigWidgetListView()
+                .tabItem {
+                    Label("Config", image: selection == 3 ? "cog-active" : "cog")
+                }
+                .tag(3)
+                .toolbarBackground(Color.white, for: .tabBar)
         }
         .toolbarBackground(Color.red, for: .tabBar)
         .accentColor(.black)

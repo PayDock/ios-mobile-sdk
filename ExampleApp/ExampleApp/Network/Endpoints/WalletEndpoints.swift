@@ -56,7 +56,7 @@ extension WalletEndpoints: Endpoint {
     }
 
     var header: [String: String]? {
-        let accessToken =  ProjectEnvironment.shared.getApiAccessToken()
+        let accessToken = ConfigManager.shared.getGlobalConfig().apiAccessToken
         switch self {
         case .initialiseWalletCharge, .initialiseColesPayWalletCharge, .vaultToken, .convertToVaultToken, .standalone3ds,
                 .captureCharge, .captureChargeForStandalone, .cardToken, .integrated3ds, .integrated3dsVault, .captureChargeColesPay:
