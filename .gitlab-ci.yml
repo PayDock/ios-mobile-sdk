@@ -82,6 +82,8 @@ run_ExampleApp_tests:
     paths:
       - fastlane/test_output
 
+## This job runs the MobileSDK unit tests and generates coverage reports.
+## Coverage comparison is automatically shown in MRs by GitLab.
 run_MobileSDK_tests:
   extends:
     - .macos_saas_runners
@@ -96,17 +98,53 @@ run_MobileSDK_tests:
     - bundle exec fastlane testPackage
     - mv fastlane/test_output/report.junit fastlane/test_output/report.xml
 
+    # Generate coverage reports in multiple formats
     - xcrun xccov view --report --json fastlane/test_output/MobileSDK.xcresult > fastlane/test_output/coverage.json
     - "COVERAGE=$(xcrun xccov view --report fastlane/test_output/MobileSDK.xcresult | grep 'MobileSDK ' | awk '{print $2}'); echo Coverage: $COVERAGE"
+    
+    # Convert to Cobertura XML format for GitLab coverage visualization
+    - python3 scripts/xccov-to-cobertura.py fastlane/test_output/coverage.json > fastlane/test_output/cobertura.xml
+    
+    # Generate HTML coverage report
+    - python3 scripts/generate-coverage-html.py fastlane/test_output/coverage.json fastlane/test_output/coverage-html
   coverage: '/\d+\.\d+%/'
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: on_success # Run on all pipelines (MRs and pushes) for coverage comparison
   artifacts:
+    expire_in: 7 days
     when: always
     reports:
       junit: fastlane/test_output/report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: fastlane/test_output/cobertura.xml
     paths:
       - fastlane/test_output
+
+# GitLab Pages job to publish HTML coverage reports
+# This makes the coverage report accessible via GitLab Pages URL
+pages:
+  stage: deploy
+  image: alpine:latest
+  dependencies:
+    - run_MobileSDK_tests
+  needs:
+    - job: run_MobileSDK_tests
+      artifacts: true
+  script:
+    - echo "Publishing coverage report to GitLab Pages"
+    - mkdir -p public
+    - ls -la fastlane/test_output/ || echo "No test_output directory"
+    - ls -la fastlane/test_output/coverage-html/ || echo "No coverage-html directory"
+    - cp -r fastlane/test_output/coverage-html/* public/ 2>/dev/null || echo "No coverage HTML report found, creating placeholder"
+    - test -f public/index.html || echo "<html><body><h1>Coverage Report Not Available</h1><p>Coverage report will be available after the next successful test run on main branch.</p></body></html>" > public/index.html
+    - ls -la public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_success
 
 # This job pulls a zip file from an AWS S3 bucket and extracts its contents.
 pull_bin_file:

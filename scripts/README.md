@@ -234,3 +234,66 @@ ALLOWED_PREFIXES=("bug/" "task/" "feature/" "release/" "spike/" "hotfix/")
 ```
 
 The system will automatically use the updated rules on the next commit/push.
+
+---
+
+# Code Coverage Scripts
+
+Scripts for generating and converting code coverage reports for GitLab CI/CD.
+
+## Overview
+
+These scripts convert Xcode coverage data to formats supported by GitLab for MR coverage comparison and HTML reporting.
+
+## Scripts
+
+### `xccov-to-cobertura.py`
+
+Converts Xcode coverage JSON (from `xcrun xccov view --json`) to Cobertura XML format, which GitLab uses for coverage visualization in merge requests.
+
+**Usage:**
+
+```bash
+# Convert coverage JSON file to Cobertura XML
+python3 scripts/xccov-to-cobertura.py coverage.json > cobertura.xml
+
+# Or pipe directly from xccov
+xcrun xccov view --report --json Result.xcresult | python3 scripts/xccov-to-cobertura.py - > cobertura.xml
+```
+
+### `generate-coverage-html.py`
+
+Generates a beautiful HTML coverage report from Xcode coverage JSON, which is published to GitLab Pages.
+
+**Usage:**
+
+```bash
+# Generate HTML report
+python3 scripts/generate-coverage-html.py coverage.json output_directory/
+
+# Or pipe from xccov
+xcrun xccov view --report --json Result.xcresult | python3 scripts/generate-coverage-html.py - output_directory/
+```
+
+## GitLab CI Integration
+
+These scripts are used in the GitLab CI pipeline to:
+
+1. **MR Coverage Comparison**: The Cobertura XML report enables GitLab to show coverage diff in merge requests
+2. **Coverage Badge**: The `coverage:` regex in CI extracts the total coverage percentage
+3. **GitLab Pages**: HTML reports are published to GitLab Pages for easy viewing
+
+### How It Works
+
+1. Tests run with coverage enabled via Fastlane
+2. `xcrun xccov view --json` extracts coverage data from the `.xcresult` bundle
+3. `xccov-to-cobertura.py` converts to Cobertura XML for GitLab
+4. `generate-coverage-html.py` creates an HTML report
+5. GitLab uses the Cobertura XML to show coverage diff on MRs
+6. GitLab Pages publishes the HTML report
+
+### Viewing Coverage
+
+- **In MRs**: Coverage changes are shown inline in the diff view
+- **GitLab Pages**: Full HTML report at `https://<group>.gitlab.io/<project>/`
+- **Pipeline**: Coverage percentage shown in pipeline/job details
