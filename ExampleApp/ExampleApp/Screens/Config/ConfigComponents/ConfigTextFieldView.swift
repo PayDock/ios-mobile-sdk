@@ -204,7 +204,6 @@ struct ConfigTextFieldView: View {
             config = CardDetailsWidgetConfig(
                 gatewayId: config.gatewayId,
                 accessToken: value,
-                showCardTitle: config.showCardTitle,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
                 schemeSupport: config.schemeSupport
@@ -213,7 +212,6 @@ struct ConfigTextFieldView: View {
             config = CardDetailsWidgetConfig(
                 gatewayId: value.isEmpty ? nil : value,
                 accessToken: config.accessToken,
-                showCardTitle: config.showCardTitle,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
                 schemeSupport: config.schemeSupport

@@ -9,7 +9,6 @@ enum ConfigKeys {
     case widgetAccessToken
     case apiAccessToken
     case gatewayId
-    case showCardTitle
     case collectCardholderName
     case allowSaveCard
     case storePin

@@ -80,7 +80,6 @@ struct ConfigSchemeView: View {
             config = CardDetailsWidgetConfig(
                 gatewayId: config.gatewayId,
                 accessToken: config.accessToken,
-                showCardTitle: config.showCardTitle,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
                 schemeSupport: schemeSupport

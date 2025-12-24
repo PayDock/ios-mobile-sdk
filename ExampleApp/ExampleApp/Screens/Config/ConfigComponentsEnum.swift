@@ -10,7 +10,6 @@ enum ConfigComponentsEnum {
     case widgetAccessToken
     case apiAccessToken
     case gatewayId
-    case showCardTitle
     case collectCardholderName
     case allowSaveCard
     case schemeSupport
@@ -33,7 +32,6 @@ enum ConfigComponentsEnum {
         case .widgetAccessToken: return "Widget Access Token"
         case .apiAccessToken: return "Api Access Token"
         case .gatewayId: return "Gateway ID"
-        case .showCardTitle: return "Show Card Title"
         case .collectCardholderName: return "Collect Cardholder Name"
         case .allowSaveCard: return "Allow Save Card"
         case .schemeSupport: return "Scheme Support"
@@ -66,7 +64,7 @@ enum ConfigComponentsEnum {
         switch self {
         case .widgetAccessToken, .apiAccessToken, .gatewayId, .clientId, .serviceId, .totalAmount, .currency:
             return createTextFieldView(selectedWidget: selectedWidget)
-        case .showCardTitle, .collectCardholderName, .storePin, .requestShipping, .enableTestMode:
+        case .collectCardholderName, .storePin, .requestShipping, .enableTestMode:
             return createToggleView(selectedWidget: selectedWidget)
         case .fundingSource, .environment:
             return createPickerView(selectedWidget: selectedWidget)
@@ -112,7 +110,6 @@ enum ConfigComponentsEnum {
         case .widgetAccessToken: return .widgetAccessToken
         case .apiAccessToken: return .apiAccessToken
         case .gatewayId: return .gatewayId
-        case .showCardTitle: return .showCardTitle
         case .collectCardholderName: return .collectCardholderName
         case .storePin: return .storePin
         case .requestShipping: return .requestShipping

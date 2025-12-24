@@ -44,7 +44,6 @@ class ConfigManager: ObservableObject {
         configurations[.card] = CardDetailsWidgetConfig(
             gatewayId: ProjectEnvironment.shared.getApplePayGatewayId(),
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            showCardTitle: true,
             collectCardholderName: true,
             allowSaveCard: SaveCardConfig(
                 consentText: "Remember this card for next time.",
@@ -131,7 +130,6 @@ class ConfigManager: ObservableObject {
         return getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) ?? CardDetailsWidgetConfig(
             gatewayId: ProjectEnvironment.shared.getApplePayGatewayId(),
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            showCardTitle: true,
             collectCardholderName: true,
             allowSaveCard: SaveCardConfig(
                 consentText: "Remember this card for next time.",

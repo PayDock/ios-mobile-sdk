@@ -19,7 +19,6 @@ struct CardPaymentWidget: View {
             config: CardDetailsWidgetConfig(
                 gatewayId: nil,
                 accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                showCardTitle: false,
                 collectCardholderName: false,
                 allowSaveCard: SaveCardConfig(
                     privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(

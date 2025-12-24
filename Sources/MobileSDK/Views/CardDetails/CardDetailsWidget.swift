@@ -39,9 +39,6 @@ public struct CardDetailsWidget: View {
 
     public var body: some View {
         VStack(spacing: viewModel.appearance.verticalSpacing) {
-            if viewModel.config.showCardTitle {
-                cardTitleView
-            }
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 getCardSchemeIconList(supportedSchemes: supportedSchemes)
             }
@@ -61,17 +58,6 @@ public struct CardDetailsWidget: View {
             primaryButton
         }
         .padding(.horizontal, viewModel.appearance.horizontalSpacing)
-    }
-
-    private var cardTitleView: some View {
-        HStack {
-            Text("Card information")
-                .font(viewModel.appearance.title.text.customFont.font)
-                .foregroundColor(viewModel.appearance.title.text.textColor)
-                .accessibilityAddTraits(.isHeader)
-            Spacer()
-        }
-        .customPadding(viewModel.appearance.title.padding)
     }
 
     private var cardholderNameTextField: some View {
