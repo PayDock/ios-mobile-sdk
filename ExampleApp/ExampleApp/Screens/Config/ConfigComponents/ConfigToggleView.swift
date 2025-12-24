@@ -47,8 +47,6 @@ struct ConfigToggleView: View {
         case .card:
             if let config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) {
                 switch configKey {
-                case .showCardTitle:
-                    toggleValue = config.showCardTitle
                 case .collectCardholderName:
                     toggleValue = config.collectCardholderName
                 default:
@@ -95,20 +93,10 @@ struct ConfigToggleView: View {
         guard var config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
 
         switch configKey {
-        case .showCardTitle:
-            config = CardDetailsWidgetConfig(
-                gatewayId: config.gatewayId,
-                accessToken: config.accessToken,
-                showCardTitle: value,
-                collectCardholderName: config.collectCardholderName,
-                allowSaveCard: config.allowSaveCard,
-                schemeSupport: config.schemeSupport
-            )
         case .collectCardholderName:
             config = CardDetailsWidgetConfig(
                 gatewayId: config.gatewayId,
                 accessToken: config.accessToken,
-                showCardTitle: config.showCardTitle,
                 collectCardholderName: value,
                 allowSaveCard: config.allowSaveCard,
                 schemeSupport: config.schemeSupport
@@ -152,8 +140,6 @@ struct ConfigToggleView: View {
         switch selectedWidget {
         case .card:
             switch configKey {
-            case .showCardTitle:
-                toggleValue = true
             case .collectCardholderName:
                 toggleValue = true
             default:

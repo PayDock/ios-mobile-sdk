@@ -92,7 +92,6 @@ struct ConfigSaveCardView: View {
             config = CardDetailsWidgetConfig(
                 gatewayId: config.gatewayId,
                 accessToken: config.accessToken,
-                showCardTitle: config.showCardTitle,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: saveCardConfig,
                 schemeSupport: config.schemeSupport
