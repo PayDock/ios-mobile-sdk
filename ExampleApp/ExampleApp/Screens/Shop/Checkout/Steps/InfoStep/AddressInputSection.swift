@@ -31,6 +31,7 @@ struct AddressInputSection: View {
                     Button("Change Address") {
                         onEnterAddress()
                     }
+
                     .font(.system(size: 14))
                     .foregroundColor(.defaultPrimary)
                 }

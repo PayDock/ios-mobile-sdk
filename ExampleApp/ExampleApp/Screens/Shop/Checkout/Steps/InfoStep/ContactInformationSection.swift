@@ -23,18 +23,22 @@ struct ContactInformationSection: View {
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     TextField("First Name", text: $firstName)
+                        .accessibilityIdentifier("Checkout First Name Field")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
 
                     TextField("Last Name", text: $lastName)
+                        .accessibilityIdentifier("Checkout Last Name Field")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
 
                 TextField("Email", text: $email)
+                    .accessibilityIdentifier("Checkout Email Field")
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
 
                 TextField("Phone", text: $phone)
+                    .accessibilityIdentifier("Checkout Phone Field")
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .keyboardType(.phonePad)
             }

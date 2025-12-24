@@ -91,6 +91,7 @@ struct EnhancedCheckoutView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("Cancel Checkout")
                 }
             }
             .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {

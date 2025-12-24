@@ -35,16 +35,20 @@ struct SavedAddressCardView: View {
 
                 Menu {
                     Button("Edit", action: onEdit)
+                        .accessibilityIdentifier("Edit Address \(address.label)")
 
                     if !address.isDefault {
                         Button("Set as Default", action: onSetDefault)
+                            .accessibilityIdentifier("Set as Default \(address.label)")
                     }
 
                     Button("Delete", role: .destructive, action: onDelete)
+                        .accessibilityIdentifier("Delete Address \(address.label)")
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .foregroundColor(.defaultPrimary)
                 }
+                .accessibilityIdentifier("Address Menu \(address.label)")
             }
 
             Text(address.formattedAddress)

@@ -51,6 +51,7 @@ struct CartItemRowView: View {
                         Image(systemName: "minus.circle.fill")
                             .foregroundColor(cartItem.quantity > 1 ? .defaultPrimary : .gray)
                     }
+                    .accessibilityIdentifier("Decrease Quantity \(cartItem.product.name)")
                     .disabled(cartItem.quantity <= 1)
 
                     Text("\(cartItem.quantity)")
@@ -63,6 +64,7 @@ struct CartItemRowView: View {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(.defaultPrimary)
                     }
+                    .accessibilityIdentifier("Increase Quantity \(cartItem.product.name)")
                 }
 
                 Button {
@@ -72,6 +74,7 @@ struct CartItemRowView: View {
                         .font(.system(size: 14))
                         .foregroundColor(.red)
                 }
+                .accessibilityIdentifier("Remove \(cartItem.product.name)")
             }
         }
         .padding()

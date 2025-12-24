@@ -30,6 +30,7 @@ struct PickerView: View {
                         self.selected = client
                         onSelection(selected)
                     }
+                    .accessibilityIdentifier("MenuItem_\(placeholder)_\(client)")
                 }
             } label: {
                 VStack {
@@ -51,6 +52,7 @@ struct PickerView: View {
                     }
                 }
             }
+            .accessibilityIdentifier("Menu_\(placeholder)")
         }
     }
 }

@@ -41,6 +41,7 @@ struct AddressWidgetContainerView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("Cancel Address Widget")
                 }
             }
         }
