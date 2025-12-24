@@ -51,6 +51,15 @@ struct ConfigWidgetListView: View {
                 ForEach(widgetItems) { item in
                     stylizedNavigationLink(item: item, destination: item.destination)
                 }
+
+                VStack(alignment: .center, spacing: 4) {
+                    Text(appVersionString)
+                        .font(.caption)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 16)
+                .listRowSeparatorTint(.clear)
+                .listRowBackground(Color(hex: "#EAE0D7"))
             }
             .navigationTitle("Config")
             .listStyle(.plain)
@@ -88,6 +97,27 @@ struct ConfigWidgetListView: View {
         UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.black]
         UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.black]
         UINavigationBar.appearance().barTintColor = .white
+    }
+
+    private var appVersionString: AttributedString {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+
+        var attributedString = AttributedString("Version ")
+
+        var versionText = AttributedString(version)
+        versionText.font = .caption.bold()
+        attributedString.append(versionText)
+
+        attributedString.append(AttributedString(" (Build "))
+
+        var buildText = AttributedString(build)
+        buildText.font = .caption.bold()
+        attributedString.append(buildText)
+
+        attributedString.append(AttributedString(")"))
+
+        return attributedString
     }
 }
 
