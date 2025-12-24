@@ -52,7 +52,6 @@ public struct AddressWidget: View {
 
                         saveButton
                             .id("saveButton")
-                        emptyFocusView
                     }
                     .animation(.easeInOut(duration: 0.25), value: viewModel.addressFormManager.showAddressSearchPopup)
                     .animation(.easeInOut(duration: 0.25), value: viewModel.countrySearchSuggestions)
@@ -117,10 +116,6 @@ public struct AddressWidget: View {
                         viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
                     }
                 )
-                .onConditionalKeyPress(key: .tab, action: {
-                    textFieldInFocus = .lastName
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
-                })
                 .focused($textFieldInFocus, equals: .firstName)
                 .id(AddressFormManager.AddressFocusable.firstName)
 
@@ -143,10 +138,6 @@ public struct AddressWidget: View {
                         viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
                     }
                 )
-                .onConditionalKeyPress(key: .tab, action: {
-                    textFieldInFocus = .searchAddress
-                    viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
-                })
                 .focused($textFieldInFocus, equals: .lastName)
                 .id(AddressFormManager.AddressFocusable.lastName)
             }
@@ -200,11 +191,6 @@ public struct AddressWidget: View {
                 }
             )
             .submitLabel(.next)
-            .onConditionalKeyPress(key: .tab, action: {
-                let isFormExpanded = viewModel.addressFormManager.isAddressFormExpanded
-                textFieldInFocus = isFormExpanded ? .addressLine1 : .firstName
-                viewModel.addressFormManager.setEditingTextField(focusedField: isFormExpanded ? .addressLine1 : .firstName)
-            })
             .focused($textFieldInFocus, equals: .searchAddress)
             .id(AddressFormManager.AddressFocusable.searchAddress)
         }
@@ -246,10 +232,6 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
             }
         )
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .addressLine2
-            viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
-        })
         .focused($textFieldInFocus, equals: .addressLine1)
         .id(AddressFormManager.AddressFocusable.addressLine1)
     }
@@ -274,10 +256,6 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .city)
             }
         )
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .city
-            viewModel.addressFormManager.setEditingTextField(focusedField: .city)
-        })
         .focused($textFieldInFocus, equals: .addressLine2)
         .id(AddressFormManager.AddressFocusable.addressLine2)
     }
@@ -302,10 +280,6 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .state)
             }
         )
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .state
-            viewModel.addressFormManager.setEditingTextField(focusedField: .state)
-        })
         .focused($textFieldInFocus, equals: .city)
         .id(AddressFormManager.AddressFocusable.city)
     }
@@ -330,10 +304,6 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
             }
         )
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .postcode
-            viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
-        })
         .focused($textFieldInFocus, equals: .state)
         .id(AddressFormManager.AddressFocusable.state)
     }
@@ -358,10 +328,6 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .country)
             }
         )
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .country
-            viewModel.addressFormManager.setEditingTextField(focusedField: .country)
-        })
         .focused($textFieldInFocus, equals: .postcode)
         .id(AddressFormManager.AddressFocusable.postcode)
     }
@@ -391,10 +357,6 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.endEditing()
             }
         )
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .firstName
-            viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
-        })
         .focused($textFieldInFocus, equals: .country)
         .id(AddressFormManager.AddressFocusable.country)
         .animation(.easeInOut(duration: 0.25), value: viewModel.addressFormManager.showCountrySearchPopup)
@@ -414,19 +376,6 @@ public struct AddressWidget: View {
             }
             .customPadding(viewModel.appearance.actionButton.dimensions.padding)
             .font(viewModel.appearance.actionButton.fonts.title.customFont.font)
-    }
-
-    private var emptyFocusView: some View {
-        VStack {}
-            .conditionalFocusable()
-            .focused($isViewFocused)
-            .onConditionalKeyPress(key: .tab, action: {
-                textFieldInFocus = .firstName
-                viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
-            })
-            .onAppear {
-                isViewFocused = true
-            }
     }
 
     private func shouldAlignVertically() -> Bool {

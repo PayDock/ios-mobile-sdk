@@ -59,7 +59,6 @@ public struct CardDetailsWidget: View {
             }
 
             primaryButton
-            emptyFocusView
         }
         .padding(.horizontal, viewModel.appearance.horizontalSpacing)
     }
@@ -107,10 +106,6 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = .cardNumber
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .cardNumber
-            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-        })
         .focused($textFieldInFocus, equals: .cardholderName)
     }
 
@@ -147,10 +142,6 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = .expiryDate
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .expiryDate
-            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-        })
         .focused($textFieldInFocus, equals: .cardNumber)
     }
 
@@ -186,10 +177,6 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = .securityCode
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .securityCode
-            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-        })
         .focused($textFieldInFocus, equals: .expiryDate)
     }
 
@@ -225,12 +212,6 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = nil
             viewModel.cardDetailsFormManager.endEditing()
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            let collectCardholderName = viewModel.config.collectCardholderName
-            textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
-            viewModel.cardDetailsFormManager.setEditingTextField(
-                focusedField: collectCardholderName ? .cardholderName : .cardNumber)
-        })
         .focused($textFieldInFocus, equals: .securityCode)
     }
 
@@ -311,20 +292,6 @@ public struct CardDetailsWidget: View {
                 .joined(separator: ", ")
         )
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var emptyFocusView: some View {
-        VStack {}
-            .conditionalFocusable()
-            .focused($isViewFocused)
-            .onConditionalKeyPress(key: .tab, action: {
-                let collectCardholderName = viewModel.config.collectCardholderName
-                textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
-                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: collectCardholderName ? .cardholderName : .cardNumber)
-            })
-            .onAppear {
-                isViewFocused = true
-            }
     }
 
     private func shouldAlignVertically() -> Bool {

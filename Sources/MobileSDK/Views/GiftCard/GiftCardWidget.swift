@@ -44,7 +44,6 @@ public struct GiftCardWidget: View {
                     }
                     primaryButton
                         .accessibilityHint("Saves a gift card.")
-                    emptyFocusView
                 }
             }
             .padding(.horizontal, viewModel.appearance.horizontalSpacing)
@@ -82,10 +81,6 @@ public struct GiftCardWidget: View {
             textFieldInFocus = .pin
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .pin
-            viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
-        })
         .focused($textFieldInFocus, equals: .cardNumber)
     }
 
@@ -122,10 +117,6 @@ public struct GiftCardWidget: View {
             textFieldInFocus = nil
             viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .cardNumber
-            viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
-        })
         .focused($textFieldInFocus, equals: .pin)
         .frame(width: shouldAlignVertically() ?
                UIScreen.main.bounds.width - viewModel.appearance.horizontalSpacing * 2 :
@@ -148,19 +139,6 @@ public struct GiftCardWidget: View {
             .padding(.leading, viewModel.appearance.actionButton.dimensions.padding.leading)
             .padding(.bottom, viewModel.appearance.actionButton.dimensions.padding.bottom)
             .padding(.trailing, viewModel.appearance.actionButton.dimensions.padding.trailing)
-    }
-
-    private var emptyFocusView: some View {
-        VStack {}
-            .conditionalFocusable()
-            .focused($isViewFocused)
-            .onConditionalKeyPress(key: .tab, action: {
-                textFieldInFocus = .cardNumber
-                viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
-            })
-            .onAppear {
-                isViewFocused = true
-            }
     }
 
     private func shouldAlignVertically() -> Bool {
