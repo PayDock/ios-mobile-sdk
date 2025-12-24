@@ -33,10 +33,12 @@ struct ColorPickerView: View {
                         .frame(height: 40)
                         .background(Color.white)
                         .padding(.leading, 32)
+                        .accessibilityIdentifier("TextField_\(title)")
                 }
                 ColorPicker(selection: $pickedColor, supportsOpacity: false, label: {})
                 .frame(width: 44, height: 44)
                 .padding(.trailing, 24)
+                .accessibilityIdentifier("ColorPicker_\(title)")
             }
         }
     }

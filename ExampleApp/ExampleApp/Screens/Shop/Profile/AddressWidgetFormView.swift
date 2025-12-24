@@ -37,9 +37,11 @@ struct AddressWidgetFormView: View {
 
                 VStack(spacing: 16) {
                     TextField("Address Label (e.g., Home, Work)", text: $label)
+                        .accessibilityIdentifier("Address Label Field")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
 
                     Toggle("Set as default address", isOn: $isDefault)
+                        .accessibilityIdentifier("Set as default address")
 
                     if let result = addressResult {
                         HStack {
@@ -56,6 +58,7 @@ struct AddressWidgetFormView: View {
                                 Button("Change Address") {
                                     showingAddressWidget = true
                                 }
+                                .accessibilityIdentifier("Change Address")
                                 .font(.system(size: 14))
                                 .foregroundColor(.defaultPrimary)
                             }
@@ -65,6 +68,7 @@ struct AddressWidgetFormView: View {
                         Button("Enter Address") {
                             showingAddressWidget = true
                         }
+                        .accessibilityIdentifier("Enter Address")
                         .foregroundColor(.white)
                         .font(.system(size: 16, weight: .semibold))
                         .frame(height: 44)
@@ -82,6 +86,7 @@ struct AddressWidgetFormView: View {
                     Button("Cancel") {
                         onCancel()
                     }
+                    .accessibilityIdentifier("Cancel Address Form")
                     .foregroundColor(.defaultPrimary)
                     .font(.system(size: 16, weight: .semibold))
                     .frame(height: 44)
@@ -94,6 +99,7 @@ struct AddressWidgetFormView: View {
                     Button("Save") {
                         saveAddress()
                     }
+                    .accessibilityIdentifier("Save Address")
                     .foregroundColor(.white)
                     .font(.system(size: 16, weight: .semibold))
                     .frame(height: 44)

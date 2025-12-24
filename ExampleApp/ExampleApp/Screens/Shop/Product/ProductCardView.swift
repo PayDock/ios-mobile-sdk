@@ -126,6 +126,7 @@ struct ProductCardView: View {
                     .background(showingAddedAnimation ? Color.green : Color.defaultPrimary)
                     .cornerRadius(8)
                 })
+                .accessibilityIdentifier("Add to Cart \(product.name)")
                 .disabled(showingAddedAnimation)
             }
             .padding(padding)

@@ -54,6 +54,7 @@ struct IconPickerView: View {
                 }
             })
             .buttonStyle(PlainButtonStyle())
+            .accessibilityIdentifier("Button_\(placeholder)")
             .sheet(isPresented: $showingIconGrid) {
                 IconGridView(
                     entries: entries,

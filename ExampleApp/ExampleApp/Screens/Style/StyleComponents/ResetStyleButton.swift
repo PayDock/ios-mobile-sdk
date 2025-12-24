@@ -30,6 +30,7 @@ struct ResetStyleButton: View {
         )
         .padding(.top, 16.0)
         .padding()
+        .accessibilityIdentifier("Button_ResetToDefaults")
     }
 }
 

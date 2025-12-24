@@ -55,6 +55,7 @@ struct GiftCardEntryView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("Cancel Gift Card Entry")
                 }
             }
             .alert("Gift Card", isPresented: $showAlert) {

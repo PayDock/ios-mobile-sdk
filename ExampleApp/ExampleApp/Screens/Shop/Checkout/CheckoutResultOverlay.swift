@@ -50,6 +50,7 @@ struct CheckoutResultOverlay: View {
                     Button(isSuccess ? "Continue" : "Try Again") {
                         onDismiss()
                     }
+                    .accessibilityIdentifier(isSuccess ? "Continue" : "Try Again")
                     .foregroundColor(.white)
                     .font(.system(size: 16, weight: .semibold))
                     .frame(height: 50)

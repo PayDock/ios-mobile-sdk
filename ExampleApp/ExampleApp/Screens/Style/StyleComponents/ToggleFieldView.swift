@@ -26,6 +26,8 @@ struct ToggleFieldView: View {
                     onChange()
                 }
                 .frame(width: 80.0)
+                .accessibilityIdentifier("Toggle_\(title)")
+                .accessibilityLabel(title)
         }
         .padding(.horizontal, 16.0)
         .padding(.vertical, 8.0)
