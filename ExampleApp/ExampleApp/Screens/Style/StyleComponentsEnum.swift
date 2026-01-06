@@ -173,20 +173,8 @@ enum StyleComponentsEnum {
                 stylingDarkMode: stylingDarkMode,
                 textKeyPath: \.title,
                 title: title))
-        case .card:
-            return AnyView(TextStyleView<CardDetailsWidgetAppearance>(
-                selectedWidget: selectedWidget,
-                stylingDarkMode: stylingDarkMode,
-                textKeyPath: \.title,
-                title: title))
         case .address:
             return AnyView(TextStyleView<AddressWidgetAppearance>(
-                selectedWidget: selectedWidget,
-                stylingDarkMode: stylingDarkMode,
-                textKeyPath: \.title,
-                title: title))
-        case .giftCard:
-            return AnyView(TextStyleView<GiftCardWidgetAppearance>(
                 selectedWidget: selectedWidget,
                 stylingDarkMode: stylingDarkMode,
                 textKeyPath: \.title,
