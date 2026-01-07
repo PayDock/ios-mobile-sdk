@@ -13,13 +13,15 @@ public struct PayPalVaultAppearance: ActionButtonStylableAppearance {
 
     public var actionButton: Theme.ButtonAppearance
 
-    public init(button: Theme.ButtonAppearance = .init(
-        colors: .init(background: .clear, text: .defaultPrimary, image: .defaultPrimary, border: .defaultPrimary),
-        dimensions: GlobalTheme.shared.globalTheme.actionButton.dimensions,
-        fonts: GlobalTheme.shared.globalTheme.actionButton.fonts,
-        loader: .init(spinnerColor: .defaultPrimary),
-        icon: Image("link", bundle: MobileSDK.bundle),
-        text: "Link PayPal account")) {
-            self.actionButton = button
-        }
+    public init(button: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton) {
+        // Custom
+        self.actionButton = button
+        self.actionButton.colors.background = .clear
+        self.actionButton.colors.text = .defaultPrimary
+        self.actionButton.colors.image = .defaultPrimary
+        self.actionButton.colors.border = .defaultPrimary
+        self.actionButton.loader = .init(spinnerColor: .defaultPrimary)
+        self.actionButton.icon = Image("link", bundle: MobileSDK.bundle)
+        self.actionButton.text = "Link PayPal account"
+    }
 }
