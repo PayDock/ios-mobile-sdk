@@ -30,13 +30,12 @@ public struct CardDetailsWidgetAppearance:
     public var toggleText: Theme.TextAppearance
     public var linkText: Theme.TextAppearance
 
-    public init(verticalSpacing: CGFloat = 16,
-                horizontalSpacing: CGFloat = 16,
-                textFieldVerticalSpacing: CGFloat = 8,
+    public init(verticalSpacing: CGFloat = GlobalTheme.shared.globalTheme.verticalSpacing,
+                horizontalSpacing: CGFloat = GlobalTheme.shared.globalTheme.horizontalSpacing,
+                textFieldVerticalSpacing: CGFloat = GlobalTheme.shared.globalTheme.textFieldVerticalSpacing,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                actionButton: Theme.ButtonAppearance = .init(
-                    text: "Submit"),
+                actionButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
                 toolbarButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.toolbarButton,
                 toggle: Theme.ToggleAppearance = GlobalTheme.shared.globalTheme.toggle,
                 toggleText: Theme.TextAppearance = GlobalTheme.shared.globalTheme.toggleText,
@@ -46,10 +45,13 @@ public struct CardDetailsWidgetAppearance:
         self.textFieldVerticalSpacing = textFieldVerticalSpacing
         self.title = title
         self.textField = textField
-        self.actionButton = actionButton
         self.toolbarButton = toolbarButton
         self.toggle = toggle
         self.toggleText = toggleText
         self.linkText = linkText
+
+        // Custom
+        self.actionButton = actionButton
+        self.actionButton.text = "Submit"
     }
 }

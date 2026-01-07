@@ -2,15 +2,11 @@
 //  WidgetsView.swift
 //  ExampleApp
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 05.07.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
 struct WidgetsView: View {
-
-    @StateObject private var viewModel = WidgetsVM()
 
     init() {
         styleNavigation()
