@@ -27,8 +27,8 @@ class StyleVM: ObservableObject {
         switch widget {
         case .all: return [.actionButton, .expandSectionButton, .linkText, .loader, .searchDropdown,
                            .textField, .title, .toggle, .toggleText, .toolbarButton]
-        case .card: return [.actionButton, .linkText, .spacings, .textField, .title, .toggle, .toggleText, .toolbarButton]
-        case .giftCard: return [.actionButton, .spacings, .textField, .title, .toolbarButton]
+        case .card: return [.actionButton, .linkText, .spacings, .textField, .toggle, .toggleText, .toolbarButton]
+        case .giftCard: return [.actionButton, .spacings, .textField, .toolbarButton]
         case .address: return [.actionButton, .expandSectionButton, .searchDropdown, .spacings, .textField, .title]
         case .applePay: return [.applePay]
         case .paypal: return [.payPal, .buttonLoader]
