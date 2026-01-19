@@ -1,0 +1,162 @@
+//
+//  ChargesService.swift
+//  DataCharges
+//
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
+
+import CommonModels
+import Foundation
+import NetworkingLib
+
+public protocol ChargesService {
+
+    // MARK: - ExampleApp Methods (apiAccessToken)
+
+    func initialiseWalletCharge(initializeWalletChargeReq: InitialiseWalletChargeReq, apiAccessToken: String) async throws -> String
+    func initialiseColesPayWalletCharge(
+        initializeWalletChargeReq: InitialiseWalletChargeReq, apiAccessToken: String) async throws -> InitialiseWalletData
+    func captureCharge(request: CaptureChargeReq, apiAccessToken: String) async throws -> CaptureChargeResource
+    func captureChargeForStandaloneFlow(
+        request: CaptureChargeStandaloneReq, apiAccessToken: String
+    ) async throws -> CaptureChargeResource
+    func captureChargeColesPay(chargeId: String, apiAccessToken: String) async throws -> CaptureChargeResource
+
+    // MARK: - MobileSDK Wallet Methods (widgetAccessToken)
+
+    func captureWalletCharge(widgetAccessToken: String, paymentMethodId: String?, refToken: String?) async throws -> WalletCaptureChargeData
+    func getWalletCallback(widgetAccessToken: String, shipping: Bool) async throws -> String
+    func getColesPayCallback(widgetAccessToken: String) async throws -> String
+    func getPayPalCallback(widgetAccessToken: String, shipping: Bool) async throws -> String
+    func getAfterpayCallback(widgetAccessToken: String) async throws -> String
+    func declineWalletTransaction(widgetAccessToken: String, chargeId: String) async throws -> String
+}
+
+public struct ChargesServiceImpl: HTTPClient, ChargesService {
+
+    public init() {}
+
+    public func initialiseWalletCharge(
+        initializeWalletChargeReq: InitialiseWalletChargeReq, apiAccessToken: String
+    ) async throws -> String {
+        let endpoint = ChargesEndpoints.initialiseWalletCharge(
+            initialiseWalletChargeReq: initializeWalletChargeReq, apiAccessToken: apiAccessToken
+        )
+        let response = try await sendRequest(
+            endpoint: endpoint,
+            responseModel: InitialiseWalletChargeRes.self)
+        return response.resource.data.token
+    }
+
+    public func initialiseColesPayWalletCharge(
+        initializeWalletChargeReq: InitialiseWalletChargeReq, apiAccessToken: String
+    ) async throws -> InitialiseWalletData {
+        let endpoint = ChargesEndpoints.initialiseColesPayWalletCharge(
+            initialiseWalletChargeReq: initializeWalletChargeReq, apiAccessToken: apiAccessToken
+        )
+        let response = try await sendRequest(
+            endpoint: endpoint,
+            responseModel: InitialiseWalletChargeRes.self)
+        return response.resource.data
+    }
+
+    public func captureCharge(request: CaptureChargeReq, apiAccessToken: String) async throws -> CaptureChargeResource {
+        let endpoint = ChargesEndpoints.captureCharge(request: request, apiAccessToken: apiAccessToken)
+        let response = try await sendRequest(
+            endpoint: endpoint,
+            responseModel: CaptureChargeRes.self)
+        return response.resource
+    }
+
+    public func captureChargeForStandaloneFlow(
+        request: CaptureChargeStandaloneReq, apiAccessToken: String
+    ) async throws -> CaptureChargeResource {
+        let endpoint = ChargesEndpoints.captureChargeForStandalone(request: request, apiAccessToken: apiAccessToken)
+        let response = try await sendRequest(
+            endpoint: endpoint,
+            responseModel: CaptureChargeRes.self)
+        return response.resource
+    }
+
+    public func captureChargeColesPay(chargeId: String, apiAccessToken: String) async throws -> CaptureChargeResource {
+        let endpoint = ChargesEndpoints.captureChargeColesPay(chargeId: chargeId, apiAccessToken: apiAccessToken)
+        let response = try await sendRequest(
+            endpoint: endpoint,
+            responseModel: CaptureChargeRes.self)
+        return response.resource
+    }
+
+    // MARK: - MobileSDK Wallet Methods
+
+    public func captureWalletCharge(
+        widgetAccessToken: String, paymentMethodId: String?, refToken: String?
+    ) async throws -> WalletCaptureChargeData {
+        let walletCaptureReq = CaptureWalletChargeReq(
+            paymentMethodId: paymentMethodId,
+            customer: .init(paymentSource: .init(refToken: refToken))
+        )
+
+        let response = try await sendRequest(
+            endpoint: ChargesEndpoints.walletCapture(
+                capture: true, walletCaptureReq: walletCaptureReq, widgetAccessToken: widgetAccessToken
+            ),
+            responseModel: WalletCaptureRes.self)
+
+        return response.resource.data
+    }
+
+    public func getWalletCallback(widgetAccessToken: String, shipping: Bool) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_TRANSACTION")
+
+        let response = try await sendRequest(
+            endpoint: ChargesEndpoints.walletCallback(
+                walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
+            ),
+            responseModel: WalletCallbackRes.self)
+
+        return response.resource.data.refToken
+    }
+
+    public func getColesPayCallback(widgetAccessToken: String) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_SESSION")
+
+        let response = try await sendRequest(
+            endpoint: ChargesEndpoints.walletCallback(
+                walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
+            ),
+            responseModel: ColesPayCallbackRes.self)
+
+        return response.resource.data.id
+    }
+
+    public func getPayPalCallback(widgetAccessToken: String, shipping: Bool) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_TRANSACTION")
+
+        let response = try await sendRequest(
+            endpoint: ChargesEndpoints.walletCallback(
+                walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
+            ),
+            responseModel: PayPalCallbackRes.self)
+
+        return response.resource.data.id
+    }
+
+    public func getAfterpayCallback(widgetAccessToken: String) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_SESSION")
+
+        let response = try await sendRequest(
+            endpoint: ChargesEndpoints.walletCallback(
+                walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
+            ),
+            responseModel: AfterpayCallbackRes.self)
+
+        return response.resource.data.refToken
+    }
+
+    public func declineWalletTransaction(widgetAccessToken: String, chargeId: String) async throws -> String {
+        let endpoint = ChargesEndpoints.declineWalletTransaction(
+            chargeId: chargeId, widgetAccessToken: widgetAccessToken
+        )
+        let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self)
+        return response.resource.data.status
+    }
+}

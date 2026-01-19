@@ -9,25 +9,27 @@
 import XCTest
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataGateways
 
 class PayPalDataCollectorUtilTests: XCTestCase {
 
     var mockConfig: PayPalDataCollectorConfig!
-    var mockService: GatewayServiceMock!
+    var mockService: GatewayMockService!
 
     override func setUp() {
         super.setUp()
         mockConfig = PayPalDataCollectorConfig(accessToken: "testAccessToken", gatewayId: "testGateway")
-        mockService = GatewayServiceMock()
+        mockService = GatewayMockService()
         MobileSDK.shared.configureMobileSDK(config: MobileSDKConfig(environment: .sandbox))
     }
 
     func testInitializeDataCollector_Success() async throws {
+        mockService.clientIdResult = "mock-paypal-client-id-123"
         let util = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: mockService)
 
         XCTAssertNotNil(util)
         XCTAssertEqual(util.clientId,
-                       mockService.clientId,
+                       mockService.clientIdResult,
                        "Client ID should match the expected mock client ID.")
     }
 
@@ -35,7 +37,7 @@ class PayPalDataCollectorUtilTests: XCTestCase {
         mockService.shouldReturnError = true
         mockService.errorToReturn = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Test error", code: "ERROR"),
+            error: .init(message: "Test error", code: "ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )

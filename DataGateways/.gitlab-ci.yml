@@ -1,0 +1,116 @@
+# Stages:
+# Defines the stages of the pipeline. Jobs within the same stage run in parallel.
+# Jobs in subsequent stages run after the previous stage has completed successfully.
+stages:
+  - quality # Stage for code quality checks (e.g., linting, static analysis).
+  - test # Stage for running unit tests.
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+  GIT_STRATEGY: clone
+  
+.macos_saas_runners:
+  tags:
+    - saas-macos-large-m2pro
+  image: macos-15-xcode-16
+
+# .setup_bundler:
+# This is a hidden job template that sets up the Ruby Bundler environment.
+# It is used by other jobs to ensure they have the necessary Ruby dependencies.
+.setup_bundler:
+  cache:
+    paths:
+      - vendor/bundle # Caches the Ruby dependencies to speed up subsequent runs.
+  before_script:
+    - chmod +x scripts/setup_bundler.sh # Ensure it is executable in CI
+    - scripts/setup_bundler.sh # Run the script
+  script:
+    - bundle --version # Checks the version of Bundler.
+
+runLint:
+  variables:
+    CODE_CLIMATE_REPORT_PATH: "fastlane/swiftlint_report.json"
+  extends:
+    - .macos_saas_runners
+  stage: quality
+  before_script:
+    - brew install swiftlint
+    - brew install gnu-sed
+  script:
+    - fastlane lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  artifacts:
+    when: always
+    paths:
+      - "$CODE_CLIMATE_REPORT_PATH"
+    reports:
+      codequality: "$CODE_CLIMATE_REPORT_PATH"
+
+## This job runs the DataGateways unit tests and generates coverage reports.
+## Coverage comparison is automatically shown in MRs by GitLab.
+run_DataGateways_tests:
+  extends:
+    - .macos_saas_runners
+    - .setup_bundler
+  stage: test
+  script:
+    # 👇 Allow SwiftPM plugins in CI
+    - defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
+    # Optional sanity: confirm setting was applied
+    - defaults read com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation || true
+
+    - bundle exec fastlane testPackage
+    - mv fastlane/test_output/report.junit fastlane/test_output/report.xml
+
+    # Generate coverage reports in multiple formats
+    - xcrun xccov view --report --json fastlane/test_output/DataGatewaysPackageTests.xcresult > fastlane/test_output/coverage.json
+    - "COVERAGE=$(xcrun xccov view --report fastlane/test_output/DataGatewaysPackageTests.xcresult | grep 'DataGateways ' | awk '{print $2}'); echo Coverage: $COVERAGE"
+    
+    # Convert to Cobertura XML format for GitLab coverage visualization
+    - python3 scripts/xccov-to-cobertura.py fastlane/test_output/coverage.json > fastlane/test_output/cobertura.xml
+    
+    # Generate HTML coverage report
+    - python3 scripts/generate-coverage-html.py fastlane/test_output/coverage.json fastlane/test_output/coverage-html
+  coverage: '/\d+\.\d+%/'
+  rules:
+    - when: on_success # Run on all pipelines (MRs and pushes) for coverage comparison
+  artifacts:
+    expire_in: 7 days
+    when: always
+    reports:
+      junit: fastlane/test_output/report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: fastlane/test_output/cobertura.xml
+    paths:
+      - fastlane/test_output
+
+# GitLab Pages job to publish HTML coverage reports
+# This makes the coverage report accessible via GitLab Pages URL
+pages:
+  stage: test
+  image: alpine:latest
+  dependencies:
+    - run_DataGateways_tests
+  needs:
+    - job: run_DataGateways_tests
+      artifacts: true
+  script:
+    - echo "Publishing coverage report to GitLab Pages"
+    - mkdir -p public
+    - ls -la fastlane/test_output/ || echo "No test_output directory"
+    - ls -la fastlane/test_output/coverage-html/ || echo "No coverage-html directory"
+    - cp -r fastlane/test_output/coverage-html/* public/ 2>/dev/null || echo "No coverage HTML report found, creating placeholder"
+    - test -f public/index.html || echo "<html><body><h1>Coverage Report Not Available</h1><p>Coverage report will be available after the next successful test run on main branch.</p></body></html>" > public/index.html
+    - ls -la public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_success
+
+

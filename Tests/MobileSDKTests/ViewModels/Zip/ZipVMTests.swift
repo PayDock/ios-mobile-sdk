@@ -10,12 +10,13 @@ import XCTest
 import Combine
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataPaymentSources
 
 @MainActor
 class ZipVMTests: XCTestCase {
 
     var viewModel: ZipVM!
-    var mockPaymentSourcesService: PaymentSourcesServiceMock!
+    var mockPaymentSourcesService: PaymentSourcesMockService!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -25,7 +26,7 @@ class ZipVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockPaymentSourcesService = PaymentSourcesServiceMock()
+        mockPaymentSourcesService = PaymentSourcesMockService()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
@@ -202,8 +203,7 @@ class ZipVMTests: XCTestCase {
         // Given
         let expectedUrl = "https://test.zip.co/checkout?token=test_token"
         let expectedCheckoutToken = "checkout_token_123"
-        mockPaymentSourcesService.zipCheckoutUrl = expectedUrl
-        mockPaymentSourcesService.zipCheckoutToken = expectedCheckoutToken
+        mockPaymentSourcesService.externalCheckoutResult = (link: expectedUrl, checkoutToken: expectedCheckoutToken)
 
         // When
         viewModel.createZipCheckout()
@@ -221,12 +221,12 @@ class ZipVMTests: XCTestCase {
         // Given
         let errorRes = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Invalid request", code: "INVALID_REQUEST"),
+            error: .init(message: "Invalid request", code: "INVALID_REQUEST", details: nil),
             resource: nil,
             errorSummary: nil
         )
-        mockPaymentSourcesService.shouldReturnZipError = true
-        mockPaymentSourcesService.zipRequestErrorToReturn = errorRes
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = errorRes
 
         // When
         viewModel.createZipCheckout()
@@ -283,8 +283,7 @@ class ZipVMTests: XCTestCase {
 
     func testHandleButtonTap() async {
         // Given
-        mockPaymentSourcesService.zipCheckoutUrl = "https://test.zip.co/checkout"
-        mockPaymentSourcesService.zipCheckoutToken = "checkout_token"
+        mockPaymentSourcesService.externalCheckoutResult = (link: "https://test.zip.co/checkout", checkoutToken: "checkout_token")
 
         // When
         viewModel.handleButtonTap()
@@ -300,9 +299,8 @@ class ZipVMTests: XCTestCase {
 
     func testHandleZipConfirmationSuccess() async {
         // Given - First create checkout to get checkout token
-        mockPaymentSourcesService.zipCheckoutUrl = "https://test.zip.co/checkout"
-        mockPaymentSourcesService.zipCheckoutToken = "checkout_token_123"
-        mockPaymentSourcesService.zipPaymentSourceToken = "payment_source_token_456"
+        mockPaymentSourcesService.externalCheckoutResult = (link: "https://test.zip.co/checkout", checkoutToken: "checkout_token_123")
+        mockPaymentSourcesService.paymentSourceTokenResult = "payment_source_token_456"
 
         viewModel.createZipCheckout()
         try? await Task.sleep(nanoseconds: 100_000_000)
@@ -358,20 +356,19 @@ class ZipVMTests: XCTestCase {
 
     func testHandleZipConfirmationRequestError() async {
         // Given - Setup checkout token first
-        mockPaymentSourcesService.zipCheckoutUrl = "https://test.zip.co/checkout"
-        mockPaymentSourcesService.zipCheckoutToken = "checkout_token_123"
+        mockPaymentSourcesService.externalCheckoutResult = (link: "https://test.zip.co/checkout", checkoutToken: "checkout_token_123")
 
         viewModel.createZipCheckout()
         try? await Task.sleep(nanoseconds: 100_000_000)
 
         let errorRes = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "Payment source creation failed", code: "TOKEN_ERROR"),
+            error: .init(message: "Payment source creation failed", code: "TOKEN_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
-        mockPaymentSourcesService.shouldReturnZipPaymentTokenError = true
-        mockPaymentSourcesService.zipPaymentTokenErrorToReturn = errorRes
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = errorRes
 
         let callbackData = ZipCallbackData(
             status: .approved,
@@ -403,13 +400,12 @@ class ZipVMTests: XCTestCase {
 
     func testHandleZipConfirmationUnknownPaymentTokenError() async {
         // Given - Setup checkout token first
-        mockPaymentSourcesService.zipCheckoutUrl = "https://test.zip.co/checkout"
-        mockPaymentSourcesService.zipCheckoutToken = "checkout_token_123"
+        mockPaymentSourcesService.externalCheckoutResult = (link: "https://test.zip.co/checkout", checkoutToken: "checkout_token_123")
 
         viewModel.createZipCheckout()
         try? await Task.sleep(nanoseconds: 100_000_000)
 
-        mockPaymentSourcesService.shouldThrowPaymentTokenUnknownError = true
+        mockPaymentSourcesService.shouldThrowUnknownError = true
 
         let callbackData = ZipCallbackData(
             status: .approved,
@@ -558,10 +554,10 @@ class ZipVMTests: XCTestCase {
 
     func testErrorRecoveryAfterFailedCheckout() async {
         // Given - Initial failure
-        mockPaymentSourcesService.shouldReturnZipError = true
-        mockPaymentSourcesService.zipRequestErrorToReturn = ErrorRes(
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Initial error", code: "ERROR"),
+            error: .init(message: "Initial error", code: "ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
@@ -573,9 +569,8 @@ class ZipVMTests: XCTestCase {
 
         // When - Retry with success
         completionResult = nil
-        mockPaymentSourcesService.shouldReturnZipError = false
-        mockPaymentSourcesService.zipCheckoutUrl = "https://test.zip.co/checkout"
-        mockPaymentSourcesService.zipCheckoutToken = "checkout_token"
+        mockPaymentSourcesService.shouldReturnError = false
+        mockPaymentSourcesService.externalCheckoutResult = (link: "https://test.zip.co/checkout", checkoutToken: "checkout_token")
 
         viewModel.createZipCheckout()
         try? await Task.sleep(nanoseconds: 100_000_000)

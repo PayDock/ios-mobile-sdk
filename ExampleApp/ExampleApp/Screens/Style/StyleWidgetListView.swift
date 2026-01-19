@@ -21,7 +21,7 @@ struct StyleWidgetListView: View {
             StyleWidgetItem(widget: .applePay),
             StyleWidgetItem(widget: .paypal),
             StyleWidgetItem(widget: .giftCard),
-            StyleWidgetItem(widget: .integrated3ds),
+            StyleWidgetItem(widget: .mpgs3ds),
             StyleWidgetItem(widget: .standalone3ds),
             StyleWidgetItem(widget: .colesPay),
             StyleWidgetItem(widget: .afterPay),

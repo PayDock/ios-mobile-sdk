@@ -9,12 +9,13 @@ import XCTest
 import Combine
 import NetworkingLib
 @testable import MobileSDK
+@testable import DataPaymentSources
 
 // swiftlint:disable all
 @MainActor
 class CardDetailsVMTests: XCTestCase {
     private var viewModel: CardDetailsVM!
-    private var mockService: PaymentSourcesServiceMock!
+    private var mockService: PaymentSourcesMockService!
     private var config: SaveCardConfig!
     private var viewState: ViewState!
     private var loadingDelegate: WidgetLoadingDelegateUtil!
@@ -24,7 +25,7 @@ class CardDetailsVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockService = PaymentSourcesServiceMock()
+        mockService = PaymentSourcesMockService()
         config = SaveCardConfig(
             consentText: "Remember",
             privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
@@ -232,7 +233,7 @@ class CardDetailsVMTests: XCTestCase {
             self.failure = failure
         }
 
-        func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String) async throws -> String {
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
             switch failure {
 
             case .connectionError(let urlError):
@@ -246,23 +247,23 @@ class CardDetailsVMTests: XCTestCase {
             }
         }
 
-        func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
             return ""
         }
 
-        func createSetupTokenData(req: PayPalVaultSetupTokenReq, accessToken: String) async throws -> PayPalVaultSetupTokenRes.SetupTokenData {
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
             fatalError("Not implemented")
         }
 
-        func createPaymentToken(request: PayPalVaultPaymentTokenReq, setupToken: String, accessToken: String) async throws -> PayPalVaultPaymentTokenRes.PaymentTokenData {
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
             fatalError("Not implemented")
         }
 
-        func initialiseExternalCheckout(accessToken: String, config: ZipConfig) async throws -> (link: String, checkoutToken: String) {
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
             fatalError("Not implemented")
         }
 
-        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, accessToken: String) async throws -> String {
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
             fatalError("Not implemented")
         }
     }

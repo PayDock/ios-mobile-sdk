@@ -11,13 +11,14 @@ import Combine
 import Afterpay
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataCharges
 
 @MainActor
 // swiftlint:disable file_length
 class AfterPayVMTests: XCTestCase {
 
     var viewModel: AfterpayVM!
-    var mockWalletService: WalletServiceMock!
+    var mockChargesService: ChargesMockService!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -28,7 +29,7 @@ class AfterPayVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockWalletService = WalletServiceMock()
+        mockChargesService = ChargesMockService()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
@@ -70,7 +71,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectShippingOption: {_, _ in
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -81,7 +82,7 @@ class AfterPayVMTests: XCTestCase {
 
     override func tearDown() {
         viewModel = nil
-        mockWalletService = nil
+        mockChargesService = nil
         viewState = nil
         loadingDelegate = nil
         eventDelegate = nil
@@ -112,7 +113,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -132,7 +133,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -152,7 +153,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,
             completion: { result in
@@ -184,7 +185,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: nil,
             eventDelegate: nil,
             completion: { result in
@@ -223,7 +224,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -379,18 +380,16 @@ class AfterPayVMTests: XCTestCase {
         XCTAssertFalse(loadingDelegate.isLoading, "Loading should be stopped after error")
     }
 
-    func testCompletionHandlerReceivesWalletServiceCaptureChargeError() {
+    func testCompletionHandlerReceivesChargesServiceCaptureChargeError() {
         // Given
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Charge failed", code: "CHARGE_ERROR"),
+            error: .init(message: "Charge failed", code: "CHARGE_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
         let expectedError = AfterpayError.errorCapturingCharge(error: errorRes)
-        mockWalletService.shouldReturnError = true
-        mockWalletService.errorToReturn = expectedError
 
         // When
         viewModel.handleButtonTap()
@@ -419,13 +418,11 @@ class AfterPayVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "URL fetch failed", code: "URL_ERROR"),
+            error: .init(message: "URL fetch failed", code: "URL_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
         let expectedError = AfterpayError.errorFetchingAfterpayUrl(error: errorRes)
-        mockWalletService.shouldReturnError = true
-        mockWalletService.errorToReturn = expectedError
 
         // When
         viewModel.handleButtonTap()
@@ -454,7 +451,7 @@ class AfterPayVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "Unknown network error", code: "UNKNOWN_ERROR"),
+            error: .init(message: "Unknown network error", code: "UNKNOWN_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
@@ -516,13 +513,11 @@ class AfterPayVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Cancel failed", code: "CANCEL_ERROR"),
+            error: .init(message: "Cancel failed", code: "CANCEL_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
         let expectedError = AfterpayError.errorCancelingTransaction(error: errorRes)
-        mockWalletService.shouldReturnError = true
-        mockWalletService.errorToReturn = expectedError
 
         // When
         viewModel.handleButtonTap()
@@ -581,7 +576,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { _ in
@@ -610,7 +605,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -644,7 +639,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,
             completion: { result in

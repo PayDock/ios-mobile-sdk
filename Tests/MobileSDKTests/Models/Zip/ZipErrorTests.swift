@@ -16,7 +16,7 @@ class ZipErrorTests: XCTestCase {
         // Given
         let errorRes = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Invalid gateway", code: "INVALID_GATEWAY"),
+            error: .init(message: "Invalid gateway", code: "INVALID_GATEWAY", details: nil),
             resource: nil,
             errorSummary: nil
         )
@@ -33,7 +33,7 @@ class ZipErrorTests: XCTestCase {
         // Given
         let errorRes = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "Charge failed", code: "CHARGE_ERROR"),
+            error: .init(message: "Charge failed", code: "CHARGE_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )

@@ -98,7 +98,7 @@ struct ProjectEnvironment {
 
     func getMPGSGatewayId() -> String? {
         guard let gatewayId = Self.infoDictionary[Keys.mpgsGatewayId] as? String else {
-            print("Integrated 3DS gateway ID not found in .plist!")
+            print("MPGS gateway ID not found in .plist!")
             return nil
         }
         return gatewayId
@@ -106,7 +106,7 @@ struct ProjectEnvironment {
 
     func getMPGSTestGatewayId() -> String? {
         guard let gatewayId = Self.infoDictionary[Keys.mpgsTestGatewayId] as? String else {
-            print("Integrated 3DS gateway ID not found in .plist!")
+            print("MPGS test gateway ID not found in .plist!")
             return nil
         }
         return gatewayId

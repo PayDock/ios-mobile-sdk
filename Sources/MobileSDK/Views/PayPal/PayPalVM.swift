@@ -10,14 +10,16 @@ import SwiftUI
 import NetworkingLib
 import PayPalWebPayments
 import CorePayments
+import DataGateways
+import DataCharges
 
 @MainActor
 class PayPalVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
-    private let gatewayService: GatewayService
+    private let chargesService: DataCharges.ChargesService
+    private let gatewayService: DataGateways.GatewayService
     private let config: PayPalWidgetConfig
 
     // MARK: - Properties
@@ -40,15 +42,15 @@ class PayPalVM: ObservableObject {
     init(config: PayPalWidgetConfig,
          viewState: ViewState,
          tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
-         walletService: WalletService = WalletServiceImpl(),
-         gatewayService: GatewayService = GatewayServiceImpl(),
+         chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
+         gatewayService: DataGateways.GatewayService = DataGateways.GatewayServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self.config = config
         self.viewState = viewState
         self.tokenRequest = tokenRequest
-        self.walletService = walletService
+        self.chargesService = chargesService
         self.gatewayService = gatewayService
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
@@ -112,7 +114,7 @@ class PayPalVM: ObservableObject {
     func getOrderId(token: String) async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await walletService.getCallback(token: token, shipping: false)
+            return try await chargesService.getPayPalCallback(widgetAccessToken: token, shipping: false)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             updateLoadingState(isLoading: false)
@@ -128,7 +130,7 @@ class PayPalVM: ObservableObject {
     func getClientId() async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await gatewayService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+            return try await gatewayService.getClientId(gatewayId: config.gatewayId, widgetAccessToken: config.accessToken)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.getPayPalClientId(error: errorResponse)))
@@ -152,13 +154,17 @@ class PayPalVM: ObservableObject {
 
         Task {
             do {
-                let charge = try await walletService.captureCharge(
-                    token: token,
+                let walletChargeData = try await chargesService.captureWalletCharge(
+                    widgetAccessToken: token,
                     paymentMethodId: paymentMethodId,
-                    payerId: payerId,
                     refToken: nil)
+                let chargeResponse = ChargeResponse(
+                    status: walletChargeData.status,
+                    amount: walletChargeData.amount,
+                    currency: walletChargeData.currency
+                )
 
-                self.completion(.success(charge))
+                self.completion(.success(chargeResponse))
                 updateLoadingState(isLoading: false)
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
