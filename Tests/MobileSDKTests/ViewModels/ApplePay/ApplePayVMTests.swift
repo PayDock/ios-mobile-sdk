@@ -10,12 +10,13 @@ import XCTest
 import PassKit
 import Combine
 @testable import MobileSDK
+@testable import DataCharges
 
 @MainActor
 class ApplePayVMTests: XCTestCase {
 
     var viewModel: ApplePayVM!
-    var mockWalletService: WalletServiceMock!
+    var mockChargesService: ChargesMockService!
     var eventDelegate: WidgetEventDelegateUtil!
     var completionResult: Result<ChargeResponse, ApplePayError>?
     var createPaymentRequestResult: Result<ApplePayRequestResult, ApplePayRequestError>?
@@ -23,7 +24,7 @@ class ApplePayVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockWalletService = WalletServiceMock()
+        mockChargesService = ChargesMockService()
         eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
         createPaymentRequestResult = nil
@@ -32,7 +33,7 @@ class ApplePayVMTests: XCTestCase {
 
     override func tearDown() {
         viewModel = nil
-        mockWalletService = nil
+        mockChargesService = nil
         eventDelegate = nil
         completionResult = nil
         createPaymentRequestResult = nil
@@ -53,7 +54,7 @@ class ApplePayVMTests: XCTestCase {
                     completion(.success(result))
                 }
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             completion: { result in
                 self.completionResult = result
 
@@ -157,7 +158,7 @@ class ApplePayVMTests: XCTestCase {
         // Given
         setupViewModelWithValidRequest()
         let mockPayment = createMockPayment()
-        mockWalletService.shouldReturnError = false
+        mockChargesService.shouldReturnError = false
 
         let expectation = XCTestExpectation(description: "Payment authorization completion")
 
@@ -176,9 +177,9 @@ class ApplePayVMTests: XCTestCase {
 
         // Verify the completion was called with success during captureCharge
         if case .success(let result) = completionResult {
-            XCTAssertEqual(result.status, "")
-            XCTAssertEqual(result.amount, 1.0)
-            XCTAssertEqual(result.currency, "")
+            XCTAssertEqual(result.status, "complete")
+            XCTAssertEqual(result.amount, 50.0)
+            XCTAssertEqual(result.currency, "AUD")
         } else {
             XCTFail("Expected success completion result from captureCharge")
         }
@@ -297,7 +298,7 @@ class ApplePayVMTests: XCTestCase {
                 let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
                 completion(.success(result))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             completion: { result in
                 self.completionResult = result
             }
@@ -328,7 +329,7 @@ class ApplePayVMTests: XCTestCase {
                 let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
                 completion(.success(result))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             completion: { result in
                 self.completionResult = result
             }
@@ -371,7 +372,7 @@ class ApplePayVMTests: XCTestCase {
                     completion(.success(result))
                 }
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             completion: { result in
                 self.completionResult = result
                 expectation.fulfill()
@@ -386,7 +387,7 @@ class ApplePayVMTests: XCTestCase {
                 let result = ApplePayRequestResult(request: mockPaymentRequest, token: "test_token")
                 completion(.success(result))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             completion: { result in
                 self.completionResult = result
                 expectation.fulfill()

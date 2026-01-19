@@ -56,5 +56,4 @@ public struct AfterpaySdkConfig {
             self.country = country
         }
     }
-
 }

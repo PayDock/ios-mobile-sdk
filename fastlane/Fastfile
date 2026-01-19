@@ -3,10 +3,19 @@ default_platform :ios
 # Fastlane runs all built in actions from one directory above where the Fastfile lives 
 # so make sure all the paths are relative in that regard.
 
+require 'json'
+require 'rexml/document'
+require 'fileutils'
+
 # --- Code Quality Lanes ---
 
 desc "Static analysis of the project. Configure the options in .swiftlint.yml"
 lane :lint do
+  # Ensure fastlane directory exists
+  FileUtils.mkdir_p("fastlane")
+  
+  # Lint entire project (includes all packages)
+  # SwiftLint automatically discovers and lints all Swift files recursively
   swiftlint(
     mode: :lint,
     config_file: ".swiftlint.yml",
@@ -24,19 +33,128 @@ desc "Configure the .env.default file in this directory before you run the test 
 desc "Info on the .env files and how to use them can be found here: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Advanced.md#environment-variables"
 lane :test do
   ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "240"
+  
+  # Run ExampleApp tests
+  # Ensure test_output directory exists
+  FileUtils.mkdir_p("fastlane/test_output")
+  
   run_tests(
     project: "ExampleApp/ExampleApp.xcodeproj",
     scheme: "ExampleApp",
     configuration: "Debug (Staging)",
-    devices: ["iPhone 16"],
-        only_testing: [
-        "ExampleAppTests"
+    destination: "platform=iOS Simulator,name=iPhone 16,OS=18.6",
+    only_testing: [
+      "ExampleAppTests"
     ],
     xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     output_types: "junit",
     output_directory: "fastlane/test_output"
   )
+  
+  # Run tests for all packages
+  test_all_packages
+end
+
+private_lane :test_all_packages do
+  packages = [
+    { name: "CommonModels", scheme: "CommonModelsPackageTests" },
+    { name: "DataCharges", scheme: "DataChargesPackageTests" },
+    { name: "DataCustomer", scheme: "DataCustomerPackageTests" },
+    { name: "DataGateways", scheme: "DataGatewaysPackageTests" },
+    { name: "DataMPGS3ds", scheme: "DataMPGS3dsPackageTests" },
+    { name: "DataPaymentSources", scheme: "DataPaymentSourcesPackageTests" },
+    { name: "DataStandalone3ds", scheme: "DataStandalone3dsPackageTests" },
+    { name: "DataVault", scheme: "DataVaultPackageTests" }
+  ]
+  
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  
+  packages.each do |package|
+    package_path = "#{package[:name]}/Package.swift"
+    if File.exist?(package_path)
+      UI.message("Running tests for #{package[:name]}...")
+      
+      Dir.chdir(package[:name]) do
+        begin
+          run_tests(
+            package_path: ".",
+            scheme: package[:scheme],
+            destination: "platform=iOS Simulator,name=iPhone 16,OS=18.6",
+            xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
+            result_bundle: true,
+            code_coverage: true,
+            output_types: "junit",
+            output_directory: "fastlane/test_output"
+          )
+          
+          # Copy test report to main test_output directory
+          package_report = "fastlane/test_output/report.junit"
+          if File.exist?(package_report)
+            main_report_dir = "../fastlane/test_output"
+            FileUtils.mkdir_p(main_report_dir)
+            FileUtils.cp(package_report, "#{main_report_dir}/#{package[:name]}_report.junit")
+          end
+        rescue => e
+          UI.important("⚠️ Tests failed for #{package[:name]}: #{e.message}")
+          # Continue with other packages
+        end
+      end
+    else
+      UI.important("⚠️ No Package.swift found for #{package[:name]}, skipping")
+    end
+  end
+  
+  # Merge all JUnit reports
+  merge_junit_reports
+end
+
+private_lane :merge_junit_reports do
+  packages = ["CommonModels", "DataCharges", "DataCustomer", "DataGateways", "DataMPGS3ds", "DataPaymentSources", "DataStandalone3ds", "DataVault"]
+  
+  # Start with ExampleApp report
+  main_report_path = "fastlane/test_output/report.junit"
+  merged_testsuites = []
+  
+  # Read main ExampleApp report
+  if File.exist?(main_report_path)
+    begin
+      main_doc = REXML::Document.new(File.read(main_report_path))
+      main_doc.root.elements.each("testsuite") do |testsuite|
+        merged_testsuites << testsuite
+      end
+    rescue => e
+      UI.important("⚠️ Failed to parse main test report: #{e.message}")
+    end
+  end
+  
+  # Merge each package report
+  packages.each do |package|
+    package_report_path = "fastlane/test_output/#{package}_report.junit"
+    if File.exist?(package_report_path)
+      begin
+        package_doc = REXML::Document.new(File.read(package_report_path))
+        package_doc.root.elements.each("testsuite") do |testsuite|
+          merged_testsuites << testsuite
+        end
+      rescue => e
+        UI.important("⚠️ Failed to merge report for #{package}: #{e.message}")
+      end
+    end
+  end
+  
+  # Create merged document
+  merged_doc = REXML::Document.new
+  testsuites_elem = merged_doc.add_element("testsuites")
+  
+  # Add all testsuites
+  merged_testsuites.each do |testsuite|
+    testsuites_elem.add_element(testsuite)
+  end
+  
+  # Write merged report
+  File.write(main_report_path, merged_doc.to_s)
+  UI.success("✅ Merged test reports from all packages (#{merged_testsuites.length} test suites)")
 end
   
 lane :testPackage do

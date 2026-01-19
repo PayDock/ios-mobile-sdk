@@ -8,13 +8,19 @@
 
 import Foundation
 import MobileSDK
+import DataPaymentSources
+import DataVault
+import DataStandalone3ds
 
 @MainActor
 class Standalone3DSExampleVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
+    private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
+    private let vaultService: DataVault.VaultService
+    private let standalone3dsService: DataStandalone3ds.Standalone3dsService
+    private let configManager = ConfigManager.shared
 
     // MARK: - Properties
 
@@ -26,24 +32,36 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
 
     // MARK: - Initialisation
 
-    init(walletService: WalletService = WalletServiceImpl()) {
-        self.walletService = walletService
+    init(paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
+         vaultService: DataVault.VaultService = DataVault.VaultServiceImpl(),
+         standalone3dsService: DataStandalone3ds.Standalone3dsService = DataStandalone3ds.Standalone3dsServiceImpl()) {
+        self.paymentSourcesService = paymentSourcesService
+        self.vaultService = vaultService
+        self.standalone3dsService = standalone3dsService
         super.init()
     }
 
-    func getValutToken() {
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
+    }
+
+    func getVaultToken() {
             isLoading = true
-            let req = TokeniseCardDetailsReq(
-                gatewayId: ProjectEnvironment.shared.getGPaymentsServiceId() ?? "",
-                cardName: "Test Card",
+            let req = DataPaymentSources.CreatePaymentSourceTokenReq(
                 cardNumber: "4100000000005000",
-                expireMonth: "08",
-                expireYear: "25",
-                cardCcv: "123")
+                cardName: "Test Card",
+                expireMonth: "09",
+                expireYear: "39",
+                cardCcv: "100",
+                storeCcv: true)
         Task {
             do {
-                let token = try await walletService.createVaultToken(request: req)
-                create3dsToken(vaultToken: token)
+                // First create card token
+                let cardToken = try await paymentSourcesService.createToken(tokeniseCardDetailsReq: req, widgetAccessToken: apiAccessToken)
+                // Then convert to vault token
+                let vaultTokenReq = DataVault.ConvertToVaultTokenReq(token: cardToken, vaultType: "session")
+                let vaultToken = try await vaultService.createVaultToken(request: vaultTokenReq, apiAccessToken: apiAccessToken)
+                create3dsToken(vaultToken: vaultToken)
             } catch {
                 self.isLoading = false
                 self.showWebView = false
@@ -55,11 +73,11 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
 
     private func create3dsToken(vaultToken: String) {
         Task {
-            let request = Standalone3DSReq(
+            let request = DataStandalone3ds.Standalone3DSReq(
                 amount: "10",
                 currency: "AUD",
                 reference: UUID().uuidString,
-                customer: .init(paymentSource: .init(token: vaultToken)),
+                customer: .init(paymentSource: .init(vaultToken: vaultToken)),
                 data: .init(
                     serviceId: ProjectEnvironment.shared.getGPaymentsServiceId() ?? "",
                     authentication: .init(
@@ -81,7 +99,7 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
                 )
             )
             do {
-                let token3DS = try await walletService.createStandalone3DSToken(request: request)
+                let token3DS = try await standalone3dsService.createStandalone3DSToken(request: request, apiAccessToken: apiAccessToken)
                 self.isLoading = false
                 self.token3DS = token3DS ?? ""
                 self.showWebView = true

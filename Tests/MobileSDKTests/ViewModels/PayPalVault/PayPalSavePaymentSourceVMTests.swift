@@ -10,6 +10,8 @@ import XCTest
 import Combine
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataPaymentSources
+@testable import DataGateways
 
 @MainActor
 // swiftlint:disable file_length
@@ -18,8 +20,8 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     // MARK: - Properties
 
     var viewModel: PayPalSavePaymentSourceVM!
-    var mockPaymentSourcesService: PaymentSourcesServiceMock!
-    var mockGatewayService: GatewayServiceMock!
+    var mockPaymentSourcesService: PaymentSourcesMockService!
+    var mockGatewayService: GatewayMockService!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -31,8 +33,8 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockPaymentSourcesService = PaymentSourcesServiceMock()
-        mockGatewayService = GatewayServiceMock()
+        mockPaymentSourcesService = PaymentSourcesMockService()
+        mockGatewayService = GatewayMockService()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
@@ -245,7 +247,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
                 self.completionResult = result
             }
         )
-        mockGatewayService.clientId = "test_client_id_123"
+        mockGatewayService.clientIdResult = "test_client_id_123"
 
         // When
         let clientId = await viewModel.getClientId()
@@ -270,7 +272,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         )
         let testError = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Client ID not found", code: "CLIENT_ID_ERROR"),
+            error: .init(message: "Client ID not found", code: "CLIENT_ID_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
@@ -309,7 +311,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
                 self.completionResult = result
             }
         )
-        mockPaymentSourcesService.setupTokenData = PayPalVaultSetupTokenRes.SetupTokenData(
+        mockPaymentSourcesService.setupTokenResult = SetupTokenData(
             setupToken: "test_setup_token_456"
         )
 
@@ -336,12 +338,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         )
         let testError = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Setup token creation failed", code: "SETUP_TOKEN_ERROR"),
+            error: .init(message: "Setup token creation failed", code: "SETUP_TOKEN_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
-        mockPaymentSourcesService.shouldReturnPayPalError = true
-        mockPaymentSourcesService.payPalErrorToReturn = testError
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = testError
 
         // When
         let setupTokenData = await viewModel.getSetupTokenData()
@@ -375,7 +377,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
                 self.completionResult = result
             }
         )
-        mockPaymentSourcesService.paymentTokenData = PayPalVaultPaymentTokenRes.PaymentTokenData(
+        mockPaymentSourcesService.paymentTokenResult = PaymentTokenData(
             token: "test_payment_token_789",
             email: "user@test.com"
         )
@@ -408,12 +410,12 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         )
         let testError = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Payment token creation failed", code: "PAYMENT_TOKEN_ERROR"),
+            error: .init(message: "Payment token creation failed", code: "PAYMENT_TOKEN_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
-        mockPaymentSourcesService.shouldReturnPayPalError = true
-        mockPaymentSourcesService.payPalErrorToReturn = testError
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = testError
 
         // When
         await viewModel.createPaymentToken(setupToken: "test_setup_token")

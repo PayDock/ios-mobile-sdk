@@ -9,13 +9,15 @@ import XCTest
 import Combine
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataCharges
+@testable import DataGateways
 
 @MainActor
 class PayPalVMTests: XCTestCase {
 
     var viewModel: PayPalVM!
-    var mockWalletService: WalletServiceMock!
-    var mockGatewayService: GatewayServiceMock!
+    var mockChargesService: ChargesMockService!
+    var mockGatewayService: GatewayMockService!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -27,8 +29,8 @@ class PayPalVMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         MobileSDK.shared.configureMobileSDK(config: .init(environment: .sandbox))
-        mockWalletService = WalletServiceMock()
-        mockGatewayService = GatewayServiceMock()
+        mockChargesService = ChargesMockService()
+        mockGatewayService = GatewayMockService()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
@@ -46,7 +48,7 @@ class PayPalVMTests: XCTestCase {
                     completion(.success(WalletTokenResult(token: "test_token")))
                 }
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -58,7 +60,7 @@ class PayPalVMTests: XCTestCase {
 
     override func tearDown() {
         viewModel = nil
-        mockWalletService = nil
+        mockChargesService = nil
         mockGatewayService = nil
         viewState = nil
         loadingDelegate = nil
@@ -83,7 +85,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -106,7 +108,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: nil,
             eventDelegate: nil,
@@ -128,7 +130,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -153,7 +155,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: nil,
             eventDelegate: nil,
@@ -181,7 +183,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -209,7 +211,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: nil,
             eventDelegate: nil,
@@ -289,7 +291,7 @@ class PayPalVMTests: XCTestCase {
         mockGatewayService.shouldReturnError = true
         mockGatewayService.errorToReturn = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "Test Error", code: "TEST"),
+            error: .init(message: "Test Error", code: "TEST", details: nil),
             resource: nil,
             errorSummary: nil
         )
@@ -339,7 +341,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -376,7 +378,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -415,7 +417,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -448,7 +450,7 @@ class PayPalVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "test_token")))
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,

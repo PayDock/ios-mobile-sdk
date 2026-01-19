@@ -57,7 +57,7 @@ struct Standalone3DSExampleView: View {
             Text(viewModel.alertMessage)
         })
         .onAppear {
-            viewModel.getValutToken()
+            viewModel.getVaultToken()
         }
     }
 

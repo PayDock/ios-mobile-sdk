@@ -36,7 +36,7 @@ class StyleVM: ObservableObject {
         case .colesPay: return [.buttonLoader]
         case .afterPay: return [.afterpay, .loader]
         case .clickToPay: return [.loader]
-        case .integrated3ds: return [.loader]
+        case .mpgs3ds: return [.loader]
         case .standalone3ds: return [.loader]
         }
     }

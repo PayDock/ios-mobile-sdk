@@ -9,6 +9,7 @@ import XCTest
 import Combine
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataCharges
 
 // swiftlint:disable all
 @MainActor
@@ -16,7 +17,7 @@ class ColesPayVMTests: XCTestCase {
 
     var viewModel: ColesPayVM!
 
-    private var walletService: ColesWalletServiceMock!
+    private var chargesService: ChargesMockService!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -26,7 +27,7 @@ class ColesPayVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        walletService = ColesWalletServiceMock()
+        chargesService = ChargesMockService()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
@@ -38,7 +39,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -49,7 +50,7 @@ class ColesPayVMTests: XCTestCase {
 
     override func tearDown() {
         viewModel = nil
-        walletService = nil
+        chargesService = nil
         viewState = nil
         loadingDelegate = nil
         eventDelegate = nil
@@ -70,7 +71,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: nil,
             eventDelegate: nil) { result in
@@ -99,7 +100,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: nil,
             eventDelegate: nil) { result in
@@ -138,7 +139,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
@@ -160,7 +161,7 @@ class ColesPayVMTests: XCTestCase {
 
     func testHandleButtonTap_SetsLoadingAndShowsWebView_OnSuccess() async {
         // Given: wallet service will return a valid order id
-        walletService.colesPayResult = .success("order_123")
+        chargesService.colesPayCallbackResult = "order_123"
 
         // When
         viewModel.handleButtonTap()
@@ -188,7 +189,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.failure(.initialisingWalletToken(reason: "Token init failed")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
@@ -219,8 +220,8 @@ class ColesPayVMTests: XCTestCase {
     }
 
     func testGetColesPayURL_CompletesWithUnknownError_OnOtherError() async {
-        // Given: service throws a different RequestError
-        walletService.colesPayResult = .failure(.unknownError(.connectionError(URLError(.notConnectedToInternet))))
+        // Given: service throws an unknown error (non-RequestError)
+        chargesService.shouldThrowUnknownError = true
 
         let exp = expectation(description: "Completion called with unknownError")
         viewModel = ColesPayVM(
@@ -228,7 +229,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
@@ -261,7 +262,7 @@ class ColesPayVMTests: XCTestCase {
 
     func testHandleSuccess_CompletesWithOrderId_AndHidesWebView() {
         // Given
-        walletService.colesPayResult = .success("order_123")
+        chargesService.colesPayCallbackResult = "order_123"
         viewModel.getColesPayURL(token: "wallet_token")
 
         // Wait briefly for showWebView to be set
@@ -275,7 +276,7 @@ class ColesPayVMTests: XCTestCase {
         viewModel = ColesPayVM(
             config: config,
             tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
@@ -303,14 +304,14 @@ class ColesPayVMTests: XCTestCase {
 
     func testHandleFailure_CompletesWithError_AndHidesWebView() {
         // Given
-        let errorRes = ErrorRes(status: 500, error: .init(message: "Server error", code: "ServerError"), resource: nil, errorSummary: nil)
+        let errorRes = ErrorRes(status: 500, error: .init(message: "Server error", code: "ServerError", details: nil), resource: nil, errorSummary: nil)
         let error = ColesPayError.errorFetchingColesPayOrder(error: errorRes)
         let exp = expectation(description: "Completion called with failure")
 
         viewModel = ColesPayVM(
             config: config,
             tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
@@ -344,7 +345,7 @@ class ColesPayVMTests: XCTestCase {
         viewModel = ColesPayVM(
             config: config,
             tokenRequest: { $0(.success(WalletTokenResult(token: "wallet_token"))) },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate) { result in
@@ -378,7 +379,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
@@ -410,7 +411,7 @@ class ColesPayVMTests: XCTestCase {
             tokenRequest: { completion in
                 completion(.success(WalletTokenResult(token: "wallet_token")))
             },
-            walletService: walletService,
+            chargesService: chargesService,
             viewState: viewState,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,
@@ -424,24 +425,6 @@ class ColesPayVMTests: XCTestCase {
         // Then - No events should be recorded in our test delegate
         XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
         XCTAssertNil(eventDelegate.lastEvent)
-    }
-}
-
-// MARK: - Test doubles
-
-private class ColesWalletServiceMock: WalletServiceMock {
-    var colesPayResult: Result<String, ColesPayError>? = .success("")
-
-    override func getColesPayCallback(token: String) async throws -> String {
-        if let colesPayResult = colesPayResult {
-            switch colesPayResult {
-            case .success(let orderId):
-                return orderId
-            case .failure(let error):
-                throw error
-            }
-        }
-        return ""
     }
 }
 // swiftlint:enable all

@@ -10,13 +10,15 @@ import Foundation
 import MobileSDK
 import NetworkingLib
 import OSLog
+import CommonModels
+import DataCharges
 
 @MainActor
 class PayPalExampleVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
+    private let chargesService: DataCharges.ChargesService
     private let configManager: ConfigManager
 
     // MARK: - Properties
@@ -28,10 +30,14 @@ class PayPalExampleVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(walletService: WalletService = WalletServiceImpl(),
+    init(chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
          configManager: ConfigManager = .shared) {
-        self.walletService = walletService
+        self.chargesService = chargesService
         self.configManager = configManager
+    }
+
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
     }
 
     // MARK: - Config
@@ -44,31 +50,25 @@ class PayPalExampleVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargePaymentSource(
-                addressLine1: nil,
-                addressLine2: nil,
-                addressPostcode: nil,
-                addressCity: nil,
-                addressState: nil,
-                addressCountry: nil,
+            let paymentSource = PaymentSource(
                 gatewayId: ProjectEnvironment.shared.getPayPalGatewayId() ?? "",
-                walletType: nil)
+            )
 
-            let customer = InitialiseWalletChargeCustomer(
+            let customer = DataCharges.InitialiseWalletChargeCustomer(
                 firstName: "Tom",
                 lastName: "Taylor",
                 email: "novaba9346@hondabbs.com",
                 phone: "+11234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeMetaData(
+            let metaData = DataCharges.InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
                 successUrl: nil,
                 errorUrl: nil)
 
-            let initializeWalletChargeReq = InitialiseWalletChargeReq(
+            let initializeWalletChargeReq = DataCharges.InitialiseWalletChargeReq(
                 customer: customer,
                 amount: Decimal(string: configManager.getGlobalConfig().totalAmount) ?? 0,
                 currency: configManager.getGlobalConfig().currency,
@@ -77,7 +77,10 @@ class PayPalExampleVM: ObservableObject {
                 meta: metaData)
 
             do {
-                let token = try await walletService.initialiseWalletCharge(initializeWalletChargeReq: initializeWalletChargeReq)
+                let token = try await chargesService.initialiseWalletCharge(
+                    initializeWalletChargeReq: initializeWalletChargeReq,
+                    apiAccessToken: apiAccessToken
+                )
                 DispatchQueue.main.async {
                     completion(.success(.init(token: token)))
                 }

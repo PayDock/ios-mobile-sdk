@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import Combine
 import NetworkingLib
+import DataPaymentSources
 
 @MainActor
 class CardDetailsVM: ObservableObject {
@@ -17,7 +18,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Dependencies
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
-    private let paymentSourcesService: PaymentSourcesService
+    private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     let config: CardDetailsWidgetConfig
     let appearance: CardDetailsWidgetAppearance
 
@@ -41,7 +42,7 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(paymentSourcesService: PaymentSourcesService = PaymentSourcesServiceImpl(),
+    init(paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          viewState: ViewState,
          config: CardDetailsWidgetConfig,
          appearance: CardDetailsWidgetAppearance,
@@ -83,19 +84,21 @@ class CardDetailsVM: ObservableObject {
             let trimmedCardName = cardDetailsFormManager.cardholderNameText.trimmingCharacters(in: .whitespacesAndNewlines)
             let cardName = trimmedCardName.isEmpty ? nil : trimmedCardName
 
-            let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
+            let tokeniseCardDetailsReq = DataPaymentSources.CreatePaymentSourceTokenReq(
+                type: "card",
                 gatewayId: config.gatewayId,
-                cardName: cardName,
                 cardNumber: cardDetailsFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
+                cardName: cardName,
                 expireMonth: String(expireMonth),
                 expireYear: String(expireYear),
-                cardCcv: cardDetailsFormManager.securityCodeText)
+                cardCcv: cardDetailsFormManager.securityCodeText,
+                storeCcv: true)
 
             do {
                 updateLoadingState(isLoading: true)
                 let cardToken = try await paymentSourcesService.createToken(
                     tokeniseCardDetailsReq: tokeniseCardDetailsReq,
-                    accessToken: config.accessToken)
+                    widgetAccessToken: config.accessToken)
 
                 updateLoadingState(isLoading: false)
                 completion(.success(createResult(token: cardToken)))

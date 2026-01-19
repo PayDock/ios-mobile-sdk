@@ -9,6 +9,7 @@
 import Combine
 import SwiftUI
 import NetworkingLib
+import DataPaymentSources
 
 @MainActor
 class GiftCardVM: ObservableObject {
@@ -17,7 +18,7 @@ class GiftCardVM: ObservableObject {
 
     let appearance: GiftCardWidgetAppearance
     @Published var giftCardFormManager: GiftCardFormManager
-    private let paymentSourcesService: PaymentSourcesService
+    private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     private let config: GiftCardWidgetConfig
     var viewState: ViewState
 
@@ -38,7 +39,7 @@ class GiftCardVM: ObservableObject {
     init(appearance: GiftCardWidgetAppearance,
          viewState: ViewState,
          giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
-         paymentSourcesService: PaymentSourcesService = PaymentSourcesServiceImpl(),
+         paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          config: GiftCardWidgetConfig,
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
@@ -62,15 +63,15 @@ class GiftCardVM: ObservableObject {
     func tokeniseGiftCard() {
         Task {
             updateLoadingState(isLoading: true)
-            let tokeniseGiftCardReq = TokeniseGiftCardReq(
+            let tokeniseGiftCardReq = CreateGiftCardTokenReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
-                pin: giftCardFormManager.pinText,
+                cardPin: giftCardFormManager.pinText,
                 storePin: config.storePin)
 
             do {
                 let cardToken = try await paymentSourcesService.createGiftCardToken(
                     tokeniseGiftCardReq: tokeniseGiftCardReq,
-                    accessToken: config.accessToken)
+                    widgetAccessToken: config.accessToken)
                 updateLoadingState(isLoading: false)
                 completion(.success(GiftCardResult(token: cardToken)))
 

@@ -10,6 +10,8 @@
 	<string>$(SERVICE_ID_AFTERPAY)</string>
 	<key>SERVICE_ID_APPLE_PAY_MPGS</key>
 	<string>$(SERVICE_ID_APPLE_PAY_MPGS)</string>
+	<key>SERVICE_ID_APPLE_PAY</key>
+	<string>$(SERVICE_ID_APPLE_PAY)</string>
 	<key>CONFIGURATION</key>
 	<string>$(CONFIGURATION)</string>
 	<key>WALLET_ID_COLES_PAY</key>

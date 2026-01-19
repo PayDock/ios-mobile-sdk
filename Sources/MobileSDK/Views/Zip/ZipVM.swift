@@ -6,13 +6,14 @@
 
 import SwiftUI
 import NetworkingLib
+import DataPaymentSources
 
 @MainActor
 class ZipVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let paymentSourcesService: PaymentSourcesService
+    private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
 
     // MARK: - Properties
 
@@ -37,7 +38,7 @@ class ZipVM: ObservableObject {
 
     init(viewState: ViewState,
          config: ZipConfig,
-         paymentSourcesService: PaymentSourcesService = PaymentSourcesServiceImpl(),
+         paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<String, ZipError>) -> Void) {
@@ -58,9 +59,36 @@ class ZipVM: ObservableObject {
         Task {
             do {
                 updateLoadingState(isLoading: true)
+                let externalCheckoutReq = DataPaymentSources.CreateExternalCheckoutReq(
+                    gatewayId: self.config.gatewayId,
+                    meta: DataPaymentSources.ExternalCheckoutMeta(
+                        firstName: self.config.shopper.firstName,
+                        lastName: self.config.shopper.lastName,
+                        email: self.config.shopper.email,
+                        tokenize: true,
+                        charge: DataPaymentSources.ExternalCheckoutCharge(
+                            amount: Double(truncating: self.config.amount as NSNumber),
+                            currency: self.config.currency,
+                            billingAddress: self.config.billing.map { billing in
+                                DataPaymentSources.ExternalBillingAddress(
+                                    firstName: billing.firstName,
+                                    lastName: billing.lastName,
+                                    addressLine1: billing.line1,
+                                    addressCity: billing.city,
+                                    addressState: billing.state,
+                                    addressCountry: billing.countryCode,
+                                    addressPostcode: billing.postalCode
+                                )
+                            }
+                        )
+                    ),
+                    successRedirectUrl: Constants.zipRedirectUrl,
+                    errorRedirectUrl: Constants.zipRedirectUrl,
+                    redirectUrl: Constants.zipRedirectUrl
+                )
                 let (link, checkoutToken) = try await paymentSourcesService.initialiseExternalCheckout(
-                    accessToken: self.accessToken,
-                    config: self.config
+                    widgetAccessToken: self.accessToken,
+                    request: externalCheckoutReq
                 )
 
                 // Store checkout token for later use
@@ -102,7 +130,7 @@ class ZipVM: ObservableObject {
                 let paymentSourceToken = try await paymentSourcesService.createPaymentSourceToken(
                     checkoutToken: checkoutToken,
                     gatewayId: self.config.gatewayId,
-                    accessToken: self.accessToken
+                    widgetAccessToken: self.accessToken
                 )
 
                 updateLoadingState(isLoading: false)

@@ -10,13 +10,15 @@ import Foundation
 import MobileSDK
 import NetworkingLib
 import OSLog
+import DataCharges
+import CommonModels
 
 @MainActor
 class ColesPayExampleVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
+    private let chargesService: DataCharges.ChargesService
     private let configManager: ConfigManager
 
     // MARK: - Properties
@@ -28,10 +30,14 @@ class ColesPayExampleVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(walletService: WalletService = WalletServiceImpl(),
+    init(chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
          configManager: ConfigManager = .shared) {
-        self.walletService = walletService
+        self.chargesService = chargesService
         self.configManager = configManager
+    }
+
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
     }
 
     // MARK: - Config
@@ -42,31 +48,30 @@ class ColesPayExampleVM: ObservableObject {
 
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
-            let paymentSource = InitialiseWalletChargePaymentSource(
+            let paymentSource = PaymentSource(
+                gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "",
                 addressLine1: "123 Test Street",
-                addressLine2: nil,
-                addressPostcode: "BN3 5SL",
+                addressLine2: "BN3 5SL",
                 addressCity: "Test City",
                 addressState: "Test State",
-                addressCountry: "AU",
-                gatewayId: ProjectEnvironment.shared.getColesPayGatewayId() ?? "",
-                walletType: nil)
+                addressPostcode: "Y35AK99",
+                addressCountry: "AU")
 
-            let customer = InitialiseWalletChargeCustomer(
+            let customer = DataCharges.InitialiseWalletChargeCustomer(
                 firstName: "Wanda",
                 lastName: "Mertz",
                 email: "wanda.mertz@example.com",
                 phone: "+1234567890",
                 paymentSource: paymentSource)
 
-            let metaData = InitialiseWalletChargeMetaData(
+            let metaData = DataCharges.InitialiseWalletChargeMetaData(
                 storeName: "Tom Taylor Ltd.",
                 merchantName: "Tom's store",
                 storeId: "1234556",
                 successUrl: nil,
                 errorUrl: nil)
 
-            let initializeWalletChargeReq = InitialiseWalletChargeReq(
+            let initializeWalletChargeReq = DataCharges.InitialiseWalletChargeReq(
                 customer: customer,
                 amount: Decimal(string: configManager.getGlobalConfig().totalAmount) ?? 0,
                 currency: configManager.getGlobalConfig().currency,
@@ -75,8 +80,8 @@ class ColesPayExampleVM: ObservableObject {
                 meta: metaData)
 
             do {
-                let token = try await walletService.initialiseColesPayWalletCharge(
-                    initializeWalletChargeReq: initializeWalletChargeReq).token
+                let token = try await chargesService.initialiseColesPayWalletCharge(
+                    initializeWalletChargeReq: initializeWalletChargeReq, apiAccessToken: apiAccessToken).token
                 DispatchQueue.main.async {
                     completion(.success(.init(token: token)))
                 }

@@ -8,12 +8,14 @@
 
 import SwiftUI
 import MobileSDK
+import DataCustomer
 
 @MainActor
 class ProfileVM: ObservableObject {
 
-    private let customersService: CustomersService
+    private let customersService: DataCustomer.CustomersService
     private let profileManager = UserProfileManager.shared
+    private let configManager = ConfigManager.shared
 
     @Published var showAlert = false
     @Published var alertTitle = ""
@@ -28,8 +30,12 @@ class ProfileVM: ObservableObject {
         profileManager.linkedCustomerInfo
     }
 
-    init(customersService: CustomersService = CustomersServiceImpl()) {
+    init(customersService: DataCustomer.CustomersService = DataCustomer.CustomersServiceImpl()) {
         self.customersService = customersService
+    }
+
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
     }
 
     func getVaultConfig() -> PayPalVaultConfig {
@@ -51,15 +57,15 @@ class ProfileVM: ObservableObject {
 
     func createCustomer(payPalVaultResult: PayPalVaultResult) {
         Task {
-            let request = CreateCustomerTokenReq(token: payPalVaultResult.token)
+            let request = DataCustomer.CreateCustomerTokenReq(token: payPalVaultResult.token)
             do {
-                let response = try await customersService.createCustomer(request: request)
+                let response = try await customersService.createCustomer(request: request, apiAccessToken: apiAccessToken)
 
                 // Store the customer information using UserProfileManager
                 let customerInfo = CustomerInfo(
-                    firstName: response.resource.data.firstName,
-                    lastName: response.resource.data.lastName,
-                    phone: response.resource.data.phone,
+                    firstName: response.resource.firstName ?? "",
+                    lastName: response.resource.lastName ?? "",
+                    phone: response.resource.phone ?? "",
                     email: payPalVaultResult.email
                 )
 
@@ -69,8 +75,8 @@ class ProfileVM: ObservableObject {
                     title: "Customer Linked Successfully",
                     message: """
                     Account linked with:
-                    \(response.resource.data.firstName) \(response.resource.data.lastName)
-                    \(response.resource.data.phone)
+                    \(response.resource.firstName) \(response.resource.lastName)
+                    \(response.resource.phone)
                     \(payPalVaultResult.email)
                     """
                 )

@@ -67,7 +67,7 @@ class StyleThemeManager {
         case .afterPay: newAppearance = AfterpayWidgetAppearance()
         case .clickToPay: newAppearance = ClickToPayWidgetAppearance()
         case .applePay: newAppearance = ApplePayWidgetAppearance()
-        case .integrated3ds: newAppearance = ThreeDSWidgetAppearance()
+        case .mpgs3ds: newAppearance = ThreeDSWidgetAppearance()
         case .standalone3ds: newAppearance = ThreeDSWidgetAppearance()
         }
 

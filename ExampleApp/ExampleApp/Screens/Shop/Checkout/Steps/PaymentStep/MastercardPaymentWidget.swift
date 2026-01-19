@@ -36,7 +36,7 @@ struct MastercardPaymentWidget: View {
                             meta: nil
                         )
                     ) { result in
-                        viewModel.handleMastercardResult(result)
+                        viewModel.handleClickToPayResult(result)
                     }
                 }
                 .navigationTitle("Checkout with Click to Pay")
