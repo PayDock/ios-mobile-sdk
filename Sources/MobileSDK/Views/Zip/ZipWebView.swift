@@ -59,7 +59,9 @@ struct ZipWebView: UIViewRepresentable {
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) { }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            isLoaded = true
+            Task { @MainActor in
+                isLoaded = true
+            }
         }
 
         /**
@@ -67,7 +69,9 @@ struct ZipWebView: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed(error: error as NSError))
+            Task { @MainActor in
+                onFailure(.webViewFailed(error: error as NSError))
+            }
         }
 
         /**
@@ -77,21 +81,25 @@ struct ZipWebView: UIViewRepresentable {
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed(error: error as NSError))
+            Task { @MainActor in
+                onFailure(.webViewFailed(error: error as NSError))
+            }
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            guard let webUrl = webView.url else { return }
+            Task { @MainActor in
+                guard let webUrl = webView.url else { return }
 
-            let path = webUrl.path()
+                let path = webUrl.path()
 
-            // Check if this is a callback URL by looking for /merchant/callback path
-            // Zip uses this path on their domain with result and checkoutId in query params
-            if path.contains("/merchant/callback") {
-                let params = parseQueryParameters(from: webUrl)
-                // Only process if we have a result parameter (indicates this is the callback with status)
-                if params["result"] != nil {
-                    handleResponse(params: params)
+                // Check if this is a callback URL by looking for /merchant/callback path
+                // Zip uses this path on their domain with result and checkoutId in query params
+                if path.contains("/merchant/callback") {
+                    let params = parseQueryParameters(from: webUrl)
+                    // Only process if we have a result parameter (indicates this is the callback with status)
+                    if params["result"] != nil {
+                        handleResponse(params: params)
+                    }
                 }
             }
         }
@@ -117,6 +125,7 @@ struct ZipWebView: UIViewRepresentable {
             authenticationChallenge challenge: URLAuthenticationChallenge,
             shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void
         ) {
+            // Reject deprecated TLS versions for PCI DSS compliance
             decisionHandler(false)
         }
 
@@ -125,54 +134,53 @@ struct ZipWebView: UIViewRepresentable {
             didReceive challenge: URLAuthenticationChallenge,
             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
         ) {
-            DispatchQueue.global(qos: .background).async {
-                let trust = challenge.protectionSpace.serverTrust!
-                let exceptions = SecTrustCopyExceptions(trust)
-                SecTrustSetExceptions(trust, exceptions)
-                completionHandler(.useCredential, URLCredential(trust: trust))
-            }
+            // Use default system SSL certificate validation for PCI DSS compliance
+            // This ensures proper certificate chain validation against system trust store
+            completionHandler(.performDefaultHandling, nil)
         }
 
         // MARK: - Helpers
 
         /// Handle response callback with 'result' status parameter
         private func handleResponse(params: [String: String]) {
-            // Extract status and checkoutId from query parameters
-            guard let resultString = params["result"] else {
-                onFailure(.unexpectedStatus(status: nil, checkoutId: params["checkoutId"]))
-                return
-            }
+            Task { @MainActor in
+                // Extract status and checkoutId from query parameters
+                guard let resultString = params["result"] else {
+                    onFailure(.unexpectedStatus(status: nil, checkoutId: params["checkoutId"]))
+                    return
+                }
 
-            guard let status = ZipStatus(rawValue: resultString) else {
-                onFailure(.unexpectedStatus(status: resultString, checkoutId: params["checkoutId"]))
-                return
-            }
+                guard let status = ZipStatus(rawValue: resultString) else {
+                    onFailure(.unexpectedStatus(status: resultString, checkoutId: params["checkoutId"]))
+                    return
+                }
 
-            let checkoutId = params["checkoutId"]
-            let orderId = params["order_id"] ?? params["id"]
+                let checkoutId = params["checkoutId"]
+                let orderId = params["order_id"] ?? params["id"]
 
-            // Handle based on status (matching web implementation logic)
-            switch status {
-            case .approved:
-                // Success flow
-                let callbackData = ZipCallbackData(
-                    status: status,
-                    checkoutId: checkoutId,
-                    orderId: orderId
-                )
-                onApprove(callbackData)
+                // Handle based on status (matching web implementation logic)
+                switch status {
+                case .approved:
+                    // Success flow
+                    let callbackData = ZipCallbackData(
+                        status: status,
+                        checkoutId: checkoutId,
+                        orderId: orderId
+                    )
+                    onApprove(callbackData)
 
-            case .declined:
-                onFailure(.transactionDeclined(checkoutId: checkoutId))
+                case .declined:
+                    onFailure(.transactionDeclined(checkoutId: checkoutId))
 
-            case .cancelled:
-                onFailure(.transactionCanceled(checkoutId: checkoutId))
+                case .cancelled:
+                    onFailure(.transactionCanceled(checkoutId: checkoutId))
 
-            case .referred:
-                onFailure(.transactionReferred(checkoutId: checkoutId))
+                case .referred:
+                    onFailure(.transactionReferred(checkoutId: checkoutId))
 
-            case .unexpected, .unexpectedError:
-                onFailure(.unexpectedStatus(status: resultString, checkoutId: checkoutId))
+                case .unexpected, .unexpectedError:
+                    onFailure(.unexpectedStatus(status: resultString, checkoutId: checkoutId))
+                }
             }
         }
     }

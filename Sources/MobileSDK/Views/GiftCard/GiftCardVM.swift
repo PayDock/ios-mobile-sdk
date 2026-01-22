@@ -54,7 +54,10 @@ class GiftCardVM: ObservableObject {
         self.completion = completion
 
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
+            // Defer to avoid publishing during view updates
+            Task {
+                self?.objectWillChange.send()
+            }
         }
     }
 

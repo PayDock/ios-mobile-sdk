@@ -402,10 +402,8 @@ extension EnhancedCheckoutVM {
                 )
                 let token = response.token
                 self.colesPayChargeId = response.charge.id
-                DispatchQueue.main.async {
-                    completion(.success(WalletTokenResult(token: token)))
-                    self.viewState?.setState(.none)
-                }
+                completion(.success(WalletTokenResult(token: token)))
+                self.viewState?.setState(.none)
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
                 viewState?.setState(.none)
@@ -514,7 +512,9 @@ extension EnhancedCheckoutVM {
 
     /// Shows the result overlay with success or error state
     func showResultOverlay(success: Bool, message: String) {
-        DispatchQueue.main.async {
+        // Note: This method may be called from non-isolated contexts (e.g., widget completion handlers)
+        // so we use Task { @MainActor in } to ensure main thread execution
+        Task { @MainActor in
             self.isLoading = false
             self.viewState?.setState(.none)
             self.resultIsSuccess = success
@@ -700,7 +700,7 @@ extension EnhancedCheckoutVM {
         switch response.authStatus {
         case .notSupported: captureCharge(id3ds: response.resource.data.threeDS.id)
         case .pending:
-            DispatchQueue.main.async {
+            Task {
                 self.isLoading = false
                 self.viewState?.setState(.none)
                 self.token3DS = response.resource.data.threeDS.token ?? ""
@@ -712,8 +712,9 @@ extension EnhancedCheckoutVM {
     }
 
     /// Handles the outcome of MPGS 3DS WebView check
+    /// Note: This method is @MainActor, so it will execute on main thread even if called from non-isolated context
     func handleMPGS3dsEvent(_ event: MPGS3dsResult) {
-        DispatchQueue.main.async {
+        Task {
             switch event.event {
             case .chargeAuth: break
             case .additionalDataCollectSuccess: break
@@ -734,8 +735,9 @@ extension EnhancedCheckoutVM {
     }
 
     /// Handles the outcome of standlone  3DS WebView check
+    /// Note: This method is @MainActor, so it will execute on main thread even if called from non-isolated context
     func handleStandalone3dsEvent(_ event: Standalone3DSResult) {
-        DispatchQueue.main.async {
+        Task {
             switch event.event {
             case .chargeAuthSuccess:
                 self.showStandalone3dsWebView = false
@@ -758,9 +760,7 @@ extension EnhancedCheckoutVM {
 
     /// Captures the charge as the final step in the payment flow
     private func captureCharge(id3ds: String) {
-        DispatchQueue.main.async {
-            self.isLoading = true
-        }
+        isLoading = true
         viewState?.setState(.disabled)
         Task {
             let request = DataCharges.CaptureChargeReq(
@@ -780,9 +780,7 @@ extension EnhancedCheckoutVM {
     }
 
     private func captureChargeForStandalone(id3ds: String) {
-        DispatchQueue.main.async {
-            self.isLoading = true
-        }
+        isLoading = true
         viewState?.setState(.disabled)
         Task {
             let request = DataCharges.CaptureChargeStandaloneReq(

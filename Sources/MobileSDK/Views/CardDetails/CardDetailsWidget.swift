@@ -52,7 +52,15 @@ public struct CardDetailsWidget: View {
             }
 
             if viewModel.config.allowSaveCard != nil {
-                privacyView
+                let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText
+                let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL
+                if viewModel.config.allowSaveCard?.privacyPolicyConfig != nil &&
+                    !text!.isEmpty &&
+                    viewModel.isValidURLString(url) {
+                    saveCardViewWithPrivacyPolicy
+                } else {
+                    saveCardViewWithoutPrivacyPolicy
+                }
             }
 
             primaryButton
@@ -178,6 +186,8 @@ public struct CardDetailsWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             textContentType: getCreditCardSecurityCode(),
             keyboardType: .numberPad,
+            // Mask the security code input for PCI DSS compliance
+            isSecureTextEntry: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .securityCode
@@ -226,9 +236,9 @@ public struct CardDetailsWidget: View {
         }
                   .customPadding(viewModel.appearance.actionButton.dimensions.padding)
                   .accessibilityHint("Submits card details information.")
-    }
+        }
 
-    private var privacyView: some View {
+    private var saveCardViewWithPrivacyPolicy: some View {
         HStack {
             VStack(alignment: .leading, spacing: 0) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
@@ -248,6 +258,23 @@ public struct CardDetailsWidget: View {
                     .simultaneousGesture(TapGesture().onEnded {
                         viewModel.handleLinkTapAnalytics(url: url)
                     })
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Toggle(isOn: $viewModel.policyAccepted) {}
+                .conditionalToggleStyle(appearance: viewModel.appearance.toggle)
+                .disabled(viewModel.viewState.isDisabled)
+                .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
+                .fixedSize()
+        }
+    }
+
+    private var saveCardViewWithoutPrivacyPolicy: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(viewModel.config.allowSaveCard?.consentText ?? "")
+                    .applyAttributes(viewModel.appearance.toggleText.text)
+                    .customPadding(viewModel.appearance.toggleText.padding)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 

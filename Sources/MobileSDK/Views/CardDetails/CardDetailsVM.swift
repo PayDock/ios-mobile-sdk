@@ -68,7 +68,10 @@ class CardDetailsVM: ObservableObject {
         }
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
+            // Defer to avoid publishing during view updates
+            Task {
+                self?.objectWillChange.send()
+            }
         }
     }
 
@@ -157,6 +160,17 @@ class CardDetailsVM: ObservableObject {
         case .visa: Image("visa", bundle: Bundle.module)
         case .unionpay: Image("unionpay", bundle: Bundle.module)
         }
+    }
+
+    func isValidURLString(_ string: String?) -> Bool {
+        guard let string else { return false }
+        guard let url = URL(string: string) else { return false }
+        guard let scheme = url.scheme,
+              let host = url.host,
+              !scheme.isEmpty,
+              !host.isEmpty else { return false }
+
+        return true
     }
 
     // MARK: - Analytics Handling

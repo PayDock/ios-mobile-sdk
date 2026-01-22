@@ -257,46 +257,58 @@ class AfterPayVMTests: XCTestCase {
 
     func testHandleButtonTapWithFailedTokenRequest() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: "Token error"))
 
         // When
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        switch completionResult {
-        case .failure(let error):
-            switch error {
-            case .initialisingWalletToken(let reason):
-                XCTAssertEqual(reason, "Token error")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            switch self.completionResult {
+            case .failure(let error):
+                switch error {
+                case .initialisingWalletToken(let reason):
+                    XCTAssertEqual(reason, "Token error")
+                default:
+                    XCTFail("Expected initialisingWalletToken error")
+                }
             default:
-                XCTFail("Expected initialisingWalletToken error")
+                XCTFail("Expected failure result")
             }
-        default:
-            XCTFail("Expected failure result")
+            expectation.fulfill()
         }
+
+        wait(for: [expectation], timeout: 1.0)
     }
 
     func testHandleButtonTapWithNilTokenRequestReason() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: nil))
 
         // When
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        switch completionResult {
-        case .failure(let error):
-            switch error {
-            case .initialisingWalletToken(let reason):
-                XCTAssertEqual(reason, "An unexpected error occurred while retrieving token.")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            switch self.completionResult {
+            case .failure(let error):
+                switch error {
+                case .initialisingWalletToken(let reason):
+                    XCTAssertEqual(reason, "An unexpected error occurred while retrieving token.")
+                default:
+                    XCTFail("Expected initialisingWalletToken error")
+                }
             default:
-                XCTFail("Expected initialisingWalletToken error")
+                XCTFail("Expected failure result")
             }
-        default:
-            XCTFail("Expected failure result")
+            expectation.fulfill()
         }
+
+        wait(for: [expectation], timeout: 1.0)
     }
 
     // MARK: - Configuration Tests
@@ -331,33 +343,45 @@ class AfterPayVMTests: XCTestCase {
 
     func testErrorRecoveryAfterFailedTokenRequest() {
         // Given - Initial failure
+        let firstExpectation = self.expectation(description: "First completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: "Initial error"))
         viewModel.handleButtonTap()
 
-        let initialError = completionResult
+        // Wait for first completion
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let initialError = self.completionResult
+            XCTAssertNotNil(initialError)
+            switch initialError {
+            case .failure:
+                XCTAssertTrue(true) // Expected initial failure
+            default:
+                XCTFail("Expected initial failure")
+            }
+            firstExpectation.fulfill()
+        }
+
+        wait(for: [firstExpectation], timeout: 1.0)
 
         // When - Retry with success
+        let secondExpectation = self.expectation(description: "Second completion handler called")
         completionResult = nil
         tokenRequestResult = .success(WalletTokenResult(token: "recovery_token"))
         viewModel.handleButtonTap()
 
-        // Then
-        XCTAssertNotNil(initialError)
-        switch initialError {
-        case .failure:
-            XCTAssertTrue(true) // Expected initial failure
-        default:
-            XCTFail("Expected initial failure")
+        // Then - Should be in loading state for successful retry
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertTrue(self.loadingDelegate.isLoading)
+            secondExpectation.fulfill()
         }
 
-        // Should be in loading state for successful retry
-        XCTAssertTrue(loadingDelegate.isLoading)
+        wait(for: [secondExpectation], timeout: 1.0)
     }
 
     // MARK: - Error Propagation Tests
 
     func testCompletionHandlerReceivesTokenInitializationError() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         let expectedReason = "Token initialization failed"
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: expectedReason))
 
@@ -365,19 +389,24 @@ class AfterPayVMTests: XCTestCase {
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        guard case .failure(let error) = completionResult else {
-            XCTFail("Expected failure result")
-            return
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            guard case .failure(let error) = self.completionResult else {
+                XCTFail("Expected failure result")
+                return
+            }
+
+            guard case .initialisingWalletToken(let actualReason) = error else {
+                XCTFail("Expected initialisingWalletToken error, got \(error)")
+                return
+            }
+
+            XCTAssertEqual(actualReason, expectedReason)
+            XCTAssertFalse(self.loadingDelegate.isLoading, "Loading should be stopped after error")
+            expectation.fulfill()
         }
 
-        guard case .initialisingWalletToken(let actualReason) = error else {
-            XCTFail("Expected initialisingWalletToken error, got \(error)")
-            return
-        }
-
-        XCTAssertEqual(actualReason, expectedReason)
-        XCTAssertFalse(loadingDelegate.isLoading, "Loading should be stopped after error")
+        wait(for: [expectation], timeout: 1.0)
     }
 
     func testCompletionHandlerReceivesChargesServiceCaptureChargeError() {

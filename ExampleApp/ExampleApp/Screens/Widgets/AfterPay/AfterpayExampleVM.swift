@@ -77,9 +77,7 @@ class AfterpayExampleVM: ObservableObject {
                 let token = try await chargesService.initialiseWalletCharge(
                     initializeWalletChargeReq: initializeWalletChargeReq, apiAccessToken: apiAccessToken
                 )
-                DispatchQueue.main.async {
-                    completion(.success(.init(token: token)))
-                }
+                completion(.success(.init(token: token)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch let RequestError.connectionError(urlError) {

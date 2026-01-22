@@ -252,24 +252,30 @@ class PayPalVMTests: XCTestCase {
 
     func testHandleButtonTapWithFailedTokenRequest() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: "Token error"))
 
         // When
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        switch completionResult {
-        case .failure(let error):
-            switch error {
-            case .initialisingWalletToken(let reason):
-                XCTAssertEqual(reason, "Token error")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            switch self.completionResult {
+            case .failure(let error):
+                switch error {
+                case .initialisingWalletToken(let reason):
+                    XCTAssertEqual(reason, "Token error")
+                default:
+                    XCTFail("Expected initialisingWalletToken error")
+                }
             default:
-                XCTFail("Expected initialisingWalletToken error")
+                XCTFail("Expected failure result")
             }
-        default:
-            XCTFail("Expected failure result")
+            expectation.fulfill()
         }
+
+        wait(for: [expectation], timeout: 1.0)
     }
 
     // MARK: - GetClientId Tests
@@ -335,6 +341,10 @@ class PayPalVMTests: XCTestCase {
         // Given
         let expectation = XCTestExpectation(description: "Capture payment success")
 
+        // Reset mock service state
+        mockChargesService.shouldReturnError = false
+        mockChargesService.shouldThrowUnknownError = false
+
         viewModel = PayPalVM(
             config: config,
             viewState: viewState,
@@ -351,8 +361,8 @@ class PayPalVMTests: XCTestCase {
             }
         )
 
-        // Simulate having a token
-        viewModel.handleButtonTap()
+        // Set token directly for testing (bypasses async token request)
+        viewModel.test_setToken("test_token")
 
         // When
         viewModel.capturePayPalPayment(paymentMethodId: "test_payment_method", payerId: "test_payer")
@@ -363,8 +373,11 @@ class PayPalVMTests: XCTestCase {
         switch completionResult {
         case .success(let response):
             XCTAssertNotNil(response)
+            XCTAssertEqual(response.status, "complete")
+            XCTAssertEqual(response.amount, 50.0)
+            XCTAssertEqual(response.currency, "AUD")
         default:
-            XCTFail("Expected success result")
+            XCTFail("Expected success result, got: \(String(describing: completionResult))")
         }
     }
 

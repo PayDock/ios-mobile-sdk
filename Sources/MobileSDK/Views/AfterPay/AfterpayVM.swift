@@ -176,15 +176,17 @@ class AfterpayVM: ObservableObject {
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
-            switch result {
-            case .success(let response):
-                self?.token = response.token
-                self?.getAfterpayURL(token: response.token)
+            Task {
+                switch result {
+                case .success(let response):
+                    self?.token = response.token
+                    self?.getAfterpayURL(token: response.token)
 
-            case .failure(let failure):
-                self?.updateLoadingState(isLoading: false)
-                self?.showWebView = false
-                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                case .failure(let failure):
+                    self?.updateLoadingState(isLoading: false)
+                    self?.showWebView = false
+                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                }
             }
         }
     }

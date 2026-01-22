@@ -82,7 +82,10 @@ class AddressVM: NSObject, ObservableObject {
         localSearchCompleter.delegate = self
 
         anyCancellable = addressFormManager.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
+            // Defer to avoid publishing during view updates
+            Task {
+                self?.objectWillChange.send()
+            }
         }
     }
 
@@ -129,7 +132,7 @@ class AddressVM: NSObject, ObservableObject {
                     }
 
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                    Task { @MainActor in
+                    Task {
                         self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
                         self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
                     }

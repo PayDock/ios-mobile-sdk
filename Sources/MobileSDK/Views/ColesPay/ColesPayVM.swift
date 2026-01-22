@@ -85,13 +85,13 @@ class ColesPayVM: ObservableObject {
         tokenRequest { [weak self] result in
             switch result {
             case .success(let response):
-                Task { @MainActor in
+                Task {
                     self?.token = response.token
                     self?.getColesPayURL(token: response.token)
                 }
 
             case .failure(let failure):
-                Task { @MainActor in
+                Task {
                     self?.updateLoadingState(isLoading: false)
                     self?.showWebView = false
                     self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
