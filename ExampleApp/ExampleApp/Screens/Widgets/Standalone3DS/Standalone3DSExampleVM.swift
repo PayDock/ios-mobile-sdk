@@ -114,7 +114,9 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
     }
 
     func handle3dsEvent(_ event: Standalone3DSResult) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        // Delay for UX purposes - allow WebView to close before showing alert
+        Task {
+            try? await Task.sleep(for: .seconds(1.0))
             switch event.event {
             case .chargeAuthChallenge: break
             case .chargeAuthDecoupled:

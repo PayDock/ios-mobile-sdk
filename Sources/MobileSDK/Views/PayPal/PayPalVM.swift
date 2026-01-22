@@ -66,14 +66,16 @@ class PayPalVM: ObservableObject {
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
-            switch result {
-            case .success(let response):
-                self?.token = response.token
-                self?.initializePayPalSDK()
+            Task {
+                switch result {
+                case .success(let response):
+                    self?.token = response.token
+                    self?.initializePayPalSDK()
 
-            case .failure(let failure):
-                self?.updateLoadingState(isLoading: false)
-                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                case .failure(let failure):
+                    self?.updateLoadingState(isLoading: false)
+                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                }
             }
         }
     }
@@ -205,6 +207,14 @@ class PayPalVM: ObservableObject {
             properties: .button(WidgetEventButtonProperties(name: "PayPalCheckoutButton", action: .click)))
         eventDelegate?.widgetEvent(event: event)
     }
+
+    // MARK: - Test Helpers
+
+    #if DEBUG
+    func test_setToken(_ token: String) {
+        self.token = token
+    }
+    #endif
 
     // MARK: - Helpers
 

@@ -54,13 +54,15 @@ class ApplePayVM: NSObject, ObservableObject {
         isCompletionCalled = false
 
         createPaymentRequest { [weak self] result in
-            switch result {
-            case .success(let response):
-                self?.applePayRequest = ApplePayRequest(token: response.token, request: response.request)
-                self?.startPayment()
+            Task {
+                switch result {
+                case .success(let response):
+                    self?.applePayRequest = ApplePayRequest(token: response.token, request: response.request)
+                    self?.startPayment()
 
-            case .failure(let failure):
-                self?.callCompletion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+                case .failure(let failure):
+                    self?.callCompletion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+                }
             }
         }
     }
@@ -148,7 +150,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
         }
     }
 
-    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
+    nonisolated func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
             Task { @MainActor in
                 if self.paymentStatus == .success, let chargeData = self.chargeData {

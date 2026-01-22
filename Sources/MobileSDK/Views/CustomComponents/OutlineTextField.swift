@@ -72,6 +72,7 @@ struct OutlineTextField: View {
     private let validationIconEnabled: Bool
     private let textContentType: UITextContentType?
     private let returnKeyType: UIReturnKeyType
+    private let isSecureTextEntry: Bool
     private let onTapGesture: () -> Void
     private let onTextChange: ((String, Int) -> Int)?
     private let onSubmit: (() -> Void)?
@@ -92,6 +93,7 @@ struct OutlineTextField: View {
     ///   - textContentType: Content type used for the suggested prefill.
     ///   - keyboardType: Keyboard type for the text field.
     ///   - returnKeyType: Return key type for the text field.
+    ///   - isSecureTextEntry: Whether to mask input (for sensitive data like CVV).
     ///   - onTapGesture: Action to take on tap gesture activaction.
     ///   - onTextChange: Custom text change handler that returns new cursor position.
     ///   - onSubmit: Action to take when return key is pressed.
@@ -108,6 +110,7 @@ struct OutlineTextField: View {
                 textContentType: UITextContentType? = nil,
                 keyboardType: UIKeyboardType = .default,
                 returnKeyType: UIReturnKeyType = .default,
+                isSecureTextEntry: Bool = false,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
                 onSubmit: (() -> Void)? = nil) {
@@ -124,6 +127,7 @@ struct OutlineTextField: View {
         self.textContentType = textContentType
         self.keyboardType = keyboardType
         self.returnKeyType = returnKeyType
+        self.isSecureTextEntry = isSecureTextEntry
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
@@ -208,6 +212,7 @@ struct OutlineTextField: View {
                 isStrikethrough: appearance.fonts.text.isStrikethrough,
                 strikethroughColor: UIColor(appearance.fonts.text.strikethroughColor),
                 isItalic: appearance.fonts.text.isItalic,
+                isSecureTextEntry: isSecureTextEntry,
                 onEditingChanged: { isEditing in
                     editing = isEditing
                 },

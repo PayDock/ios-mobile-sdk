@@ -82,9 +82,7 @@ class ColesPayExampleVM: ObservableObject {
             do {
                 let token = try await chargesService.initialiseColesPayWalletCharge(
                     initializeWalletChargeReq: initializeWalletChargeReq, apiAccessToken: apiAccessToken).token
-                DispatchQueue.main.async {
-                    completion(.success(.init(token: token)))
-                }
+                completion(.success(.init(token: token)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
             } catch let RequestError.connectionError(urlError) {

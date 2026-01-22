@@ -2,9 +2,7 @@
 //  DropdownStyleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 13.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import SwiftUI
 import MobileSDK
@@ -170,7 +168,7 @@ class DropdownStyleVM: ObservableObject {
 
         appearance.searchDropdown.dropdown.text.listText.text.underlineColor = dropdownUnderlineColor
         appearance.searchDropdown.dropdown.text.listText.text.strikethroughColor = dropdownStrikethroughColor
-        appearance.searchDropdown.textField.fonts.text.customFont.type = .custom(name: dropdownListFont)
+        appearance.searchDropdown.dropdown.text.listText.text.customFont.type = .custom(name: dropdownListFont)
         appearance.searchDropdown.dropdown.text.listText.text.customFont.size = dropdownFontSize
 
         // TextField
@@ -198,17 +196,17 @@ class DropdownStyleVM: ObservableObject {
 
         appearance.searchDropdown.textField.fonts.title.underlineColor = titleUnderlineColor
         appearance.searchDropdown.textField.fonts.title.strikethroughColor = titleStrikethroughColor
-        appearance.searchDropdown.textField.fonts.text.customFont.type = .custom(name: titleFont)
+        appearance.searchDropdown.textField.fonts.title.customFont.type = .custom(name: titleFont)
         appearance.searchDropdown.textField.fonts.title.customFont.size = titleFontSize
 
         appearance.searchDropdown.textField.fonts.placeholder.underlineColor = placeholderUnderlineColor
         appearance.searchDropdown.textField.fonts.placeholder.strikethroughColor = placeholderStrikethroughColor
-        appearance.searchDropdown.textField.fonts.text.customFont.type = .custom(name: placeholderFont)
+        appearance.searchDropdown.textField.fonts.placeholder.customFont.type = .custom(name: placeholderFont)
         appearance.searchDropdown.textField.fonts.placeholder.customFont.size = placeholderFontSize
 
         appearance.searchDropdown.textField.fonts.error.underlineColor = errorUnderlineColor
         appearance.searchDropdown.textField.fonts.error.strikethroughColor = errorStrikethroughColor
-        appearance.searchDropdown.textField.fonts.text.customFont.type = .custom(name: errorFont)
+        appearance.searchDropdown.textField.fonts.error.customFont.type = .custom(name: errorFont)
         appearance.searchDropdown.textField.fonts.error.customFont.size = errorFontSize
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
