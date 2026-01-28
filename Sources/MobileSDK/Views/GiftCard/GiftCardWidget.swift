@@ -95,6 +95,7 @@ public struct GiftCardWidget: View {
             valid: $viewModel.giftCardFormManager.pinValid,
             disabled: $viewModel.viewState.isDisabled,
             keyboardType: .numberPad,
+            isSecureTextEntry: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .pin

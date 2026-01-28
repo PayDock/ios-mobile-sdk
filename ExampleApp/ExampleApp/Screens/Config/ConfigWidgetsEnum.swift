@@ -16,6 +16,7 @@ enum ConfigWidgetsEnum {
     case afterPay
     case colesPay
     case clickToPay
+    case zip
 
     var title: String {
         switch self {
@@ -28,6 +29,7 @@ enum ConfigWidgetsEnum {
         case .afterPay: return "Afterpay"
         case .colesPay: return "Coles Pay"
         case .clickToPay: return "Click to Pay"
+        case .zip: return "Zip"
         }
     }
 
@@ -42,6 +44,7 @@ enum ConfigWidgetsEnum {
         case .afterPay: Image("afterpay-style")
         case .colesPay: Image("coles-pay-style")
         case .clickToPay: Image("click-to-pay-style")
+        case .zip: Image("zip")
         }
     }
 }

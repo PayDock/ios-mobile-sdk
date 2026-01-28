@@ -12,13 +12,12 @@ struct ZipExampleView: View {
 
     @StateObject private var viewModel = ZipExampleVM()
     @Environment(\.colorScheme) var colorScheme
-    @State private var selectedStyle: ZipButtonStyle = .whiteOnBlack
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 ZipWidget(
-                    config: viewModel.createZipConfig(),
+                    config: viewModel.getConfig(),
                     appearance: getAppearance(),
                     completion: { result in
                         switch result {
@@ -40,9 +39,12 @@ struct ZipExampleView: View {
     }
 
     private func getAppearance() -> ZipWidgetAppearance {
-        return ZipWidgetAppearance(
-            buttonStyle: selectedStyle
-        )
+        let appearance = StyleThemeManager.getAppearance(
+            for: .zip,
+            isDarkMode: colorScheme == .dark,
+            as: ZipWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ZipWidgetAppearance()
     }
 }
 

@@ -2,9 +2,7 @@
 //  EnhancedCheckoutVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 30.09.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import Foundation
 import MobileSDK
@@ -127,6 +125,7 @@ class EnhancedCheckoutVM: ObservableObject {
     @Published var afterPayToken = ""
     @Published var mastercardToken = ""
     @Published var colesPayToken = ""
+    @Published var zipToken = ""
 
     // UI State
     @Published var showAlert = false
@@ -336,19 +335,20 @@ extension EnhancedCheckoutVM {
         let config = AfterpaySdkConfig.AfterpayConfiguration(
             minimumAmount: "1.0",
             maximumAmount: "100.0",
-            currency: "AUD",
+            currency: ConfigManager.shared.getGlobalConfig().currency,
             language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions(shippingOptionRequired: true)
         return AfterpaySdkConfig(config: config, environment: .sandbox, options: options)
     }
 
     func getAfterpayShippingOptions() -> [ShippingOption] {
+        let currency = ConfigManager.shared.getGlobalConfig().currency
         let shippingOption1 = ShippingOption(
             id: cartManager.selectedShipping.name,
             name: cartManager.selectedShipping.name,
             description: cartManager.selectedShipping.description,
-            shippingAmount: Money(amount: cartManager.stringShippingCost, currency: "AUD"),
-            orderAmount: Money(amount: cartManager.stringTotalWithoutShipping, currency: "AUD"))
+            shippingAmount: Money(amount: cartManager.stringShippingCost, currency: currency),
+            orderAmount: Money(amount: cartManager.stringTotalWithoutShipping, currency: currency))
 
         return [shippingOption1]
     }
@@ -422,27 +422,6 @@ extension EnhancedCheckoutVM {
             showResultOverlay(success: false, message: error.customMessage)
         }
     }
-
-    private func captureColesPayCharge() {
-        isLoading = true
-        Task {
-            do {
-                // For Coles Pay - a delay is needed as order is still processing with hook that needs to be fired to finish payment setup
-                // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture".
-                // Improvement to add polling of charge state and when in correct state then finish the charge.
-                try await Task.sleep(for: .seconds(2))
-                let res = try await chargesService.captureChargeColesPay(chargeId: colesPayChargeId, apiAccessToken: apiAccessToken)
-                showResultOverlay(success: true, message: "Coles Pay Charge successful: \(res.data.amount) \(res.data.currency)")
-            } catch let RequestError.requestError(errorResponse: errorResponse) {
-                isLoading = false
-                let errorMessage = errorResponse.error?.message ?? errorResponse.errorSummary?.message ?? "Unknown error"
-                showResultOverlay(success: false, message: errorMessage)
-            } catch {
-                isLoading = false
-                showResultOverlay(success: false, message: "Unknown error")
-            }
-        }
-    }
 }
 
 // MARK: - ClickToPay
@@ -462,6 +441,116 @@ extension EnhancedCheckoutVM {
                 showResultOverlay(success: false, message: "Error with ClickToPay payment.")
             }
 
+        case let .failure(error):
+            showResultOverlay(success: false, message: error.customMessage)
+        }
+    }
+}
+
+// MARK: - Zip
+
+extension EnhancedCheckoutVM {
+
+    // swiftlint:disable:next function_body_length
+    func getZipConfig() -> ZipWidgetConfig {
+        let globalConfig = ConfigManager.shared.getGlobalConfig()
+        let currency = globalConfig.currency
+        let amount = Decimal(cartManager.total)
+
+        // Get saved addresses to access firstName/lastName from selected addresses
+        let savedAddresses = UserProfileManager.shared.profile.savedAddresses
+
+        // Get shipping address name from saved address if selected, otherwise use contact info
+        let selectedShippingAddress = selectedShippingAddressId.flatMap { id in
+            savedAddresses.first { $0.id == id }
+        }
+        let shippingFirstNameValue = selectedShippingAddress?.firstName.isEmpty == false
+            ? selectedShippingAddress!.firstName
+            : (self.shippingFirstName.isEmpty ? self.firstName : self.shippingFirstName)
+        let shippingLastNameValue = selectedShippingAddress?.lastName.isEmpty == false
+            ? selectedShippingAddress!.lastName
+            : (self.shippingLastName.isEmpty ? self.lastName : self.shippingLastName)
+
+        // Get billing address name
+        let selectedBillingAddress = useShippingAsBilling
+            ? selectedShippingAddress
+            : selectedBillingAddressId.flatMap { id in
+                savedAddresses.first { $0.id == id }
+            }
+        let billingFirstNameValue = selectedBillingAddress?.firstName.isEmpty == false
+            ? selectedBillingAddress!.firstName
+            : (self.billingFirstName.isEmpty ? self.firstName : self.billingFirstName)
+        let billingLastNameValue = selectedBillingAddress?.lastName.isEmpty == false
+            ? selectedBillingAddress!.lastName
+            : (self.billingLastName.isEmpty ? self.lastName : self.billingLastName)
+
+        // Convert cart items to Zip items
+        let items = cartManager.cartItems.map { cartItem in
+            ZipWidgetConfig.Item(
+                name: cartItem.product.name,
+                amount: String(format: "%.2f", cartItem.product.price),
+                quantity: cartItem.quantity,
+                reference: cartItem.product.id
+            )
+        }
+
+        // Convert billing address
+        let billingAddress: ZipWidgetConfig.Address? = billingAddressComplete
+            ? ZipWidgetConfig.Address(
+                firstName: billingFirstNameValue,
+                lastName: billingLastNameValue,
+                line1: billingAddress,
+                line2: billingAddressLine2.isEmpty ? nil : billingAddressLine2,
+                city: billingCity,
+                state: billingState,
+                postcode: billingPostalCode,
+                country: countryCode(from: billingCountry)
+            )
+            : nil
+
+        // Convert shipping address
+        let shippingAddress: ZipWidgetConfig.Address? = shippingAddressComplete
+            ? ZipWidgetConfig.Address(
+                firstName: shippingFirstNameValue,
+                lastName: shippingLastNameValue,
+                line1: address,
+                line2: addressLine2.isEmpty ? nil : addressLine2,
+                city: city,
+                state: state,
+                postcode: postalCode,
+                country: countryCode(from: country)
+            )
+            : nil
+
+        // Get Zip config from ConfigManager to use configured values
+        let zipConfig = ConfigManager.shared.getZipConfig()
+
+        return ZipWidgetConfig(
+            accessToken: zipConfig.accessToken,
+            gatewayId: zipConfig.gatewayId,
+            amount: amount,
+            currency: currency,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone.isEmpty ? nil : phone,
+            tokenize: true,
+            gender: "Male",
+            dateOfBirth: "1990-10-16",
+            shippingType: "delivery",
+            hideShippingAddress: true,
+            billing: billingAddress,
+            shipping: shippingAddress,
+            items: items,
+            statistics: nil
+        )
+    }
+
+    func handleZipResult(_ result: Result<String, ZipError>) {
+        isLoading = false
+        switch result {
+        case let .success(token):
+            self.captureChargeWallet(walletToken: token)
         case let .failure(error):
             showResultOverlay(success: false, message: error.customMessage)
         }
@@ -567,7 +656,7 @@ extension EnhancedCheckoutVM {
         return DataCharges.InitialiseWalletChargeReq(
             customer: customer,
             amount: Decimal(cartManager.total),
-            currency: "AUD",
+            currency: ConfigManager.shared.getGlobalConfig().currency,
             reference: UUID().uuidString,
             description: "Order from Demo Store",
             meta: metaData
@@ -579,7 +668,7 @@ extension EnhancedCheckoutVM {
             amount: Decimal(cartManager.total),
             amountLabel: "Amount",
             countryCode: "AU",
-            currencyCode: "AUD",
+            currencyCode: ConfigManager.shared.getGlobalConfig().currency,
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
@@ -634,11 +723,16 @@ extension EnhancedCheckoutVM {
             }
         }
     }
+}
+
+// MARK: - Handle 3ds
+
+extension EnhancedCheckoutVM {
 
     private func attemptMPGS3dsTokenCreation() {
         let request = DataMPGS3ds.MPGS3dsVaultReq(
             amount: cartManager.stringTotal,
-            currency: "AUD",
+            currency: ConfigManager.shared.getGlobalConfig().currency,
             customer: .init(
                 paymentSource: .init(
                     vaultToken: vaultToken,
@@ -660,7 +754,7 @@ extension EnhancedCheckoutVM {
         Task {
             let request = DataStandalone3ds.Standalone3DSReq(
                 amount: cartManager.stringTotal,
-                currency: "AUD",
+                currency: ConfigManager.shared.getGlobalConfig().currency,
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(vaultToken: vaultToken)),
                 data: .init(
@@ -698,7 +792,7 @@ extension EnhancedCheckoutVM {
     /// Based on 3DS auth status selects the appropriate flow
     func handleMPGS3dsStatus(_ response: DataMPGS3ds.MPGS3dsRes) {
         switch response.authStatus {
-        case .notSupported: captureCharge(id3ds: response.resource.data.threeDS.id)
+        case .notSupported: captureChargeMPGS(id3ds: response.resource.data.threeDS.id)
         case .pending:
             Task {
                 self.isLoading = false
@@ -729,7 +823,7 @@ extension EnhancedCheckoutVM {
                 self.showResultOverlay(success: false, message: "MPGS 3DS cancelled!")
             case .chargeAuthSuccess:
                 self.showMPGS3dsWebView = false
-                self.captureCharge(id3ds: event.charge3dsId)
+                self.captureChargeMPGS(id3ds: event.charge3dsId)
             }
         }
     }
@@ -757,15 +851,20 @@ extension EnhancedCheckoutVM {
             }
         }
     }
+}
+
+// MARK: - Charges
+
+extension EnhancedCheckoutVM {
 
     /// Captures the charge as the final step in the payment flow
-    private func captureCharge(id3ds: String) {
+    private func captureChargeMPGS(id3ds: String) {
         isLoading = true
         viewState?.setState(.disabled)
         Task {
             let request = DataCharges.CaptureChargeReq(
                 amount: cartManager.stringTotal,
-                currency: "AUD",
+                currency: ConfigManager.shared.getGlobalConfig().currency,
                 reference: UUID().uuidString,
                 description: "Test Payment",
                 threeDS: .init(id: id3ds))
@@ -785,7 +884,7 @@ extension EnhancedCheckoutVM {
         Task {
             let request = DataCharges.CaptureChargeStandaloneReq(
                 amount: cartManager.stringTotal,
-                currency: "AUD",
+                currency: ConfigManager.shared.getGlobalConfig().currency,
                 customer: .init(
                     firstName: firstName,
                     lastName: lastName,
@@ -805,6 +904,48 @@ extension EnhancedCheckoutVM {
                 showResultOverlay(success: true, message: "\(result.data.amount) \(result.data.currency) successfully charged!")
             } catch {
                 showResultOverlay(success: false, message: "Payment failed. Please try again.")
+            }
+        }
+    }
+
+    /// Captures the charge as the final step in the payment flow
+    private func captureChargeWallet(walletToken: String) {
+        isLoading = true
+        viewState?.setState(.disabled)
+        Task {
+            let request = DataCharges.CaptureChargeReq(
+                amount: cartManager.stringTotal,
+                currency: ConfigManager.shared.getGlobalConfig().currency,
+                reference: UUID().uuidString,
+                description: "Test Payment",
+                token: walletToken)
+
+            do {
+                let result = try await chargesService.captureCharge(request: request, apiAccessToken: apiAccessToken)
+                showResultOverlay(success: true, message: "\(result.data.amount) \(result.data.currency) successfully charged!")
+            } catch {
+                showResultOverlay(success: false, message: "Payment failed. Please try again.")
+            }
+        }
+    }
+
+    private func captureColesPayCharge() {
+        isLoading = true
+        Task {
+            do {
+                // For Coles Pay - a delay is needed as order is still processing with hook that needs to be fired to finish payment setup
+                // If this hook has not completed, this charge will fail with error "Charge in invalid state for capture".
+                // Improvement to add polling of charge state and when in correct state then finish the charge.
+                try await Task.sleep(for: .seconds(2))
+                let res = try await chargesService.captureChargeColesPay(chargeId: colesPayChargeId, apiAccessToken: apiAccessToken)
+                showResultOverlay(success: true, message: "Coles Pay Charge successful: \(res.data.amount) \(res.data.currency)")
+            } catch let RequestError.requestError(errorResponse: errorResponse) {
+                isLoading = false
+                let errorMessage = errorResponse.error?.message ?? errorResponse.errorSummary?.message ?? "Unknown error"
+                showResultOverlay(success: false, message: errorMessage)
+            } catch {
+                isLoading = false
+                showResultOverlay(success: false, message: "Unknown error")
             }
         }
     }

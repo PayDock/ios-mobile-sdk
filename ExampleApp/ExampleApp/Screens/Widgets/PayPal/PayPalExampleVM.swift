@@ -2,9 +2,7 @@
 //  PayPalExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 26.10.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import Foundation
 import MobileSDK

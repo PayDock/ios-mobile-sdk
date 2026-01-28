@@ -30,6 +30,22 @@ class ConfigVM: ObservableObject {
             return [.clientId]
         case .clickToPay:
             return [.widgetAccessToken, .clickToPayMetaConfig, .serviceId]
+        case .zip:
+            return [
+                .widgetAccessToken,
+                .gatewayId,
+                .firstName,
+                .lastName,
+                .email,
+                .phoneNumber,
+                .tokenize,
+                .gender,
+                .dateOfBirth,
+                .shippingType,
+                .hideShippingAddress,
+                .billingAddress,
+                .shippingAddress
+            ]
         }
     }
 

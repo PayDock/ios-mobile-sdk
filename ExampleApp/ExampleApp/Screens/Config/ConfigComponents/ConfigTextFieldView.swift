@@ -1,7 +1,6 @@
 //
 //  ConfigTextFieldView.swift
 //  ExampleApp
-//
 
 import SwiftUI
 import MobileSDK
@@ -12,9 +11,19 @@ struct ConfigTextFieldView: View {
     @State private var textValue: String = ""
 
     let selectedWidget: ConfigWidgetsEnum
-    let configKey: ConfigKeys
+    let configKey: ConfigKeys?
     let title: String
     let description: String?
+
+    init(selectedWidget: ConfigWidgetsEnum,
+         configKey: ConfigKeys? = nil,
+         title: String,
+         description: String? = nil) {
+        self.selectedWidget = selectedWidget
+        self.configKey = configKey
+        self.title = title
+        self.description = description
+    }
 
     var body: some View {
         NavigationStack {
@@ -35,6 +44,9 @@ struct ConfigTextFieldView: View {
         .onAppear {
             loadCurrentValue()
         }
+        .onChange(of: textValue) { _ in
+            updateConfiguration(with: textValue)
+        }
     }
 
     private func loadCurrentValue() {
@@ -53,13 +65,16 @@ struct ConfigTextFieldView: View {
             loadColesPayCurrentValue()
         case .clickToPay:
             loadClickToPayCurrentValue()
+        case .zip:
+            loadZipCurrentValue()
         default:
             break
         }
     }
 
     private func loadGlobalCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .global, as: GlobalConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .global, as: GlobalConfig.self) else { return }
 
         switch configKey {
         case .apiAccessToken:
@@ -74,7 +89,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func loadCardCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -87,7 +103,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func loadGiftCardCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -98,7 +115,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func loadPayPalCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -111,7 +129,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func loadPayPalVaultCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .paypalVault, as: PayPalVaultConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .paypalVault, as: PayPalVaultConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -124,7 +143,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func loadColesPayCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .colesPay, as: ColesPayConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .colesPay, as: ColesPayConfig.self) else { return }
 
         switch configKey {
         case .clientId:
@@ -135,13 +155,38 @@ struct ConfigTextFieldView: View {
     }
 
     private func loadClickToPayCurrentValue() {
-        guard let config = configVM.getConfiguration(for: .clickToPay, as: ClickToPayWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .clickToPay, as: ClickToPayWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
             textValue = config.accessToken
         case .serviceId:
             textValue = config.serviceId
+        default:
+            break
+        }
+    }
+
+    private func loadZipCurrentValue() {
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .zip, as: ZipWidgetConfig.self) else { return }
+
+        switch configKey {
+        case .widgetAccessToken:
+            textValue = config.accessToken
+        case .gatewayId:
+            textValue = config.gatewayId
+        case .firstName:
+            textValue = config.firstName ?? ""
+        case .lastName:
+            textValue = config.lastName ?? ""
+        case .email:
+            textValue = config.email ?? ""
+        case .phoneNumber:
+            textValue = config.phone ?? ""
+        case .dateOfBirth:
+            textValue = config.dateOfBirth ?? ""
         default:
             break
         }
@@ -163,13 +208,16 @@ struct ConfigTextFieldView: View {
             updateColesPayConfiguration(with: value)
         case .clickToPay:
             updateClickToPayConfiguration(with: value)
+        case .zip:
+            updateZipConfiguration(with: value)
         default:
             break
         }
     }
 
     private func updateGlobalConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .global, as: GlobalConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .global, as: GlobalConfig.self) else { return }
 
         switch configKey {
         case .apiAccessToken:
@@ -197,7 +245,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func updateCardConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -223,7 +272,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func updateGiftCardConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -238,7 +288,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func updatePayPalConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -262,7 +313,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func updatePayPalVaultConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .paypalVault, as: PayPalVaultConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .paypalVault, as: PayPalVaultConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -282,7 +334,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func updateColesPayConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .colesPay, as: ColesPayConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .colesPay, as: ColesPayConfig.self) else { return }
 
         switch configKey {
         case .clientId:
@@ -294,7 +347,8 @@ struct ConfigTextFieldView: View {
     }
 
     private func updateClickToPayConfiguration(with value: String) {
-        guard var config = configVM.getConfiguration(for: .clickToPay, as: ClickToPayWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .clickToPay, as: ClickToPayWidgetConfig.self) else { return }
 
         switch configKey {
         case .widgetAccessToken:
@@ -313,5 +367,159 @@ struct ConfigTextFieldView: View {
             return
         }
         configVM.updateConfiguration(for: .clickToPay, with: config)
+    }
+
+    // swiftlint:disable:next function_body_length
+    private func updateZipConfiguration(with value: String) {
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .zip, as: ZipWidgetConfig.self) else { return }
+
+        let updatedConfig: ZipWidgetConfig
+
+        switch configKey {
+        case .widgetAccessToken:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: value,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: config.email,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .gatewayId:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: value,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: config.email,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .firstName:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: value,
+                lastName: config.lastName,
+                email: config.email,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .lastName:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: value,
+                email: config.email,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .email:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: value,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .phoneNumber:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: config.email,
+                phone: value.isEmpty ? nil : value,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .dateOfBirth:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: config.email,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: value.isEmpty ? nil : value,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        default:
+            return
+        }
+        configVM.updateConfiguration(for: .zip, with: updatedConfig)
     }
 }

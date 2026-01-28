@@ -26,6 +26,17 @@ enum ConfigComponentsEnum {
     case serviceId
     case totalAmount
     case currency
+    case firstName
+    case lastName
+    case email
+    case phoneNumber
+    case gender
+    case dateOfBirth
+    case tokenize
+    case shippingType
+    case hideShippingAddress
+    case billingAddress
+    case shippingAddress
 
     var title: String {
         switch self {
@@ -48,6 +59,17 @@ enum ConfigComponentsEnum {
         case .serviceId: return "Service ID"
         case .totalAmount: return "Total Amount"
         case .currency: return "Currency"
+        case .firstName: return "First Name"
+        case .lastName: return "Last Name"
+        case .email: return "Email"
+        case .phoneNumber: return "Phone"
+        case .gender: return "Gender"
+        case .dateOfBirth: return "Date of Birth"
+        case .tokenize: return "Tokenize"
+        case .shippingType: return "Shipping Type"
+        case .hideShippingAddress: return "Hide Shipping Address"
+        case .billingAddress: return "Billing Address"
+        case .shippingAddress: return "Shipping Address"
         }
     }
 
@@ -62,12 +84,15 @@ enum ConfigComponentsEnum {
 
     func destinationView(selectedWidget: ConfigWidgetsEnum) -> AnyView {
         switch self {
-        case .widgetAccessToken, .apiAccessToken, .gatewayId, .clientId, .serviceId, .totalAmount, .currency:
+        case .widgetAccessToken, .apiAccessToken, .gatewayId, .clientId, .serviceId, .totalAmount, .currency,
+                    .firstName, .lastName, .email, .phoneNumber, .dateOfBirth:
             return createTextFieldView(selectedWidget: selectedWidget)
-        case .collectCardholderName, .storePin, .requestShipping, .enableTestMode:
+        case .collectCardholderName, .storePin, .requestShipping, .enableTestMode, .tokenize, .hideShippingAddress:
             return createToggleView(selectedWidget: selectedWidget)
-        case .fundingSource, .environment:
+        case .fundingSource, .environment, .gender, .shippingType:
             return createPickerView(selectedWidget: selectedWidget)
+        case .billingAddress, .shippingAddress:
+            return createAddressView(selectedWidget: selectedWidget)
         case .allowSaveCard:
             return AnyView(ConfigSaveCardView(selectedWidget: selectedWidget, title: title))
         case .schemeSupport:
@@ -105,6 +130,13 @@ enum ConfigComponentsEnum {
             title: title))
     }
 
+    private func createAddressView(selectedWidget: ConfigWidgetsEnum) -> AnyView {
+        return AnyView(ConfigAddressView(
+            selectedWidget: selectedWidget,
+            configKey: configKey,
+            title: title))
+    }
+
     private var configKey: ConfigKeys {
         switch self {
         case .widgetAccessToken: return .widgetAccessToken
@@ -120,6 +152,17 @@ enum ConfigComponentsEnum {
         case .serviceId: return .serviceId
         case .totalAmount: return .totalAmount
         case .currency: return .currency
+        case .shippingAddress: return .shippingAddress
+        case .billingAddress: return .billingAddress
+        case .firstName: return .firstName
+        case .lastName: return .lastName
+        case .phoneNumber: return .phoneNumber
+        case .email: return .email
+        case .gender: return .gender
+        case .shippingType: return .shippingType
+        case .hideShippingAddress: return .hideShippingAddress
+        case .dateOfBirth: return .dateOfBirth
+        case .tokenize: return .tokenize
         case .allowSaveCard, .schemeSupport, .address, .afterpayConfig, .checkoutOptions, .clickToPayMetaConfig:
             fatalError("This component doesn't use ConfigKeys")
         }

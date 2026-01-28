@@ -20,7 +20,7 @@ class ZipVMTests: XCTestCase {
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
-    var config: ZipConfig!
+    var config: ZipWidgetConfig!
     var completionResult: Result<String, ZipError>?
     var cancellables = Set<AnyCancellable>()
 
@@ -33,37 +33,33 @@ class ZipVMTests: XCTestCase {
         completionResult = nil
 
         // Create test configuration
-        config = ZipConfig(
+        config = ZipWidgetConfig(
+            accessToken: "test_access_token",
             gatewayId: "test_gateway_id",
-            token: "test_access_token",
             amount: 100.00,
             currency: "AUD",
-            orderReference: "ORDER-123",
-            orderItems: [
-                ZipConfig.OrderItem(
-                    name: "Test Product",
-                    amount: 100.00,
-                    quantity: 1,
-                    type: "physical",
-                    reference: "ITEM-001"
-                )
-            ],
-            shopper: ZipConfig.Shopper(
-                firstName: "John",
-                lastName: "Doe",
-                email: "john.doe@example.com",
-                phone: "+1234567890"
-            ),
-            billing: ZipConfig.Address(
+            firstName: "John",
+            lastName: "Doe",
+            email: "john.doe@example.com",
+            phone: "+1234567890",
+            tokenize: true,
+            billing: ZipWidgetConfig.Address(
                 firstName: "John",
                 lastName: "Doe",
                 line1: "123 Main St",
                 city: "Sydney",
                 state: "NSW",
-                postalCode: "2000",
-                countryCode: "AU"
+                postcode: "2000",
+                country: "AU"
             ),
-            environment: .sandbox
+            items: [
+                ZipWidgetConfig.Item(
+                    name: "Test Product",
+                    amount: "100.00",
+                    quantity: 1,
+                    reference: "ITEM-001"
+                )
+            ]
         )
 
         viewModel = ZipVM(
@@ -507,15 +503,14 @@ class ZipVMTests: XCTestCase {
 
     func testConfigurationIsProperlySet() {
         XCTAssertEqual(config.gatewayId, "test_gateway_id")
-        XCTAssertEqual(config.token, "test_access_token")
+        XCTAssertEqual(config.accessToken, "test_access_token")
         XCTAssertEqual(config.amount, 100.00)
         XCTAssertEqual(config.currency, "AUD")
-        XCTAssertEqual(config.orderReference, "ORDER-123")
-        XCTAssertEqual(config.orderItems.count, 1)
-        XCTAssertEqual(config.orderItems[0].name, "Test Product")
-        XCTAssertEqual(config.shopper.firstName, "John")
-        XCTAssertEqual(config.shopper.lastName, "Doe")
-        XCTAssertEqual(config.shopper.email, "john.doe@example.com")
+        XCTAssertEqual(config.firstName, "John")
+        XCTAssertEqual(config.lastName, "Doe")
+        XCTAssertEqual(config.email, "john.doe@example.com")
+        XCTAssertEqual(config.items?.count, 1)
+        XCTAssertEqual(config.items?[0].name, "Test Product")
     }
 
     // MARK: - WebView State Tests

@@ -38,6 +38,7 @@ class StyleVM: ObservableObject {
         case .clickToPay: return [.loader]
         case .mpgs3ds: return [.loader]
         case .standalone3ds: return [.loader]
+        case .zip: return [.zip, .buttonLoader]
         }
     }
 }

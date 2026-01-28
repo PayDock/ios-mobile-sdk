@@ -13,6 +13,7 @@ enum PaymentMethod: CaseIterable {
     case afterpay
     case mastercard
     case colesPay
+    case zip
 
     var displayName: String {
         switch self {
@@ -22,6 +23,7 @@ enum PaymentMethod: CaseIterable {
         case .afterpay: return "Afterpay"
         case .mastercard: return "Mastercard Click to Pay"
         case .colesPay: return "Coles Pay"
+        case .zip: return "Zip"
         }
     }
 
@@ -33,6 +35,7 @@ enum PaymentMethod: CaseIterable {
         case .afterpay: return "afterpay"
         case .mastercard: return "mastercard"
         case .colesPay: return "coles-pay"
+        case .zip: return "zip"
         }
     }
 }
