@@ -17,7 +17,7 @@ class ZipVM: ObservableObject {
 
     // MARK: - Properties
 
-    private let config: ZipConfig
+    private let config: ZipWidgetConfig
 
     @Published var showWebView = false
     @Published var isLoading = false
@@ -37,14 +37,14 @@ class ZipVM: ObservableObject {
     // MARK: - Initialisation
 
     init(viewState: ViewState,
-         config: ZipConfig,
+         config: ZipWidgetConfig,
          paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<String, ZipError>) -> Void) {
         self.viewState = viewState
         self.config = config
-        self.accessToken = config.token
+        self.accessToken = config.accessToken
         self.paymentSourcesService = paymentSourcesService
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
@@ -55,6 +55,7 @@ class ZipVM: ObservableObject {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func createZipCheckout() {
         Task {
             do {
@@ -62,25 +63,63 @@ class ZipVM: ObservableObject {
                 let externalCheckoutReq = DataPaymentSources.CreateExternalCheckoutReq(
                     gatewayId: self.config.gatewayId,
                     meta: DataPaymentSources.ExternalCheckoutMeta(
-                        firstName: self.config.shopper.firstName,
-                        lastName: self.config.shopper.lastName,
-                        email: self.config.shopper.email,
-                        tokenize: true,
+                        firstName: self.config.firstName,
+                        lastName: self.config.lastName,
+                        email: self.config.email,
+                        phone: self.config.phone,
+                        gender: self.config.gender,
+                        dateOfBirth: self.config.dateOfBirth,
+                        tokenize: self.config.tokenize,
                         charge: DataPaymentSources.ExternalCheckoutCharge(
                             amount: Double(truncating: self.config.amount as NSNumber),
                             currency: self.config.currency,
+                            shippingType: self.config.shippingType,
                             billingAddress: self.config.billing.map { billing in
                                 DataPaymentSources.ExternalBillingAddress(
                                     firstName: billing.firstName,
                                     lastName: billing.lastName,
                                     addressLine1: billing.line1,
+                                    addressLine2: billing.line2,
                                     addressCity: billing.city,
                                     addressState: billing.state,
-                                    addressCountry: billing.countryCode,
-                                    addressPostcode: billing.postalCode
+                                    addressCountry: billing.country,
+                                    addressPostcode: billing.postcode
+                                )
+                            },
+                            shippingAddress: self.config.shipping.map { shipping in
+                                DataPaymentSources.ExternalBillingAddress(
+                                    firstName: shipping.firstName,
+                                    lastName: shipping.lastName,
+                                    addressLine1: shipping.line1,
+                                    addressLine2: shipping.line2,
+                                    addressCity: shipping.city,
+                                    addressState: shipping.state,
+                                    addressCountry: shipping.country,
+                                    addressPostcode: shipping.postcode
+                                )
+                            },
+                            items: self.config.items?.map { item in
+                                DataPaymentSources.ExternalCheckoutItem(
+                                    name: item.name,
+                                    amount: item.amount,
+                                    quantity: item.quantity,
+                                    reference: item.reference
                                 )
                             }
-                        )
+                        ),
+                        statistics: self.config.statistics.map { stats in
+                            DataPaymentSources.ExternalCheckoutStatistics(
+                                accountCreated: stats.accountCreated,
+                                salesTotalNumber: stats.salesTotalNumber,
+                                salesTotalAmount: stats.salesTotalAmount,
+                                salesAvgValue: stats.salesAvgValue,
+                                salesMaxValue: stats.salesMaxValue,
+                                refundsTotalAmount: stats.refundsTotalAmount,
+                                previousChargeback: stats.previousChargeback,
+                                currency: stats.currency,
+                                lastLogin: stats.lastLogin
+                            )
+                        }
                     ),
                     successRedirectUrl: Constants.zipRedirectUrl,
                     errorRedirectUrl: Constants.zipRedirectUrl,

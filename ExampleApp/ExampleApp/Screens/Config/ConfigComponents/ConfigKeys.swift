@@ -20,4 +20,15 @@ enum ConfigKeys {
     case serviceId
     case totalAmount
     case currency
+    case shippingAddress
+    case billingAddress
+    case firstName
+    case lastName
+    case email
+    case phoneNumber
+    case gender
+    case dateOfBirth
+    case tokenize
+    case shippingType
+    case hideShippingAddress
 }

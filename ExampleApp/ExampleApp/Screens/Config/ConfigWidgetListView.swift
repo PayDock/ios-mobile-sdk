@@ -19,7 +19,8 @@ struct ConfigWidgetListView: View {
             ConfigWidgetItem(widget: .paypalVault),
             ConfigWidgetItem(widget: .afterPay),
             ConfigWidgetItem(widget: .colesPay),
-            ConfigWidgetItem(widget: .clickToPay)
+            ConfigWidgetItem(widget: .clickToPay),
+            ConfigWidgetItem(widget: .zip)
         ].sorted { $0.widget.title < $1.widget.title }
 
         return [globalItem] + otherItems
@@ -82,7 +83,9 @@ struct ConfigWidgetListView: View {
         HStack {
             HStack {
                 icon
-                    .frame(width: 24.0, height: 24.0)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 24, height: 24)
                 Text(title)
                     .font(.title2)
                     .padding(.vertical, 6)

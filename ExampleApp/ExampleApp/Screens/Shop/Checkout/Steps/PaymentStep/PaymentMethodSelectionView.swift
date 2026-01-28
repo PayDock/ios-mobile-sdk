@@ -23,9 +23,9 @@ struct PaymentMethodSelectionView: View {
                         method: method,
                         isSelected: selectedMethod == method
                     ) {
-                        withAnimation(.easeInOut) {
+//                        withAnimation(.easeInOut) {
                             onMethodSelected(method)
-                        }
+//                        }
                     }
 
                     if selectedMethod == method {

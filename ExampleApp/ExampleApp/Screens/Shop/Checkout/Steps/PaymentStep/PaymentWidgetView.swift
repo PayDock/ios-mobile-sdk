@@ -28,6 +28,8 @@ struct PaymentWidgetView: View {
             MastercardPaymentWidget(viewModel: viewModel, currentStep: $currentStep)
         case .colesPay:
             ColesPayPaymentWidget(viewModel: viewModel, currentStep: $currentStep)
+        case .zip:
+            ZipPaymentWidget(viewModel: viewModel, currentStep: $currentStep)
         }
     }
 }

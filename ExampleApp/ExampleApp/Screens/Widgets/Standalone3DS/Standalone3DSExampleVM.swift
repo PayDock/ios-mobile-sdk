@@ -74,8 +74,8 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
     private func create3dsToken(vaultToken: String) {
         Task {
             let request = DataStandalone3ds.Standalone3DSReq(
-                amount: "10",
-                currency: "AUD",
+                amount: configManager.getGlobalConfig().totalAmount,
+                currency: configManager.getGlobalConfig().currency,
                 reference: UUID().uuidString,
                 customer: .init(paymentSource: .init(vaultToken: vaultToken)),
                 data: .init(

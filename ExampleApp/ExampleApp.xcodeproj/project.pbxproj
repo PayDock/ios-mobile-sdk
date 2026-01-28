@@ -141,6 +141,9 @@
 		5874582C2E5370B700A24A35 /* PayPalWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5874582B2E5370B700A24A35 /* PayPalWidgetUITests.swift */; };
 		587C10782ECCDEF800D8FCBE /* ZipExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587C10752ECCDEF800D8FCBE /* ZipExampleView.swift */; };
 		587C10792ECCDEF800D8FCBE /* ZipExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587C10762ECCDEF800D8FCBE /* ZipExampleVM.swift */; };
+		58A1B2FD2F23C4510012F135 /* ZipPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A1B2FC2F23C4510012F135 /* ZipPaymentWidget.swift */; };
+		58A1B3052F23C5A40012F135 /* ZipStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A1B3022F23C5A40012F135 /* ZipStyleView.swift */; };
+		58A1B3062F23C5A40012F135 /* ZipStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A1B3032F23C5A40012F135 /* ZipStyleVM.swift */; };
 		58A90DAE2F1546970012D4C9 /* MPGS3dsExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */; };
 		58A90DAF2F1546970012D4C9 /* MPGS3dsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */; };
 		58D3D0DB2E8DA3190059584D /* ConfigComponentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D42E8DA3190059584D /* ConfigComponentListView.swift */; };
@@ -326,6 +329,9 @@
 		5874582B2E5370B700A24A35 /* PayPalWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalWidgetUITests.swift; sourceTree = "<group>"; };
 		587C10752ECCDEF800D8FCBE /* ZipExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipExampleView.swift; sourceTree = "<group>"; };
 		587C10762ECCDEF800D8FCBE /* ZipExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipExampleVM.swift; sourceTree = "<group>"; };
+		58A1B2FC2F23C4510012F135 /* ZipPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipPaymentWidget.swift; sourceTree = "<group>"; };
+		58A1B3022F23C5A40012F135 /* ZipStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipStyleView.swift; sourceTree = "<group>"; };
+		58A1B3032F23C5A40012F135 /* ZipStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipStyleVM.swift; sourceTree = "<group>"; };
 		58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleVM.swift; sourceTree = "<group>"; };
 		58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleView.swift; sourceTree = "<group>"; };
 		58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigAddressView.swift; sourceTree = "<group>"; };
@@ -530,6 +536,7 @@
 				285C14102E95D7A8007ECC80 /* PaymentMethodSelectionView.swift */,
 				285C14112E95D7A8007ECC80 /* PaymentWidgetView.swift */,
 				285C14122E95D7A8007ECC80 /* PayPalPaymentWidget.swift */,
+				58A1B2FC2F23C4510012F135 /* ZipPaymentWidget.swift */,
 			);
 			path = PaymentStep;
 			sourceTree = "<group>";
@@ -673,6 +680,7 @@
 				281DECA12E70766900C3DC0C /* PayPal */,
 				28A2DB492E0B3E4B00A94753 /* Spacings */,
 				28A2DB4F2E0B54A900A94753 /* ButtonLoader */,
+				58A1B3042F23C5A40012F135 /* Zip */,
 			);
 			path = StyleComponents;
 			sourceTree = "<group>";
@@ -930,6 +938,15 @@
 			children = (
 				587C10752ECCDEF800D8FCBE /* ZipExampleView.swift */,
 				587C10762ECCDEF800D8FCBE /* ZipExampleVM.swift */,
+			);
+			path = Zip;
+			sourceTree = "<group>";
+		};
+		58A1B3042F23C5A40012F135 /* Zip */ = {
+			isa = PBXGroup;
+			children = (
+				58A1B3022F23C5A40012F135 /* ZipStyleView.swift */,
+				58A1B3032F23C5A40012F135 /* ZipStyleVM.swift */,
 			);
 			path = Zip;
 			sourceTree = "<group>";
@@ -1269,7 +1286,10 @@
 				280EB39F2AFE42BC0036E575 /* PayPalExampleVM.swift in Sources */,
 				28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */,
 				28C65E7A2EEA2880001790CE /* ToggleFieldView.swift in Sources */,
+				58A1B3052F23C5A40012F135 /* ZipStyleView.swift in Sources */,
+				58A1B3062F23C5A40012F135 /* ZipStyleVM.swift in Sources */,
 				281859082EA29B24002D7CDE /* IconGridView.swift in Sources */,
+				58A1B2FD2F23C4510012F135 /* ZipPaymentWidget.swift in Sources */,
 				587C10782ECCDEF800D8FCBE /* ZipExampleView.swift in Sources */,
 				587C10792ECCDEF800D8FCBE /* ZipExampleVM.swift in Sources */,
 				287F399B2DF8C03700F4D771 /* ButtonStyleVM.swift in Sources */,

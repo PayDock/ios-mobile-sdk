@@ -2,8 +2,7 @@
 //  ApplePayExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 04.10.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import Foundation
 import MobileSDK
@@ -101,7 +100,7 @@ class ApplePayExampleVM: NSObject, ObservableObject {
             amount: 10,
             amountLabel: "Amount",
             countryCode: "AU",
-            currencyCode: "AUD",
+            currencyCode: configManager.getGlobalConfig().currency,
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
 
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)

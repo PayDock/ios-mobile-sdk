@@ -1,7 +1,6 @@
 //
 //  ConfigToggleView.swift
 //  ExampleApp
-//
 
 import SwiftUI
 import MobileSDK
@@ -12,8 +11,16 @@ struct ConfigToggleView: View {
     @State private var toggleValue: Bool = false
 
     let selectedWidget: ConfigWidgetsEnum
-    let configKey: ConfigKeys
+    let configKey: ConfigKeys?
     let title: String
+
+    init(selectedWidget: ConfigWidgetsEnum,
+         configKey: ConfigKeys? = nil,
+         title: String) {
+        self.selectedWidget = selectedWidget
+        self.configKey = configKey
+        self.title = title
+    }
 
     var body: some View {
         NavigationStack {
@@ -45,7 +52,8 @@ struct ConfigToggleView: View {
     private func loadCurrentValue() {
         switch selectedWidget {
         case .card:
-            if let config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) {
+            if let configKey = configKey,
+               let config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) {
                 switch configKey {
                 case .collectCardholderName:
                     toggleValue = config.collectCardholderName
@@ -54,7 +62,8 @@ struct ConfigToggleView: View {
                 }
             }
         case .giftCard:
-            if let config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) {
+            if let configKey = configKey,
+               let config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) {
                 switch configKey {
                 case .storePin:
                     toggleValue = config.storePin
@@ -63,10 +72,23 @@ struct ConfigToggleView: View {
                 }
             }
         case .paypal:
-            if let config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) {
+            if let configKey = configKey,
+               let config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) {
                 switch configKey {
                 case .requestShipping:
                     toggleValue = config.requestShipping
+                default:
+                    break
+                }
+            }
+        case .zip:
+            if let configKey = configKey,
+               let config = configVM.getConfiguration(for: .zip, as: ZipWidgetConfig.self) {
+                switch configKey {
+                case .tokenize:
+                    toggleValue = config.tokenize ?? true
+                case .hideShippingAddress:
+                    toggleValue = config.hideShippingAddress ?? false
                 default:
                     break
                 }
@@ -84,13 +106,16 @@ struct ConfigToggleView: View {
             updateGiftCardConfiguration(with: value)
         case .paypal:
             updatePayPalConfiguration(with: value)
+        case .zip:
+            updateZipConfiguration(with: value)
         default:
             break
         }
     }
 
     private func updateCardConfiguration(with value: Bool) {
-        guard var config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) else { return }
 
         switch configKey {
         case .collectCardholderName:
@@ -108,7 +133,8 @@ struct ConfigToggleView: View {
     }
 
     private func updateGiftCardConfiguration(with value: Bool) {
-        guard var config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) else { return }
 
         switch configKey {
         case .storePin:
@@ -120,7 +146,8 @@ struct ConfigToggleView: View {
     }
 
     private func updatePayPalConfiguration(with value: Bool) {
-        guard var config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) else { return }
+        guard let configKey = configKey,
+              var config = configVM.getConfiguration(for: .paypal, as: PayPalWidgetConfig.self) else { return }
 
         switch configKey {
         case .requestShipping:
@@ -136,28 +163,98 @@ struct ConfigToggleView: View {
         configVM.updateConfiguration(for: .paypal, with: config)
     }
 
+    private func updateZipConfiguration(with value: Bool) {
+        guard let configKey = configKey,
+              let config = configVM.getConfiguration(for: .zip, as: ZipWidgetConfig.self) else { return }
+
+        let updatedConfig: ZipWidgetConfig
+
+        switch configKey {
+        case .tokenize:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: config.email,
+                phone: config.phone,
+                tokenize: value,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: config.hideShippingAddress,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        case .hideShippingAddress:
+            updatedConfig = ZipWidgetConfig(
+                accessToken: config.accessToken,
+                gatewayId: config.gatewayId,
+                amount: config.amount,
+                currency: config.currency,
+                firstName: config.firstName,
+                lastName: config.lastName,
+                email: config.email,
+                phone: config.phone,
+                tokenize: config.tokenize,
+                gender: config.gender,
+                dateOfBirth: config.dateOfBirth,
+                shippingType: config.shippingType,
+                hideShippingAddress: value,
+                billing: config.billing,
+                shipping: config.shipping,
+                items: config.items,
+                statistics: config.statistics
+            )
+        default:
+            return
+        }
+        configVM.updateConfiguration(for: .zip, with: updatedConfig)
+    }
+
     private func resetToDefault() {
         switch selectedWidget {
         case .card:
-            switch configKey {
-            case .collectCardholderName:
-                toggleValue = true
-            default:
-                break
+            if let configKey = configKey {
+                switch configKey {
+                case .collectCardholderName:
+                    toggleValue = true
+                default:
+                    break
+                }
             }
         case .giftCard:
-            switch configKey {
-            case .storePin:
-                toggleValue = true
-            default:
-                break
+            if let configKey = configKey {
+                switch configKey {
+                case .storePin:
+                    toggleValue = true
+                default:
+                    break
+                }
             }
         case .paypal:
-            switch configKey {
-            case .requestShipping:
-                toggleValue = true
-            default:
-                break
+            if let configKey = configKey {
+                switch configKey {
+                case .requestShipping:
+                    toggleValue = true
+                default:
+                    break
+                }
+            }
+        case .zip:
+                if let configKey = configKey {
+                switch configKey {
+                case .tokenize:
+                    toggleValue = true
+                case .hideShippingAddress:
+                    toggleValue = false
+                default:
+                    break
+                }
             }
         default:
             break

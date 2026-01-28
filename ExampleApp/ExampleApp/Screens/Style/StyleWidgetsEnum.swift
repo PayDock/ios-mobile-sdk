@@ -22,6 +22,7 @@ enum WidgetsEnum {
     case applePay
     case mpgs3ds
     case standalone3ds
+    case zip
 
     var title: String {
         switch self {
@@ -37,6 +38,7 @@ enum WidgetsEnum {
         case .applePay: return "Apple Pay"
         case .mpgs3ds: return "MPGS 3DS"
         case .standalone3ds: return "Standalone 3DS"
+        case .zip: return "Zip"
         }
     }
 
@@ -54,6 +56,7 @@ enum WidgetsEnum {
         case .applePay: Image("apple-pay-style")
         case .mpgs3ds: Image("integrated-3ds-style")
         case .standalone3ds: Image("standalone-3ds-style")
+        case .zip: Image("zip")
         }
     }
 }

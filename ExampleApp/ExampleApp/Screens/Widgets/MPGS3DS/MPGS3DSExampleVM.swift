@@ -66,7 +66,10 @@ class MPGS3dsExampleVM: NSObject, ObservableObject {
 
     private func create3dsToken(cardToken: String) {
         Task {
-            let req = DataMPGS3ds.MPGS3dsReq(amount: "10", currency: "AUD", threeDS: .init(browserDetails: .init()), token: cardToken)
+            let req = DataMPGS3ds.MPGS3dsReq(amount: configManager.getGlobalConfig().totalAmount,
+                                             currency: configManager.getGlobalConfig().currency,
+                                             threeDS: .init(browserDetails: .init()),
+                                             token: cardToken)
             do {
                 let token3DS = try await mpgs3dsService.createMPGS3dsToken(request: req, apiAccessToken: self.apiAccessToken)
                 self.isLoading = false

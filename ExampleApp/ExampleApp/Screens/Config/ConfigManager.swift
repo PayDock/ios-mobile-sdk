@@ -2,9 +2,7 @@
 //  ConfigManager.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 10.12.2025..
 //  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
 
 import Foundation
 import MobileSDK
@@ -29,7 +27,9 @@ class ConfigManager: ObservableObject {
         setupGiftCardConfiguration()
         setupPayPalConfigurations()
         setupAfterpayConfiguration()
-        setupWalletConfigurations()
+        setupColesPayConfiguration()
+        setupClickToPayConfiguration()
+        setupZipConfiguration()
     }
 
     private func setupGlobalConfiguration() {
@@ -103,15 +103,75 @@ class ConfigManager: ObservableObject {
         )
     }
 
-    private func setupWalletConfigurations() {
+    private func setupColesPayConfiguration() {
         configurations[.colesPay] = ColesPayConfig(
             clientId: ProjectEnvironment.shared.getColesPayClientId() ?? ""
         )
+    }
 
+    private func setupClickToPayConfiguration() {
         configurations[.clickToPay] = ClickToPayWidgetConfig(
             serviceId: ProjectEnvironment.shared.getClickToPayServiceId() ?? "",
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
             meta: nil
+        )
+    }
+
+    // swiftlint:disable:next function_body_length
+    private func setupZipConfiguration() {
+        let globalConfig = getGlobalConfig()
+        let amount = Decimal(string: globalConfig.totalAmount) ?? 10.00
+        let currency = globalConfig.currency
+
+        configurations[.zip] = ZipWidgetConfig(
+            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+            gatewayId: ProjectEnvironment.shared.getZipGatewayId() ?? "",
+            amount: amount,
+            currency: currency,
+            firstName: "Joshua",
+            lastName: "Wood",
+            email: "joshuawood@hotmail.com.au",
+            phone: "+61412345678",
+            tokenize: true,
+            gender: "male",
+            dateOfBirth: nil,
+            shippingType: nil,
+            hideShippingAddress: nil,
+            billing: ZipWidgetConfig.Address(
+                firstName: "Joshua",
+                lastName: "Wood",
+                line1: "Suite 660",
+                line2: "test",
+                city: "Sydney",
+                state: "LA",
+                postcode: "3223",
+                country: "AU"
+            ),
+            shipping: ZipWidgetConfig.Address(
+                firstName: "Joshua",
+                lastName: "Wood",
+                line1: "Suite 660",
+                line2: "822 Ruiz Square",
+                city: "Sydney",
+                state: "LA",
+                postcode: "3223",
+                country: "AU"
+            ),
+            items: [
+                ZipWidgetConfig.Item(
+                    name: "ACME Toolbox",
+                    amount: "2.00",
+                    quantity: 1,
+                    reference: "Fuga consequuntur sint ab magnam"
+                ),
+                ZipWidgetConfig.Item(
+                    name: "Device 42",
+                    amount: "2.00",
+                    quantity: 1,
+                    reference: "Fuga consequuntur sint ab magnam"
+                )
+            ],
+            statistics: nil
         )
     }
 
@@ -207,6 +267,33 @@ class ConfigManager: ObservableObject {
             serviceId: ProjectEnvironment.shared.getClickToPayServiceId() ?? "",
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
             meta: nil
+        )
+    }
+
+    func getZipConfig() -> ZipWidgetConfig {
+        let globalConfig = getGlobalConfig()
+        let amount = Decimal(string: globalConfig.totalAmount) ?? 10.00
+        let currency = globalConfig.currency
+
+        let config = getConfiguration(for: .zip, as: ZipWidgetConfig.self)
+        return ZipWidgetConfig(
+            accessToken: config?.accessToken ?? ProjectEnvironment.shared.getWidgetAccessToken(),
+            gatewayId: config?.gatewayId ?? ProjectEnvironment.shared.getZipGatewayId() ?? "",
+            amount: amount,
+            currency: currency,
+            firstName: config?.firstName,
+            lastName: config?.lastName,
+            email: config?.email,
+            phone: config?.phone,
+            tokenize: config?.tokenize,
+            gender: config?.gender,
+            dateOfBirth: config?.dateOfBirth,
+            shippingType: config?.shippingType,
+            hideShippingAddress: config?.hideShippingAddress,
+            billing: config?.billing,
+            shipping: config?.shipping,
+            items: config?.items,
+            statistics: nil
         )
     }
 

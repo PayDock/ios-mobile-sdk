@@ -2,13 +2,12 @@
 //  ZipWidgetAppearance.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import SwiftUI
 
-public struct ZipWidgetAppearance {
+public struct ZipWidgetAppearance: ActionButtonLoaderStylableAppearance {
 
     /// The button style following Zip's brand guidelines
     /// Default: .colorOnBlack (colored icon on black background)
@@ -17,18 +16,17 @@ public struct ZipWidgetAppearance {
     /// - blackOnWhite: Black icon on white background with black border
     public var buttonStyle: ZipButtonStyle
 
-    /// The corner radius of the button
-    /// Default: 8.0 (per Zip brand guidelines)
-    public var cornerRadius: CGFloat
-
     /// The loader/spinner appearance
     public var loader: Theme.ButtonLoader
 
+    /// The corner radius of the button
+    /// Brand guidelines mean this value is not editable
+    public let cornerRadius: CGFloat
+
     public init(buttonStyle: ZipButtonStyle = .whiteOnBlack,
-                cornerRadius: CGFloat = 8.0,
                 loader: Theme.ButtonLoader? = nil) {
         self.buttonStyle = buttonStyle
-        self.cornerRadius = cornerRadius
+        self.cornerRadius = 8.0
 
         // Adapt loader color to button style
         if let loader = loader {

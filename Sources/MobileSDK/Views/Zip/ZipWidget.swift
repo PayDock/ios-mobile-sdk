@@ -11,7 +11,7 @@ public struct ZipWidget: View {
     @State var appearance: ZipWidgetAppearance
 
     public init(viewState: ViewState? = nil,
-                config: ZipConfig,
+                config: ZipWidgetConfig,
                 appearance: ZipWidgetAppearance = ZipWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 eventDelegate: WidgetEventDelegate? = nil,
@@ -40,7 +40,7 @@ public struct ZipWidget: View {
         ZStack {
             if viewModel.isLoading && viewModel.showLoaders {
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: appearance.buttonStyle == .blackOnWhite ? .black : .white))
+                    .progressViewStyle(CircularProgressViewStyle(tint: appearance.loader.spinnerColor))
             } else {
                 Image(appearance.buttonStyle.imageName, bundle: .module)
                     .resizable()
@@ -142,20 +142,17 @@ struct ZipWidget_Previews: PreviewProvider {
         VStack(spacing: 16) {
             // Colored icon on black (default)
             ZipWidget(
-                config: ZipConfig(
+                config: ZipWidgetConfig(
+                    accessToken: "YOUR-TOKEN",
                     gatewayId: "YOUR-GATEWAY-ID",
-                    token: "YOUR-TOKEN",
                     amount: 100.0,
                     currency: "AUD",
-                    orderReference: "ORDER-123",
-                    orderItems: [
-                        ZipConfig.OrderItem(name: "Test Item", amount: 100.0, quantity: 1)
-                    ],
-                    shopper: ZipConfig.Shopper(
-                        firstName: "John",
-                        lastName: "Doe",
-                        email: "john.doe@example.com"
-                    )
+                    firstName: "John",
+                    lastName: "Doe",
+                    email: "john.doe@example.com",
+                    items: [
+                        ZipWidgetConfig.Item(name: "Test Item", amount: "100.00", quantity: 1)
+                    ]
                 ),
                 appearance: ZipWidgetAppearance(buttonStyle: .whiteOnBlack),
                 completion: { _ in }
@@ -163,20 +160,17 @@ struct ZipWidget_Previews: PreviewProvider {
 
             // Colored icon on white with border
             ZipWidget(
-                config: ZipConfig(
+                config: ZipWidgetConfig(
+                    accessToken: "YOUR-TOKEN",
                     gatewayId: "YOUR-GATEWAY-ID",
-                    token: "YOUR-TOKEN",
                     amount: 100.0,
                     currency: "AUD",
-                    orderReference: "ORDER-123",
-                    orderItems: [
-                        ZipConfig.OrderItem(name: "Test Item", amount: 100.0, quantity: 1)
-                    ],
-                    shopper: ZipConfig.Shopper(
-                        firstName: "John",
-                        lastName: "Doe",
-                        email: "john.doe@example.com"
-                    )
+                    firstName: "John",
+                    lastName: "Doe",
+                    email: "john.doe@example.com",
+                    items: [
+                        ZipWidgetConfig.Item(name: "Test Item", amount: "100.00", quantity: 1)
+                    ]
                 ),
                 appearance: ZipWidgetAppearance(buttonStyle: .blackOnWhite),
                 completion: { _ in }

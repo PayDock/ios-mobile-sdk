@@ -13,50 +13,17 @@ class ZipExampleVM: ObservableObject {
 
     // MARK: - Properties
 
+    private let configManager = ConfigManager.shared
+
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
     @Published var isLoading = false
 
-    // MARK: - Initialisation
-
-    init() {}
-
     // MARK: - Configuration
 
-    func createZipConfig() -> ZipConfig {
-        return ZipConfig(
-            gatewayId: ProjectEnvironment.shared.getZipGatewayId() ?? "",
-            token: ProjectEnvironment.shared.getWidgetAccessToken(),
-            amount: 17,
-            currency: "AUD",
-            orderReference: "ORDER-\(UUID().uuidString.prefix(8))",
-            orderItems: [
-                ZipConfig.OrderItem(
-                    name: "Demo Product",
-                    amount: 50.00,
-                    quantity: 1,
-                    type: "physical",
-                    reference: "ITEM-001"
-                )
-            ],
-            shopper: ZipConfig.Shopper(
-                firstName: "JP",
-                lastName: "Costello",
-                email: "john.doe@example.com",
-                phone: "+1234567890"
-            ),
-            billing: ZipConfig.Address(
-                firstName: "JP",
-                lastName: "Costello",
-                line1: "123 Main Street",
-                city: "VIC",
-                state: "NSW",
-                postalCode: "4001",
-                countryCode: "AU"
-            ),
-            environment: .sandbox
-        )
+    func getConfig() -> ZipWidgetConfig {
+        return configManager.getZipConfig()
     }
 
     // MARK: - Handlers
