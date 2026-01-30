@@ -2,9 +2,7 @@
 //  AfterpayExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 19.02.2024..
-//  Copyright © 2024 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -97,15 +95,15 @@ class AfterpayExampleVM: ObservableObject {
             id: "Standard",
             name: "Standard",
             description: "",
-            shippingAmount: Money(amount: "5.0", currency: "AUD"),
-            orderAmount: Money(amount: "10.0", currency: "AUD"))
+            shippingAmount: Money(amount: "5.0", currency: configManager.getGlobalConfig().currency),
+            orderAmount: Money(amount: "10.0", currency: configManager.getGlobalConfig().currency))
 
         let shippingOption2 = ShippingOption(
             id: "Standard",
             name: "Standard",
             description: "",
-            shippingAmount: Money(amount: "2.0", currency: "AUD"),
-            orderAmount: Money(amount: "10.0", currency: "AUD"))
+            shippingAmount: Money(amount: "2.0", currency: configManager.getGlobalConfig().currency),
+            orderAmount: Money(amount: "10.0", currency: configManager.getGlobalConfig().currency))
 
         return [shippingOption1, shippingOption2]
     }
@@ -113,8 +111,8 @@ class AfterpayExampleVM: ObservableObject {
     func getShippingOptionUpdate() -> ShippingOptionUpdate {
         return ShippingOptionUpdate(
             id: "Standard",
-            shippingAmount: Money(amount: "5.0", currency: "AUD"),
-            orderAmount: Money(amount: "10.0", currency: "AUD"))
+            shippingAmount: Money(amount: "5.0", currency: configManager.getGlobalConfig().currency),
+            orderAmount: Money(amount: "10.0", currency: configManager.getGlobalConfig().currency))
     }
 
     func handleError(error: AfterpayError) {

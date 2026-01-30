@@ -86,14 +86,12 @@ class ConfigManager: ObservableObject {
 
     private func setupAfterpayConfiguration() {
         configurations[.afterPay] = AfterpaySdkConfig(
-            config: AfterpaySdkConfig.AfterpayConfiguration(
-                minimumAmount: nil,
-                maximumAmount: "1000",
-                currency: "AUD",
-                language: "en_AU",
-                country: "AU"
-            ),
-            environment: .sandbox,
+            environment: {
+                switch ProjectEnvironment.shared.environment {
+                case .production: return .production
+                case .sandbox, .staging: return .sandbox
+                }
+            }(),
             options: AfterpaySdkConfig.CheckoutOptions(
                 pickup: false,
                 buyNow: false,
@@ -136,7 +134,6 @@ class ConfigManager: ObservableObject {
             gender: "male",
             dateOfBirth: nil,
             shippingType: nil,
-            hideShippingAddress: nil,
             billing: ZipWidgetConfig.Address(
                 firstName: "Joshua",
                 lastName: "Wood",
@@ -234,13 +231,6 @@ class ConfigManager: ObservableObject {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
         return getConfiguration(for: .afterPay, as: AfterpaySdkConfig.self) ?? AfterpaySdkConfig(
-            config: AfterpaySdkConfig.AfterpayConfiguration(
-                minimumAmount: nil,
-                maximumAmount: "1000",
-                currency: "AUD",
-                language: "en_AU",
-                country: "AU"
-            ),
             environment: {
                 switch ProjectEnvironment.shared.environment {
                 case .production: return .production
@@ -289,7 +279,6 @@ class ConfigManager: ObservableObject {
             gender: config?.gender,
             dateOfBirth: config?.dateOfBirth,
             shippingType: config?.shippingType,
-            hideShippingAddress: config?.hideShippingAddress,
             billing: config?.billing,
             shipping: config?.shipping,
             items: config?.items,

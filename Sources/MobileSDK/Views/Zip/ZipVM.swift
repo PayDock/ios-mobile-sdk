@@ -71,7 +71,7 @@ class ZipVM: ObservableObject {
                         dateOfBirth: self.config.dateOfBirth,
                         tokenize: self.config.tokenize,
                         charge: DataPaymentSources.ExternalCheckoutCharge(
-                            amount: Double(truncating: self.config.amount as NSNumber),
+                            amount: self.config.amount,
                             currency: self.config.currency,
                             shippingType: self.config.shippingType,
                             billingAddress: self.config.billing.map { billing in

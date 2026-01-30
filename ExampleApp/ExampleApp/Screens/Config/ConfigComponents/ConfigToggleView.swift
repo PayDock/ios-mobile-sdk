@@ -87,8 +87,6 @@ struct ConfigToggleView: View {
                 switch configKey {
                 case .tokenize:
                     toggleValue = config.tokenize ?? true
-                case .hideShippingAddress:
-                    toggleValue = config.hideShippingAddress ?? false
                 default:
                     break
                 }
@@ -184,27 +182,6 @@ struct ConfigToggleView: View {
                 gender: config.gender,
                 dateOfBirth: config.dateOfBirth,
                 shippingType: config.shippingType,
-                hideShippingAddress: config.hideShippingAddress,
-                billing: config.billing,
-                shipping: config.shipping,
-                items: config.items,
-                statistics: config.statistics
-            )
-        case .hideShippingAddress:
-            updatedConfig = ZipWidgetConfig(
-                accessToken: config.accessToken,
-                gatewayId: config.gatewayId,
-                amount: config.amount,
-                currency: config.currency,
-                firstName: config.firstName,
-                lastName: config.lastName,
-                email: config.email,
-                phone: config.phone,
-                tokenize: config.tokenize,
-                gender: config.gender,
-                dateOfBirth: config.dateOfBirth,
-                shippingType: config.shippingType,
-                hideShippingAddress: value,
                 billing: config.billing,
                 shipping: config.shipping,
                 items: config.items,
@@ -250,8 +227,6 @@ struct ConfigToggleView: View {
                 switch configKey {
                 case .tokenize:
                     toggleValue = true
-                case .hideShippingAddress:
-                    toggleValue = false
                 default:
                     break
                 }

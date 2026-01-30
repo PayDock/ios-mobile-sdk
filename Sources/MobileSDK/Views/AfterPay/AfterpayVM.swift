@@ -72,11 +72,12 @@ class AfterpayVM: ObservableObject {
     }
 
     private func setupConfig() {
+        // Note: Values overwritten by values setup in service on dashboard but required for SDK
         let afterpayConfig =  try? Configuration(
-            minimumAmount: configuration.config.minimumAmount,
-            maximumAmount: configuration.config.maximumAmount,
-            currencyCode: configuration.config.currency,
-            locale: Locale(identifier: configuration.config.language),
+            minimumAmount: nil,
+            maximumAmount: "1000.00",
+            currencyCode: "AUD",
+            locale: Locale(identifier: "en_AU"),
             environment: configuration.environment)
         Afterpay.setConfiguration(afterpayConfig)
     }

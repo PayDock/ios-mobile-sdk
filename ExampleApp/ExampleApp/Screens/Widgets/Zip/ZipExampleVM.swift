@@ -26,6 +26,15 @@ class ZipExampleVM: ObservableObject {
         return configManager.getZipConfig()
     }
 
+    func getAppearance(isDarkMode: Bool) -> ZipWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .zip,
+            isDarkMode: isDarkMode,
+            as: ZipWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ZipWidgetAppearance()
+    }
+
     // MARK: - Handlers
 
     func handleError(error: ZipError) {

@@ -3,7 +3,6 @@
 //  ExampleApp
 //
 //  Copyright © 2025 Paydock Ltd.
-//
 
 import SwiftUI
 import MobileSDK
@@ -18,7 +17,7 @@ struct ZipExampleView: View {
             ScrollView {
                 ZipWidget(
                     config: viewModel.getConfig(),
-                    appearance: getAppearance(),
+                    appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                     completion: { result in
                         switch result {
                         case .success(let ottToken): viewModel.handleSuccess(ottToken: ottToken)
@@ -36,15 +35,6 @@ struct ZipExampleView: View {
             })
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         }
-    }
-
-    private func getAppearance() -> ZipWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .zip,
-            isDarkMode: colorScheme == .dark,
-            as: ZipWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? ZipWidgetAppearance()
     }
 }
 

@@ -17,9 +17,6 @@ enum ConfigComponentsEnum {
     case requestShipping
     case fundingSource
     case address
-    case environment
-    case enableTestMode
-    case afterpayConfig
     case clickToPayMetaConfig
     case checkoutOptions
     case clientId
@@ -34,7 +31,6 @@ enum ConfigComponentsEnum {
     case dateOfBirth
     case tokenize
     case shippingType
-    case hideShippingAddress
     case billingAddress
     case shippingAddress
 
@@ -50,9 +46,6 @@ enum ConfigComponentsEnum {
         case .requestShipping: return "Request Shipping"
         case .fundingSource: return "Funding Source"
         case .address: return "Address"
-        case .environment: return "Environment"
-        case .enableTestMode: return "Enable Test Mode"
-        case .afterpayConfig: return "Afterpay Configuration"
         case .clickToPayMetaConfig: return "Click To Pay Meta Configuration"
         case .checkoutOptions: return "Checkout Options"
         case .clientId: return "Client ID"
@@ -67,7 +60,6 @@ enum ConfigComponentsEnum {
         case .dateOfBirth: return "Date of Birth"
         case .tokenize: return "Tokenize"
         case .shippingType: return "Shipping Type"
-        case .hideShippingAddress: return "Hide Shipping Address"
         case .billingAddress: return "Billing Address"
         case .shippingAddress: return "Shipping Address"
         }
@@ -87,9 +79,9 @@ enum ConfigComponentsEnum {
         case .widgetAccessToken, .apiAccessToken, .gatewayId, .clientId, .serviceId, .totalAmount, .currency,
                     .firstName, .lastName, .email, .phoneNumber, .dateOfBirth:
             return createTextFieldView(selectedWidget: selectedWidget)
-        case .collectCardholderName, .storePin, .requestShipping, .enableTestMode, .tokenize, .hideShippingAddress:
+        case .collectCardholderName, .storePin, .requestShipping, .tokenize:
             return createToggleView(selectedWidget: selectedWidget)
-        case .fundingSource, .environment, .gender, .shippingType:
+        case .fundingSource, .gender, .shippingType:
             return createPickerView(selectedWidget: selectedWidget)
         case .billingAddress, .shippingAddress:
             return createAddressView(selectedWidget: selectedWidget)
@@ -99,8 +91,6 @@ enum ConfigComponentsEnum {
             return AnyView(ConfigSchemeView(selectedWidget: selectedWidget, title: title))
         case .address:
             return AnyView(ConfigAddressView(selectedWidget: selectedWidget, title: title))
-        case .afterpayConfig:
-            return AnyView(ConfigAfterpayView(selectedWidget: selectedWidget, title: title))
         case .clickToPayMetaConfig:
             return AnyView(ConfigClickToPayView(selectedWidget: selectedWidget, title: title))
         case .checkoutOptions:
@@ -146,8 +136,6 @@ enum ConfigComponentsEnum {
         case .storePin: return .storePin
         case .requestShipping: return .requestShipping
         case .fundingSource: return .fundingSource
-        case .environment: return .environment
-        case .enableTestMode: return .enableTestMode
         case .clientId: return .clientId
         case .serviceId: return .serviceId
         case .totalAmount: return .totalAmount
@@ -160,10 +148,9 @@ enum ConfigComponentsEnum {
         case .email: return .email
         case .gender: return .gender
         case .shippingType: return .shippingType
-        case .hideShippingAddress: return .hideShippingAddress
         case .dateOfBirth: return .dateOfBirth
         case .tokenize: return .tokenize
-        case .allowSaveCard, .schemeSupport, .address, .afterpayConfig, .checkoutOptions, .clickToPayMetaConfig:
+        case .allowSaveCard, .schemeSupport, .address, .checkoutOptions, .clickToPayMetaConfig:
             fatalError("This component doesn't use ConfigKeys")
         }
     }

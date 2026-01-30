@@ -82,13 +82,8 @@ struct ConfigCheckoutOptionsView: View {
 
         // Get existing configuration or use defaults
         let existingConfig = configVM.getConfiguration(for: .afterPay, as: AfterpaySdkConfig.self)
-        let afterpayConfig = existingConfig?.config ?? AfterpaySdkConfig.AfterpayConfiguration(
-            maximumAmount: "1000",
-            currency: "AUD"
-        )
 
         let sdkConfig = AfterpaySdkConfig(
-            config: afterpayConfig,
             environment: existingConfig?.environment ?? .sandbox,
             options: checkoutOptions
         )

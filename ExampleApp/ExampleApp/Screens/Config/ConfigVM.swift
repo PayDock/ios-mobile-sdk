@@ -25,7 +25,7 @@ class ConfigVM: ObservableObject {
         case .paypalVault:
             return [.widgetAccessToken, .gatewayId]
         case .afterPay:
-            return [.afterpayConfig, .checkoutOptions]
+            return [.checkoutOptions]
         case .colesPay:
             return [.clientId]
         case .clickToPay:
@@ -42,7 +42,6 @@ class ConfigVM: ObservableObject {
                 .gender,
                 .dateOfBirth,
                 .shippingType,
-                .hideShippingAddress,
                 .billingAddress,
                 .shippingAddress
             ]
