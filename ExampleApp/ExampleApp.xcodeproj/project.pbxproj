@@ -151,7 +151,6 @@
 		58D3D0DD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0CD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift */; };
 		58D3D0DE2E8DA3190059584D /* ConfigTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D12E8DA3190059584D /* ConfigTextFieldView.swift */; };
 		58D3D0DF2E8DA3190059584D /* ConfigWidgetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D82E8DA3190059584D /* ConfigWidgetListView.swift */; };
-		58D3D0E02E8DA3190059584D /* ConfigAfterpayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0CC2E8DA3190059584D /* ConfigAfterpayView.swift */; };
 		58D3D0E12E8DA3190059584D /* ConfigToggleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D22E8DA3190059584D /* ConfigToggleView.swift */; };
 		58D3D0E22E8DA3190059584D /* ConfigWidgetItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D72E8DA3190059584D /* ConfigWidgetItem.swift */; };
 		58D3D0E32E8DA3190059584D /* ConfigComponentsEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D52E8DA3190059584D /* ConfigComponentsEnum.swift */; };
@@ -335,7 +334,6 @@
 		58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleVM.swift; sourceTree = "<group>"; };
 		58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleView.swift; sourceTree = "<group>"; };
 		58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigAddressView.swift; sourceTree = "<group>"; };
-		58D3D0CC2E8DA3190059584D /* ConfigAfterpayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigAfterpayView.swift; sourceTree = "<group>"; };
 		58D3D0CD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigCheckoutOptionsView.swift; sourceTree = "<group>"; };
 		58D3D0CE2E8DA3190059584D /* ConfigKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigKeys.swift; sourceTree = "<group>"; };
 		58D3D0CF2E8DA3190059584D /* ConfigPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigPickerView.swift; sourceTree = "<group>"; };
@@ -463,8 +461,8 @@
 		282D31612A66B7F600E3ECAD /* Style */ = {
 			isa = PBXGroup;
 			children = (
-				287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */,
 				287F39762DF76C5600F4D771 /* StyleComponents */,
+				287F397E2DF7869E00F4D771 /* StyleThemeManager.swift */,
 				287F39372DF259A000F4D771 /* StyleWidgetListView.swift */,
 				287F39392DF259A900F4D771 /* StyleComponentListView.swift */,
 				287F393C2DF259D300F4D771 /* StyleVM.swift */,
@@ -956,7 +954,6 @@
 			children = (
 				58D3D0E92E8DAD970059584D /* ConfigSaveCardView.swift */,
 				58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */,
-				58D3D0CC2E8DA3190059584D /* ConfigAfterpayView.swift */,
 				58D3D0CD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift */,
 				58D3D0CE2E8DA3190059584D /* ConfigKeys.swift */,
 				58D3D0CF2E8DA3190059584D /* ConfigPickerView.swift */,
@@ -1257,7 +1254,6 @@
 				58D3D0DD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift in Sources */,
 				58D3D0DE2E8DA3190059584D /* ConfigTextFieldView.swift in Sources */,
 				58D3D0DF2E8DA3190059584D /* ConfigWidgetListView.swift in Sources */,
-				58D3D0E02E8DA3190059584D /* ConfigAfterpayView.swift in Sources */,
 				58D3D0E12E8DA3190059584D /* ConfigToggleView.swift in Sources */,
 				58D3D0E22E8DA3190059584D /* ConfigWidgetItem.swift in Sources */,
 				28C65E762EEA177D001790CE /* ConfigManager.swift in Sources */,

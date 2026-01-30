@@ -38,8 +38,6 @@ public struct ZipWidgetConfig {
     public let dateOfBirth: String?
     /// Optional shipping type (e.g., "delivery", "pickup").
     public let shippingType: String?
-    /// Optional flag to hide shipping address fields.
-    public let hideShippingAddress: Bool?
     /// Optional billing address information.
     public let billing: Address?
     /// Optional shipping address information.
@@ -61,7 +59,6 @@ public struct ZipWidgetConfig {
                 gender: String? = nil,
                 dateOfBirth: String? = nil,
                 shippingType: String? = nil,
-                hideShippingAddress: Bool? = nil,
                 billing: Address? = nil,
                 shipping: Address? = nil,
                 items: [Item]? = nil,
@@ -78,7 +75,6 @@ public struct ZipWidgetConfig {
         self.gender = gender
         self.dateOfBirth = dateOfBirth
         self.shippingType = shippingType
-        self.hideShippingAddress = hideShippingAddress
         self.billing = billing
         self.shipping = shipping
         self.items = items

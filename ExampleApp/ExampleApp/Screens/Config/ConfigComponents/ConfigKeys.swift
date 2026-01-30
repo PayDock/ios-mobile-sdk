@@ -30,5 +30,4 @@ enum ConfigKeys {
     case dateOfBirth
     case tokenize
     case shippingType
-    case hideShippingAddress
 }

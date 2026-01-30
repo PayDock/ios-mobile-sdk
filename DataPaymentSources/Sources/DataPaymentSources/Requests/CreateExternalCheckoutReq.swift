@@ -60,7 +60,7 @@ public struct ExternalCheckoutMeta: Codable {
     /// Whether to tokenize the payment source (optional)
     public let tokenize: Bool?
 
-    /// Charge information (optional)
+    /// Charge information (required)
     public let charge: ExternalCheckoutCharge
 
     /// Customer statistics for fraud prevention (optional)
@@ -90,7 +90,7 @@ public struct ExternalCheckoutMeta: Codable {
 /// External checkout charge information
 public struct ExternalCheckoutCharge: Codable {
     /// Charge amount (required)
-    public let amount: Double
+    public let amount: Decimal
 
     /// Currency code (required)
     public let currency: String
@@ -107,7 +107,7 @@ public struct ExternalCheckoutCharge: Codable {
     /// List of items in the order (optional)
     public let items: [ExternalCheckoutItem]?
 
-    public init(amount: Double,
+    public init(amount: Decimal,
                 currency: String,
                 shippingType: String? = nil,
                 billingAddress: ExternalBillingAddress? = nil,

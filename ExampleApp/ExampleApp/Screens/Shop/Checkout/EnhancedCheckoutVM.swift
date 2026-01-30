@@ -332,13 +332,16 @@ extension EnhancedCheckoutVM {
 extension EnhancedCheckoutVM {
 
     func getAfterpayConfig() -> AfterpaySdkConfig {
-        let config = AfterpaySdkConfig.AfterpayConfiguration(
-            minimumAmount: "1.0",
-            maximumAmount: "100.0",
-            currency: ConfigManager.shared.getGlobalConfig().currency,
-            language: "en_AU")
         let options = AfterpaySdkConfig.CheckoutOptions(shippingOptionRequired: true)
-        return AfterpaySdkConfig(config: config, environment: .sandbox, options: options)
+        return AfterpaySdkConfig(
+            environment: {
+                switch ProjectEnvironment.shared.environment {
+                case .production: return .production
+                case .sandbox, .staging: return .sandbox
+                }
+            }(),
+            options: options
+        )
     }
 
     func getAfterpayShippingOptions() -> [ShippingOption] {
@@ -538,7 +541,6 @@ extension EnhancedCheckoutVM {
             gender: "Male",
             dateOfBirth: "1990-10-16",
             shippingType: "delivery",
-            hideShippingAddress: true,
             billing: billingAddress,
             shipping: shippingAddress,
             items: items,

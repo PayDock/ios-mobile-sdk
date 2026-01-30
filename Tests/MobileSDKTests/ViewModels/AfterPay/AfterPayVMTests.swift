@@ -35,13 +35,6 @@ class AfterPayVMTests: XCTestCase {
         eventDelegate = WidgetEventDelegateUtil()
 
         // Create test configuration
-        let afterpayConfig = AfterpaySdkConfig.AfterpayConfiguration(
-            minimumAmount: "10.00",
-            maximumAmount: "1000.00",
-            currency: "AUD",
-            language: "en_AU",
-            country: "AU"
-        )
         let checkoutOptions = AfterpaySdkConfig.CheckoutOptions(
             pickup: false,
             buyNow: true,
@@ -49,7 +42,6 @@ class AfterPayVMTests: XCTestCase {
             enableSingleShippingOptionUpdate: true
         )
         configuration = AfterpaySdkConfig(
-            config: afterpayConfig,
             environment: .sandbox,
             options: checkoutOptions
         )
@@ -314,10 +306,6 @@ class AfterPayVMTests: XCTestCase {
     // MARK: - Configuration Tests
 
     func testConfigurationIsProperlySet() {
-        XCTAssertEqual(viewModel.configuration.config.currency, "AUD")
-        XCTAssertEqual(viewModel.configuration.config.country, "AU")
-        XCTAssertEqual(viewModel.configuration.config.maximumAmount, "1000.00")
-        XCTAssertEqual(viewModel.configuration.config.minimumAmount, "10.00")
         XCTAssertEqual(viewModel.configuration.options.buyNow, true)
         XCTAssertEqual(viewModel.configuration.options.pickup, false)
     }

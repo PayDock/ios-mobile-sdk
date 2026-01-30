@@ -97,7 +97,7 @@ class ApplePayExampleVM: NSObject, ObservableObject {
 
     func getApplePayRequestResult(walletToken: String) -> ApplePayRequestResult {
         let paymentRequest = MobileSDK.createApplePayRequest(
-            amount: 10,
+            amount: Decimal(string: configManager.getGlobalConfig().totalAmount) ?? 0,
             amountLabel: "Amount",
             countryCode: "AU",
             currencyCode: configManager.getGlobalConfig().currency,
