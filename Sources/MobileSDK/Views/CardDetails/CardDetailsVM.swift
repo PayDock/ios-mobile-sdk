@@ -95,7 +95,8 @@ class CardDetailsVM: ObservableObject {
                 expireMonth: String(expireMonth),
                 expireYear: String(expireYear),
                 cardCcv: cardDetailsFormManager.securityCodeText,
-                storeCcv: config.storeSecurityCode)
+                storeCcv: config.storeSecurityCode,
+                savedCardConsentAccepted: config.allowSaveCard != nil ? policyAccepted : nil)
 
             do {
                 updateLoadingState(isLoading: true)
