@@ -2,9 +2,7 @@
 //  GiftCardExampleView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 10.11.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -13,14 +11,13 @@ struct GiftCardExampleView: View {
 
     @StateObject var viewModel = GiftCardExampleVM()
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject private var configManager = ConfigManager.shared
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 GiftCardWidget(
                     config: viewModel.getConfig(),
-                    appearance: getAppearance(),
+                    appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                     eventDelegate: viewModel) { result in
                         switch result {
                         case .success(let giftCardResult):
@@ -34,15 +31,6 @@ struct GiftCardExampleView: View {
                 Text(viewModel.alertMessage)
             })
         }
-    }
-
-    private func getAppearance() -> GiftCardWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .giftCard,
-            isDarkMode: colorScheme == .dark,
-            as: GiftCardWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? GiftCardWidgetAppearance()
     }
 }
 

@@ -2,9 +2,7 @@
 //  AfterpayExampleView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 19.02.2024..
-//  Copyright © 2024 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -18,8 +16,8 @@ struct AfterpayExampleView: View {
         NavigationStack {
             ScrollView {
                 AfterpayWidget(
-                    configuration: viewModel.getAfterpayConfig(),
-                    appearance: getAppearance(),
+                    configuration: viewModel.getConfig(),
+                    appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                     eventDelegate: viewModel,
                     tokenRequest: { tokenResult in
                         viewModel.initializeWalletCharge(completion: tokenResult)
@@ -42,15 +40,6 @@ struct AfterpayExampleView: View {
                 Text(viewModel.alertMessage)
             })
         }
-    }
-
-    private func getAppearance() -> AfterpayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .afterPay,
-            isDarkMode: colorScheme == .dark,
-            as: AfterpayWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? AfterpayWidgetAppearance()
     }
 }
 

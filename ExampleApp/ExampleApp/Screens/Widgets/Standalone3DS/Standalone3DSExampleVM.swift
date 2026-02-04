@@ -2,9 +2,7 @@
 //  Standalone3DSExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 29.11.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -20,7 +18,7 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
     private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     private let vaultService: DataVault.VaultService
     private let standalone3dsService: DataStandalone3ds.Standalone3dsService
-    private let configManager = ConfigManager.shared
+    private let configManager: ConfigManager
 
     // MARK: - Properties
 
@@ -30,20 +28,35 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
     @Published var alertMessage = ""
     @Published var isLoading = false
 
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
+    }
+
     // MARK: - Initialisation
 
     init(paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          vaultService: DataVault.VaultService = DataVault.VaultServiceImpl(),
-         standalone3dsService: DataStandalone3ds.Standalone3dsService = DataStandalone3ds.Standalone3dsServiceImpl()) {
+         standalone3dsService: DataStandalone3ds.Standalone3dsService = DataStandalone3ds.Standalone3dsServiceImpl(),
+         configManager: ConfigManager = .shared) {
         self.paymentSourcesService = paymentSourcesService
         self.vaultService = vaultService
         self.standalone3dsService = standalone3dsService
+        self.configManager = configManager
         super.init()
     }
 
-    private var apiAccessToken: String {
-        return configManager.getGlobalConfig().apiAccessToken
+    // MARK: - Config
+
+    func getAppearance(isDarkMode: Bool) -> ThreeDSWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .standalone3ds,
+            isDarkMode: isDarkMode,
+            as: ThreeDSWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ThreeDSWidgetAppearance()
     }
+
+    // MARK: - Tokenisation
 
     func getVaultToken() {
             isLoading = true
@@ -112,6 +125,8 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
             }
         }
     }
+
+    // MARK: - Handle Callbacks
 
     func handle3dsEvent(_ event: Standalone3DSResult) {
         // Delay for UX purposes - allow WebView to close before showing alert

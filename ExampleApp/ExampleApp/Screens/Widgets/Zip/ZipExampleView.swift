@@ -2,7 +2,7 @@
 //  ZipExampleView.swift
 //  ExampleApp
 //
-//  Copyright © 2025 Paydock Ltd.
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK

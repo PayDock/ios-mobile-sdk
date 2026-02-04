@@ -2,9 +2,7 @@
 //  PayPalVaultExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 24.10.2024..
-//  Copyright © 2024 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -33,7 +31,16 @@ class PayPalVaultExampleVM: ObservableObject {
         return configManager.getPayPalVaultConfig()
     }
 
-    // MARK: - Completion handling
+    func getAppearance(isDarkMode: Bool) -> PayPalVaultAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .paypalVault,
+            isDarkMode: isDarkMode,
+            as: PayPalVaultAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? PayPalVaultAppearance()
+    }
+
+    // MARK: - Handle callbacks
 
     func handleError(error: PayPalVaultError) {
         alertTitle = "Error"

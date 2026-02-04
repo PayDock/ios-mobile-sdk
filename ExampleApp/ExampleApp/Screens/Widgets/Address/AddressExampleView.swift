@@ -2,9 +2,7 @@
 //  AddressExampleView.swift
 //  ExampleApp
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 21.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -12,13 +10,12 @@ import MobileSDK
 struct AddressExampleView: View {
     @StateObject var viewModel = AddressExampleVM()
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject private var configManager = ConfigManager.shared
 
     var body: some View {
         NavigationStack {
             AddressWidget(
                 config: viewModel.getConfig(),
-                appearance: getAppearance(),
+                appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                 eventDelegate: viewModel) { address in
                     viewModel.handleAddressCompletion(address)
                 }
@@ -26,15 +23,6 @@ struct AddressExampleView: View {
                     Text(viewModel.alertMessage)
                 })
         }
-    }
-
-    private func getAppearance() -> AddressWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .address,
-            isDarkMode: colorScheme == .dark,
-            as: AddressWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? AddressWidgetAppearance()
     }
 }
 

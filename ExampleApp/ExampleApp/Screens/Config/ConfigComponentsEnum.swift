@@ -12,6 +12,7 @@ enum ConfigComponentsEnum {
     case gatewayId
     case collectCardholderName
     case allowSaveCard
+    case storeSecurityCode
     case schemeSupport
     case storePin
     case requestShipping
@@ -41,6 +42,7 @@ enum ConfigComponentsEnum {
         case .gatewayId: return "Gateway ID"
         case .collectCardholderName: return "Collect Cardholder Name"
         case .allowSaveCard: return "Allow Save Card"
+        case .storeSecurityCode: return "Store Security Code"
         case .schemeSupport: return "Scheme Support"
         case .storePin: return "Store PIN"
         case .requestShipping: return "Request Shipping"
@@ -87,6 +89,8 @@ enum ConfigComponentsEnum {
             return createAddressView(selectedWidget: selectedWidget)
         case .allowSaveCard:
             return AnyView(ConfigSaveCardView(selectedWidget: selectedWidget, title: title))
+        case .storeSecurityCode:
+            return AnyView(ConfigStoreSecurityCodeView(selectedWidget: selectedWidget, title: title))
         case .schemeSupport:
             return AnyView(ConfigSchemeView(selectedWidget: selectedWidget, title: title))
         case .address:
@@ -150,7 +154,7 @@ enum ConfigComponentsEnum {
         case .shippingType: return .shippingType
         case .dateOfBirth: return .dateOfBirth
         case .tokenize: return .tokenize
-        case .allowSaveCard, .schemeSupport, .address, .checkoutOptions, .clickToPayMetaConfig:
+        case .allowSaveCard, .storeSecurityCode, .schemeSupport, .address, .checkoutOptions, .clickToPayMetaConfig:
             fatalError("This component doesn't use ConfigKeys")
         }
     }

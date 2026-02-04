@@ -15,7 +15,7 @@ class ConfigVM: ObservableObject {
         case .global:
             return [.apiAccessToken, .totalAmount, .currency]
         case .card:
-            return [.widgetAccessToken, .gatewayId, .collectCardholderName, .allowSaveCard, .schemeSupport]
+            return [.widgetAccessToken, .gatewayId, .collectCardholderName, .allowSaveCard, .storeSecurityCode, .schemeSupport]
         case .address:
             return [.address]
         case .giftCard:

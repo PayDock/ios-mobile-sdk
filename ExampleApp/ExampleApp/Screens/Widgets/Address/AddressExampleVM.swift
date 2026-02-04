@@ -2,9 +2,7 @@
 //  AddressExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 05.11.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -23,6 +21,8 @@ class AddressExampleVM: ObservableObject {
     @Published var alertTitle = ""
     @Published var alertMessage = ""
 
+    // MARK: - Initialisation
+
     init(configManager: ConfigManager = .shared) {
         self.configManager = configManager
     }
@@ -33,7 +33,16 @@ class AddressExampleVM: ObservableObject {
         return configManager.getAddressConfig()
     }
 
-    // MARK: - Completion handling
+    func getAppearance(isDarkMode: Bool) -> AddressWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .address,
+            isDarkMode: isDarkMode,
+            as: AddressWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? AddressWidgetAppearance()
+    }
+
+    // MARK: - Handle Callback
 
     func handleAddressCompletion(_ address: Address) {
         alertTitle = "Address"

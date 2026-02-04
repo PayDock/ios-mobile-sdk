@@ -2,9 +2,7 @@
 //  GiftCardExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 05.11.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -23,6 +21,8 @@ class GiftCardExampleVM: ObservableObject {
     @Published var alertTitle = ""
     @Published var alertMessage = ""
 
+    // MARK: - Initialisation
+
     init(configManager: ConfigManager = .shared) {
         self.configManager = configManager
     }
@@ -31,6 +31,15 @@ class GiftCardExampleVM: ObservableObject {
 
     func getConfig() -> GiftCardWidgetConfig {
         return configManager.getGiftCardConfig()
+    }
+
+    func getAppearance(isDarkMode: Bool) -> GiftCardWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .giftCard,
+            isDarkMode: isDarkMode,
+            as: GiftCardWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? GiftCardWidgetAppearance()
     }
 
     // MARK: - Completion handling

@@ -94,6 +94,7 @@ struct ConfigSaveCardView: View {
                 accessToken: config.accessToken,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: saveCardConfig,
+                storeSecurityCode: config.storeSecurityCode,
                 schemeSupport: config.schemeSupport
             )
             configVM.updateConfiguration(for: .card, with: config)

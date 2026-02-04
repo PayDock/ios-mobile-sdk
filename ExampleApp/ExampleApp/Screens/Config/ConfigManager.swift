@@ -52,6 +52,7 @@ class ConfigManager: ObservableObject {
                     privacyPolicyURL: "https://www.google.com"
                 )
             ),
+            storeSecurityCode: nil,
             schemeSupport: SupportedSchemesConfig(
                 supportedSchemes: Set(CardScheme.allCases),
                 enableValidation: true
@@ -195,6 +196,7 @@ class ConfigManager: ObservableObject {
                     privacyPolicyURL: "https://www.google.com"
                 )
             ),
+            storeSecurityCode: nil,
             schemeSupport: SupportedSchemesConfig(
                 supportedSchemes: Set(CardScheme.allCases),
                 enableValidation: true

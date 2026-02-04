@@ -102,5 +102,7 @@ iOSInjectionProject/
 .DS_Store
 NetworkingLib/
 Gemfile.lock
-config
+# Config files at root level only (avoid matching ExampleApp/Screens/Config/)
+/config
+/*.config
 vendor/bundle

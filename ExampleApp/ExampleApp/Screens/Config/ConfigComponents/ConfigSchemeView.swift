@@ -82,6 +82,7 @@ struct ConfigSchemeView: View {
                 accessToken: config.accessToken,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
+                storeSecurityCode: config.storeSecurityCode,
                 schemeSupport: schemeSupport
             )
             configVM.updateConfiguration(for: .card, with: config)

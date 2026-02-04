@@ -2,8 +2,7 @@
 //  MPGS3DSExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 27.11.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -18,7 +17,7 @@ class MPGS3dsExampleVM: NSObject, ObservableObject {
 
     private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     private let mpgs3dsService: DataMPGS3ds.MPGS3dsService
-    private let configManager = ConfigManager.shared
+    private let configManager: ConfigManager
 
     // MARK: - Properties
 
@@ -28,18 +27,33 @@ class MPGS3dsExampleVM: NSObject, ObservableObject {
     @Published var alertMessage = ""
     @Published var isLoading = false
 
-    // MARK: - Initialisation
-
-    init(paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
-         mpgs3dsService: DataMPGS3ds.MPGS3dsService = DataMPGS3ds.MPGS3dsServiceImpl()) {
-        self.paymentSourcesService = paymentSourcesService
-        self.mpgs3dsService = mpgs3dsService
-        super.init()
-    }
-
     private var apiAccessToken: String {
         return configManager.getGlobalConfig().apiAccessToken
     }
+
+    // MARK: - Initialisation
+
+    init(paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
+         mpgs3dsService: DataMPGS3ds.MPGS3dsService = DataMPGS3ds.MPGS3dsServiceImpl(),
+         configManager: ConfigManager = ConfigManager.shared) {
+        self.paymentSourcesService = paymentSourcesService
+        self.mpgs3dsService = mpgs3dsService
+        self.configManager = configManager
+        super.init()
+    }
+
+    // MARK: - Config
+
+    func getAppearance(isDarkMode: Bool) -> ThreeDSWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .mpgs3ds,
+            isDarkMode: isDarkMode,
+            as: ThreeDSWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ThreeDSWidgetAppearance()
+    }
+
+    // MARK: - Tokenisation
 
     func tokeniseCardDetails() {
         isLoading = true
@@ -83,6 +97,8 @@ class MPGS3dsExampleVM: NSObject, ObservableObject {
             }
         }
     }
+
+    // MARK: - Handle Callback
 
     func handle3dsEvent(_ event: MPGS3dsResult) {
         switch event.event {
