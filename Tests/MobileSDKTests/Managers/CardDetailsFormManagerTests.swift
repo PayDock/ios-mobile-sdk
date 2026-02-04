@@ -545,6 +545,15 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
     }
 
+    func testUpdateSecurityCodeTitleAndPlaceholder_Eftpos() {
+        mockSchemeValidator.getCardSchemeFromBINResult = .eftpos
+
+        sut.updateSecurityCodeTitleAndPlaceholder()
+
+        XCTAssertEqual(sut.securityCodeTitle, "CVV / CVC")
+        XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
+    }
+
     func testUpdateSecurityCodeTitleAndPlaceholder_None() {
         mockSchemeValidator.getCardSchemeFromBINResult = nil
 

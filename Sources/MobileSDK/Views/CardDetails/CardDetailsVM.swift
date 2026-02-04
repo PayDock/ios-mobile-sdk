@@ -152,12 +152,11 @@ class CardDetailsVM: ObservableObject {
     func getSchemeIcon(for scheme: CardScheme) -> Image {
         switch scheme {
         case .amex: Image("american-express", bundle: Bundle.module)
-        case .ausbc: Image("australian-commonwealth-bank", bundle: Bundle.module)
         case .diners: Image("diners", bundle: Bundle.module)
         case .discover: Image("discover", bundle: Bundle.module)
+        case .eftpos: Image("eftpos", bundle: Bundle.module)
         case .japcb: Image("jcb", bundle: Bundle.module)
         case .mastercard: Image("mastercard", bundle: Bundle.module)
-        case .solo: Image("solo", bundle: Bundle.module)
         case .visa: Image("visa", bundle: Bundle.module)
         case .unionpay: Image("unionpay", bundle: Bundle.module)
         }

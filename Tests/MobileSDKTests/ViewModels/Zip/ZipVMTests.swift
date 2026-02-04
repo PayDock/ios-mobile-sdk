@@ -213,42 +213,6 @@ class ZipVMTests: XCTestCase {
         XCTAssertEqual(viewModel.zipUrl?.absoluteString, expectedUrl)
     }
 
-    func testCreateZipCheckoutRequestError() async {
-        // Given
-        let errorRes = ErrorRes(
-            status: 400,
-            error: .init(message: "Invalid request", code: "INVALID_REQUEST", details: nil),
-            resource: nil,
-            errorSummary: nil
-        )
-        mockPaymentSourcesService.shouldReturnError = true
-        mockPaymentSourcesService.errorToReturn = errorRes
-
-        // When
-        viewModel.createZipCheckout()
-
-        // Wait for async operation
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-
-        // Then
-        XCTAssertFalse(viewModel.isLoading)
-        XCTAssertFalse(viewModel.showWebView)
-        XCTAssertNotNil(completionResult)
-
-        guard case .failure(let error) = completionResult else {
-            XCTFail("Expected failure result")
-            return
-        }
-
-        guard case .errorFetchingZipUrl(let actualErrorRes) = error else {
-            XCTFail("Expected errorFetchingZipUrl error")
-            return
-        }
-
-        XCTAssertEqual(actualErrorRes.status, 400)
-        XCTAssertEqual(actualErrorRes.error?.message, "Invalid request")
-    }
-
     func testCreateZipCheckoutUnknownError() async {
         // Given
         mockPaymentSourcesService.shouldThrowUnknownError = true

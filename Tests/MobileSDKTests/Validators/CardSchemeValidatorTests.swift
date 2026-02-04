@@ -2,9 +2,7 @@
 //  CardIssuerValidatorTests.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Ricardo Da Silva on 2024/12/31.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 @testable import MobileSDK
@@ -27,18 +25,10 @@ let testCases: [CardTestCase] = [
     CardTestCase(cardNumber: "30312568541349", expectedIssuer: .diners, isValid: true),
     // JCB
     CardTestCase(cardNumber: "3534429687149385", expectedIssuer: .japcb, isValid: true),
-    // Solo
-    CardTestCase(cardNumber: "6334101999990013", expectedIssuer: .solo, isValid: false),
-    CardTestCase(cardNumber: "67675678901234568698", expectedIssuer: .solo, isValid: false),
-    // AUSBC
-    CardTestCase(cardNumber: "6771892573677360", expectedIssuer: .ausbc, isValid: false),
-    CardTestCase(cardNumber: "5610591081018250989", expectedIssuer: .ausbc, isValid: false),
-    CardTestCase(cardNumber: "5610591081018250", expectedIssuer: .ausbc, isValid: true),
     // Unionpay
     CardTestCase(cardNumber: "6229293072324646", expectedIssuer: .unionpay, isValid: true),
     CardTestCase(cardNumber: "561059108101850", expectedIssuer: .unionpay, isValid: false),
     CardTestCase(cardNumber: "353442987149385", expectedIssuer: .unionpay, isValid: false)
-
 ]
 
 class CardSchemeValidatorTests: XCTestCase {
@@ -87,14 +77,15 @@ class CardSchemeValidatorTests: XCTestCase {
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "22222"), .mastercard)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "349013"), .amex)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "372697"), .amex)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "633454"), .solo)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "633461234"), .solo)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "644000123123"), .discover)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "5610"), .ausbc)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "213100"), .japcb)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "622956"), .unionpay)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "622970"), .unionpay)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "626256"), .unionpay)
+
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "633454")) // Solo - should return nil
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "633461234")) // Solo - should return nil
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "5610")) // AUSBC - should return nil
     }
 
     func testGetCardSchemeFromBIN_InvalidBIN() {
@@ -118,15 +109,7 @@ class CardSchemeValidatorTests: XCTestCase {
 
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111", scheme: .japcb))
 
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111", scheme: .solo))
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 111", scheme: .solo))
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .solo))
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .solo))
-
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111", scheme: .ausbc))
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 111", scheme: .ausbc))
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .ausbc))
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .ausbc))
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111", scheme: .eftpos))
 
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 1111 1111", scheme: .unionpay))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 444", scheme: .unionpay))
@@ -150,11 +133,9 @@ class CardSchemeValidatorTests: XCTestCase {
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .japcb))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .japcb))
 
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5", scheme: .solo))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .solo))
-
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5", scheme: .ausbc))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .ausbc))
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .eftpos))
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .eftpos))
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .eftpos))
 
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 1111 111", scheme: .unionpay))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 4444", scheme: .unionpay))
