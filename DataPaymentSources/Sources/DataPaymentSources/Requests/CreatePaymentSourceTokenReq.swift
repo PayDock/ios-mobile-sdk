@@ -38,6 +38,11 @@ public struct CreatePaymentSourceTokenReq: Codable {
     /// Whether to store the CVV for future use (optional)
     public let storeCcv: Bool?
 
+    /// Whether the user has accepted consent to save the card (optional)
+    /// This value reflects the save card toggle state in the widget UI.
+    /// It is `true` when the save card toggle is enabled, `false` when disabled.
+    public let savedCardConsentAccepted: Bool?
+
     // MARK: - Gift Card Fields
 
     /// Gift card PIN (optional, required for gift_card type)
@@ -79,6 +84,8 @@ public struct CreatePaymentSourceTokenReq: Codable {
     /// Additional metadata as key-value pairs (optional)
     public let meta: [String: String]?
 
+    // MARK: - Initialisation
+
     public init(type: String? = nil,
                 gatewayId: String? = nil,
                 cardNumber: String? = nil,
@@ -87,6 +94,7 @@ public struct CreatePaymentSourceTokenReq: Codable {
                 expireYear: String? = nil,
                 cardCcv: String? = nil,
                 storeCcv: Bool? = nil,
+                savedCardConsentAccepted: Bool? = nil,
                 cardPin: String? = nil,
                 storePin: Bool? = nil,
                 cardScheme: String? = nil,
@@ -106,6 +114,7 @@ public struct CreatePaymentSourceTokenReq: Codable {
         self.expireYear = expireYear
         self.cardCcv = cardCcv
         self.storeCcv = storeCcv
+        self.savedCardConsentAccepted = savedCardConsentAccepted
         self.cardPin = cardPin
         self.storePin = storePin
         self.cardScheme = cardScheme

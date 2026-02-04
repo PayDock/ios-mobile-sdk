@@ -579,5 +579,108 @@ class CardDetailsVMTests: XCTestCase {
         XCTAssertNotNil(capturingService.capturedRequest)
         XCTAssertEqual(capturingService.capturedRequest?.storeCcv, false, "storeCcv should be false when storeSecurityCode is false")
     }
+
+    // MARK: - Save Card Consent Tests
+
+    func testTokeniseCardDetails_WithAllowSaveCardNil_PassesNilToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertNil(capturingService.capturedRequest?.savedCardConsentAccepted, "savedCardConsentAccepted should be nil when allowSaveCard is nil")
+    }
+
+    func testTokeniseCardDetails_WithSaveCardToggleOn_PassesTrueToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: config,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+        viewModel.policyAccepted = true
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.savedCardConsentAccepted, true, "savedCardConsentAccepted should be true when save card toggle is on")
+    }
+
+    func testTokeniseCardDetails_WithSaveCardToggleOff_PassesFalseToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: config,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+        viewModel.policyAccepted = false
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.savedCardConsentAccepted, false, "savedCardConsentAccepted should be false when save card toggle is off")
+    }
 }
 // swiftlint:enable all
