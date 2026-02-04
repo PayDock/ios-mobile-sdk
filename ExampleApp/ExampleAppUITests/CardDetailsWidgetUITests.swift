@@ -56,11 +56,10 @@ final class CardDetailsWidgetUITests: XCTestCase {
             ("Visa", ["visa"]),
             ("Mastercard", ["mastercard"]),
             ("American Express", ["american express", "amex"]),
-            ("Australian Bank Card", ["australian bank card"]),
             ("Dinners Club", ["dinners club", "diners"]),
             ("Discover", ["discover"]),
             ("JCB", ["jcb"]),
-            ("SOL", ["sol"])
+            ("Eftpos", ["eftpos"])
         ]
 
         // Check for card schemes - some may only be visible when interacting with form

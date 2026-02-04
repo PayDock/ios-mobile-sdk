@@ -133,8 +133,12 @@ class CardDetailsFormManager: ObservableObject {
             securityCodeTitle = "CVV"
             securityCodePlaceholder = "XXX"
 
-        case .mastercard, .solo, .ausbc:
+        case .mastercard:
             securityCodeTitle = "CVC"
+            securityCodePlaceholder = "XXX"
+
+        case .eftpos:
+            securityCodeTitle = "CVV / CVC"
             securityCodePlaceholder = "XXX"
 
         case .amex:
@@ -158,13 +162,12 @@ class CardDetailsFormManager: ObservableObject {
     private func getCardSchemeIcon(for cardScheme: CardScheme?) -> Image {
         switch cardScheme {
         case .amex: return Image("american-express", bundle: Bundle.module)
-        case .ausbc: return Image("australian-commonwealth-bank", bundle: Bundle.module)
         case .diners: return Image("diners", bundle: Bundle.module)
         case .discover: return Image("discover", bundle: Bundle.module)
+        case .eftpos: return Image("eftpos", bundle: Bundle.module)
         case .japcb: return Image("jcb", bundle: Bundle.module)
         case .mastercard: return Image("mastercard", bundle: Bundle.module)
         case .visa: return Image("visa", bundle: Bundle.module)
-        case .solo: return Image("solo", bundle: Bundle.module)
         case .unionpay: return Image("unionpay", bundle: Bundle.module)
         case .none: return Image("credit-card", bundle: Bundle.module)
         }
@@ -358,7 +361,6 @@ class CardDetailsFormManager: ObservableObject {
         editingExpiryDate = false
         editingSecurityCode = false
     }
-
 }
 
 extension CardDetailsFormManager {
@@ -369,5 +371,4 @@ extension CardDetailsFormManager {
         case expiryDate
         case securityCode
     }
-
 }

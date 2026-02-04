@@ -2,9 +2,7 @@
 //  CardSecurityCodeValidatorTests.swift
 //  MobileSDK
 //
-//  Copyright © 2025 Paydock Ltd.
-//  Created by Domagoj Grizelj on 13.01.2025..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 @testable import MobileSDK
@@ -103,28 +101,16 @@ class CardSecurityCodeValidatorTests: XCTestCase {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .japcb))
     }
 
-    func testValidSoloSecurityCode() {
-        XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .solo))
+    func testValidEftposSecurityCode() {
+        XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .eftpos))
     }
 
-    func testInvalidSoloSecurityCode_LenghtTooShort() {
-        XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .solo))
+    func testInvalidEftposSecurityCode_LenghtTooShort() {
+        XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .eftpos))
     }
 
-    func testInvalidSoloSecurityCode_LenghtTooLong() {
-        XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .solo))
-    }
-
-    func testValidAusbcSecurityCode() {
-        XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .ausbc))
-    }
-
-    func testInvalidAusbcSecurityCode_LenghtTooShort() {
-        XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .ausbc))
-    }
-
-    func testInvalidAusbcSecurityCode_LenghtTooLong() {
-        XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .ausbc))
+    func testInvalidEftposSecurityCode_LenghtTooLong() {
+        XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .eftpos))
     }
 
     func testValidUnionpaySecurityCode() {
