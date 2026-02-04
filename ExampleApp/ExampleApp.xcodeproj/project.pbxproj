@@ -144,6 +144,7 @@
 		58A1B2FD2F23C4510012F135 /* ZipPaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A1B2FC2F23C4510012F135 /* ZipPaymentWidget.swift */; };
 		58A1B3052F23C5A40012F135 /* ZipStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A1B3022F23C5A40012F135 /* ZipStyleView.swift */; };
 		58A1B3062F23C5A40012F135 /* ZipStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A1B3032F23C5A40012F135 /* ZipStyleVM.swift */; };
+		58A2472C2F32197D003210DF /* ConfigStoreSecurityCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A2472B2F32197D003210DF /* ConfigStoreSecurityCodeView.swift */; };
 		58A90DAE2F1546970012D4C9 /* MPGS3dsExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */; };
 		58A90DAF2F1546970012D4C9 /* MPGS3dsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */; };
 		58D3D0DB2E8DA3190059584D /* ConfigComponentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D42E8DA3190059584D /* ConfigComponentListView.swift */; };
@@ -331,6 +332,7 @@
 		58A1B2FC2F23C4510012F135 /* ZipPaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipPaymentWidget.swift; sourceTree = "<group>"; };
 		58A1B3022F23C5A40012F135 /* ZipStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipStyleView.swift; sourceTree = "<group>"; };
 		58A1B3032F23C5A40012F135 /* ZipStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipStyleVM.swift; sourceTree = "<group>"; };
+		58A2472B2F32197D003210DF /* ConfigStoreSecurityCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigStoreSecurityCodeView.swift; sourceTree = "<group>"; };
 		58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleVM.swift; sourceTree = "<group>"; };
 		58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleView.swift; sourceTree = "<group>"; };
 		58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigAddressView.swift; sourceTree = "<group>"; };
@@ -952,6 +954,7 @@
 		58D3D0D32E8DA3190059584D /* ConfigComponents */ = {
 			isa = PBXGroup;
 			children = (
+				58A2472B2F32197D003210DF /* ConfigStoreSecurityCodeView.swift */,
 				58D3D0E92E8DAD970059584D /* ConfigSaveCardView.swift */,
 				58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */,
 				58D3D0CD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift */,
@@ -1249,6 +1252,7 @@
 				2838F0472ACEF584006B23E2 /* ApplePayExampleVM.swift in Sources */,
 				28D8BA632E00706900EDD422 /* ResetConfirmationModifier.swift in Sources */,
 				58D3D0EA2E8DAD970059584D /* ConfigSaveCardView.swift in Sources */,
+				58A2472C2F32197D003210DF /* ConfigStoreSecurityCodeView.swift in Sources */,
 				58D3D0DB2E8DA3190059584D /* ConfigComponentListView.swift in Sources */,
 				58D3D0DC2E8DA3190059584D /* ConfigVM.swift in Sources */,
 				58D3D0DD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift in Sources */,

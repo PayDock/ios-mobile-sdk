@@ -448,5 +448,136 @@ class CardDetailsVMTests: XCTestCase {
         XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
         XCTAssertNil(eventDelegate.lastEvent)
     }
+
+    // MARK: - Store Security Code Tests
+
+    private class CapturingPaymentSourcesServiceMock: PaymentSourcesService {
+        var capturedRequest: CreatePaymentSourceTokenReq?
+        var tokenToReturn: String = "mock-token-123"
+
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
+            capturedRequest = tokeniseCardDetailsReq
+            return tokenToReturn
+        }
+
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
+            fatalError("Not implemented")
+        }
+    }
+
+    func testTokeniseCardDetails_WithStoreSecurityCodeNil_PassesNilToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertNil(capturingService.capturedRequest?.storeCcv, "storeCcv should be nil when storeSecurityCode is nil")
+    }
+
+    func testTokeniseCardDetails_WithStoreSecurityCodeTrue_PassesTrueToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: true
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.storeCcv, true, "storeCcv should be true when storeSecurityCode is true")
+    }
+
+    func testTokeniseCardDetails_WithStoreSecurityCodeFalse_PassesFalseToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: false
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.storeCcv, false, "storeCcv should be false when storeSecurityCode is false")
+    }
 }
 // swiftlint:enable all

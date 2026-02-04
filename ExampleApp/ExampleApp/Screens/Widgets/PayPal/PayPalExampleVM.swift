@@ -44,6 +44,15 @@ class PayPalExampleVM: ObservableObject {
         return configManager.getPayPalConfig()
     }
 
+    func getAppearance(isDarkMode: Bool) -> PayPalWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .paypal,
+            isDarkMode: isDarkMode,
+            as: PayPalWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? PayPalWidgetAppearance()
+    }
+
     // MARK: - Logic
 
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {

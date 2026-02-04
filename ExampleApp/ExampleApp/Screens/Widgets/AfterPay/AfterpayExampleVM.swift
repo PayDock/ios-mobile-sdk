@@ -26,6 +26,10 @@ class AfterpayExampleVM: ObservableObject {
     @Published var alertTitle = ""
     @Published var alertMessage = ""
 
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
+    }
+
     // MARK: - Initialisation
 
     init(chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
@@ -34,9 +38,22 @@ class AfterpayExampleVM: ObservableObject {
         self.configManager = configManager
     }
 
-    private var apiAccessToken: String {
-        return configManager.getGlobalConfig().apiAccessToken
+    // MARK: Config
+
+    func getConfig() -> AfterpaySdkConfig {
+        return ConfigManager.shared.getAfterpayConfig()
     }
+
+    func getAppearance(isDarkMode: Bool) -> AfterpayWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .afterPay,
+            isDarkMode: isDarkMode,
+            as: AfterpayWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? AfterpayWidgetAppearance()
+    }
+
+    // MARK: - Initialise Wallet
 
     func initializeWalletCharge(completion: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) {
         Task {
@@ -86,9 +103,7 @@ class AfterpayExampleVM: ObservableObject {
         }
     }
 
-    func getAfterpayConfig() -> AfterpaySdkConfig {
-        return ConfigManager.shared.getAfterpayConfig()
-    }
+    // MARK: - Shipping
 
     func getShippingOptions() -> [ShippingOption] {
         let shippingOption1 = ShippingOption(
@@ -114,6 +129,8 @@ class AfterpayExampleVM: ObservableObject {
             shippingAmount: Money(amount: "5.0", currency: configManager.getGlobalConfig().currency),
             orderAmount: Money(amount: "10.0", currency: configManager.getGlobalConfig().currency))
     }
+
+    // MARK: - Handle Callbacks
 
     func handleError(error: AfterpayError) {
         alertTitle = "Error"

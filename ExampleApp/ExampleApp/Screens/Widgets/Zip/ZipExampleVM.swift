@@ -2,8 +2,7 @@
 //  ZipExampleVM.swift
 //  ExampleApp
 //
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -35,7 +34,7 @@ class ZipExampleVM: ObservableObject {
         return appearance ?? ZipWidgetAppearance()
     }
 
-    // MARK: - Handlers
+    // MARK: - Handle callbacks
 
     func handleError(error: ZipError) {
         alertTitle = "Error"

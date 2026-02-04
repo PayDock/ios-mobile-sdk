@@ -122,6 +122,7 @@ struct ConfigToggleView: View {
                 accessToken: config.accessToken,
                 collectCardholderName: value,
                 allowSaveCard: config.allowSaveCard,
+                storeSecurityCode: config.storeSecurityCode,
                 schemeSupport: config.schemeSupport
             )
         default:

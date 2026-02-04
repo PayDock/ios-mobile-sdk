@@ -26,6 +26,10 @@ class ApplePayExampleVM: NSObject, ObservableObject {
     @Published var alertTitle = ""
     @Published var alertMessage = ""
 
+    private var apiAccessToken: String {
+        return configManager.getGlobalConfig().apiAccessToken
+    }
+
     // MARK: - Initialisation
 
     init(chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
@@ -34,9 +38,18 @@ class ApplePayExampleVM: NSObject, ObservableObject {
         self.configManager = configManager
     }
 
-    private var apiAccessToken: String {
-        return configManager.getGlobalConfig().apiAccessToken
+    // MARK: - Config
+
+    func getAppearance(isDarkMode: Bool) -> ApplePayWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .applePay,
+            isDarkMode: isDarkMode,
+            as: ApplePayWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? ApplePayWidgetAppearance()
     }
+
+    // MARK: - Initialise Wallet
 
     func initializeWalletCharge(completion: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) {
         Task {
@@ -105,6 +118,8 @@ class ApplePayExampleVM: NSObject, ObservableObject {
 
         return ApplePayRequestResult(request: paymentRequest, token: walletToken)
     }
+
+    // MARK: - Handle Callbacks
 
     func handleError(error: ApplePayError) {
         isLoading = false

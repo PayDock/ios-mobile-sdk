@@ -28,7 +28,7 @@ struct MPGS3dsExampleView: View {
                                 VStack {
                                     MPGS3DSWidget(
                                         config: .init(token: viewModel.token3DS),
-                                        appearance: getAppearance(),
+                                        appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):
@@ -57,15 +57,6 @@ struct MPGS3dsExampleView: View {
         .onAppear {
             viewModel.tokeniseCardDetails()
         }
-    }
-
-    private func getAppearance() -> ThreeDSWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .mpgs3ds,
-            isDarkMode: colorScheme == .dark,
-            as: ThreeDSWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? ThreeDSWidgetAppearance()
     }
 }
 

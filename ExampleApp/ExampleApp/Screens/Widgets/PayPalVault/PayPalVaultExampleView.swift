@@ -2,9 +2,7 @@
 //  PayPalVaultExampleView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 14.10.2024..
-//  Copyright © 2024 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -20,7 +18,8 @@ struct PayPalVaultExampleView: View {
                 PayPalSavePaymentSourceWidget(
                     config: viewModel.getConfig(),
                     eventDelegate: viewModel,
-                    appearance: getAppearance()) { result in
+                    appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark)
+                ) { result in
                         switch result {
                         case let .success(payPalVaultResult):
                             viewModel.handleSuccess(result: payPalVaultResult)
@@ -36,15 +35,6 @@ struct PayPalVaultExampleView: View {
             })
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         }
-    }
-
-    private func getAppearance() -> PayPalVaultAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .paypalVault,
-            isDarkMode: colorScheme == .dark,
-            as: PayPalVaultAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? PayPalVaultAppearance()
     }
 }
 

@@ -19,7 +19,7 @@ struct ApplePayExampleView: View {
         NavigationStack {
             ScrollView {
                 ApplePayWidget(
-                    appearance: getAppearance(),
+                    appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                     eventDelegate: viewModel) { onApplePayButtonTap in
                         viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
                     } completion: { result in

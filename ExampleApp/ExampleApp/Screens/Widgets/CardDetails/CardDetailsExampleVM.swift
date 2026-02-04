@@ -2,9 +2,7 @@
 //  CardDetailsExampleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 05.11.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -13,28 +11,33 @@ import OSLog
 @MainActor
 class CardDetailsExampleVM: ObservableObject {
 
+    // MARK: - Dependencies
+
+    private let configManager: ConfigManager
+
     // MARK: - Properties
 
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
 
+    init(configManager: ConfigManager = .shared) {
+        self.configManager = configManager
+    }
+
     // MARK: - Config
 
     func getConfig() -> CardDetailsWidgetConfig {
-        return CardDetailsWidgetConfig(
-            gatewayId: ProjectEnvironment.shared.getMPGSGatewayId(),
-            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            allowSaveCard: SaveCardConfig(
-                consentText: "Remember this card for next time.",
-                privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
-                    privacyPolicyText: "Read our privacy policy",
-                    privacyPolicyURL: "https://www.google.com")),
-            schemeSupport: SupportedSchemesConfig(
-                supportedSchemes: Set(CardScheme.allCases),
-                enableValidation: true
-            )
-        )
+        return configManager.getCardDetailsConfig()
+    }
+
+    func getAppearance(isDarkMode: Bool) -> CardDetailsWidgetAppearance {
+        let appearance = StyleThemeManager.getAppearance(
+            for: .card,
+            isDarkMode: isDarkMode,
+            as: CardDetailsWidgetAppearance.self,
+            shouldCreateDefaultIfNeeded: false)
+        return appearance ?? CardDetailsWidgetAppearance()
     }
 
     // MARK: - Completion handling

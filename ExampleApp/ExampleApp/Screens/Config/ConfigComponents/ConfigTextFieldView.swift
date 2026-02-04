@@ -255,6 +255,7 @@ struct ConfigTextFieldView: View {
                 accessToken: value,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
+                storeSecurityCode: config.storeSecurityCode,
                 schemeSupport: config.schemeSupport
             )
         case .gatewayId:
@@ -263,6 +264,7 @@ struct ConfigTextFieldView: View {
                 accessToken: config.accessToken,
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
+                storeSecurityCode: config.storeSecurityCode,
                 schemeSupport: config.schemeSupport
             )
         default:

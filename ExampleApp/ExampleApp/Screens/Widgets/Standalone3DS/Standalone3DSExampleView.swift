@@ -2,9 +2,7 @@
 //  Standalone3DSExampleView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 29.11.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import SwiftUI
@@ -30,7 +28,7 @@ struct Standalone3DSExampleView: View {
                                 VStack {
                                     Standalone3DSWidget(
                                         config: ThreeDSConfig(token: viewModel.token3DS),
-                                        appearance: getAppearance(),
+                                        appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                                         completion: { result in
                                             switch result {
                                             case .success(let result):
@@ -59,15 +57,6 @@ struct Standalone3DSExampleView: View {
         .onAppear {
             viewModel.getVaultToken()
         }
-    }
-
-    private func getAppearance() -> ThreeDSWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .standalone3ds,
-            isDarkMode: colorScheme == .dark,
-            as: ThreeDSWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? ThreeDSWidgetAppearance()
     }
 }
 
