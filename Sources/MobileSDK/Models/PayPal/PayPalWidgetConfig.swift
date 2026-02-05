@@ -2,9 +2,7 @@
 //  PayPalWidgetConfig.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 14.09.2025..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import PayPalWebPayments

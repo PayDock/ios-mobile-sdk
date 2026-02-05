@@ -15,7 +15,7 @@ public struct WalletCallbackReq: Codable {
     public let requestType: String
 
     /// Whether shipping is requested (optional)
-    public let shipping: Bool?
+    public let requestShipping: Bool?
 
     /// Session ID (optional)
     public let sessionId: String?
@@ -24,11 +24,11 @@ public struct WalletCallbackReq: Codable {
     public let walletType: String?
 
     public init(requestType: String,
-                shipping: Bool? = nil,
+                requestShipping: Bool? = nil,
                 sessionId: String? = nil,
                 walletType: String? = nil) {
         self.requestType = requestType
-        self.shipping = shipping
+        self.requestShipping = requestShipping
         self.sessionId = sessionId
         self.walletType = walletType
     }
