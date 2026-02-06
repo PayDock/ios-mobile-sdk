@@ -78,6 +78,10 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Api Calls
 
     func tokeniseCardDetails() {
+        guard cardDetailsFormManager.isFormValid() else {
+            return
+        }
+
         Task {
             guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {

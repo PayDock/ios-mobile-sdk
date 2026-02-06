@@ -307,8 +307,9 @@ class CardDetailsFormManager: ObservableObject {
         let cardHolderNameValid = shouldValidateCardholderName
             ? (!cardholderNameText.isEmpty && !cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText))
             : true
+        // When scheme validation is enabled, require cardNumberValid so that "Card type not accepted" blocks submit
         let creditCardValid = enableCardValidation
-            ? cardSchemeValidator.isCardNumberValid(number: cardNumberText)
+            ? (cardNumberValid == true)
             : cardSchemeValidator.isPossibleCreditCardNumber(number: cardNumberText)
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText) == .valid
 
