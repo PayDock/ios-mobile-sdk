@@ -676,6 +676,34 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertFalse(sut.isFormValid())
     }
 
+    func testIsFormValid_WithCardValidationEnabled_UnsupportedCardType() {
+        sut = CardDetailsFormManager(
+            supportedSchemes: [.visa],
+            enableCardValidation: true,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+
+        mockNameValidator.isValidNameResult = true
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = .mastercard // Not in supported schemes (Visa only)
+        mockExpiryValidator.validateCreditCardExpiryResult = .valid
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+
+        sut.cardholderNameText = "John Doe"
+        sut.cardNumberText = "5123456789012346"
+        sut.expiryDateText = "12/25"
+        sut.securityCodeText = "123"
+
+        XCTAssertFalse(sut.cardNumberValid ?? true, "Card type not accepted should set cardNumberValid to false")
+        XCTAssertEqual(sut.cardNumberError, "Card type not accepted")
+        XCTAssertFalse(sut.isFormValid(), "Submit should be disabled when card type is not accepted")
+    }
+
     // MARK: - Formatting Tests
 
     func testFormatCardNumber() {
