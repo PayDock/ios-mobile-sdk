@@ -2,9 +2,7 @@
 //  PayPalVM.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 25.10.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import NetworkingLib
@@ -116,7 +114,7 @@ class PayPalVM: ObservableObject {
     func getOrderId(token: String) async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await chargesService.getPayPalCallback(widgetAccessToken: token, shipping: false)
+            return try await chargesService.getPayPalCallback(widgetAccessToken: token, requestShipping: config.requestShipping)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             updateLoadingState(isLoading: false)

@@ -24,9 +24,8 @@ public protocol ChargesService {
     // MARK: - MobileSDK Wallet Methods (widgetAccessToken)
 
     func captureWalletCharge(widgetAccessToken: String, paymentMethodId: String?, refToken: String?) async throws -> WalletCaptureChargeData
-    func getWalletCallback(widgetAccessToken: String, shipping: Bool) async throws -> String
     func getColesPayCallback(widgetAccessToken: String) async throws -> String
-    func getPayPalCallback(widgetAccessToken: String, shipping: Bool) async throws -> String
+    func getPayPalCallback(widgetAccessToken: String, requestShipping: Bool) async throws -> String
     func getAfterpayCallback(widgetAccessToken: String) async throws -> String
     func declineWalletTransaction(widgetAccessToken: String, chargeId: String) async throws -> String
 }
@@ -104,18 +103,6 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         return response.resource.data
     }
 
-    public func getWalletCallback(widgetAccessToken: String, shipping: Bool) async throws -> String {
-        let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_TRANSACTION")
-
-        let response = try await sendRequest(
-            endpoint: ChargesEndpoints.walletCallback(
-                walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
-            ),
-            responseModel: WalletCallbackRes.self)
-
-        return response.resource.data.refToken
-    }
-
     public func getColesPayCallback(widgetAccessToken: String) async throws -> String {
         let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_SESSION")
 
@@ -128,8 +115,12 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         return response.resource.data.id
     }
 
-    public func getPayPalCallback(widgetAccessToken: String, shipping: Bool) async throws -> String {
-        let walletCallbackReq = WalletCallbackReq(requestType: "CREATE_TRANSACTION")
+    public func getPayPalCallback(widgetAccessToken: String, requestShipping: Bool) async throws -> String {
+        let walletCallbackReq = WalletCallbackReq(
+            requestType: "CREATE_TRANSACTION",
+            requestShipping: requestShipping,
+            walletType: "paypal"
+        )
 
         let response = try await sendRequest(
             endpoint: ChargesEndpoints.walletCallback(

@@ -170,16 +170,6 @@ public class ChargesMockService: ChargesService {
         )
     }
 
-    public func getWalletCallback(widgetAccessToken: String, shipping: Bool) async throws -> String {
-        if shouldThrowUnknownError {
-            throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
-        }
-        if shouldReturnError, let error = errorToReturn {
-            throw RequestError.requestError(error)
-        }
-        return "mock-wallet-ref-token-123"
-    }
-
     public func getColesPayCallback(widgetAccessToken: String) async throws -> String {
         if shouldThrowUnknownError {
             throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
@@ -190,7 +180,7 @@ public class ChargesMockService: ChargesService {
         return colesPayCallbackResult ?? "mock-coles-pay-id-456"
     }
 
-    public func getPayPalCallback(widgetAccessToken: String, shipping: Bool) async throws -> String {
+    public func getPayPalCallback(widgetAccessToken: String, requestShipping: Bool) async throws -> String {
         if shouldThrowUnknownError {
             throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
         }
