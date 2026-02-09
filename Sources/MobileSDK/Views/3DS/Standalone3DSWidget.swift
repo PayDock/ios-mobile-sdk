@@ -123,6 +123,13 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             completion(.success(Standalone3DSResult(event: event, charge3dsId: token)))
         }
 
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            activityIndicator?.startAnimating()
+            DispatchQueue.main.async {
+                UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
+            }
+        }
+
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
             activityIndicator?.stopAnimating()
@@ -133,26 +140,36 @@ public struct Standalone3DSWidget: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            activityIndicator?.stopAnimating()
-            completion(.failure(.webViewFailed(error: error as NSError)))
-        }
+            let nsError = error as NSError
+            if self.isNonFatalNavigationError(nsError) { return }
 
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            activityIndicator?.startAnimating()
-            DispatchQueue.main.async {
-                UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
-            }
+            activityIndicator?.stopAnimating()
+            completion(.failure(.webViewFailed(error: nsError)))
         }
 
         /**
          This method handles errors that happen before the resource of the url can even be reached.
          These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
-
-         @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
+         Non-fatal errors (e.g. NSURLErrorCancelled during redirects) are ignored so the 3DS flow can continue.
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            let nsError = error as NSError
+            if self.isNonFatalNavigationError(nsError) { return }
+
             activityIndicator?.stopAnimating()
-            completion(.failure(.webViewFailed(error: error as NSError)))
+            completion(.failure(.webViewFailed(error: nsError)))
+        }
+
+        /// Returns true if the navigation error should not terminate the 3DS flow (e.g. cancelled/redirect-related).
+        /// Exposed for on-device testing of non-fatal error handling.
+        private func isNonFatalNavigationError(_ error: NSError) -> Bool {
+            if error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled {
+                return true // -999: cancelled provisional navigation during redirect
+            }
+            if error.domain == "WebKitErrorDomain" && error.code == 102 {
+                return true // Frame load interrupted
+            }
+            return false
         }
 
         public func webView(_ webView: WKWebView,
