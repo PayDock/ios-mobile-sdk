@@ -2,9 +2,7 @@
 //  ApplePayError.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 05.10.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import NetworkingLib
@@ -23,11 +21,12 @@ public enum ApplePayError: Error {
         switch self {
         case .invalidApplePayRequest: return "Missing or invalid ApplePayRequest object"
         case .errorInitializingPayment: return "Initialisation of ApplePay has failed"
-        case .errorCompletingPayment: return "Payment failed"
+        case .errorCompletingPayment(let errorRes):
+                return errorRes.apiFailureMessage(fallback: "Payment failed")
         case .userCanceledPayment: return "User has canceled the payment"
         case .unableToPresentPaymentSheet: return "Unable to present ApplePay sheet - check the provided Merchant ID"
         case .creatingPaymentRequest(let reason): return reason
-        case let .unknownError(requestError): return requestError?.uiMessage ?? "Unknown error"
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }

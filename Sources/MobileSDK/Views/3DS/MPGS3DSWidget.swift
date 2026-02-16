@@ -137,7 +137,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             activityIndicator?.stopAnimating()
-            completion(.failure(.webViewFailed(error: error as NSError)))
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
+            completion(.failure(.webViewFailed(error: nsError)))
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -155,7 +157,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             activityIndicator?.stopAnimating()
-            completion(.failure(.webViewFailed(error: error as NSError)))
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
+            completion(.failure(.webViewFailed(error: nsError)))
         }
 
         public func webView(_ webView: WKWebView,

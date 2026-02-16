@@ -2,9 +2,7 @@
 //  AfterpayError.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 19.02.2024..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import NetworkingLib
@@ -20,9 +18,12 @@ public enum AfterpayError: Error {
 
     public var customMessage: String {
         switch self {
-        case .errorFetchingAfterpayUrl: return "Unable to fetch Afterpay widget URL"
-        case .errorCapturingCharge: return "Unable to complete the charge"
-        case .errorCancelingTransaction: return "Unable to cancel transaction"
+        case .errorFetchingAfterpayUrl(let errorRes):
+                return errorRes.apiFailureMessage(fallback: "Unable to fetch Afterpay widget URL")
+        case .errorCapturingCharge(let errorRes):
+                return errorRes.apiFailureMessage(fallback: "Unable to complete the charge")
+        case .errorCancelingTransaction(let errorRes):
+                return errorRes.apiFailureMessage(fallback: "Unable to cancel transaction")
         case .transactionCanceled: return "Afterpay transaction was canceled."
         case .initialisingWalletToken(let reason): return reason
         case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"

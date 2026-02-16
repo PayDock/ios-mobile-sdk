@@ -169,8 +169,10 @@ struct ColesPayWebView: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
             Task { @MainActor in
-                onFailure(.webViewFailed(error: error as NSError))
+                onFailure(.webViewFailed(error: nsError))
             }
         }
 
@@ -181,8 +183,10 @@ struct ColesPayWebView: UIViewRepresentable {
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
             Task { @MainActor in
-                onFailure(.webViewFailed(error: error as NSError))
+                onFailure(.webViewFailed(error: nsError))
             }
         }
 

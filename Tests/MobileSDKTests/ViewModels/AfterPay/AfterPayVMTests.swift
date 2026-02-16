@@ -556,7 +556,7 @@ class AfterPayVMTests: XCTestCase {
 
         XCTAssertEqual(actualErrorRes.error?.message, "Cancel failed")
         XCTAssertEqual(actualErrorRes.status, 400)
-        XCTAssertEqual(error.customMessage, "Unable to cancel transaction")
+        XCTAssertEqual(error.customMessage, "Cancel failed")
     }
 
     // MARK: - Success Case Tests
