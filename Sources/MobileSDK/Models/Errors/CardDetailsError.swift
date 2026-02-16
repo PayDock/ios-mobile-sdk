@@ -2,9 +2,7 @@
 //  CardDetailsError.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 06.12.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import NetworkingLib
@@ -16,8 +14,9 @@ public enum CardDetailsError: Error {
 
     public var customMessage: String {
         switch self {
-        case let .errorTokenisingCard(error): return error.error?.message ?? "Error tokenising gift card"
-        case let .unknownError(requestError): return requestError?.uiMessage ?? "Unknown error"
+        case .errorTokenisingCard(let errorRes):
+                return errorRes.apiFailureMessage(fallback: "Error tokenising card")
+        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }
 }

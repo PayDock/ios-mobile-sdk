@@ -2,9 +2,7 @@
 //  WalletTokenError.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 16.06.2025..
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 public enum WalletTokenError: Error, Equatable {
 

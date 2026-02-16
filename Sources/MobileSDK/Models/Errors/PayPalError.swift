@@ -21,9 +21,12 @@ public enum PayPalError: Error {
 
     public var customMessage: String {
         switch self {
-        case .getPayPalClientId: return "Error getting PayPal client ID."
-        case .errorFetchingOrderId: return "Unable to fetch PayPal order ID"
-        case .errorCapturingCharge: return "Unable to complete the charge"
+        case .getPayPalClientId(let errorRes):
+            return errorRes.apiFailureMessage(fallback: "Error getting PayPal client ID")
+        case .errorFetchingOrderId(let errorRes):
+            return errorRes.apiFailureMessage(fallback: "Unable to fetch PayPal order ID")
+        case .errorCapturingCharge(let errorRes):
+            return errorRes.apiFailureMessage(fallback: "Unable to complete the charge")
         case .userCancelled: return "PayPal transaction was canceled."
         case .initialisingWalletToken(let reason): return reason
         case .sdkException(let description): return description

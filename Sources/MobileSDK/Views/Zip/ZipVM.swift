@@ -2,7 +2,7 @@
 //  ZipVM.swift
 //  MobileSDK
 //
-//  Copyright © 2025 Paydock Ltd.
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import NetworkingLib
@@ -130,9 +130,16 @@ class ZipVM: ObservableObject {
                     request: externalCheckoutReq
                 )
 
+                guard let url = URL(string: link) else {
+                    updateLoadingState(isLoading: false)
+                    self.showWebView = false
+                    self.completion(.failure(.invalidCheckoutUrl))
+                    return
+                }
+
                 // Store checkout token for later use
                 self.checkoutToken = checkoutToken
-                self.zipUrl = URL(string: link)
+                self.zipUrl = url
 
                 updateLoadingState(isLoading: false)
 
@@ -148,7 +155,7 @@ class ZipVM: ObservableObject {
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError))
+                self.completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }
@@ -157,7 +164,7 @@ class ZipVM: ObservableObject {
         // On success, create a payment source token (matching web implementation)
         guard let checkoutToken = self.checkoutToken else {
             self.showWebView = false
-            self.completion(.failure(.unknownError))
+            self.completion(.failure(.unknownError(nil)))
             return
         }
 
@@ -184,7 +191,7 @@ class ZipVM: ObservableObject {
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError))
+                self.completion(.failure(.unknownError(error as? RequestError)))
             }
         }
     }

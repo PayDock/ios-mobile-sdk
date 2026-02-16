@@ -239,6 +239,48 @@ class ZipVMTests: XCTestCase {
         }
     }
 
+    func testCreateZipCheckoutFailsWithInvalidUrl() async {
+        // Given - API returns a string that URL(string:) cannot parse (e.g. empty yields nil)
+        mockPaymentSourcesService.externalCheckoutResult = (link: "", checkoutToken: "token")
+
+        // When
+        viewModel.createZipCheckout()
+        try? await Task.sleep(nanoseconds: 100_000_000)
+
+        // Then
+        XCTAssertFalse(viewModel.showWebView)
+        XCTAssertNil(viewModel.zipUrl)
+        guard case .failure(let error) = completionResult else {
+            XCTFail("Expected failure")
+            return
+        }
+        guard case .invalidCheckoutUrl = error else {
+            XCTFail("Expected invalidCheckoutUrl, got \(error)")
+            return
+        }
+    }
+
+    func testCreateZipCheckoutFailsWithBlankUrl() async {
+        // Given - API returns blank URL (URL(string:) returns nil)
+        mockPaymentSourcesService.externalCheckoutResult = (link: "", checkoutToken: "token")
+
+        // When
+        viewModel.createZipCheckout()
+        try? await Task.sleep(nanoseconds: 100_000_000)
+
+        // Then
+        XCTAssertFalse(viewModel.showWebView)
+        XCTAssertNil(viewModel.zipUrl)
+        guard case .failure(let error) = completionResult else {
+            XCTFail("Expected failure")
+            return
+        }
+        guard case .invalidCheckoutUrl = error else {
+            XCTFail("Expected invalidCheckoutUrl, got \(error)")
+            return
+        }
+    }
+
     // MARK: - Handle Button Tap Tests
 
     func testHandleButtonTap() async {

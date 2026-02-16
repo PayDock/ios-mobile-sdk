@@ -2,7 +2,7 @@
 //  ZipErrorTests.swift
 //  MobileSDK
 //
-//  Copyright © 2025 Paydock Ltd.
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 @testable import MobileSDK
@@ -13,7 +13,7 @@ class ZipErrorTests: XCTestCase {
     // MARK: - Custom Message Tests
 
     func testErrorFetchingZipUrlCustomMessage() {
-        // Given
+        // Given - API returns a message, so we show the API failure reason
         let errorRes = ErrorRes(
             status: 400,
             error: .init(message: "Invalid gateway", code: "INVALID_GATEWAY", details: nil),
@@ -26,11 +26,23 @@ class ZipErrorTests: XCTestCase {
         let message = error.customMessage
 
         // Then
+        XCTAssertEqual(message, "Invalid gateway")
+    }
+
+    func testErrorFetchingZipUrlCustomMessageWhenNoApiMessage() {
+        // Given - No API message, fallback is shown
+        let errorRes = ErrorRes(status: 400, error: nil, resource: nil, errorSummary: nil)
+        let error = ZipError.errorFetchingZipUrl(error: errorRes)
+
+        // When
+        let message = error.customMessage
+
+        // Then
         XCTAssertEqual(message, "Unable to fetch Zip widget URL")
     }
 
     func testErrorCapturingChargeCustomMessage() {
-        // Given
+        // Given - API returns a message, so we show the API failure reason
         let errorRes = ErrorRes(
             status: 500,
             error: .init(message: "Charge failed", code: "CHARGE_ERROR", details: nil),
@@ -43,11 +55,34 @@ class ZipErrorTests: XCTestCase {
         let message = error.customMessage
 
         // Then
+        XCTAssertEqual(message, "Charge failed")
+    }
+
+    func testErrorCapturingChargeCustomMessageWhenNoApiMessage() {
+        // Given - No API message, fallback is shown
+        let errorRes = ErrorRes(status: 500, error: nil, resource: nil, errorSummary: nil)
+        let error = ZipError.errorCapturingCharge(error: errorRes)
+
+        // When
+        let message = error.customMessage
+
+        // Then
         XCTAssertEqual(message, "Unable to complete the charge")
     }
 
-    func testWebViewFailedCustomMessage() {
+    func testInvalidCheckoutUrlCustomMessage() {
         // Given
+        let error = ZipError.invalidCheckoutUrl
+
+        // When
+        let message = error.customMessage
+
+        // Then - Matches Android INVALID_URL
+        XCTAssertEqual(message, "Unsupported URL - unable to proceed.")
+    }
+
+    func testWebViewFailedCustomMessage() {
+        // Given - NSError has localizedDescription, so we show it (e.g. "Request timed out", "Network connection was lost")
         let nsError = NSError(domain: "WebViewError", code: -1, userInfo: [NSLocalizedDescriptionKey: "WebView crashed"])
         let error = ZipError.webViewFailed(error: nsError)
 
@@ -55,7 +90,57 @@ class ZipErrorTests: XCTestCase {
         let message = error.customMessage
 
         // Then
-        XCTAssertEqual(message, "Zip WebView widget has failed")
+        XCTAssertEqual(message, "Zip WebView widget has failed: WebView crashed")
+    }
+
+    func testWebViewFailedCustomMessageWhenDescriptionEmpty() {
+        // Given - NSError with no userInfo; system may still provide a localizedDescription
+        let nsError = NSError(domain: "WebViewError", code: -1, userInfo: nil)
+        let error = ZipError.webViewFailed(error: nsError)
+
+        // When
+        let message = error.customMessage
+
+        // Then - We show the system description when present (e.g. "The operation couldn't be completed. (WebViewError error -1.)")
+        XCTAssertTrue(message.hasPrefix("Zip WebView widget has failed"), "Should prefix with fallback")
+        let isFallbackOrDetail = message == "Zip WebView widget has failed" || message.contains("WebViewError")
+        XCTAssertTrue(isFallbackOrDetail, "Should be fallback or include detail")
+    }
+
+    func testWebViewFailedCustomMessageForTimedOut() {
+        // Given - NSURLErrorDomain timed out (e.g. from WKWebView)
+        let nsError = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: nil)
+        let error = ZipError.webViewFailed(error: nsError)
+
+        // When
+        let message = error.customMessage
+
+        // Then - Specific message for timeout
+        XCTAssertEqual(message, "The request timed out. Please check your connection and try again.")
+    }
+
+    func testWebViewFailedCustomMessageForNetworkConnectionLost() {
+        // Given - NSURLErrorDomain connection lost (e.g. from WKWebView)
+        let nsError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNetworkConnectionLost, userInfo: nil)
+        let error = ZipError.webViewFailed(error: nsError)
+
+        // When
+        let message = error.customMessage
+
+        // Then - Specific message for connection lost
+        XCTAssertEqual(message, "The network connection was lost. Please try again.")
+    }
+
+    func testWebViewFailedCustomMessageForNotConnectedToInternet() {
+        // Given - NSURLErrorDomain not connected to internet
+        let nsError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        let error = ZipError.webViewFailed(error: nsError)
+
+        // When
+        let message = error.customMessage
+
+        // Then - Specific message for offline
+        XCTAssertEqual(message, "The Internet connection appears to be offline. Please check your network.")
     }
 
     func testTransactionCanceledCustomMessage() {
@@ -125,14 +210,27 @@ class ZipErrorTests: XCTestCase {
     }
 
     func testUnknownErrorCustomMessage() {
-        // Given
-        let error = ZipError.unknownError
+        // Given - No request error
+        let error = ZipError.unknownError(nil)
 
         // When
         let message = error.customMessage
 
         // Then
         XCTAssertEqual(message, "Unknown error")
+    }
+
+    func testUnknownErrorWithRequestErrorCustomMessage() {
+        // Given - Underlying RequestError (e.g. connection timeout) supplies uiMessage
+        let requestError = RequestError.connectionError(URLError(.timedOut))
+        let error = ZipError.unknownError(requestError)
+
+        // When
+        let message = error.customMessage
+
+        // Then - Uses RequestError.uiMessage (e.g. timed out description)
+        XCTAssertNotEqual(message, "Unknown error")
+        XCTAssertFalse(message.isEmpty)
     }
 
     // MARK: - CheckoutId Extraction Tests
@@ -219,7 +317,7 @@ class ZipErrorTests: XCTestCase {
 
     func testCheckoutIdNilFromUnknownError() {
         // Given
-        let error = ZipError.unknownError
+        let error = ZipError.unknownError(nil)
 
         // When
         let checkoutId = error.checkoutId

@@ -15,12 +15,42 @@ struct ZipWebView: UIViewRepresentable {
     static private let callbackHost = Constants.zipCallbackHost
     static private let responsePath = "/zip/response"
 
+    /// When true, target="_blank" links load in the current WebView instead of opening a new window.
+    static private let openInSameWindowScript = """
+    (function() {
+        var origOpen = window.open;
+        window.open = function(url, target, features) {
+            if (!target || String(target) === '_blank') {
+                if (url) window.location.href = url;
+                return null;
+            }
+            return origOpen ? origOpen.call(window, url, target, features) : null;
+        };
+        document.addEventListener('click', function(e) {
+            var findA = function(n) { while (n && n !== document) { if (n.tagName === 'A') return n; n = n.parentNode; } return null; };
+            var a = e.target && (e.target.closest ? e.target.closest('a') : findA(e.target));
+            if (a && (a.target === '_blank' || a.getAttribute('target') === '_blank')) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (a.href) window.location.href = a.href;
+            }
+        }, true);
+    })();
+    """
+
     private let url: URL
+    private let openTargetBlankInSameWebView: Bool
     private let onApprove: OnApprove
     private let onFailure: OnFailure
 
-    init(url: URL, onApprove: @escaping OnApprove, onFailure: @escaping OnFailure) {
+    init(
+        url: URL,
+        openTargetBlankInSameWebView: Bool = true,
+        onApprove: @escaping OnApprove,
+        onFailure: @escaping OnFailure
+    ) {
         self.url = url
+        self.openTargetBlankInSameWebView = openTargetBlankInSameWebView
         self.onApprove = onApprove
         self.onFailure = onFailure
     }
@@ -29,6 +59,9 @@ struct ZipWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: UIScreen.main.bounds, configuration: configuration)
         webView.navigationDelegate = context.coordinator
+        if openTargetBlankInSameWebView {
+            webView.uiDelegate = context.coordinator
+        }
         return webView
     }
 
@@ -40,18 +73,27 @@ struct ZipWebView: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        .init(onApprove: onApprove, onFailure: onFailure)
+        .init(
+            openTargetBlankInSameWebView: openTargetBlankInSameWebView,
+            onApprove: onApprove,
+            onFailure: onFailure
+        )
     }
 
     // MARK: - Coordinator
 
-    class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+    class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+        var openTargetBlankInSameWebView: Bool
         var onApprove: OnApprove
         var onFailure: OnFailure
         var isLoaded = false
 
-        init(onApprove: @escaping OnApprove,
-             onFailure: @escaping OnFailure) {
+        init(
+            openTargetBlankInSameWebView: Bool,
+            onApprove: @escaping OnApprove,
+            onFailure: @escaping OnFailure
+        ) {
+            self.openTargetBlankInSameWebView = openTargetBlankInSameWebView
             self.onApprove = onApprove
             self.onFailure = onFailure
         }
@@ -61,7 +103,26 @@ struct ZipWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             Task { @MainActor in
                 isLoaded = true
+                if openTargetBlankInSameWebView {
+                    webView.evaluateJavaScript(ZipWebView.openInSameWindowScript, completionHandler: nil)
+                }
             }
+        }
+
+        /// When `openTargetBlankInSameWebView` is true, load target="_blank" / window.open
+        /// requests in the current WebView instead of opening a new window.
+        func webView(
+            _ webView: WKWebView,
+            createWebViewWith configuration: WKWebViewConfiguration,
+            for navigationAction: WKNavigationAction,
+            windowFeatures: WKWindowFeatures
+        ) -> WKWebView? {
+            guard openTargetBlankInSameWebView,
+                  let url = navigationAction.request.url else {
+                return nil
+            }
+            webView.load(URLRequest(url: url))
+            return nil
         }
 
         /**
@@ -69,8 +130,10 @@ struct ZipWebView: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
             Task { @MainActor in
-                onFailure(.webViewFailed(error: error as NSError))
+                onFailure(.webViewFailed(error: nsError))
             }
         }
 
@@ -81,8 +144,10 @@ struct ZipWebView: UIViewRepresentable {
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
             Task { @MainActor in
-                onFailure(.webViewFailed(error: error as NSError))
+                onFailure(.webViewFailed(error: nsError))
             }
         }
 

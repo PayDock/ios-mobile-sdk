@@ -2,8 +2,7 @@
 //  ZipStatusTests.swift
 //  MobileSDK
 //
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 @testable import MobileSDK

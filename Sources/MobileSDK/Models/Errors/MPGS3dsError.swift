@@ -1,10 +1,8 @@
 //
-//  Integrated3DSError.swift
+//  MPGS3dsError.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Ricardo Da Silva on 2024/08/19.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 
@@ -15,7 +13,8 @@ public enum MPGS3dsError: Error, Equatable {
 
     public var customMessage: String {
         switch self {
-        case .webViewFailed: return "3DS WebView widget has failed"
+        case .webViewFailed(let nsError):
+            return nsError.webViewFailureMessage(fallback: "3DS WebView widget has failed")
         case .invalidToken: return "Provided 3DS token is not valid"
         case .mappingFailed: return "3DS response mapping failed"
         }
