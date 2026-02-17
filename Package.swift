@@ -23,7 +23,8 @@ let package = Package(
         .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", exact: "0.59.1"),
         .package(path: "./DataGateways"),
         .package(path: "./DataPaymentSources"),
-        .package(path: "./DataCharges")
+        .package(path: "./DataCharges"),
+        .package(path: "./BinProcessing")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -38,14 +39,14 @@ let package = Package(
                 .product(name: "PayPalWebPayments", package: "paypal-ios"),
                 .product(name: "DataGateways", package: "DataGateways"),
                 .product(name: "DataPaymentSources", package: "DataPaymentSources"),
-                .product(name: "DataCharges", package: "DataCharges")],
+                .product(name: "DataCharges", package: "DataCharges"),
+                .product(name: "BinProcessing", package: "BinProcessing")],
             path: "Sources",
             resources: [
                 .copy("MobileSDK/Resources/JSON/paypal_vault_session_auth_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_setup_token_success_response.json"),
                 .copy("MobileSDK/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
-                .copy("MobileSDK/Resources/JSON/paypal_vault_payment_token_success_response.json"),
-                .copy("MobileSDK/Resources/JSON/card-schemes.json")
+                .copy("MobileSDK/Resources/JSON/paypal_vault_payment_token_success_response.json")
             ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
@@ -53,7 +54,7 @@ let package = Package(
         ),
         .testTarget(
             name: "MobileSDKTests",
-            dependencies: ["MobileSDK"],
+            dependencies: ["MobileSDK", .product(name: "BinProcessing", package: "BinProcessing")],
             path: "Tests",
             resources: [
                 .copy("MobileSDKTests/Resources/JSON/card_tokenisation_error_response.json"),
@@ -62,8 +63,7 @@ let package = Package(
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_session_auth_error_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_setup_token_success_response.json"),
                 .copy("MobileSDKTests/Resources/JSON/paypal_vault_get_client_id_success_response.json"),
-                .copy("MobileSDKTests/Resources/JSON/paypal_vault_payment_token_success_response.json"),
-                .copy("MobileSDKTests/Resources/JSON/card_schemes.json")
+                .copy("MobileSDKTests/Resources/JSON/paypal_vault_payment_token_success_response.json")
             ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")

@@ -6,6 +6,7 @@
 
 import XCTest
 @testable import MobileSDK
+import BinProcessing
 
 struct CardTestCase {
     let cardNumber: String
@@ -37,13 +38,11 @@ class CardSchemeValidatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        validator = CardSchemeValidator()
-
-        let expectation = expectation(description: "Delay for setup")
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
-            expectation.fulfill()
+        guard let detector = BinProcessing.makeCardSchemeDetector() else {
+            XCTFail("BinProcessing detector could not be loaded")
+            return
         }
-        wait(for: [expectation], timeout: 0.2)
+        validator = CardSchemeValidator(binDetector: detector)
     }
 
     func testIsPossibleCreditCardNumber_ValidNumbers() {
@@ -69,31 +68,30 @@ class CardSchemeValidatorTests: XCTestCase {
     }
 
     func testGetCardSchemeFromBIN_ValidBIN() {
+        // BinProcessing card-schemes.json (2/4/6/8-digit prefix and ranges)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "41"), .visa)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "4111"), .visa)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "4988"), .visa)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "49899"), .visa)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "4049401"), .visa)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "300"), .diners)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "3000"), .diners)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "2221"), .mastercard)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "22222"), .mastercard)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "349013"), .amex)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "2720"), .mastercard)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "34"), .amex)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "372697"), .amex)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "644000123123"), .discover)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "213100"), .japcb)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "644000"), .discover)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "622956"), .unionpay)
         XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "622970"), .unionpay)
-        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "626256"), .unionpay)
-
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "633454")) // Solo - should return nil
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "633461234")) // Solo - should return nil
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "5610")) // AUSBC - should return nil
+        // 63 -> mastercard, 64 -> discover in BinProcessing data
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "63"), .mastercard)
+        XCTAssertEqual(validator.getCardSchemeFromBIN(cardNumber: "64"), .discover)
     }
 
     func testGetCardSchemeFromBIN_InvalidBIN() {
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "123455"))
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "3915"))
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "0000"))
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "123"))
-        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "321"))
+        // BINs that do not match any scheme in BinProcessing card-schemes.json
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "00"))
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "0012"))
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "12"))
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "1212"))
+        XCTAssertNil(validator.getCardSchemeFromBIN(cardNumber: "1"))
     }
 
     func testIsCardNumberLengthValid_ValidLength() {

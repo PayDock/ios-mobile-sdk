@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import BinProcessing
 
 class CardDetailsFormManager: ObservableObject {
 
@@ -92,7 +93,7 @@ class CardDetailsFormManager: ObservableObject {
     init(shouldValidateCardholderName: Bool = true,
          supportedSchemes: Set<CardScheme>? = nil,
          enableCardValidation: Bool = false,
-         cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(),
+         cardIssuerValidator: CardSchemeValidator = CardSchemeValidator(binDetector: BinProcessing.makeCardSchemeDetector()!),
          cardExpiryDateValidator: CardExpiryDateValidatior = CardExpiryDateValidatior(),
          cardSecurityCodeValidator: CardSecurityCodeValidator = CardSecurityCodeValidator(),
          cardExpiryDateFormatter: CardDetailsFormatter = CardDetailsFormatter(),

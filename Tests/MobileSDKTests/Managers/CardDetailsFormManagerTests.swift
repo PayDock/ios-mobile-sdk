@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import MobileSDK
+import BinProcessing
 
 // swiftlint:disable file_length large_tuple
 // swiftlint:disable:next type_body_length
@@ -888,6 +889,14 @@ class CardDetailsFormManagerTests: XCTestCase {
 // MARK: - Mock Classes
 
 class MockCardSchemeValidator: CardSchemeValidator {
+    override init(binDetector: CardSchemeDetector) {
+        super.init(binDetector: binDetector)
+    }
+
+    convenience init() {
+        self.init(binDetector: BinProcessing.makeCardSchemeDetector()!)
+    }
+
     var isPossibleCreditCardNumberResult = false
     var isUnknownCardNumberLengthValidResult = false
     var isCardNumberValidResult = false
