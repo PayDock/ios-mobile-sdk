@@ -239,7 +239,7 @@ public struct CardDetailsWidget: View {
         }
 
     private var saveCardViewWithPrivacyPolicy: some View {
-        HStack {
+        HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
                     .applyAttributes(viewModel.appearance.toggleText.text)
@@ -270,13 +270,11 @@ public struct CardDetailsWidget: View {
     }
 
     private var saveCardViewWithoutPrivacyPolicy: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(viewModel.config.allowSaveCard?.consentText ?? "")
-                    .applyAttributes(viewModel.appearance.toggleText.text)
-                    .customPadding(viewModel.appearance.toggleText.padding)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(alignment: .center, spacing: 0) {
+            Text(viewModel.config.allowSaveCard?.consentText ?? "")
+                .applyAttributes(viewModel.appearance.toggleText.text)
+                .customPadding(viewModel.appearance.toggleText.padding)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Toggle(isOn: $viewModel.policyAccepted) {}
                 .conditionalToggleStyle(appearance: viewModel.appearance.toggle)
