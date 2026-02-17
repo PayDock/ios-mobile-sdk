@@ -2,33 +2,23 @@
 //  CardIssuerValidator.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 15.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
+import BinProcessing
 
 /**
- A utility object for detecting card schemes based on card numbers
+ A utility object for detecting card schemes based on card numbers.
+ Uses the BinProcessing package for BIN lookup (card-schemes.json).
  */
 class CardSchemeValidator {
 
-    private let jsonLoader: JSONLoader
-    private var binSchemas: [BinSchemaRes.BinSchema]
-    private var lastResult: LastBINResult?
+    private let binDetector: CardSchemeDetector
 
     // MARK: - Initialization
 
-    init(jsonLoader: JSONLoader = JSONLoader()) {
-        self.jsonLoader = jsonLoader
-        self.binSchemas = []
-        loadLocalBinSchema()
-    }
-
-    // MARK: - Data Loading
-
-    private func loadLocalBinSchema() {
-        binSchemas = jsonLoader.loadJSON(filename: "card-schemes", type: BinSchemaRes.self).cardSchemas
+    init(binDetector: CardSchemeDetector) {
+        self.binDetector = binDetector
     }
 
     /// Validates card PAN number using Luhn's algorithm.
@@ -73,34 +63,8 @@ class CardSchemeValidator {
     }
 
     func getCardSchemeFromBIN(cardNumber: String) -> CardScheme? {
-        let cleanNumber = cardNumber.filter { !$0.isWhitespace }
-
-        if let cachedSchema = lastResult, cachedSchema.cardNumber == cleanNumber {
-            return CardScheme(rawValue: cachedSchema.resolvedScheme ?? "")
-        }
-
-        for schema in binSchemas {
-            let binParts = schema.bin.split(separator: "~")
-
-            if binParts.count == 1 {
-                // Exact match
-                if cleanNumber.starts(with: String(binParts[0])) {
-                    lastResult = LastBINResult(cardNumber: cleanNumber, resolvedScheme: schema.schema)
-                    return CardScheme(rawValue: schema.schema)
-                }
-            } else if binParts.count == 2 {
-                // Range match
-                guard let lowerBound = Int(binParts[0]),
-                      let upperBound = Int(binParts[1]),
-                      let cardPrefix = Int(String(cleanNumber.prefix(binParts[0].count))) else { continue }
-
-                if cardPrefix >= lowerBound && cardPrefix <= upperBound {
-                    lastResult = LastBINResult(cardNumber: cleanNumber, resolvedScheme: schema.schema)
-                    return CardScheme(rawValue: schema.schema)
-                }
-            }
-        }
-        return nil
+        guard let result = binDetector.detectScheme(pan: cardNumber) else { return nil }
+        return CardScheme(rawValue: result.scheme)
     }
 
     // MARK: - Card number length
@@ -127,10 +91,5 @@ class CardSchemeValidator {
         case .visa, .discover, .unionpay: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
         case .mastercard, .japcb, .eftpos: return try? NSRegularExpression(pattern: "^\\d{16}$")
         }
-    }
-
-    struct LastBINResult {
-        var cardNumber: String
-        var resolvedScheme: String?
     }
 }
