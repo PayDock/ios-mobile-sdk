@@ -240,8 +240,9 @@ class ZipVMTests: XCTestCase {
     }
 
     func testCreateZipCheckoutFailsWithInvalidUrl() async {
-        // Given - API returns a string that URL(string:) cannot parse (e.g. empty yields nil)
-        mockPaymentSourcesService.externalCheckoutResult = (link: "", checkoutToken: "token")
+        // Given - API returns a malformed URL missing "://" (scheme is "httpsandbox" not "https")
+        let malformedUrl = "httpsandbox.zip.co/checkout?co=co_test&m=1234"
+        mockPaymentSourcesService.externalCheckoutResult = (link: malformedUrl, checkoutToken: "token")
 
         // When
         viewModel.createZipCheckout()
