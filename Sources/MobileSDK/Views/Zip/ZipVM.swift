@@ -130,7 +130,7 @@ class ZipVM: ObservableObject {
                     request: externalCheckoutReq
                 )
 
-                guard let url = URL(string: link) else {
+                guard let url = URL(string: link), isValidWebViewUrl(url) else {
                     updateLoadingState(isLoading: false)
                     self.showWebView = false
                     self.completion(.failure(.invalidCheckoutUrl))
@@ -228,5 +228,14 @@ class ZipVM: ObservableObject {
             type: .button,
             properties: .button(WidgetEventButtonProperties(name: "ZipCheckoutButton", action: .click)))
         eventDelegate?.widgetEvent(event: event)
+    }
+
+    // MARK: - Private Helpers
+
+    /// Validates that the URL has an http or https scheme.
+    /// This catches malformed URLs like "httpsandbox.zip.co/..." where the scheme separator is missing.
+    private func isValidWebViewUrl(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased() else { return false }
+        return scheme == "http" || scheme == "https"
     }
 }
