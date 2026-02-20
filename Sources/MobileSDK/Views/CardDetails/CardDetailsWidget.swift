@@ -80,6 +80,7 @@ public struct CardDetailsWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             textContentType: getCreditCardName(),
             returnKeyType: .next,
+            autocorrectionDisabled: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .cardholderName

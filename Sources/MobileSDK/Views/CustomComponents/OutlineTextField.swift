@@ -73,6 +73,7 @@ struct OutlineTextField: View {
     private let textContentType: UITextContentType?
     private let returnKeyType: UIReturnKeyType
     private let isSecureTextEntry: Bool
+    private let autocorrectionDisabled: Bool
     private let onTapGesture: () -> Void
     private let onTextChange: ((String, Int) -> Int)?
     private let onSubmit: (() -> Void)?
@@ -94,6 +95,7 @@ struct OutlineTextField: View {
     ///   - keyboardType: Keyboard type for the text field.
     ///   - returnKeyType: Return key type for the text field.
     ///   - isSecureTextEntry: Whether to mask input (for sensitive data like CVV).
+    ///   - autocorrectionDisabled: Whether to disable autocorrection and spell checking.
     ///   - onTapGesture: Action to take on tap gesture activaction.
     ///   - onTextChange: Custom text change handler that returns new cursor position.
     ///   - onSubmit: Action to take when return key is pressed.
@@ -111,6 +113,7 @@ struct OutlineTextField: View {
                 keyboardType: UIKeyboardType = .default,
                 returnKeyType: UIReturnKeyType = .default,
                 isSecureTextEntry: Bool = false,
+                autocorrectionDisabled: Bool = false,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
                 onSubmit: (() -> Void)? = nil) {
@@ -128,6 +131,7 @@ struct OutlineTextField: View {
         self.keyboardType = keyboardType
         self.returnKeyType = returnKeyType
         self.isSecureTextEntry = isSecureTextEntry
+        self.autocorrectionDisabled = autocorrectionDisabled
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
@@ -213,6 +217,7 @@ struct OutlineTextField: View {
                 strikethroughColor: UIColor(appearance.fonts.text.strikethroughColor),
                 isItalic: appearance.fonts.text.isItalic,
                 isSecureTextEntry: isSecureTextEntry,
+                autocorrectionDisabled: autocorrectionDisabled,
                 onEditingChanged: { isEditing in
                     editing = isEditing
                 },

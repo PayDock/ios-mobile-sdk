@@ -70,26 +70,48 @@ class CardSchemeValidator {
     // MARK: - Card number length
 
     func isCardNumberLengthValid(number: String, scheme: CardScheme?) -> Bool {
-        guard let scheme = scheme, let regex = cardLengthRegex(for: scheme) else { return false }
-        let cleanNumber = number.filter { !$0.isWhitespace }
-
-        let range = NSRange(location: 0, length: cleanNumber.utf16.count)
-        let matches = regex.matches(in: cleanNumber, options: [], range: range)
-
-        return !matches.isEmpty
+        guard let scheme = scheme else { return false }
+        return isDigitCountInValidRange(number: number, scheme: scheme)
     }
 
     func isUnknownCardNumberLengthValid(number: String) -> Bool {
-        let cleanNumber = number.filter { !$0.isWhitespace }
-        return cleanNumber.count >= 12 && cleanNumber.count <= 19
+        return isDigitCountInValidRange(number: number, scheme: nil)
     }
 
-    private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
+    // MARK: - Digit range helpers
+
+    /// Get minimum and maximum digit lengths for a card scheme
+    /// - Parameter scheme: The card scheme, or nil for unknown schemes
+    /// - Returns: A tuple with (min, max) digit lengths. Defaults to (12, 19) for unknown schemes.
+    func digitRange(for scheme: CardScheme?) -> (min: Int, max: Int) {
+        guard let scheme = scheme else { return (12, 19) }
         switch scheme {
-        case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
-        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}$")
-        case .visa, .discover, .unionpay: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
-        case .mastercard, .japcb, .eftpos: return try? NSRegularExpression(pattern: "^\\d{16}$")
+        case .amex: return (15, 15)
+        case .diners: return (14, 14)
+        case .visa, .discover, .unionpay: return (16, 19)
+        case .mastercard, .japcb, .eftpos: return (16, 16)
         }
+    }
+
+    /// Check if digit count is within valid range for scheme
+    /// - Parameters:
+    ///   - number: The card number string (may contain whitespace or other characters)
+    ///   - scheme: The detected card scheme, or nil for unknown schemes
+    /// - Returns: true if digit count is within the valid range for the scheme
+    func isDigitCountInValidRange(number: String, scheme: CardScheme?) -> Bool {
+        let digitCount = number.filter { $0.isNumber }.count
+        let range = digitRange(for: scheme)
+        return digitCount >= range.min && digitCount <= range.max
+    }
+
+    /// Check if digit count meets minimum for scheme
+    /// - Parameters:
+    ///   - number: The card number string (may contain whitespace or other characters)
+    ///   - scheme: The detected card scheme, or nil for unknown schemes
+    /// - Returns: true if digit count meets or exceeds the minimum for the scheme
+    func hasMinimumDigits(number: String, scheme: CardScheme?) -> Bool {
+        let digitCount = number.filter { $0.isNumber }.count
+        let range = digitRange(for: scheme)
+        return digitCount >= range.min
     }
 }

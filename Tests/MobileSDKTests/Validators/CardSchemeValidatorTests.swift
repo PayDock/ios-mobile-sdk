@@ -139,4 +139,197 @@ class CardSchemeValidatorTests: XCTestCase {
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 4444", scheme: .unionpay))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 32", scheme: .unionpay))
     }
+
+    // MARK: - Digit Range Tests
+
+    func testDigitRange_Amex() {
+        let range = validator.digitRange(for: .amex)
+        XCTAssertEqual(range.min, 15)
+        XCTAssertEqual(range.max, 15)
+    }
+
+    func testDigitRange_Diners() {
+        let range = validator.digitRange(for: .diners)
+        XCTAssertEqual(range.min, 14)
+        XCTAssertEqual(range.max, 14)
+    }
+
+    func testDigitRange_Visa() {
+        let range = validator.digitRange(for: .visa)
+        XCTAssertEqual(range.min, 16)
+        XCTAssertEqual(range.max, 19)
+    }
+
+    func testDigitRange_Mastercard() {
+        let range = validator.digitRange(for: .mastercard)
+        XCTAssertEqual(range.min, 16)
+        XCTAssertEqual(range.max, 16)
+    }
+
+    func testDigitRange_Discover() {
+        let range = validator.digitRange(for: .discover)
+        XCTAssertEqual(range.min, 16)
+        XCTAssertEqual(range.max, 19)
+    }
+
+    func testDigitRange_UnionPay() {
+        let range = validator.digitRange(for: .unionpay)
+        XCTAssertEqual(range.min, 16)
+        XCTAssertEqual(range.max, 19)
+    }
+
+    func testDigitRange_JCB() {
+        let range = validator.digitRange(for: .japcb)
+        XCTAssertEqual(range.min, 16)
+        XCTAssertEqual(range.max, 16)
+    }
+
+    func testDigitRange_EFTPOS() {
+        let range = validator.digitRange(for: .eftpos)
+        XCTAssertEqual(range.min, 16)
+        XCTAssertEqual(range.max, 16)
+    }
+
+    func testDigitRange_UnknownScheme() {
+        let range = validator.digitRange(for: nil)
+        XCTAssertEqual(range.min, 12)
+        XCTAssertEqual(range.max, 19)
+    }
+
+    // MARK: - isDigitCountInValidRange Tests
+
+    func testIsDigitCountInValidRange_Amex_Valid() {
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "378282246310005", scheme: .amex)) // 15 digits
+    }
+
+    func testIsDigitCountInValidRange_Amex_TooFew() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "37828224631000", scheme: .amex)) // 14 digits
+    }
+
+    func testIsDigitCountInValidRange_Amex_TooMany() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "3782822463100051", scheme: .amex)) // 16 digits
+    }
+
+    func testIsDigitCountInValidRange_Visa_AtMinimum() {
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "4111111111111111", scheme: .visa)) // 16 digits
+    }
+
+    func testIsDigitCountInValidRange_Visa_AtMaximum() {
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "4111111111111111123", scheme: .visa)) // 19 digits
+    }
+
+    func testIsDigitCountInValidRange_Visa_BelowMinimum() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "411111111111111", scheme: .visa)) // 15 digits
+    }
+
+    func testIsDigitCountInValidRange_Visa_AboveMaximum() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "41111111111111111234", scheme: .visa)) // 20 digits
+    }
+
+    func testIsDigitCountInValidRange_WithWhitespace() {
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "4111 1111 1111 1111", scheme: .visa)) // 16 digits with spaces
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "3782 8224 6310 005", scheme: .amex)) // 15 digits with spaces
+    }
+
+    func testIsDigitCountInValidRange_UnknownScheme_Valid() {
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "123456789012", scheme: nil)) // 12 digits (minimum)
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "1234567890123456789", scheme: nil)) // 19 digits (maximum)
+    }
+
+    func testIsDigitCountInValidRange_UnknownScheme_BelowMinimum() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "12345678901", scheme: nil)) // 11 digits
+    }
+
+    // MARK: - hasMinimumDigits Tests
+
+    func testHasMinimumDigits_Amex_AtMinimum() {
+        XCTAssertTrue(validator.hasMinimumDigits(number: "378282246310005", scheme: .amex)) // 15 digits
+    }
+
+    func testHasMinimumDigits_Amex_BelowMinimum() {
+        XCTAssertFalse(validator.hasMinimumDigits(number: "37828224631000", scheme: .amex)) // 14 digits
+    }
+
+    func testHasMinimumDigits_Amex_AboveMinimum() {
+        XCTAssertTrue(validator.hasMinimumDigits(number: "3782822463100051", scheme: .amex)) // 16 digits (above min, used for range check)
+    }
+
+    func testHasMinimumDigits_Visa_AtMinimum() {
+        XCTAssertTrue(validator.hasMinimumDigits(number: "4111111111111111", scheme: .visa)) // 16 digits
+    }
+
+    func testHasMinimumDigits_Visa_BelowMinimum() {
+        XCTAssertFalse(validator.hasMinimumDigits(number: "411111111111111", scheme: .visa)) // 15 digits
+    }
+
+    func testHasMinimumDigits_UnknownScheme_AtMinimum() {
+        XCTAssertTrue(validator.hasMinimumDigits(number: "123456789012", scheme: nil)) // 12 digits
+    }
+
+    func testHasMinimumDigits_UnknownScheme_BelowMinimum() {
+        XCTAssertFalse(validator.hasMinimumDigits(number: "12345678901", scheme: nil)) // 11 digits
+    }
+
+    func testHasMinimumDigits_WithWhitespace() {
+        XCTAssertTrue(validator.hasMinimumDigits(number: "4111 1111 1111 1111", scheme: .visa))
+        XCTAssertFalse(validator.hasMinimumDigits(number: "4111 1111 1111 111", scheme: .visa)) // 15 digits
+    }
+
+    // MARK: - Digit-Only Counting Tests (verifies non-digit characters are not counted)
+
+    func testIsDigitCountInValidRange_IgnoresNonDigitCharacters() {
+        // "4111abc1111def1111ghi1111" has 16 digits but also letters
+        // Should count only the 16 digits and return true for Visa
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "4111abc1111def1111ghi1111", scheme: .visa))
+    }
+
+    func testIsDigitCountInValidRange_WithLetters_StillBelowMinimum() {
+        // "411abc111" has only 6 digits plus letters
+        // Should count only 6 digits and return false (below 16 minimum for Visa)
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "411abc111", scheme: .visa))
+    }
+
+    func testIsDigitCountInValidRange_SpecialCharactersNotCounted() {
+        // "4111-1111-1111-1111" has 16 digits with hyphens
+        // Should count only 16 digits (not the hyphens)
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "4111-1111-1111-1111", scheme: .visa))
+    }
+
+    func testIsDigitCountInValidRange_MixedNonDigitCharacters() {
+        // Mix of spaces, letters, symbols - only 15 digits for Amex
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "3782 822a 4631-0005!", scheme: .amex))
+    }
+
+    func testHasMinimumDigits_IgnoresNonDigitCharacters() {
+        // "4111abc1111def1111ghi1111" has 16 digits
+        // Should count only digits and return true for Visa (min 16)
+        XCTAssertTrue(validator.hasMinimumDigits(number: "4111abc1111def1111ghi1111", scheme: .visa))
+    }
+
+    func testHasMinimumDigits_WithLetters_StillBelowMinimum() {
+        // "411abcdefghij111" has only 6 digits plus many letters
+        // Should count only 6 digits and return false (below 16 minimum for Visa)
+        XCTAssertFalse(validator.hasMinimumDigits(number: "411abcdefghij111", scheme: .visa))
+    }
+
+    func testHasMinimumDigits_SpecialCharactersNotCounted() {
+        // "123-456-789-012" has 12 digits with hyphens (minimum for unknown scheme)
+        XCTAssertTrue(validator.hasMinimumDigits(number: "123-456-789-012", scheme: nil))
+    }
+
+    func testHasMinimumDigits_OnlyLetters_ReturnsZeroDigits() {
+        // "abcdefghijklmnop" has 0 digits - should return false for any scheme
+        XCTAssertFalse(validator.hasMinimumDigits(number: "abcdefghijklmnop", scheme: .visa))
+        XCTAssertFalse(validator.hasMinimumDigits(number: "abcdefghijklmnop", scheme: nil))
+    }
+
+    func testIsDigitCountInValidRange_EmptyString() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "", scheme: .visa))
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "", scheme: nil))
+    }
+
+    func testHasMinimumDigits_EmptyString() {
+        XCTAssertFalse(validator.hasMinimumDigits(number: "", scheme: .visa))
+        XCTAssertFalse(validator.hasMinimumDigits(number: "", scheme: nil))
+    }
 }
