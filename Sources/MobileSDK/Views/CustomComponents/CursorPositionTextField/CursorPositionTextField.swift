@@ -34,6 +34,7 @@ struct CursorPositionTextField: UIViewRepresentable {
     let strikethroughColor: UIColor?
     let isItalic: Bool
     let isSecureTextEntry: Bool
+    let autocorrectionDisabled: Bool
     let onEditingChanged: (Bool) -> Void
     let onCommit: () -> Void
     let onSubmit: (() -> Void)?
@@ -53,6 +54,7 @@ struct CursorPositionTextField: UIViewRepresentable {
          strikethroughColor: UIColor? = nil,
          isItalic: Bool = false,
          isSecureTextEntry: Bool = false,
+         autocorrectionDisabled: Bool = false,
          onEditingChanged: @escaping (Bool) -> Void = { _ in },
          onCommit: @escaping () -> Void = {},
          onSubmit: (() -> Void)? = nil,
@@ -71,6 +73,7 @@ struct CursorPositionTextField: UIViewRepresentable {
         self.strikethroughColor = strikethroughColor
         self.isItalic = isItalic
         self.isSecureTextEntry = isSecureTextEntry
+        self.autocorrectionDisabled = autocorrectionDisabled
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
         self.onSubmit = onSubmit
@@ -88,6 +91,12 @@ struct CursorPositionTextField: UIViewRepresentable {
         textField.tintColor = tintColor
         // Enable secure text entry for masking sensitive data (e.g., CVV) - PCI DSS compliance
         textField.isSecureTextEntry = isSecureTextEntry
+
+        // Disable autocorrection and spell checking if requested (e.g., for name fields)
+        if autocorrectionDisabled {
+            textField.autocorrectionType = .no
+            textField.spellCheckingType = .no
+        }
 
         // Prevent the text field from expanding
         textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
