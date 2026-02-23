@@ -77,7 +77,7 @@ class ZipErrorTests: XCTestCase {
         // When
         let message = error.customMessage
 
-        // Then - Matches Android INVALID_URL
+        // Then - Matches INVALID_URL
         XCTAssertEqual(message, "Unsupported URL - unable to proceed.")
     }
 

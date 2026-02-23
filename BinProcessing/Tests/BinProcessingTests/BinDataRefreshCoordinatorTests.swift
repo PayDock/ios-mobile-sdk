@@ -10,7 +10,7 @@ import XCTest
 // MARK: - Spy
 
 /// Test double for `BinDataCacheManaging`.
-/// Records call counts and lets tests control return values — mirrors Android's mockk spy
+/// Records call counts and lets tests control return values
 /// used in `BinDataRefreshCoordinatorTest`.
 final class SpyBinDataCacheManager: BinDataCacheManaging {
 
@@ -47,8 +47,6 @@ final class SpyBinDataCacheManager: BinDataCacheManaging {
 /// - App foreground refresh when cache is stale or missing
 /// - Skipping refresh when cache is fresh
 /// - Correct behaviour across multiple foreground events
-///
-/// Mirrors Android's `BinDataRefreshCoordinatorTest`.
 final class BinDataRefreshCoordinatorTests: XCTestCase {
 
     // MARK: - refreshAtSDKInit Tests
@@ -127,7 +125,6 @@ final class BinDataRefreshCoordinatorTests: XCTestCase {
     // MARK: - Multiple Foreground Events Tests
 
     func testMultipleForegroundEventsEachCheckShouldRefreshOnForeground() async {
-        // Mirrors Android: returnsMany [true, false, true] → 3 checks, 2 refreshes
         let spy = SpyBinDataCacheManager()
         let coordinator = BinDataRefreshCoordinator(cacheManager: spy)
 

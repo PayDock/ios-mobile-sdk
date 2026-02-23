@@ -90,7 +90,7 @@ final class BinDataCacheManager: BinDataCacheManaging {
     /// Performs a HEAD request and returns true if the full file should be downloaded:
     /// no cache exists, or the remote Last-Modified / ETag differs from the stored value.
     ///
-    /// Mirrors Android's `when` block — Last-Modified is preferred; ETag is the fallback.
+    /// Last-Modified is preferred; ETag is the fallback.
     /// Returns false (skip download) if the HEAD request fails so existing cache is preserved.
     func shouldDownloadFullFile() async -> Bool {
         guard getCachedBinData() != nil else { return true }

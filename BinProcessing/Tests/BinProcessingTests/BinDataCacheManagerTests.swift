@@ -10,7 +10,6 @@ import XCTest
 // MARK: - Mock URL Protocol
 
 /// URLProtocol subclass that intercepts all requests and delegates to a static handler.
-/// Mirrors Android's Ktor `MockEngine` used in `BinDataCacheManagerTest`.
 final class MockURLProtocol: URLProtocol {
 
     /// Set this before each test to control the response for any outgoing request.
@@ -59,8 +58,6 @@ enum BinDataTestConstants {
 /// - HEAD request comparison for cache freshness (Last-Modified preferred, ETag fallback)
 /// - Download and persistence on success, error propagation on failure
 /// - Foreground refresh timing logic (1-hour threshold)
-///
-/// Mirrors Android's `BinDataCacheManagerTest`.
 final class BinDataCacheManagerTests: XCTestCase {
 
     private var sut: BinDataCacheManager!
@@ -106,7 +103,7 @@ final class BinDataCacheManagerTests: XCTestCase {
 
     // MARK: - Helpers
 
-    /// Mirrors Android's `mockBinDataSuccessModule` — responds with both Last-Modified and ETag by default.
+    /// Responds with both Last-Modified and ETag by default.
     private func setupSuccessHandler(
         lastModified: String? = BinDataTestConstants.mockLastModified,
         etag: String? = BinDataTestConstants.mockEtag
@@ -138,12 +135,12 @@ final class BinDataCacheManagerTests: XCTestCase {
         }
     }
 
-    /// Mirrors Android's `mockBinDataEtagOnlyModule` — HEAD/GET return ETag only, no Last-Modified.
+    /// HEAD/GET return ETag only, no Last-Modified.
     private func setupEtagOnlyHandler() {
         setupSuccessHandler(lastModified: nil, etag: BinDataTestConstants.mockEtag)
     }
 
-    /// Mirrors Android's `mockBinDataFailureModule` — all requests throw a network error.
+    /// All requests throw a network error.
     private func setupFailureHandler() {
         MockURLProtocol.requestHandler = { _ in
             throw URLError(.notConnectedToInternet)
