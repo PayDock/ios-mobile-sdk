@@ -35,8 +35,7 @@ final class BinDataRefreshCoordinator {
 
     // MARK: - Lifecycle observation
 
-    /// Registers a foreground notification observer (iOS: `willEnterForeground`;
-    /// macOS: `willBecomeActive`). Safe to call multiple times — registers only once.
+    /// Registers a foreground notification observer`willEnterForeground`
     func start() {
         guard !isObserving else { return }
         isObserving = true
