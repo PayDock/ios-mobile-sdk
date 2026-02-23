@@ -385,6 +385,9 @@ class CardDetailsFormManagerTests: XCTestCase {
     func testExpiryDateValidation_InvalidMonthAt2ndDigit() {
         mockExpiryValidator.validateMonthResult = false
 
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
+
         // Simulate typing month "13" (invalid)
         sut.expiryDateText = "1"  // 1 digit - no validation yet
         XCTAssertNil(sut.expiryDateValid)
@@ -396,6 +399,9 @@ class CardDetailsFormManagerTests: XCTestCase {
 
     func testExpiryDateValidation_ValidMonthAt2ndDigit() {
         mockExpiryValidator.validateMonthResult = true
+
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
 
         // Simulate typing month "12" (valid)
         sut.expiryDateText = "1"  // 1 digit - no validation yet
@@ -411,6 +417,9 @@ class CardDetailsFormManagerTests: XCTestCase {
         mockExpiryValidator.validateMonthResult = true
         mockExpiryValidator.validateCreditCardExpiryResult = .valid
 
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
+
         // Simulate typing full date
         sut.expiryDateText = "12"    // 2 digits - month valid
         sut.expiryDateText = "12/2"  // 3 digits - no full validation yet
@@ -425,6 +434,9 @@ class CardDetailsFormManagerTests: XCTestCase {
         mockExpiryValidator.validateMonthResult = true
         mockExpiryValidator.validateCreditCardExpiryResult = .expired
 
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
+
         sut.expiryDateText = "01/20" // 4 digits - full validation shows expired
         XCTAssertFalse(sut.expiryDateValid ?? true)
         XCTAssertEqual(sut.expiryDateError, "Card expired")
@@ -433,6 +445,9 @@ class CardDetailsFormManagerTests: XCTestCase {
     func testExpiryDateValidation_RevalidatesOnEdit() {
         mockExpiryValidator.validateMonthResult = true
         mockExpiryValidator.validateCreditCardExpiryResult = .valid
+
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
 
         // Enter valid date
         sut.expiryDateText = "12/25"
@@ -448,6 +463,9 @@ class CardDetailsFormManagerTests: XCTestCase {
     func testExpiryDateValidation_ClearsErrorOnDelete() {
         mockExpiryValidator.validateMonthResult = false
 
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
+
         // Enter invalid month
         sut.expiryDateText = "13"
         XCTAssertFalse(sut.expiryDateValid ?? true)
@@ -461,6 +479,9 @@ class CardDetailsFormManagerTests: XCTestCase {
 
     func testExpiryDateValidation_ClearsOnEmpty() {
         mockExpiryValidator.validateCreditCardExpiryResult = .valid
+
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
 
         // Enter valid date
         sut.expiryDateText = "12/25"
@@ -476,6 +497,9 @@ class CardDetailsFormManagerTests: XCTestCase {
         // Scenario: User enters expired date, then deletes back to edit
         mockExpiryValidator.validateMonthResult = true
         mockExpiryValidator.validateCreditCardExpiryResult = .expired
+
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
 
         // Enter expired date - shows "Card expired" error
         sut.expiryDateText = "01/20"
@@ -494,6 +518,9 @@ class CardDetailsFormManagerTests: XCTestCase {
         mockExpiryValidator.validateMonthResult = true
         mockExpiryValidator.validateCreditCardExpiryResult = .expired
 
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
+
         // Enter expired date
         sut.expiryDateText = "01/20"
         XCTAssertEqual(sut.expiryDateError, "Card expired")
@@ -506,6 +533,9 @@ class CardDetailsFormManagerTests: XCTestCase {
 
     func testExpiryDateValidation_CanFixExpiredDateByReentering() {
         mockExpiryValidator.validateMonthResult = true
+
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
 
         // Enter expired date
         mockExpiryValidator.validateCreditCardExpiryResult = .expired
@@ -1088,6 +1118,9 @@ class CardDetailsFormManagerTests: XCTestCase {
     func testExpiryDateText_ActiveValidationDuringTyping() {
         // Expiry validates actively at 2nd digit (month) and 4th digit (full date)
         mockExpiryValidator.validateCreditCardExpiryResult = .valid
+
+        // Focus the field for active validation during typing
+        sut.setEditingTextField(focusedField: .expiryDate)
 
         // Setting full date "12/25" (4 digits) triggers immediate validation
         sut.expiryDateText = "12/25"

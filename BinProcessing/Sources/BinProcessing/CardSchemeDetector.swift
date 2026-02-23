@@ -39,6 +39,16 @@ public final class CardSchemeDetector {
         return CardSchemeDetector(data: decoded)
     }
 
+    /// Loads detector from raw JSON data (e.g. a cached file downloaded from CloudFront).
+    /// - Parameter data: Raw JSON data conforming to the card-schemes.json format.
+    /// - Returns: A detector instance, or nil if the data is invalid or cannot be decoded.
+    public static func load(from data: Data) -> CardSchemeDetector? {
+        guard let decoded = try? JSONDecoder().decode(CardSchemeData.self, from: data) else {
+            return nil
+        }
+        return CardSchemeDetector(data: decoded)
+    }
+
     /// Detects card scheme from a PAN string (digits only; non-digits are stripped).
     /// - Parameter pan: Full or partial card number (may contain spaces or other non-digits).
     /// - Returns: Detection result with scheme name and metadata, or nil if PAN has fewer than 2 digits or no match.

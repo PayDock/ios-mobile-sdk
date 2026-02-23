@@ -13,11 +13,17 @@ public enum BinProcessing {
     /// Module version.
     public static let version = "1.0.0"
 
-    /// Creates a card scheme detector loaded from the package's bundled card-schemes.json.
-    /// Use this from MobileSDK to resolve scheme from partial or full PAN.
-    /// - Returns: A detector instance, or nil if the bundled JSON is missing or invalid.
+    /// Creates a card scheme detector, preferring the cached CloudFront file over the bundled JSON.
+    /// Call `startBinDataRefreshCoordinator()` and `triggerBinDataRefreshAtSDKInit()` at SDK
+    /// initialisation so the cache is populated; subsequent calls to this method will use the
+    /// freshly downloaded data automatically.
+    /// - Returns: A detector instance, or nil if both the cache and the bundled JSON are invalid.
     public static func makeCardSchemeDetector() -> CardSchemeDetector? {
-        CardSchemeDetector.load(from: .module)
+        if let cachedData = BinDataCacheManager.shared.getCachedBinData(),
+           let detector = CardSchemeDetector.load(from: cachedData) {
+            return detector
+        }
+        return CardSchemeDetector.load(from: .module)
     }
 
     /// Creates a card scheme detector using JSON from a custom bundle.
@@ -25,5 +31,22 @@ public enum BinProcessing {
     /// - Returns: A detector instance, or nil if the resource is missing or invalid.
     public static func makeCardSchemeDetector(bundle: Bundle) -> CardSchemeDetector? {
         CardSchemeDetector.load(from: bundle)
+    }
+
+    // MARK: - Refresh coordinator
+
+    /// Starts the BIN data refresh coordinator, registering the foreground notification observer
+    /// so the cache is kept up-to-date whenever the app returns to the foreground.
+    /// Call once at SDK initialisation (e.g. inside `configureMobileSDK`).
+    public static func startBinDataRefreshCoordinator() {
+        BinDataRefreshCoordinator.shared.start()
+    }
+
+    /// Triggers a one-off BIN data refresh in the background at SDK initialisation.
+    /// Uses HEAD-then-conditional-GET so the full download only happens when the remote
+    /// file has changed since the last fetch.
+    /// Call once at SDK initialisation after `startBinDataRefreshCoordinator()`.
+    public static func triggerBinDataRefreshAtSDKInit() {
+        BinDataRefreshCoordinator.shared.refreshAtSDKInit()
     }
 }

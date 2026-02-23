@@ -101,11 +101,17 @@ class CardDetailsFormManager: ObservableObject {
         didSet {
             if expiryDateText.isEmpty {
                 expiryDateHadInput = false
+                if isExpiryDateBeingEdited {
+                    expiryDateValid = nil
+                    expiryDateError = ""
+                }
             } else {
                 expiryDateHadInput = true
+                // Active validation during typing at specific digit counts
+                if isExpiryDateBeingEdited {
+                    validateExpiryDuringTyping(oldValue: oldValue)
+                }
             }
-            // Active validation during typing at specific digit counts
-            validateExpiryDuringTyping(oldValue: oldValue)
         }
     }
     var securityCodeText = "" {
