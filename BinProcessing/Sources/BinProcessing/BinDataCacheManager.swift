@@ -87,14 +87,17 @@ final class BinDataCacheManager: BinDataCacheManaging {
         return Date().timeIntervalSince1970 - lastFetchTime >= cacheRefreshInterval
     }
 
-    /// Performs a HEAD request and returns true if the full file should be downloaded:
-    /// no cache exists, or the remote Last-Modified / ETag differs from the stored value.
+    /// Performs a HEAD request and returns whether the full file should be downloaded.
+    ///
+    /// - Returns:
+    ///   - `true`: Download needed (no cache, or remote headers differ from stored)
+    ///   - `false`: Cache verified fresh (headers match, no download needed)
+    ///   - `nil`: HEAD request failed (couldn't verify; existing cache preserved but freshness unknown)
     ///
     /// Last-Modified is preferred; ETag is the fallback.
-    /// Returns false (skip download) if the HEAD request fails so existing cache is preserved.
-    func shouldDownloadFullFile() async -> Bool {
+    func shouldDownloadFullFile() async -> Bool? {
         guard getCachedBinData() != nil else { return true }
-        guard let remote = await fetchRemoteCacheHeaders() else { return false }
+        guard let remote = await fetchRemoteCacheHeaders() else { return nil }
 
         let storedLastModified = defaults.string(forKey: prefsKeyLastModified)
         let storedEtag = defaults.string(forKey: prefsKeyEtag)
@@ -111,16 +114,20 @@ final class BinDataCacheManager: BinDataCacheManaging {
     // MARK: - Refresh orchestration
 
     /// Refreshes BIN data if needed: HEAD first, then GET only when remote is newer or no cache.
-    /// Updates the fetch timestamp after any successful check (HEAD or full download) to prevent
-    /// repeated HEAD requests on every foreground event once the 1-hour window expires.
+    /// Updates the fetch timestamp only after a successful verification (HEAD confirmed fresh or full
+    /// download succeeded). If HEAD fails, the timestamp is left unchanged so the next foreground retries.
     func refreshBinDataIfNeeded() async {
-        let needsDownload = await shouldDownloadFullFile()
+        let downloadResult = await shouldDownloadFullFile()
 
-        if needsDownload {
+        switch downloadResult {
+        case true:
             try? await downloadAndCacheBinData()
-        } else {
-            // HEAD check succeeded and cache is up-to-date — update timestamp to reset the 1-hour window
+        case false:
+            // HEAD check succeeded and cache is verified fresh — update timestamp to reset the 1-hour window
             defaults.set(Date().timeIntervalSince1970, forKey: prefsKeyLastFetchTime)
+        case nil:
+            // HEAD request failed — don't update timestamp so next foreground can retry
+            break
         }
     }
 

@@ -226,7 +226,7 @@ final class BinDataCacheManagerTests: XCTestCase {
 
     func testShouldDownloadFullFileReturnsTrueWhenNoCacheExists() async {
         let result = await sut.shouldDownloadFullFile()
-        XCTAssertTrue(result)
+        XCTAssertEqual(result, true)
     }
 
     func testShouldDownloadFullFileReturnsTrueWhenLastModifiedHeaderDiffersFromStored() async throws {
@@ -235,7 +235,7 @@ final class BinDataCacheManagerTests: XCTestCase {
         // Mock returns MOCK_LAST_MODIFIED (different from stored OLD value)
         setupSuccessHandler()
         let result = await sut.shouldDownloadFullFile()
-        XCTAssertTrue(result)
+        XCTAssertEqual(result, true)
     }
 
     func testShouldDownloadFullFileReturnsTrueWhenETagDiffersFromStoredAndNoLastModified() async throws {
@@ -244,7 +244,7 @@ final class BinDataCacheManagerTests: XCTestCase {
         // Mock returns MOCK_ETAG (different from stored OLD), no Last-Modified (ETag-only path)
         setupEtagOnlyHandler()
         let result = await sut.shouldDownloadFullFile()
-        XCTAssertTrue(result)
+        XCTAssertEqual(result, true)
     }
 
     func testShouldDownloadFullFileReturnsFalseWhenLastModifiedHeaderMatchesStored() async throws {
@@ -253,7 +253,7 @@ final class BinDataCacheManagerTests: XCTestCase {
         // Mock returns same MOCK_LAST_MODIFIED
         setupSuccessHandler()
         let result = await sut.shouldDownloadFullFile()
-        XCTAssertFalse(result)
+        XCTAssertEqual(result, false)
     }
 
     func testShouldDownloadFullFileReturnsFalseWhenETagMatchesStoredAndNoLastModified() async throws {
@@ -262,14 +262,14 @@ final class BinDataCacheManagerTests: XCTestCase {
         // Mock returns same MOCK_ETAG, no Last-Modified
         setupEtagOnlyHandler()
         let result = await sut.shouldDownloadFullFile()
-        XCTAssertFalse(result)
+        XCTAssertEqual(result, false)
     }
 
-    func testShouldDownloadFullFileReturnsFalseWhenHEADRequestFailsGracefulDegradationWithExistingCache() async throws {
+    func testShouldDownloadFullFileReturnsNilWhenHEADRequestFailsWithExistingCache() async throws {
         try writeCacheFile()
         setupFailureHandler()
         let result = await sut.shouldDownloadFullFile()
-        XCTAssertFalse(result)
+        XCTAssertNil(result, "Should return nil when HEAD fails so caller knows freshness wasn't verified")
     }
 
     // MARK: - downloadAndCacheBinData Tests
@@ -396,5 +396,26 @@ final class BinDataCacheManagerTests: XCTestCase {
 
         // After refresh: timestamp should be updated to now, so shouldRefreshOnForeground returns false
         XCTAssertFalse(sut.shouldRefreshOnForeground())
+    }
+
+    func testRefreshBinDataIfNeededDoesNotUpdateTimestampWhenHEADFails() async throws {
+        // Scenario: Cache exists, 1-hour window expired, but HEAD request fails (network error)
+        // Expected: Timestamp should NOT be updated so the next foreground can retry
+        try writeCacheFile()
+        testDefaults.set(BinDataTestConstants.mockLastModified, forKey: sut.prefsKeyLastModified)
+        let twoHoursAgo = Date().timeIntervalSince1970 - 7200
+        testDefaults.set(twoHoursAgo, forKey: sut.prefsKeyLastFetchTime)
+        setupFailureHandler()
+
+        // Precondition: shouldRefreshOnForeground returns true (2 hours > 1 hour threshold)
+        XCTAssertTrue(sut.shouldRefreshOnForeground())
+
+        await sut.refreshBinDataIfNeeded()
+
+        // Timestamp should NOT be updated — HEAD failed, freshness wasn't verified
+        XCTAssertEqual(testDefaults.double(forKey: sut.prefsKeyLastFetchTime), twoHoursAgo)
+
+        // Next foreground should still trigger a refresh attempt
+        XCTAssertTrue(sut.shouldRefreshOnForeground())
     }
 }
