@@ -70,22 +70,30 @@ public final class CardSchemeDetector {
                 detectedAt = 1
             }
         }
-        if length >= 4, let name = schemeName(forPrefix: String(cleanedPan.prefix(4)), exact: data.prefix4, ranges: data.ranges["4"]) {
-            detectedScheme = name
-            detectedAt = 4
+        if length >= 4 {
+            let prefix4 = String(cleanedPan.prefix(4))
+            if let name = schemeName(forPrefix: prefix4, exact: data.prefix4, ranges: data.ranges["4"]) {
+                detectedScheme = name
+                detectedAt = 4
+            }
         }
-        if length >= 6, let name = schemeName(forPrefix: String(cleanedPan.prefix(6)), exact: data.prefix6, ranges: data.ranges["6"]) {
-            detectedScheme = name
-            detectedAt = 6
+        if length >= 6 {
+            let prefix6 = String(cleanedPan.prefix(6))
+            if let name = schemeName(forPrefix: prefix6, exact: data.prefix6, ranges: data.ranges["6"]) {
+                detectedScheme = name
+                detectedAt = 6
+            }
         }
-        if length >= 8, data.prefix8 != nil || data.ranges["8"] != nil,
-           let name = schemeName(forPrefix: String(cleanedPan.prefix(8)), exact: data.prefix8, ranges: data.ranges["8"]) {
-            detectedScheme = name
-            detectedAt = 8
+        if length >= 8, data.prefix8 != nil || data.ranges["8"] != nil {
+            let prefix8 = String(cleanedPan.prefix(8))
+            if let name = schemeName(forPrefix: prefix8, exact: data.prefix8, ranges: data.ranges["8"]) {
+                detectedScheme = name
+                detectedAt = 8
+            }
         }
 
-        guard let scheme = detectedScheme, let at = detectedAt else { return nil }
-        return CardSchemeDetectionResult(scheme: scheme, detectedAt: at, length: length)
+        guard let scheme = detectedScheme, let detectedAtIdx = detectedAt else { return nil }
+        return CardSchemeDetectionResult(scheme: scheme, detectedAt: detectedAtIdx, length: length)
     }
 
     private func schemeName(forPrefix prefix: String, exact: [String: String]?, ranges: [[String]]?) -> String? {

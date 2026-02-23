@@ -16,8 +16,8 @@ final class MockURLProtocol: URLProtocol {
     /// Set this before each test to control the response for any outgoing request.
     static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 
-    override class func canInit(with request: URLRequest) -> Bool { true }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override static func canInit(with request: URLRequest) -> Bool { true }
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
         guard let handler = MockURLProtocol.requestHandler else {
@@ -45,7 +45,8 @@ enum BinDataTestConstants {
     static let mockLastModifiedOld = "Wed, 17 Feb 2026 10:00:00 GMT"
     static let mockEtag = "\"abc123\""
     static let mockEtagOld = "\"old-etag\""
-    /// Valid iOS card-schemes.json format (matches CardSchemeData CodingKeys).
+    // Valid iOS card-schemes.json format (matches CardSchemeData CodingKeys).
+    // swiftlint:disable:next line_length
     static let mockBinDataContent = #"{"s":{"v":"visa"},"2":{"41":"v"},"4":{},"6":{},"r":{"2":[],"4":[],"6":[],"8":[]}}"#
     static var mockBinDataContentData: Data { Data(mockBinDataContent.utf8) }
 }
@@ -114,8 +115,8 @@ final class BinDataCacheManagerTests: XCTestCase {
         MockURLProtocol.requestHandler = { request in
             if request.httpMethod == "HEAD" {
                 var headers: [String: String] = [:]
-                if let lm = lastModified { headers["Last-Modified"] = lm }
-                if let e = etag { headers["ETag"] = e }
+                if let lastMod = lastModified { headers["Last-Modified"] = lastMod }
+                if let etagVal = etag { headers["ETag"] = etagVal }
                 let response = HTTPURLResponse(
                     url: request.url!,
                     statusCode: 200,
@@ -125,8 +126,8 @@ final class BinDataCacheManagerTests: XCTestCase {
                 return (response, Data())
             } else {
                 var headers: [String: String] = ["Content-Type": "application/json"]
-                if let lm = lastModified { headers["Last-Modified"] = lm }
-                if let e = etag { headers["ETag"] = e }
+                if let lastMod = lastModified { headers["Last-Modified"] = lastMod }
+                if let etagVal = etag { headers["ETag"] = etagVal }
                 let response = HTTPURLResponse(
                     url: request.url!,
                     statusCode: 200,
