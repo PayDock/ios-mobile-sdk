@@ -15,7 +15,7 @@ import Foundation
 /// - App foregrounding when the cached file exists and last successful fetch was more than 1 hour ago
 ///
 /// Uses a HEAD request (Last-Modified / ETag) to avoid full download when the remote file is unchanged.
-/// The latest file is saved in Application Support; all requests use the injected `URLSession`.
+/// The latest file is saved in Cache Directory; all requests use the injected `URLSession`.
 final class BinDataCacheManager: BinDataCacheManaging {
 
     static let shared = BinDataCacheManager()
@@ -111,9 +111,17 @@ final class BinDataCacheManager: BinDataCacheManaging {
     // MARK: - Refresh orchestration
 
     /// Refreshes BIN data if needed: HEAD first, then GET only when remote is newer or no cache.
+    /// Updates the fetch timestamp after any successful check (HEAD or full download) to prevent
+    /// repeated HEAD requests on every foreground event once the 1-hour window expires.
     func refreshBinDataIfNeeded() async {
-        guard await shouldDownloadFullFile() else { return }
-        try? await downloadAndCacheBinData()
+        let needsDownload = await shouldDownloadFullFile()
+
+        if needsDownload {
+            try? await downloadAndCacheBinData()
+        } else {
+            // HEAD check succeeded and cache is up-to-date — update timestamp to reset the 1-hour window
+            defaults.set(Date().timeIntervalSince1970, forKey: prefsKeyLastFetchTime)
+        }
     }
 
     // MARK: - Download

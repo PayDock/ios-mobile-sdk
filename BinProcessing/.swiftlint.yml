@@ -3,3 +3,6 @@ excluded:
 
 line_length:
   warning: 140
+
+file_length:
+  warning: 600

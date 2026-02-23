@@ -356,16 +356,21 @@ final class BinDataCacheManagerTests: XCTestCase {
 
     // MARK: - refreshBinDataIfNeeded Tests
 
-    func testRefreshBinDataIfNeededSkipsDownloadWhenLastModifiedMatches() async throws {
+    func testRefreshBinDataIfNeededSkipsDownloadButUpdatesTimestampWhenLastModifiedMatches() async throws {
         try writeCacheFile()
         testDefaults.set(BinDataTestConstants.mockLastModified, forKey: sut.prefsKeyLastModified)
         // Mock returns same Last-Modified → shouldDownloadFullFile returns false → no download
         setupSuccessHandler()
 
+        let originalData = sut.getCachedBinData()
+
         await sut.refreshBinDataIfNeeded()
 
-        // Fetch time should not have been updated since no download occurred
-        XCTAssertEqual(testDefaults.double(forKey: sut.prefsKeyLastFetchTime), 0)
+        // Cache file should not have been re-downloaded (content unchanged)
+        XCTAssertEqual(sut.getCachedBinData(), originalData)
+
+        // But fetch time SHOULD be updated to reset the 1-hour window and prevent repeated HEAD requests
+        XCTAssertGreaterThan(testDefaults.double(forKey: sut.prefsKeyLastFetchTime), 0)
     }
 
     func testRefreshBinDataIfNeededDownloadsAndCachesWhenNoCacheExists() async throws {
@@ -376,5 +381,23 @@ final class BinDataCacheManagerTests: XCTestCase {
         let cachedFileURL = tempDirectory.appendingPathComponent("card-schemes-cached.json")
         XCTAssertTrue(FileManager.default.fileExists(atPath: cachedFileURL.path))
         XCTAssertGreaterThan(testDefaults.double(forKey: sut.prefsKeyLastFetchTime), 0)
+    }
+
+    func testRefreshBinDataIfNeededPreventsRepeatedHEADRequestsAfterSuccessfulCheck() async throws {
+        // Scenario: Cache exists, headers match, 1-hour window has expired
+        // Expected: HEAD check succeeds, no download, but timestamp updated so next foreground skips HEAD
+        try writeCacheFile()
+        testDefaults.set(BinDataTestConstants.mockLastModified, forKey: sut.prefsKeyLastModified)
+        let twoHoursAgo = Date().timeIntervalSince1970 - 7200
+        testDefaults.set(twoHoursAgo, forKey: sut.prefsKeyLastFetchTime)
+        setupSuccessHandler()
+
+        // First check: shouldRefreshOnForeground returns true (2 hours > 1 hour threshold)
+        XCTAssertTrue(sut.shouldRefreshOnForeground())
+
+        await sut.refreshBinDataIfNeeded()
+
+        // After refresh: timestamp should be updated to now, so shouldRefreshOnForeground returns false
+        XCTAssertFalse(sut.shouldRefreshOnForeground())
     }
 }
