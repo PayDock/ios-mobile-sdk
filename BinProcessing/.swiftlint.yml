@@ -1,2 +1,5 @@
 excluded:
   - .build
+
+line_length:
+  warning: 140

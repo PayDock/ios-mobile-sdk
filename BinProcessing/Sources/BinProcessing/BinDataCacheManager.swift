@@ -120,14 +120,21 @@ final class BinDataCacheManager: BinDataCacheManaging {
 
     /// Downloads the latest BIN data from CloudFront and caches it.
     /// Persists Last-Modified and ETag from the response and updates the last fetch timestamp.
+    /// Throws if the response is not a successful 2xx status code.
     func downloadAndCacheBinData() async throws {
         let (data, response) = try await session.data(from: cloudFrontURL)
 
+        guard let httpResponse = response as? HTTPURLResponse else { return }
+
+        // Validate status code — reject non-2xx responses to avoid caching error pages
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+
         guard !data.isEmpty else { return }
 
-        let httpResponse = response as? HTTPURLResponse
-        let lastModified = httpResponse?.value(forHTTPHeaderField: "Last-Modified")
-        let etag = httpResponse?.value(forHTTPHeaderField: "ETag")
+        let lastModified = httpResponse.value(forHTTPHeaderField: "Last-Modified")
+        let etag = httpResponse.value(forHTTPHeaderField: "ETag")
 
         guard let fileURL = cachedFileURL else { return }
 

@@ -150,6 +150,23 @@ final class BinDataCacheManagerTests: XCTestCase {
         }
     }
 
+    /// Sets up a handler that returns a non-2xx status code with a body (e.g. HTML error page).
+    private func setupNon2xxHandler(statusCode: Int, body: String) {
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(
+                url: request.url!,
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: [
+                    "Content-Type": "text/html",
+                    "Last-Modified": "Wed, 01 Jan 2020 00:00:00 GMT",
+                    "ETag": "\"error-etag\""
+                ]
+            )!
+            return (response, Data(body.utf8))
+        }
+    }
+
     /// Writes mock BIN data to the cache file, simulating an existing cache.
     private func writeCacheFile() throws {
         let fileURL = tempDirectory.appendingPathComponent("card-schemes-cached.json")
@@ -290,6 +307,51 @@ final class BinDataCacheManagerTests: XCTestCase {
         } catch {
             XCTAssertNotNil(error)
         }
+    }
+
+    func testDownloadAndCacheBinDataThrowsOnNon2xxStatusAndDoesNotCorruptCache() async throws {
+        // Pre-populate a valid cache so we can verify it's not overwritten
+        try writeCacheFile()
+        testDefaults.set(BinDataTestConstants.mockLastModified, forKey: sut.prefsKeyLastModified)
+        testDefaults.set(BinDataTestConstants.mockEtag, forKey: sut.prefsKeyEtag)
+        let originalFetchTime = Date().timeIntervalSince1970 - 7200
+        testDefaults.set(originalFetchTime, forKey: sut.prefsKeyLastFetchTime)
+
+        // Setup handler that returns 404 with HTML error page body
+        setupNon2xxHandler(statusCode: 404, body: "<html><body>Not Found</body></html>")
+
+        do {
+            try await sut.downloadAndCacheBinData()
+            XCTFail("Expected an error to be thrown for non-2xx response")
+        } catch {
+            // Verify error is thrown
+            XCTAssertNotNil(error)
+        }
+
+        // Verify cache file was NOT overwritten with error page
+        let cachedData = sut.getCachedBinData()
+        XCTAssertNotNil(cachedData)
+        XCTAssertEqual(cachedData, BinDataTestConstants.mockBinDataContentData)
+
+        // Verify UserDefaults were NOT updated
+        XCTAssertEqual(testDefaults.string(forKey: sut.prefsKeyLastModified), BinDataTestConstants.mockLastModified)
+        XCTAssertEqual(testDefaults.string(forKey: sut.prefsKeyEtag), BinDataTestConstants.mockEtag)
+        XCTAssertEqual(testDefaults.double(forKey: sut.prefsKeyLastFetchTime), originalFetchTime)
+    }
+
+    func testDownloadAndCacheBinDataThrowsOn500ServerError() async {
+        setupNon2xxHandler(statusCode: 500, body: "Internal Server Error")
+
+        do {
+            try await sut.downloadAndCacheBinData()
+            XCTFail("Expected an error to be thrown for 500 response")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+
+        // Verify no cache file was created
+        XCTAssertNil(sut.getCachedBinData())
+        XCTAssertEqual(testDefaults.double(forKey: sut.prefsKeyLastFetchTime), 0)
     }
 
     // MARK: - refreshBinDataIfNeeded Tests
