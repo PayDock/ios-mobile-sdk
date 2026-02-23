@@ -46,7 +46,6 @@ enum BinDataTestConstants {
     static let mockEtag = "\"abc123\""
     static let mockEtagOld = "\"old-etag\""
     // Valid iOS card-schemes.json format (matches CardSchemeData CodingKeys).
-    // swiftlint:disable:next line_length
     static let mockBinDataContent = #"{"s":{"v":"visa"},"2":{"41":"v"},"4":{},"6":{},"r":{"2":[],"4":[],"6":[],"8":[]}}"#
     static var mockBinDataContentData: Data { Data(mockBinDataContent.utf8) }
 }
