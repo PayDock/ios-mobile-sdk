@@ -26,7 +26,7 @@ variables:
 .macos_saas_runners:
   tags:
     - saas-macos-large-m2pro
-  image: macos-15-xcode-16
+  image: macos-26-xcode-26
 
 # .setup_bundler:
 # This is a hidden job template that sets up the Ruby Bundler environment.
