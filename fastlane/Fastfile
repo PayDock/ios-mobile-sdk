@@ -42,7 +42,7 @@ lane :test do
     project: "ExampleApp/ExampleApp.xcodeproj",
     scheme: "ExampleApp",
     configuration: "Debug (Staging)",
-    destination: "platform=iOS Simulator,name=iPhone 16,OS=18.6",
+    destination: "platform=iOS Simulator,name=iPhone 17,OS=26.2",
     only_testing: [
       "ExampleAppTests"
     ],
@@ -80,7 +80,7 @@ private_lane :test_all_packages do
           run_tests(
             package_path: ".",
             scheme: package[:scheme],
-            destination: "platform=iOS Simulator,name=iPhone 16,OS=18.6",
+            destination: "platform=iOS Simulator,name=iPhone 17,OS=26.2",
             xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
             result_bundle: true,
             code_coverage: true,
@@ -162,7 +162,7 @@ lane :testPackage do
   run_tests(
     package_path: ".",
     scheme: "MobileSDK",
-    destination: "platform=iOS Simulator,name=iPhone 16",
+    destination: "platform=iOS Simulator,name=iPhone 17,OS=26.2",
     xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
     result_bundle: true,
     code_coverage: true,
