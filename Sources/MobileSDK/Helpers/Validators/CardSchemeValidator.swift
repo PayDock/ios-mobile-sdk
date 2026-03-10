@@ -89,7 +89,7 @@ class CardSchemeValidator {
         case .amex: return (15, 15)
         case .diners: return (14, 14)
         case .visa, .discover, .unionpay: return (16, 19)
-        case .mastercard, .japcb, .eftpos: return (16, 16)
+        case .mastercard, .japcb: return (16, 16)
         }
     }
 

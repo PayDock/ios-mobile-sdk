@@ -42,7 +42,8 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         )
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: InitialiseWalletChargeRes.self)
+            responseModel: InitialiseWalletChargeRes.self,
+            timeout: 60)
         return response.resource.data.token
     }
 
@@ -54,7 +55,8 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         )
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: InitialiseWalletChargeRes.self)
+            responseModel: InitialiseWalletChargeRes.self,
+            timeout: 60)
         return response.resource.data
     }
 
@@ -62,7 +64,8 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         let endpoint = ChargesEndpoints.captureCharge(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: CaptureChargeRes.self)
+            responseModel: CaptureChargeRes.self,
+            timeout: 60)
         return response.resource
     }
 
@@ -72,7 +75,8 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         let endpoint = ChargesEndpoints.captureChargeForStandalone(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: CaptureChargeRes.self)
+            responseModel: CaptureChargeRes.self,
+            timeout: 60)
         return response.resource
     }
 
@@ -80,7 +84,8 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         let endpoint = ChargesEndpoints.captureChargeColesPay(chargeId: chargeId, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: CaptureChargeRes.self)
+            responseModel: CaptureChargeRes.self,
+            timeout: 60)
         return response.resource
     }
 
@@ -98,7 +103,8 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
             endpoint: ChargesEndpoints.walletCapture(
                 capture: true, walletCaptureReq: walletCaptureReq, widgetAccessToken: widgetAccessToken
             ),
-            responseModel: WalletCaptureRes.self)
+            responseModel: WalletCaptureRes.self,
+            timeout: 60)
 
         return response.resource.data
     }
@@ -110,7 +116,9 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
             endpoint: ChargesEndpoints.walletCallback(
                 walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
             ),
-            responseModel: ColesPayCallbackRes.self)
+            responseModel: ColesPayCallbackRes.self,
+            timeout: 60,
+            maxRetries: 1)
 
         return response.resource.data.id
     }
@@ -126,7 +134,9 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
             endpoint: ChargesEndpoints.walletCallback(
                 walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
             ),
-            responseModel: PayPalCallbackRes.self)
+            responseModel: PayPalCallbackRes.self,
+            timeout: 60,
+            maxRetries: 1)
 
         return response.resource.data.id
     }
@@ -138,7 +148,9 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
             endpoint: ChargesEndpoints.walletCallback(
                 walletCallbackReq: walletCallbackReq, widgetAccessToken: widgetAccessToken
             ),
-            responseModel: AfterpayCallbackRes.self)
+            responseModel: AfterpayCallbackRes.self,
+            timeout: 60,
+            maxRetries: 1)
 
         return response.resource.data.refToken
     }
@@ -147,7 +159,7 @@ public struct ChargesServiceImpl: HTTPClient, ChargesService {
         let endpoint = ChargesEndpoints.declineWalletTransaction(
             chargeId: chargeId, widgetAccessToken: widgetAccessToken
         )
-        let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self)
+        let response = try await sendRequest(endpoint: endpoint, responseModel: WalletDeclineRes.self, timeout: 60)
         return response.resource.data.status
     }
 }

@@ -218,6 +218,7 @@ struct OutlineTextField: View {
                 isItalic: appearance.fonts.text.isItalic,
                 isSecureTextEntry: isSecureTextEntry,
                 autocorrectionDisabled: autocorrectionDisabled,
+                accessibilityLabel: title,
                 onEditingChanged: { isEditing in
                     editing = isEditing
                 },
@@ -271,7 +272,7 @@ struct OutlineTextField: View {
         HStack {
             VStack {
                 Text(errorMessage)
-                    .font(appearance.fonts.error.customFont.font)
+                    .font(appearance.fonts.error.customFont.scaledFont)
                     .foregroundColor(appearance.colors.error)
                     .padding(.leading, 16.0)
             }

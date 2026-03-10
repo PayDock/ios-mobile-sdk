@@ -157,7 +157,7 @@ struct AutocompleteTextField: View {
 
     private var emptyStateView: some View {
         Text("No results")
-            .font(appearance.dropdown.text.listText.text.customFont.font)
+            .font(appearance.dropdown.text.listText.text.customFont.scaledFont)
             .foregroundColor(appearance.dropdown.text.listText.text.textColor)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -174,9 +174,7 @@ struct AutocompleteTextField: View {
     private func optionRowView(for option: String) -> some View {
         HStack(alignment: .top) {
             Text(option)
-                .applyAttributes(appearance.dropdown.text.listText.text)
-                .font(appearance.dropdown.text.listText.text.customFont.font)
-                .foregroundColor(appearance.dropdown.text.listText.text.textColor)
+                .applyAttributesWithScaledFont(appearance.dropdown.text.listText.text)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 16)

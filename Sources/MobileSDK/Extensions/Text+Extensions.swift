@@ -10,9 +10,10 @@ import SwiftUI
 
 extension Text {
 
-    func applyAttributes(_ attributes: TextAttributes) -> Text {
+    /// Applies text attributes with a font that scales with Dynamic Type (accessibility font size).
+    func applyAttributesWithScaledFont(_ attributes: TextAttributes) -> Text {
         self
-            .font(attributes.customFont.font)
+            .font(attributes.customFont.scaledFont)
             .foregroundColor(attributes.textColor)
             .underline(attributes.underlineColor != .clear, color: attributes.underlineColor)
             .strikethrough(attributes.strikethroughColor != .clear, color: attributes.strikethroughColor)

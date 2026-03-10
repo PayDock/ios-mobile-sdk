@@ -13,7 +13,6 @@ public enum CardScheme: String, CaseIterable {
     case amex
     case diners
     case discover
-    case eftpos
     case japcb
     case mastercard
     case visa
@@ -24,7 +23,6 @@ public enum CardScheme: String, CaseIterable {
         case .amex: return "American Express"
         case .diners: return "Diners Club"
         case .discover: return "Discover"
-        case .eftpos: return "Eftpos"
         case .japcb: return "JCB"
         case .mastercard: return "Mastercard"
         case .visa: return "Visa"
@@ -33,7 +31,7 @@ public enum CardScheme: String, CaseIterable {
     }
 
     static let preferredOrder: [CardScheme] = [
-        .visa, .mastercard, .amex, .diners, .discover, .japcb, .eftpos, .unionpay
+        .visa, .mastercard, .amex, .diners, .discover, .japcb, .unionpay
     ]
 
     static func sortedArray(from set: Set<CardScheme>) -> [CardScheme] {

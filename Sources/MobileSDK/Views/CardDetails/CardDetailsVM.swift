@@ -2,9 +2,7 @@
 //  CardDetailsVM.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 02.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import SwiftUI
@@ -158,7 +156,6 @@ class CardDetailsVM: ObservableObject {
         case .amex: Image("american-express", bundle: Bundle.module)
         case .diners: Image("diners", bundle: Bundle.module)
         case .discover: Image("discover", bundle: Bundle.module)
-        case .eftpos: Image("eftpos", bundle: Bundle.module)
         case .japcb: Image("jcb", bundle: Bundle.module)
         case .mastercard: Image("mastercard", bundle: Bundle.module)
         case .visa: Image("visa", bundle: Bundle.module)

@@ -288,10 +288,6 @@ class CardDetailsFormManager: ObservableObject {
             securityCodeTitle = "CVC"
             securityCodePlaceholder = "XXX"
 
-        case .eftpos:
-            securityCodeTitle = "CVV / CVC"
-            securityCodePlaceholder = "XXX"
-
         case .amex:
             securityCodeTitle = "CID"
             securityCodePlaceholder = "XXXX"
@@ -315,7 +311,6 @@ class CardDetailsFormManager: ObservableObject {
         case .amex: return Image("american-express", bundle: Bundle.module)
         case .diners: return Image("diners", bundle: Bundle.module)
         case .discover: return Image("discover", bundle: Bundle.module)
-        case .eftpos: return Image("eftpos", bundle: Bundle.module)
         case .japcb: return Image("jcb", bundle: Bundle.module)
         case .mastercard: return Image("mastercard", bundle: Bundle.module)
         case .visa: return Image("visa", bundle: Bundle.module)
@@ -409,14 +404,15 @@ class CardDetailsFormManager: ObservableObject {
         // Check if digit count is within valid range for the detected scheme
         let isInValidRange = cardSchemeValidator.isDigitCountInValidRange(number: cardNumberText, scheme: scheme)
 
+        // Priority check: Show "card type not accepted" early if unsupported scheme is detected
+        if handleUnsupportedSchemeIfDetected(scheme: scheme) { return }
+
         // During typing: only run Luhn check if digit count is in valid range
         if isCardNumberBeingEdited && !isInValidRange {
-            // Clear any existing error when digit count falls below minimum (e.g., when deleting)
-            // Error will be shown on defocus if minimum not met
-            if cardNumberValid == false {
-                cardNumberValid = nil
-                cardNumberError = ""
-            }
+            // Clear validation when digit count falls below minimum (e.g., when deleting)
+            // Ensures action button disables when form becomes invalid
+            cardNumberValid = nil
+            cardNumberError = ""
             return
         }
 
@@ -449,11 +445,10 @@ class CardDetailsFormManager: ObservableObject {
         let isInValidRange = cardSchemeValidator.isDigitCountInValidRange(number: cardNumberText, scheme: nil)
 
         if isCardNumberBeingEdited && !isInValidRange {
-            // Clear any existing error when digit count falls below minimum (e.g., when deleting)
-            if cardNumberValid == false {
-                cardNumberValid = nil
-                cardNumberError = ""
-            }
+            // Clear validation when digit count falls below minimum (e.g., when deleting)
+            // Ensures action button disables when form becomes invalid
+            cardNumberValid = nil
+            cardNumberError = ""
             return
         }
 
@@ -465,6 +460,22 @@ class CardDetailsFormManager: ObservableObject {
 
         // If all validations pass, clear any errors
         updateCardNumberValidationState(isValid: true, errorMessage: nil)
+    }
+
+    /// Checks if an unsupported card scheme is detected early (with > 8 digits for BIN detection).
+    /// If detected, updates validation state with error and returns true so caller can exit early.
+    /// - Parameter scheme: The detected card scheme from BIN lookup, or nil if not detected
+    /// - Returns: true if an unsupported scheme was detected and handled, false otherwise
+    private func handleUnsupportedSchemeIfDetected(scheme: CardScheme?) -> Bool {
+        guard enableCardValidation else { return false }
+
+        let digitCount = cardNumberText.filter { $0.isNumber }.count
+        if digitCount > 8, let detectedScheme = scheme,
+           let supportedSchemes = supportedSchemes, !supportedSchemes.contains(detectedScheme) {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Card type not accepted")
+            return true
+        }
+        return false
     }
 
     private func validateAgainstSupportedSchemes(detectedScheme: CardScheme) {
@@ -484,6 +495,9 @@ class CardDetailsFormManager: ObservableObject {
         guard !cardNumberText.isEmpty else { return }
 
         let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
+
+        // Priority check: Show "card type not accepted" early if unsupported scheme is detected
+        if handleUnsupportedSchemeIfDetected(scheme: scheme) { return }
 
         // Check minimum digits first - show error if not met
         if !cardSchemeValidator.hasMinimumDigits(number: cardNumberText, scheme: scheme) {

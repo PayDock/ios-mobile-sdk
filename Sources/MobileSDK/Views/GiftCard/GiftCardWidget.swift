@@ -12,7 +12,6 @@ public struct GiftCardWidget: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
-    @FocusState private var isViewFocused: Bool
 
     public init(viewState: ViewState? = nil,
                 config: GiftCardWidgetConfig,
@@ -132,6 +131,8 @@ public struct GiftCardWidget: View {
                 appearance: viewModel.appearance.actionButton,
                 isDisabled: viewModel.isActionButtonDisabled())),
             shouldTemplate: true) {
+                textFieldInFocus = nil
+                viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
                 viewModel.giftCardFormManager.endEditing()
                 viewModel.tokeniseGiftCard()
                 viewModel.handleButtonTapAnalytics()

@@ -16,7 +16,6 @@ public struct CardDetailsWidget: View {
     @ScaledMetric private var cardIconWidth: CGFloat = 26.0
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
-    @FocusState private var isViewFocused: Bool
 
     // MARK: - Initialisation
 
@@ -243,14 +242,14 @@ public struct CardDetailsWidget: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
-                    .applyAttributes(viewModel.appearance.toggleText.text)
+                    .applyAttributesWithScaledFont(viewModel.appearance.toggleText.text)
                     .customPadding(viewModel.appearance.toggleText.padding)
 
                 let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
                 let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                 let link = "[\(text)](\(url))"
                 Text(.init(link))
-                    .applyAttributes(viewModel.appearance.linkText.text)
+                    .applyAttributesWithScaledFont(viewModel.appearance.linkText.text)
                     .customPadding(viewModel.appearance.linkText.padding)
                     .accentColor(viewModel.appearance.linkText.text.textColor)
                     .disabled(viewModel.viewState.isDisabled)
@@ -273,7 +272,7 @@ public struct CardDetailsWidget: View {
     private var saveCardViewWithoutPrivacyPolicy: some View {
         HStack(alignment: .center, spacing: 0) {
             Text(viewModel.config.allowSaveCard?.consentText ?? "")
-                .applyAttributes(viewModel.appearance.toggleText.text)
+                .applyAttributesWithScaledFont(viewModel.appearance.toggleText.text)
                 .customPadding(viewModel.appearance.toggleText.padding)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -303,6 +302,7 @@ public struct CardDetailsWidget: View {
                 .map(\.voiceoverName)
                 .joined(separator: ", ")
         )
+        .accessibilityRespondsToUserInteraction(false)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

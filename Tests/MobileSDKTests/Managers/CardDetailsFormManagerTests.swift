@@ -856,15 +856,6 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
     }
 
-    func testUpdateSecurityCodeTitleAndPlaceholder_Eftpos() {
-        mockSchemeValidator.getCardSchemeFromBINResult = .eftpos
-
-        sut.updateSecurityCodeTitleAndPlaceholder()
-
-        XCTAssertEqual(sut.securityCodeTitle, "CVV / CVC")
-        XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
-    }
-
     func testUpdateSecurityCodeTitleAndPlaceholder_None() {
         mockSchemeValidator.getCardSchemeFromBINResult = nil
 
@@ -1361,6 +1352,138 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertFalse(sut.cardNumberValid ?? true)
         XCTAssertEqual(sut.cardNumberError, "Invalid card number")
         XCTAssertTrue(mockSchemeValidator.hasMinimumDigitsCalled)
+    }
+
+    // MARK: - Additional BDD Coverage Tests
+
+    func testCardNumberValidation_DuringTyping_ClearsErrorWhenDeletingBelowMinimum() {
+        // Setup: Card number has error (16 digits, invalid Luhn)
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+        mockSchemeValidator.isDigitCountInValidRangeResult = true
+        mockSchemeValidator.isPossibleCreditCardNumberResult = false
+        mockSchemeValidator.isCardNumberValidResult = false
+
+        sut.setEditingTextField(focusedField: .cardNumber)
+        sut.cardNumberText = "4111111111111112" // Invalid, shows error
+
+        XCTAssertFalse(sut.cardNumberValid ?? true)
+        XCTAssertEqual(sut.cardNumberError, "Invalid card number")
+
+        // User deletes to below minimum
+        mockSchemeValidator.isDigitCountInValidRangeResult = false
+        mockSchemeValidator.isPossibleCreditCardNumberCalled = false
+        sut.cardNumberText = "411111111111" // 12 digits, below Visa minimum of 16
+
+        // Error should be cleared when below minimum during typing
+        XCTAssertNil(sut.cardNumberValid)
+        XCTAssertEqual(sut.cardNumberError, "")
+    }
+
+    func testDeletingCardNumberWhileFocused_DisablesForm() {
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+        mockSchemeValidator.isDigitCountInValidRangeResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+
+        sut.setEditingTextField(focusedField: .cardNumber)
+        sut.cardNumberText = "4111111111111111"
+        XCTAssertTrue(sut.cardNumberValid ?? false, "Card number should be valid initially")
+
+        mockSchemeValidator.isDigitCountInValidRangeResult = false
+        sut.cardNumberText = "411111111111111"
+
+        XCTAssertNil(sut.cardNumberValid, "Deleting below valid range should clear cardNumberValid")
+        XCTAssertEqual(sut.cardNumberError, "", "Error message should be cleared when below minimum during typing")
+    }
+
+    func testDeletingCardNumberWhileFocused_UnknownScheme_DisablesForm() {
+        mockSchemeValidator.getCardSchemeFromBINResult = nil
+        mockSchemeValidator.isDigitCountInValidRangeResult = true
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isUnknownCardNumberLengthValidResult = true
+
+        sut.setEditingTextField(focusedField: .cardNumber)
+        sut.cardNumberText = "1234567890123456"
+        XCTAssertTrue(sut.cardNumberValid ?? false, "Card number should be valid initially (unknown scheme)")
+
+        mockSchemeValidator.isDigitCountInValidRangeResult = false
+        sut.cardNumberText = "123456789012345"
+
+        XCTAssertNil(sut.cardNumberValid, "Deleting below valid range should clear cardNumberValid")
+        XCTAssertEqual(sut.cardNumberError, "", "Error message should be cleared when below minimum during typing")
+    }
+
+    func testCardNumberClear_ResetsAllState() {
+        // Setup: Valid card number entered
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockSchemeValidator.isDigitCountInValidRangeResult = true
+
+        sut.setEditingTextField(focusedField: .cardNumber)
+        sut.cardNumberText = "4111111111111111"
+        XCTAssertTrue(sut.cardNumberValid ?? false)
+
+        // Clear the field
+        mockSchemeValidator.getCardSchemeFromBINResult = nil
+        mockSchemeValidator.isDigitCountInValidRangeResult = false
+        sut.cardNumberText = ""
+
+        // Should reset to neutral state
+        XCTAssertNil(sut.cardNumberValid)
+        XCTAssertEqual(sut.cardNumberError, "")
+    }
+
+    func testCardSchemeIcon_UpdatesWhenChangingScheme() {
+        // Start with Visa
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+        sut.cardNumberText = "4111"
+
+        XCTAssertTrue(mockSchemeValidator.getCardSchemeFromBINCalled)
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
+        mockSchemeValidator.getCardSchemeFromBINCalled = false
+
+        // Change to Amex
+        mockSchemeValidator.getCardSchemeFromBINResult = .amex
+        sut.cardNumberText = "3782"
+
+        XCTAssertTrue(mockSchemeValidator.getCardSchemeFromBINCalled)
+        XCTAssertEqual(sut.securityCodeTitle, "CID")
+        XCTAssertEqual(sut.securityCodePlaceholder, "XXXX")
+    }
+
+    func testCardNumber_EmptyField_NoErrorUntilInteraction() {
+        // Initial state - no interaction
+        XCTAssertNil(sut.cardNumberValid)
+        XCTAssertEqual(sut.cardNumberError, "")
+
+        // User focuses then immediately defocuses without typing
+        sut.setEditingTextField(focusedField: .cardNumber)
+        sut.setEditingTextField(focusedField: nil)
+
+        // Should remain neutral (no error for empty untouched field)
+        XCTAssertNil(sut.cardNumberValid)
+        XCTAssertEqual(sut.cardNumberError, "")
+    }
+
+    func testCardNumber_EmptyAfterHavingInput_NoErrorOnDefocus() {
+        // User enters some text first
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+        mockSchemeValidator.isDigitCountInValidRangeResult = false
+
+        sut.setEditingTextField(focusedField: .cardNumber)
+        sut.cardNumberText = "4111"
+
+        // User clears all text
+        mockSchemeValidator.getCardSchemeFromBINResult = nil
+        sut.cardNumberText = ""
+
+        // Defocus - empty fields are not validated on defocus
+        // (submit button handles required field validation)
+        sut.setEditingTextField(focusedField: nil)
+
+        // Empty field should remain neutral - no error shown
+        XCTAssertNil(sut.cardNumberValid)
+        XCTAssertEqual(sut.cardNumberError, "")
     }
 }
 

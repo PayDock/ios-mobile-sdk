@@ -15,7 +15,7 @@ let package = Package(
             targets: ["DataCharges"])
     ],
     dependencies: [
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.1"),
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.2"),
         .package(path: "../CommonModels")
     ],
     targets: [

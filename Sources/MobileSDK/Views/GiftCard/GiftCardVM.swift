@@ -64,6 +64,9 @@ class GiftCardVM: ObservableObject {
     // MARK: - Requests
 
     func tokeniseGiftCard() {
+        giftCardFormManager.revalidateAll()
+        guard giftCardFormManager.isFormValid() else { return }
+
         Task {
             updateLoadingState(isLoading: true)
             let tokeniseGiftCardReq = CreateGiftCardTokenReq(

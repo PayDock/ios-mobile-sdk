@@ -20,7 +20,8 @@ public struct VaultServiceImpl: HTTPClient, VaultService {
         let endpoint = VaultEndpoints.vaultToken(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: VaultTokenRes.self)
+            responseModel: VaultTokenRes.self,
+            timeout: 60)
         return response.resource.data.vaultToken
     }
 
@@ -28,7 +29,8 @@ public struct VaultServiceImpl: HTTPClient, VaultService {
         let endpoint = VaultEndpoints.convertToVaultToken(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: VaultTokenRes.self)
+            responseModel: VaultTokenRes.self,
+            timeout: 60)
         return response.resource.data.vaultToken
     }
 }

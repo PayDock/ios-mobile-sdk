@@ -21,7 +21,9 @@ public struct GatewayServiceImpl: HTTPClient, GatewayService {
     public func getClientId(gatewayId: String, widgetAccessToken: String) async throws -> String {
         let response = try await sendRequest(
             endpoint: GatewayEndpoints.clientId(gatewayId: gatewayId, widgetAccessToken: widgetAccessToken),
-            responseModel: PayPalConfigRes.self)
+            responseModel: PayPalConfigRes.self,
+            timeout: 60,
+            maxRetries: 1)
         return response.resource.data.credentials.clientAuth
     }
 }

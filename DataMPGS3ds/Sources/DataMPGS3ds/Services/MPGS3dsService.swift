@@ -20,7 +20,8 @@ public struct MPGS3dsServiceImpl: HTTPClient, MPGS3dsService {
         let endpoint = MPGS3dsEndpoints.mpgs3ds(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: MPGS3dsRes.self)
+            responseModel: MPGS3dsRes.self,
+            timeout: 60)
         return response.resource.data.threeDS.token
     }
 
@@ -28,7 +29,8 @@ public struct MPGS3dsServiceImpl: HTTPClient, MPGS3dsService {
         let endpoint = MPGS3dsEndpoints.mpgs3dsVault(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: MPGS3dsRes.self)
+            responseModel: MPGS3dsRes.self,
+            timeout: 60)
         return response
     }
 }

@@ -402,4 +402,34 @@ class CardDetailsFormatterTests: XCTestCase {
         XCTAssertEqual(result.formattedText, "1234")
         XCTAssertEqual(result.newCursorPosition, 4) // pinned at max digits
     }
+
+    // MARK: - Additional Card Number Input Filtering Tests
+
+    func test_formatCardNumber_filtersNonNumericDuringTyping() {
+        // User types letters mixed with numbers
+        let result = sut.formatCardNumber(updatedText: "4a1b1c1d1e1f1g1h1", cursorPosition: 18, maxDigits: 16)
+        XCTAssertEqual(result.formattedText, "4111 1111 1")
+        XCTAssertEqual(result.formattedText.filter { $0.isNumber }.count, 9)
+    }
+
+    func test_formatCardNumber_filtersSpecialCharacters() {
+        // User pastes card number with dashes
+        let result = sut.formatCardNumber(updatedText: "4111-1111-1111-1111", cursorPosition: 19, maxDigits: 16)
+        XCTAssertEqual(result.formattedText, "4111 1111 1111 1111")
+    }
+
+    func test_formatCardNumber_handlesOnlyLettersInput() {
+        // User types only letters
+        let result = sut.formatCardNumber(updatedText: "abcdefgh", cursorPosition: 8, maxDigits: 16)
+        XCTAssertEqual(result.formattedText, "")
+        XCTAssertEqual(result.newCursorPosition, 0)
+    }
+
+    func test_formatCardNumber_cursorAdjustsWhenNonDigitsFiltered() {
+        // User types "41a1" - cursor at position 4 (after 'a')
+        // After filtering, should have "411" with cursor at position 2
+        let result = sut.formatCardNumber(updatedText: "41a1", cursorPosition: 3, maxDigits: 16)
+        XCTAssertEqual(result.formattedText, "411")
+        XCTAssertEqual(result.newCursorPosition, 2)
+    }
 }

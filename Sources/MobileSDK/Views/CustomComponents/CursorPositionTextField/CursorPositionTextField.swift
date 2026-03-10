@@ -35,6 +35,7 @@ struct CursorPositionTextField: UIViewRepresentable {
     let isItalic: Bool
     let isSecureTextEntry: Bool
     let autocorrectionDisabled: Bool
+    let accessibilityLabelText: String?
     let onEditingChanged: (Bool) -> Void
     let onCommit: () -> Void
     let onSubmit: (() -> Void)?
@@ -55,6 +56,7 @@ struct CursorPositionTextField: UIViewRepresentable {
          isItalic: Bool = false,
          isSecureTextEntry: Bool = false,
          autocorrectionDisabled: Bool = false,
+         accessibilityLabel: String? = nil,
          onEditingChanged: @escaping (Bool) -> Void = { _ in },
          onCommit: @escaping () -> Void = {},
          onSubmit: (() -> Void)? = nil,
@@ -74,6 +76,7 @@ struct CursorPositionTextField: UIViewRepresentable {
         self.isItalic = isItalic
         self.isSecureTextEntry = isSecureTextEntry
         self.autocorrectionDisabled = autocorrectionDisabled
+        self.accessibilityLabelText = accessibilityLabel
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
         self.onSubmit = onSubmit
@@ -91,6 +94,15 @@ struct CursorPositionTextField: UIViewRepresentable {
         textField.tintColor = tintColor
         // Enable secure text entry for masking sensitive data (e.g., CVV) - PCI DSS compliance
         textField.isSecureTextEntry = isSecureTextEntry
+
+        // Set accessibility label for UI testing
+        if let accessibilityLabel = accessibilityLabelText {
+            textField.accessibilityLabel = accessibilityLabel
+        }
+
+        // Configure accessibility to work properly with Full Keyboard Access
+        textField.accessibilityTraits = .none
+        textField.isAccessibilityElement = true
 
         // Disable autocorrection and spell checking if requested (e.g., for name fields)
         if autocorrectionDisabled {
@@ -119,6 +131,11 @@ struct CursorPositionTextField: UIViewRepresentable {
         if uiView.text != text {
             uiView.text = text
             updateTextStyling(uiView)
+        }
+
+        // Update accessibility label if it changed
+        if let accessibilityLabel = accessibilityLabelText {
+            uiView.accessibilityLabel = accessibilityLabel
         }
 
         // Update font when dynamic type size changes

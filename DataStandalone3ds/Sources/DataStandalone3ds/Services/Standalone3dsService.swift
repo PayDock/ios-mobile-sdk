@@ -19,7 +19,8 @@ public struct Standalone3dsServiceImpl: HTTPClient, Standalone3dsService {
         let endpoint = Standalone3dsEndpoints.standalone3ds(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: Standalone3dsRes.self)
+            responseModel: Standalone3dsRes.self,
+            timeout: 60)
         return response.resource.data.threeDS.token
     }
 }

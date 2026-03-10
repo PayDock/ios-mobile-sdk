@@ -22,7 +22,7 @@ struct CustomButtonStyle: ButtonStyle {
             : appearance.colors.border
 
         return configuration.label
-            .font(appearance.fonts.title.customFont.font)
+            .font(appearance.fonts.title.customFont.scaledFont)
             .imageScale(.small)
             .lineLimit(nil)
             .multilineTextAlignment(.center)

@@ -19,7 +19,8 @@ public struct CustomersServiceImpl: HTTPClient, CustomersService {
         let endpoint = CustomersEndpoints.createCustomer(request: request, apiAccessToken: apiAccessToken)
         let response = try await sendRequest(
             endpoint: endpoint,
-            responseModel: CreateCustomerTokenRes.self)
+            responseModel: CreateCustomerTokenRes.self,
+            timeout: 60)
         return response
     }
 }

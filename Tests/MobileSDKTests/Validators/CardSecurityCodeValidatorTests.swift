@@ -101,18 +101,6 @@ class CardSecurityCodeValidatorTests: XCTestCase {
         XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .japcb))
     }
 
-    func testValidEftposSecurityCode() {
-        XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .eftpos))
-    }
-
-    func testInvalidEftposSecurityCode_LenghtTooShort() {
-        XCTAssertFalse(validator.isSecurityCodeValid(code: "12", cardScheme: .eftpos))
-    }
-
-    func testInvalidEftposSecurityCode_LenghtTooLong() {
-        XCTAssertFalse(validator.isSecurityCodeValid(code: "1234", cardScheme: .eftpos))
-    }
-
     func testValidUnionpaySecurityCode() {
         XCTAssertTrue(validator.isSecurityCodeValid(code: "123", cardScheme: .unionpay))
     }

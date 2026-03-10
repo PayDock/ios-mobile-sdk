@@ -12,7 +12,6 @@ public struct AddressWidget: View {
 
     @StateObject var viewModel: AddressVM
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
-    @FocusState private var isViewFocused: Bool
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Initialisation
@@ -80,7 +79,7 @@ public struct AddressWidget: View {
     private var nameHeader: some View {
         HStack {
             Text("Name")
-                .font(viewModel.appearance.title.text.customFont.font)
+                .font(viewModel.appearance.title.text.customFont.scaledFont)
                 .foregroundColor(viewModel.appearance.title.text.textColor)
                 .accessibilityAddTraits(.isHeader)
             Spacer()
@@ -147,7 +146,7 @@ public struct AddressWidget: View {
     private var findAnAddressHeader: some View {
         HStack {
             Text("Find an address")
-                .font(viewModel.appearance.title.text.customFont.font)
+                .font(viewModel.appearance.title.text.customFont.scaledFont)
                 .foregroundColor(viewModel.appearance.title.text.textColor)
                 .accessibilityAddTraits(.isHeader)
             Spacer()
@@ -375,7 +374,7 @@ public struct AddressWidget: View {
                 viewModel.handleSaveAddresTapAnalytics()
             }
             .customPadding(viewModel.appearance.actionButton.dimensions.padding)
-            .font(viewModel.appearance.actionButton.fonts.title.customFont.font)
+            .font(viewModel.appearance.actionButton.fonts.title.customFont.scaledFont)
     }
 
     private func shouldAlignVertically() -> Bool {

@@ -107,8 +107,6 @@ class CardSchemeValidatorTests: XCTestCase {
 
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111", scheme: .japcb))
 
-        XCTAssertTrue(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111", scheme: .eftpos))
-
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 1111 1111", scheme: .unionpay))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 444", scheme: .unionpay))
         XCTAssertTrue(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 33", scheme: .unionpay))
@@ -130,10 +128,6 @@ class CardSchemeValidatorTests: XCTestCase {
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .japcb))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .japcb))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .japcb))
-
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 111", scheme: .eftpos))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 1111 1111", scheme: .eftpos))
-        XCTAssertFalse(validator.isCardNumberLengthValid(number: "5111 1111 1111 11", scheme: .eftpos))
 
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 1111 111", scheme: .unionpay))
         XCTAssertFalse(validator.isCardNumberLengthValid(number: "4111 1111 2222 3333 4444", scheme: .unionpay))
@@ -180,12 +174,6 @@ class CardSchemeValidatorTests: XCTestCase {
 
     func testDigitRange_JCB() {
         let range = validator.digitRange(for: .japcb)
-        XCTAssertEqual(range.min, 16)
-        XCTAssertEqual(range.max, 16)
-    }
-
-    func testDigitRange_EFTPOS() {
-        let range = validator.digitRange(for: .eftpos)
         XCTAssertEqual(range.min, 16)
         XCTAssertEqual(range.max, 16)
     }
@@ -331,5 +319,54 @@ class CardSchemeValidatorTests: XCTestCase {
     func testHasMinimumDigits_EmptyString() {
         XCTAssertFalse(validator.hasMinimumDigits(number: "", scheme: .visa))
         XCTAssertFalse(validator.hasMinimumDigits(number: "", scheme: nil))
+    }
+
+    // MARK: - Additional Min/Max Digit Coverage Tests
+
+    func testIsCardNumberLengthValid_Mastercard_BelowMinimum() {
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "511111111111111", scheme: .mastercard)) // 15 digits
+    }
+
+    func testIsCardNumberLengthValid_Diners_BelowMinimum() {
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "3031256854134", scheme: .diners)) // 13 digits
+    }
+
+    func testIsCardNumberLengthValid_Diners_AboveMaximum() {
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "303125685413491", scheme: .diners)) // 15 digits
+    }
+
+    func testIsCardNumberLengthValid_Discover_BelowMinimum() {
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "601111111111111", scheme: .discover)) // 15 digits
+    }
+
+    func testIsCardNumberLengthValid_Discover_AtMaximum() {
+        XCTAssertTrue(validator.isCardNumberLengthValid(number: "6011111111111111111", scheme: .discover)) // 19 digits
+    }
+
+    func testIsCardNumberLengthValid_Discover_AboveMaximum() {
+        XCTAssertFalse(validator.isCardNumberLengthValid(number: "60111111111111111111", scheme: .discover)) // 20 digits
+    }
+
+    func testIsDigitCountInValidRange_UnknownScheme_AboveMaximum() {
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "12345678901234567890", scheme: nil)) // 20 digits
+    }
+
+    // MARK: - Luhn Validation Whitespace Handling Tests
+
+    func testIsPossibleCreditCardNumber_IgnoresWhitespace() {
+        XCTAssertTrue(validator.isPossibleCreditCardNumber(number: "4111 1111 1111 1111")) // With spaces
+        XCTAssertTrue(validator.isPossibleCreditCardNumber(number: "3782 8224 6310 005")) // Amex with spaces
+    }
+
+    func testIsPossibleCreditCardNumber_IgnoresMultipleSpaces() {
+        XCTAssertTrue(validator.isPossibleCreditCardNumber(number: "4111  1111  1111  1111")) // Multiple spaces
+    }
+
+    func testIsPossibleCreditCardNumber_IgnoresLeadingTrailingSpaces() {
+        XCTAssertTrue(validator.isPossibleCreditCardNumber(number: " 4111111111111111 ")) // Leading/trailing spaces
+    }
+
+    func testIsPossibleCreditCardNumber_InvalidWithWhitespace() {
+        XCTAssertFalse(validator.isPossibleCreditCardNumber(number: "4111 1111 1111 1112")) // Invalid Luhn with spaces
     }
 }

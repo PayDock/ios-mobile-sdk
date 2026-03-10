@@ -22,7 +22,7 @@ final class BinDataCacheManager: BinDataCacheManaging {
 
     // MARK: - Constants
 
-    private let cloudFrontURL = URL(string: "https://d192wsfqzdoj1n.cloudfront.net/bin-data-au-v1.json")!
+    private let cloudFrontURL = URL(string: "https://d25lng5khxpk7i.cloudfront.net/bin-data-au-v1.json")!
     private let cachedFilename = "card-schemes-cached.json"
 
     // Internal so tests can reference them directly when asserting UserDefaults state.

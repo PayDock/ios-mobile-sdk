@@ -63,12 +63,15 @@ runLint:
     CODE_CLIMATE_REPORT_PATH: "fastlane/swiftlint_report.json"
   extends:
     - .macos_saas_runners
+    - .setup_bundler
   stage: quality
   before_script:
     - brew install swiftlint
     - brew install gnu-sed
+    - chmod +x scripts/setup_bundler.sh
+    - scripts/setup_bundler.sh
   script:
-    - fastlane lint
+    - bundle exec fastlane lint
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

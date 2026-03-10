@@ -5,6 +5,7 @@ disabled_rules:
 excluded:
   - "**/.build"
   - "**/.swiftpm"
+  - "**/vendor"
 
 line_length:
   warning: 140

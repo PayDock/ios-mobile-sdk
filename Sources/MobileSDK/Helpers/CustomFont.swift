@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 public struct CustomFont {
 
@@ -23,6 +24,18 @@ public struct CustomFont {
         switch type {
         case .system: return Font.system(size: size)
         case .custom(let name): return Font.custom(name, size: size)
+        }
+    }
+
+    /// A font that scales with Dynamic Type (accessibility font size settings).
+    var scaledFont: Font {
+        switch type {
+        case .system:
+            let baseFont = UIFont.systemFont(ofSize: size)
+            let scaledUIFont = UIFontMetrics.default.scaledFont(for: baseFont)
+            return Font(scaledUIFont)
+        case .custom(let name):
+            return Font.custom(name, size: size, relativeTo: .body)
         }
     }
 
