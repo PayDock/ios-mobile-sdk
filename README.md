@@ -5,9 +5,9 @@ flow in your iOS app. The SDK provides a customisable experience with pre-built 
 handle and support various payment methods.
 
 Once you have setup and initialised the MobileSDK in your application, you can use the MobileSDK
-widgets to access payment flows. These include interacting with ApplePay, Paypal, Afterpay, ColesPay and Click To Pay. You can also
-complete 3DS challenges, capture addresses, securely collect gift card details, and tokenise card
-details.
+widgets to access payment flows. These include interacting with ApplePay, Paypal, Afterpay, ColesPay, Zip and 
+Click To Pay. You can also complete 3DS challenges, capture addresses, securely collect gift card details, 
+and tokenise card details.
 
 # Requirements
 
