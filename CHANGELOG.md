@@ -21,6 +21,11 @@
 - Font for widgets now defaults to system font
 - Improved NSError mappings to readable strings
 
+## [4.2.1] - 2026-02-06
+
+### Fixed
+- Standalone 3ds: Ignore non fatal issues in webview navigation
+
 ## [4.2.0] - 2025-11-25
 
 ### Added
