@@ -31,6 +31,7 @@ struct CartView: View {
                     Button("Close") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("Close Cart")
                 }
             }
             .fullScreenCover(isPresented: $showingCheckout) {
@@ -62,6 +63,7 @@ struct CartView: View {
             Button("Continue Shopping") {
                 dismiss()
             }
+            .accessibilityIdentifier("Continue Shopping")
             .foregroundColor(.white)
             .font(.system(size: 16, weight: .semibold))
             .frame(height: 44)
@@ -127,6 +129,7 @@ struct CartView: View {
                 }
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.defaultPrimary)
+                .accessibilityIdentifier("Add Gift Card")
             }
 
             if cartManager.hasGiftCards {
@@ -221,6 +224,7 @@ struct CartView: View {
             Button("Proceed to Checkout") {
                 showingCheckout = true
             }
+            .accessibilityIdentifier("Proceed to Checkout")
             .foregroundColor(.white)
             .font(.system(size: 18, weight: .semibold))
             .frame(height: 50)

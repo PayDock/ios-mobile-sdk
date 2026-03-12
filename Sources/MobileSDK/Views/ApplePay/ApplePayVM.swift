@@ -9,13 +9,14 @@
 import SwiftUI
 import PassKit
 import NetworkingLib
+import DataCharges
 
 @MainActor
 class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
+    private let chargesService: DataCharges.ChargesService
 
     // MARK: - Properties
 
@@ -40,11 +41,11 @@ class ApplePayVM: NSObject, ObservableObject {
     init(eventDelegate: WidgetEventDelegate?,
          createPaymentRequest: @escaping (
             _ createPaymentRequestResult: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
-         walletService: WalletService = WalletServiceImpl(),
+         chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
          completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
         self.eventDelegate = eventDelegate
         self.createPaymentRequest = createPaymentRequest
-        self.walletService = walletService
+        self.chargesService = chargesService
         self.completion = completion
     }
 
@@ -53,13 +54,15 @@ class ApplePayVM: NSObject, ObservableObject {
         isCompletionCalled = false
 
         createPaymentRequest { [weak self] result in
-            switch result {
-            case .success(let response):
-                self?.applePayRequest = ApplePayRequest(token: response.token, request: response.request)
-                self?.startPayment()
+            Task {
+                switch result {
+                case .success(let response):
+                    self?.applePayRequest = ApplePayRequest(token: response.token, request: response.request)
+                    self?.startPayment()
 
-            case .failure(let failure):
-                self?.callCompletion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+                case .failure(let failure):
+                    self?.callCompletion(.failure(.creatingPaymentRequest(reason: failure.customMessage)))
+                }
             }
         }
     }
@@ -93,11 +96,15 @@ class ApplePayVM: NSObject, ObservableObject {
         Task {
             do {
                 let refToken = String(data: payment.token.paymentData, encoding: .utf8)
-                let chargeResponse = try await self.walletService.captureCharge(
-                    token: applePayRequest.token,
+                let walletChargeData = try await self.chargesService.captureWalletCharge(
+                    widgetAccessToken: applePayRequest.token,
                     paymentMethodId: nil,
-                    payerId: nil,
                     refToken: refToken)
+                let chargeResponse = ChargeResponse(
+                    status: walletChargeData.status,
+                    amount: walletChargeData.amount,
+                    currency: walletChargeData.currency
+                )
                 paymentStatus = .success
                 self.callCompletion(.success(chargeResponse))
                 completion(paymentStatus)
@@ -143,7 +150,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
         }
     }
 
-    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
+    nonisolated func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
             Task { @MainActor in
                 if self.paymentStatus == .success, let chargeData = self.chargeData {

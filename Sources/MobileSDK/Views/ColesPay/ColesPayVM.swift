@@ -8,13 +8,14 @@
 
 import SwiftUI
 import NetworkingLib
+import DataCharges
 
 @MainActor
 class ColesPayVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
+    private let chargesService: DataCharges.ChargesService
 
     // MARK: - Properties
 
@@ -39,14 +40,14 @@ class ColesPayVM: ObservableObject {
 
     init(config: ColesPayConfig,
          tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
-         walletService: WalletService = WalletServiceImpl(),
+         chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
          viewState: ViewState,
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<String, ColesPayError>) -> Void) {
         self.config = config
         self.tokenRequest = tokenRequest
-        self.walletService = walletService
+        self.chargesService = chargesService
         self.viewState = viewState
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
@@ -61,7 +62,7 @@ class ColesPayVM: ObservableObject {
         Task {
             do {
                 updateLoadingState(isLoading: true)
-                let colesPayOrderId = try await walletService.getColesPayCallback(token: token)
+                let colesPayOrderId = try await chargesService.getColesPayCallback(widgetAccessToken: token)
                 self.isLoading = false
                 self.colesPayOrderId = colesPayOrderId
                 self.showWebView = true
@@ -84,13 +85,13 @@ class ColesPayVM: ObservableObject {
         tokenRequest { [weak self] result in
             switch result {
             case .success(let response):
-                Task { @MainActor in
+                Task {
                     self?.token = response.token
                     self?.getColesPayURL(token: response.token)
                 }
 
             case .failure(let failure):
-                Task { @MainActor in
+                Task {
                     self?.updateLoadingState(isLoading: false)
                     self?.showWebView = false
                     self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))

@@ -9,13 +9,14 @@ import XCTest
 import Combine
 import NetworkingLib
 @testable import MobileSDK
+@testable import DataPaymentSources
 
 // swiftlint:disable all
 @MainActor
 class GiftCardVMTests: XCTestCase {
 
     var viewModel: GiftCardVM!
-    var mockService: CardServiceMock!
+    var mockService: PaymentSourcesMockService!
     var viewState: ViewState!
     var config: GiftCardWidgetConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
@@ -25,7 +26,7 @@ class GiftCardVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockService = CardServiceMock()
+        mockService = PaymentSourcesMockService()
         viewState = ViewState()
         config = GiftCardWidgetConfig(accessToken: "")
         loadingDelegate = WidgetLoadingDelegateUtil()
@@ -33,7 +34,7 @@ class GiftCardVMTests: XCTestCase {
         completionResult = nil
         viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
                                viewState: viewState,
-                               cardService: mockService,
+                               paymentSourcesService: mockService,
                                config: config,
                                loadingDelegate: loadingDelegate,
                                eventDelegate: nil) { result in
@@ -55,7 +56,7 @@ class GiftCardVMTests: XCTestCase {
         // Given
         viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
                                viewState: viewState,
-                               cardService: mockService,
+                               paymentSourcesService: mockService,
                                config: config,
                                loadingDelegate: loadingDelegate,
                                eventDelegate: nil) { result in
@@ -74,7 +75,7 @@ class GiftCardVMTests: XCTestCase {
         // Given
         viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
                                viewState: viewState,
-                               cardService: mockService,
+                               paymentSourcesService: mockService,
                                config: config,
                                loadingDelegate: nil,
                                eventDelegate: nil) { result in
@@ -95,7 +96,7 @@ class GiftCardVMTests: XCTestCase {
         // Given
         viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
                                viewState: viewState,
-                               cardService: mockService,
+                               paymentSourcesService: mockService,
                                config: config,
                                loadingDelegate: loadingDelegate,
                                eventDelegate: nil) { result in
@@ -116,7 +117,7 @@ class GiftCardVMTests: XCTestCase {
         // Given
         viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
                                viewState: viewState,
-                               cardService: mockService,
+                               paymentSourcesService: mockService,
                                config: config,
                                loadingDelegate: nil,
                                eventDelegate: nil) { result in
@@ -141,7 +142,7 @@ class GiftCardVMTests: XCTestCase {
     }
 
     // swiftlint:disable:next nesting
-    private class ErroringCardServiceMock: CardService {
+    private class ErroringPaymentSourcesServiceMock: PaymentSourcesService {
         enum FailureType {
             case requestError(message: String, code: String)
             case connectionError(URLError)
@@ -154,11 +155,11 @@ class GiftCardVMTests: XCTestCase {
             self.failure = failure
         }
 
-        func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String) async throws -> String {
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
             return ""
         }
 
-        func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
             switch failure {
 
             case .connectionError(let urlError):
@@ -171,6 +172,22 @@ class GiftCardVMTests: XCTestCase {
                 throw GiftCardError.unknownError(nil)
             }
         }
+
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
+            fatalError("Not implemented")
+        }
     }
 
     // MARK: - Completion Error Tests
@@ -178,13 +195,13 @@ class GiftCardVMTests: XCTestCase {
     func testTokeniseGiftCard_CompletesWithUnknownError_OnConnectionError() async {
         // Given
         let urlError = URLError(.notConnectedToInternet)
-        let failingService = ErroringCardServiceMock(failure: .connectionError(urlError))
+        let failingService = ErroringPaymentSourcesServiceMock(failure: .connectionError(urlError))
         let expectation = XCTestExpectation(description: "Completion called with unknownError")
 
         viewModel = GiftCardVM(
             appearance: GiftCardWidgetAppearance(),
             viewState: viewState,
-            cardService: failingService,
+            paymentSourcesService: failingService,
             config: config,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil) { result in
@@ -224,7 +241,7 @@ class GiftCardVMTests: XCTestCase {
         viewModel = GiftCardVM(
             appearance: appearance,
             viewState: viewState,
-            cardService: mockService,
+            paymentSourcesService: mockService,
             config: config,
             loadingDelegate: nil,
             eventDelegate: eventDelegate) { result in
@@ -253,7 +270,7 @@ class GiftCardVMTests: XCTestCase {
         viewModel = GiftCardVM(
             appearance: GiftCardWidgetAppearance(),
             viewState: viewState,
-            cardService: mockService,
+            paymentSourcesService: mockService,
             config: config,
             loadingDelegate: nil,
             eventDelegate: nil) { result in

@@ -159,7 +159,9 @@ struct ColesPayWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            isLoaded = true
+            Task { @MainActor in
+                isLoaded = true
+            }
         }
 
         /**
@@ -167,7 +169,11 @@ struct ColesPayWebView: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed(error: error as NSError))
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
+            Task { @MainActor in
+                onFailure(.webViewFailed(error: nsError))
+            }
         }
 
         /**
@@ -177,43 +183,49 @@ struct ColesPayWebView: UIViewRepresentable {
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            onFailure(.webViewFailed(error: error as NSError))
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
+            Task { @MainActor in
+                onFailure(.webViewFailed(error: nsError))
+            }
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            if webView.url?.host() == URL(string: redirectUrlString)?.host() {
-                onApprove()
+            Task { @MainActor in
+                if webView.url?.host() == URL(string: redirectUrlString)?.host() {
+                    onApprove()
+                }
             }
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard let messageString = message.body as? String else { return }
+            Task { @MainActor in
+                guard let messageString = message.body as? String else { return }
 
-            if messageString == "paydock://close" {
-                onClose()
-                return
-            }
+                if messageString == "paydock://close" {
+                    onClose()
+                    return
+                }
 
-            if messageString.contains("/payment-confirmed") {
-                onApprove()
+                if messageString.contains("/payment-confirmed") {
+                    onApprove()
+                }
             }
         }
 
         func webView(_ webView: WKWebView,
                      authenticationChallenge challenge: URLAuthenticationChallenge,
                      shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
-            decisionHandler(true)
+            // Reject deprecated TLS versions for PCI DSS compliance
+            decisionHandler(false)
         }
 
         func webView(_ webView: WKWebView,
                      didReceive challenge: URLAuthenticationChallenge,
                      completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-            DispatchQueue.global(qos: .background).async {
-                let trust = challenge.protectionSpace.serverTrust!
-                let exceptions = SecTrustCopyExceptions(trust)
-                SecTrustSetExceptions(trust, exceptions)
-                completionHandler(.useCredential, URLCredential(trust: trust))
-            }
+            // Use default system SSL certificate validation for PCI DSS compliance
+            // This ensures proper certificate chain validation against system trust store
+            completionHandler(.performDefaultHandling, nil)
         }
     }
 }

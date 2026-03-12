@@ -16,7 +16,6 @@ public struct CardDetailsWidget: View {
     @ScaledMetric private var cardIconWidth: CGFloat = 26.0
     @StateObject var viewModel: CardDetailsVM
     @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
-    @FocusState private var isViewFocused: Bool
 
     // MARK: - Initialisation
 
@@ -39,9 +38,6 @@ public struct CardDetailsWidget: View {
 
     public var body: some View {
         VStack(spacing: viewModel.appearance.verticalSpacing) {
-            if viewModel.config.showCardTitle {
-                cardTitleView
-            }
             if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 getCardSchemeIconList(supportedSchemes: supportedSchemes)
             }
@@ -55,24 +51,20 @@ public struct CardDetailsWidget: View {
             }
 
             if viewModel.config.allowSaveCard != nil {
-                privacyView
+                let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText
+                let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL
+                if viewModel.config.allowSaveCard?.privacyPolicyConfig != nil &&
+                    !text!.isEmpty &&
+                    viewModel.isValidURLString(url) {
+                    saveCardViewWithPrivacyPolicy
+                } else {
+                    saveCardViewWithoutPrivacyPolicy
+                }
             }
 
             primaryButton
-            emptyFocusView
         }
         .padding(.horizontal, viewModel.appearance.horizontalSpacing)
-    }
-
-    private var cardTitleView: some View {
-        HStack {
-            Text("Card information")
-                .font(viewModel.appearance.title.text.customFont.font)
-                .foregroundColor(viewModel.appearance.title.text.textColor)
-                .accessibilityAddTraits(.isHeader)
-            Spacer()
-        }
-        .customPadding(viewModel.appearance.title.padding)
     }
 
     private var cardholderNameTextField: some View {
@@ -87,6 +79,7 @@ public struct CardDetailsWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             textContentType: getCreditCardName(),
             returnKeyType: .next,
+            autocorrectionDisabled: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .cardholderName
@@ -100,17 +93,13 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = .cardNumber
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .cardNumber
-            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
-        })
         .focused($textFieldInFocus, equals: .cardholderName)
     }
 
@@ -140,17 +129,13 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = .expiryDate
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .expiryDate
-            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
-        })
         .focused($textFieldInFocus, equals: .cardNumber)
     }
 
@@ -179,17 +164,13 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Next",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = .securityCode
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .securityCode
-            viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
-        })
         .focused($textFieldInFocus, equals: .expiryDate)
     }
 
@@ -205,6 +186,8 @@ public struct CardDetailsWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             textContentType: getCreditCardSecurityCode(),
             keyboardType: .numberPad,
+            // Mask the security code input for PCI DSS compliance
+            isSecureTextEntry: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .securityCode
@@ -218,19 +201,13 @@ public struct CardDetailsWidget: View {
         .customToolbar(
             buttonTitle: "Done",
             font: UIFont(
-                name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+                name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                 size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = nil
             viewModel.cardDetailsFormManager.endEditing()
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            let collectCardholderName = viewModel.config.collectCardholderName
-            textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
-            viewModel.cardDetailsFormManager.setEditingTextField(
-                focusedField: collectCardholderName ? .cardholderName : .cardNumber)
-        })
         .focused($textFieldInFocus, equals: .securityCode)
     }
 
@@ -259,20 +236,20 @@ public struct CardDetailsWidget: View {
         }
                   .customPadding(viewModel.appearance.actionButton.dimensions.padding)
                   .accessibilityHint("Submits card details information.")
-    }
+        }
 
-    private var privacyView: some View {
-        HStack {
+    private var saveCardViewWithPrivacyPolicy: some View {
+        HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(viewModel.config.allowSaveCard?.consentText ?? "")
-                    .applyAttributes(viewModel.appearance.toggleText.text)
+                    .applyAttributesWithScaledFont(viewModel.appearance.toggleText.text)
                     .customPadding(viewModel.appearance.toggleText.padding)
 
                 let text = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyText ?? ""
                 let url = viewModel.config.allowSaveCard?.privacyPolicyConfig?.privacyPolicyURL ?? ""
                 let link = "[\(text)](\(url))"
                 Text(.init(link))
-                    .applyAttributes(viewModel.appearance.linkText.text)
+                    .applyAttributesWithScaledFont(viewModel.appearance.linkText.text)
                     .customPadding(viewModel.appearance.linkText.padding)
                     .accentColor(viewModel.appearance.linkText.text.textColor)
                     .disabled(viewModel.viewState.isDisabled)
@@ -283,6 +260,21 @@ public struct CardDetailsWidget: View {
                     })
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            Toggle(isOn: $viewModel.policyAccepted) {}
+                .conditionalToggleStyle(appearance: viewModel.appearance.toggle)
+                .disabled(viewModel.viewState.isDisabled)
+                .accessibilityLabel(viewModel.config.allowSaveCard?.consentText ?? "")
+                .fixedSize()
+        }
+    }
+
+    private var saveCardViewWithoutPrivacyPolicy: some View {
+        HStack(alignment: .center, spacing: 0) {
+            Text(viewModel.config.allowSaveCard?.consentText ?? "")
+                .applyAttributesWithScaledFont(viewModel.appearance.toggleText.text)
+                .customPadding(viewModel.appearance.toggleText.padding)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Toggle(isOn: $viewModel.policyAccepted) {}
                 .conditionalToggleStyle(appearance: viewModel.appearance.toggle)
@@ -310,21 +302,8 @@ public struct CardDetailsWidget: View {
                 .map(\.voiceoverName)
                 .joined(separator: ", ")
         )
+        .accessibilityRespondsToUserInteraction(false)
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var emptyFocusView: some View {
-        VStack {}
-            .conditionalFocusable()
-            .focused($isViewFocused)
-            .onConditionalKeyPress(key: .tab, action: {
-                let collectCardholderName = viewModel.config.collectCardholderName
-                textFieldInFocus = collectCardholderName ? .cardholderName : .cardNumber
-                viewModel.cardDetailsFormManager.setEditingTextField(focusedField: collectCardholderName ? .cardholderName : .cardNumber)
-            })
-            .onAppear {
-                isViewFocused = true
-            }
     }
 
     private func shouldAlignVertically() -> Bool {

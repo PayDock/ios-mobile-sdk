@@ -50,6 +50,7 @@ struct CheckoutAddressWidgetView: View {
                     Button("Cancel") {
                         onCancel()
                     }
+                    .accessibilityIdentifier("Cancel Address Entry")
                 }
             }
         }

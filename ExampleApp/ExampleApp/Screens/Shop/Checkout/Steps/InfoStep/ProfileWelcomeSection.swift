@@ -25,6 +25,7 @@ struct ProfileWelcomeSection: View {
             }
             .font(.system(size: 14, weight: .medium))
             .foregroundColor(.defaultPrimary)
+            .accessibilityIdentifier("Use Profile Info")
         }
         .padding()
         .background(Color.defaultPrimary.opacity(0.1))

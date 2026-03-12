@@ -11,31 +11,27 @@ import Foundation
 public enum CardScheme: String, CaseIterable {
 
     case amex
-    case ausbc
     case diners
     case discover
     case japcb
     case mastercard
-    case solo
     case visa
     case unionpay
 
     var voiceoverName: String {
         switch self {
         case .amex: return "American Express"
-        case .ausbc: return "Australian Bank Card"
         case .diners: return "Diners Club"
         case .discover: return "Discover"
         case .japcb: return "JCB"
         case .mastercard: return "Mastercard"
-        case .solo: return "Solo"
         case .visa: return "Visa"
         case .unionpay: return "UnionPay International"
         }
     }
 
     static let preferredOrder: [CardScheme] = [
-        .visa, .mastercard, .amex, .ausbc, .diners, .discover, .japcb, .solo, .unionpay
+        .visa, .mastercard, .amex, .diners, .discover, .japcb, .unionpay
     ]
 
     static func sortedArray(from set: Set<CardScheme>) -> [CardScheme] {

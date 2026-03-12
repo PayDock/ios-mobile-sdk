@@ -92,6 +92,10 @@ struct ButtonStyleView<T>: View {
                     get: { viewModel.loaderColor.toHex() },
                     set: { viewModel.loaderColor = Color(hex: $0) }),
                 pickedColor: $viewModel.loaderColor)
+
+            OpacitySliderView(
+                title: "Disabled opacity",
+                value: $viewModel.disabledOpacity)
         }
     }
 

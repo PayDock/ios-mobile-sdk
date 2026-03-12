@@ -32,6 +32,7 @@ struct GiftCardRowView: View {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundColor(.red)
             }
+            .accessibilityIdentifier("Remove Gift Card \(appliedGiftCard.giftCard.maskedCardNumber)")
         }
         .padding()
         .background(Color.green.opacity(0.1))

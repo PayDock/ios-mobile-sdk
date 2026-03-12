@@ -48,7 +48,7 @@ struct OutlineTextField: View {
     private var titleVerticalPadding: CGFloat {
         let isActive = animatableEditingState || !text.isEmpty
         if isActive {
-            return -10.0
+            return -11.0
         } else {
             return 0.0
         }
@@ -72,6 +72,8 @@ struct OutlineTextField: View {
     private let validationIconEnabled: Bool
     private let textContentType: UITextContentType?
     private let returnKeyType: UIReturnKeyType
+    private let isSecureTextEntry: Bool
+    private let autocorrectionDisabled: Bool
     private let onTapGesture: () -> Void
     private let onTextChange: ((String, Int) -> Int)?
     private let onSubmit: (() -> Void)?
@@ -92,6 +94,8 @@ struct OutlineTextField: View {
     ///   - textContentType: Content type used for the suggested prefill.
     ///   - keyboardType: Keyboard type for the text field.
     ///   - returnKeyType: Return key type for the text field.
+    ///   - isSecureTextEntry: Whether to mask input (for sensitive data like CVV).
+    ///   - autocorrectionDisabled: Whether to disable autocorrection and spell checking.
     ///   - onTapGesture: Action to take on tap gesture activaction.
     ///   - onTextChange: Custom text change handler that returns new cursor position.
     ///   - onSubmit: Action to take when return key is pressed.
@@ -108,6 +112,8 @@ struct OutlineTextField: View {
                 textContentType: UITextContentType? = nil,
                 keyboardType: UIKeyboardType = .default,
                 returnKeyType: UIReturnKeyType = .default,
+                isSecureTextEntry: Bool = false,
+                autocorrectionDisabled: Bool = false,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
                 onSubmit: (() -> Void)? = nil) {
@@ -124,6 +130,8 @@ struct OutlineTextField: View {
         self.textContentType = textContentType
         self.keyboardType = keyboardType
         self.returnKeyType = returnKeyType
+        self.isSecureTextEntry = isSecureTextEntry
+        self.autocorrectionDisabled = autocorrectionDisabled
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
@@ -200,7 +208,7 @@ struct OutlineTextField: View {
                 keyboardType: keyboardType,
                 textContentType: textContentType,
                 returnKeyType: returnKeyType,
-                font: UIFont(name: appearance.fonts.text.customFont.name, size: appearance.fonts.text.customFont.size),
+                font: UIFont.init(descriptor: appearance.fonts.text.customFont.fontDescriptor, size: appearance.fonts.text.customFont.size),
                 textColor: UIColor(appearance.colors.text),
                 tintColor: UIColor(appearance.colors.active),
                 isUnderlined: appearance.fonts.text.isUnderlined,
@@ -208,6 +216,9 @@ struct OutlineTextField: View {
                 isStrikethrough: appearance.fonts.text.isStrikethrough,
                 strikethroughColor: UIColor(appearance.fonts.text.strikethroughColor),
                 isItalic: appearance.fonts.text.isItalic,
+                isSecureTextEntry: isSecureTextEntry,
+                autocorrectionDisabled: autocorrectionDisabled,
+                accessibilityLabel: title,
                 onEditingChanged: { isEditing in
                     editing = isEditing
                 },
@@ -246,7 +257,7 @@ struct OutlineTextField: View {
                     .strikethrough(appearance.fonts.title.isStrikethrough, color: appearance.fonts.title.strikethroughColor)
                     .underline(appearance.fonts.title.isUnderlined, color: appearance.fonts.title.underlineColor)
                     .italic(appearance.fonts.title.isItalic)
-                    .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.name)
+                    .animatableFont(size: titleFontSize, fontName: appearance.fonts.title.customFont.fontName)
                     .padding([.leading, .trailing], 4.0)
                     .layoutPriority(1)
             }
@@ -261,7 +272,7 @@ struct OutlineTextField: View {
         HStack {
             VStack {
                 Text(errorMessage)
-                    .font(appearance.fonts.error.customFont.font)
+                    .font(appearance.fonts.error.customFont.scaledFont)
                     .foregroundColor(appearance.colors.error)
                     .padding(.leading, 16.0)
             }

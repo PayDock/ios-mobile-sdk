@@ -54,7 +54,6 @@ struct AfterpayWidget_Previews: PreviewProvider {
     static var previews: some View {
         AfterpayWidget(
             configuration: .init(
-                config: .init(maximumAmount: "100.0", currency: "AUD"),
                 environment: .sandbox,
                 options: .init())) { _ in
 

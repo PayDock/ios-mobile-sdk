@@ -2,9 +2,7 @@
 //  PayPalVaultError.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 16.10.2024..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import NetworkingLib
@@ -20,9 +18,12 @@ public enum PayPalVaultError: Error {
 
     public var customMessage: String {
         switch self {
-        case .createSetupToken: return "Error creating setup token."
-        case .getPayPalClientId: return "Error getting PayPal client ID."
-        case .createPaymentToken: return "Error creating payment token."
+        case .createSetupToken(let errorRes):
+            return errorRes.apiFailureMessage(fallback: "Error creating setup token")
+        case .getPayPalClientId(let errorRes):
+            return errorRes.apiFailureMessage(fallback: "Error getting PayPal client ID")
+        case .createPaymentToken(let errorRes):
+            return errorRes.apiFailureMessage(fallback: "Error creating payment token")
         case .sdkException(let description): return description
         case .userCancelled: return "User canceled the operation."
         case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"

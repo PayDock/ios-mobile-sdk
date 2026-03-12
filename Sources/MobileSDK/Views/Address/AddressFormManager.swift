@@ -235,6 +235,7 @@ class AddressFormManager: ObservableObject {
         stateText = reversedGeoLocation.state
         postcodeText = reversedGeoLocation.zipCode
         countryText = reversedGeoLocation.country
+        countrySearchText = reversedGeoLocation.country
 
         validateAllAddressFields()
     }
@@ -252,6 +253,7 @@ class AddressFormManager: ObservableObject {
             self.stateText = address.state
             self.postcodeText = address.postcode
             self.countryText = address.country
+            self.countrySearchText = address.country
 
             self.validateAllTextFields()
         }

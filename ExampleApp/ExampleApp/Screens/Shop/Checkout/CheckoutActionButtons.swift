@@ -23,6 +23,7 @@ struct CheckoutActionButtons: View {
                     Button("Back") {
                         onBack()
                     }
+                    .accessibilityIdentifier("Checkout Back Button")
                     .foregroundColor(.defaultPrimary)
                     .font(.system(size: 16, weight: .semibold))
                     .frame(height: 50)
@@ -37,7 +38,7 @@ struct CheckoutActionButtons: View {
                     Button(actionButtonTitle) {
                         onAction()
                     }
-
+                    .accessibilityIdentifier(actionButtonTitle)
                     .foregroundColor(.white)
                     .font(.system(size: 16, weight: .semibold))
                     .frame(height: 50)

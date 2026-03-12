@@ -2,9 +2,7 @@
 //  GiftCardFormManager.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 13.11.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
@@ -27,22 +25,53 @@ class GiftCardFormManager: ObservableObject {
     var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"
     @Published var pinPlaceholder = "XXXX"
 
+    private static let giftCardNumberMinDigits = 14
+    private static let giftCardNumberMaxDigits = 25
+    private static let pinDigitCount = 4
+
     var cardNumberText: String = "" {
         didSet {
-            if !cardNumberText.isEmpty {
-                self.validateTextField(.cardNumber)
+            if cardNumberText.isEmpty {
+                cardNumberWasInErrorState = false
+                if isCardNumberBeingEdited {
+                    cardNumberValid = nil
+                    cardNumberError = ""
+                }
+            } else {
+                if cardNumberWasInErrorState {
+                    cardNumberWasInErrorState = false
+                }
+                validateTextField(.cardNumber)
             }
         }
     }
     var pinText = "" {
         didSet {
-            if !pinText.isEmpty {
-                self.validateTextField(.pin)
+            if pinText.isEmpty {
+                pinHadInput = false
+                if isPinBeingEdited {
+                    pinValid = nil
+                    pinError = ""
+                }
+            } else {
+                pinHadInput = true
+                validateTextField(.pin)
             }
         }
     }
 
     private var currentTextField: GiftCardFocusable?
+
+    /// Tracks if fields are being actively edited
+    private var isCardNumberBeingEdited = false
+    private var isPinBeingEdited = false
+
+    /// Tracks if fields were in an error state when refocused
+    private var cardNumberWasInErrorState = false
+    private var pinWasInErrorState = false
+
+    /// Tracks if PIN has had data entered (to avoid validating empty field on defocus)
+    private var pinHadInput = false
 
     // MARK: - Initialisation
 
@@ -53,11 +82,49 @@ class GiftCardFormManager: ObservableObject {
     // MARK: - Methods
 
     func setEditingTextField(focusedField: GiftCardFocusable?) {
-        validateTextField(currentTextField)
+        let wasEditingCardNumber = editingCardNumber
+        let wasEditingPin = editingPin
+
         currentTextField = focusedField
 
-        guard let focusedField = focusedField else { return }
+        guard let focusedField = focusedField else {
+            editingCardNumber = false
+            editingPin = false
+            isCardNumberBeingEdited = false
+            isPinBeingEdited = false
 
+            if wasEditingCardNumber { validateCardNumberOnDefocus() }
+            if wasEditingPin { validatePinOnDefocus() }
+            return
+        }
+
+        if wasEditingCardNumber && focusedField != .cardNumber {
+            isCardNumberBeingEdited = false
+            validateCardNumberOnDefocus()
+        }
+        if wasEditingPin && focusedField != .pin {
+            isPinBeingEdited = false
+            validatePinOnDefocus()
+        }
+
+        switch focusedField {
+        case .cardNumber:
+            cardNumberWasInErrorState = !cardNumberError.isEmpty
+            if cardNumberWasInErrorState {
+                cardNumberValid = nil
+                cardNumberError = ""
+            }
+
+        case .pin:
+            pinWasInErrorState = !pinError.isEmpty
+            if pinWasInErrorState {
+                pinValid = nil
+                pinError = ""
+            }
+        }
+
+        isCardNumberBeingEdited = focusedField == .cardNumber
+        isPinBeingEdited = focusedField == .pin
         editingCardNumber = focusedField == .cardNumber
         editingPin = focusedField == .pin
     }
@@ -74,19 +141,64 @@ class GiftCardFormManager: ObservableObject {
     }
 
     private func validateCardNumber() {
-        let cardNumberProper = cardNumberText.replacingOccurrences(of: " ", with: "")
+        let digitCount = cardNumberText.filter { $0.isNumber }.count
+        let isInValidRange = digitCount >= Self.giftCardNumberMinDigits && digitCount <= Self.giftCardNumberMaxDigits
 
-        if cardNumberProper.count >= 14 && cardNumberProper.count <= 25 {
-            cardNumberValid = true
+        if isCardNumberBeingEdited && !isInValidRange {
+            cardNumberValid = nil
             cardNumberError = ""
+            return
+        }
+
+        if isInValidRange {
+            updateCardNumberValidationState(isValid: true, errorMessage: nil)
         } else {
-            cardNumberValid = false
-            cardNumberError = "Invalid card number"
+            updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
         }
     }
 
+    private func validateCardNumberOnDefocus() {
+        guard !cardNumberText.isEmpty else { return }
+
+        let digitCount = cardNumberText.filter { $0.isNumber }.count
+
+        let isInValidRange = digitCount >= Self.giftCardNumberMinDigits && digitCount <= Self.giftCardNumberMaxDigits
+
+        if isInValidRange {
+            updateCardNumberValidationState(isValid: true, errorMessage: nil)
+        } else {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
+        }
+    }
+
+    private func updateCardNumberValidationState(isValid: Bool, errorMessage: String?) {
+        cardNumberValid = isValid
+        cardNumberError = errorMessage ?? ""
+    }
+
     private func validatePin() {
-        if CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText)) && pinText.count == 4 {
+        let digitCount = pinText.count
+
+        if digitCount == Self.pinDigitCount {
+            if CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText)) {
+                pinValid = true
+                pinError = ""
+            } else {
+                pinValid = false
+                pinError = "Invalid PIN number"
+            }
+        } else if isPinBeingEdited && digitCount < Self.pinDigitCount {
+            pinValid = nil
+            pinError = ""
+        } else {
+            pinValid = false
+            pinError = "Invalid PIN number"
+        }
+    }
+
+    private func validatePinOnDefocus() {
+        guard pinHadInput else { return }
+        if CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText)) && pinText.count == Self.pinDigitCount {
             pinValid = true
             pinError = ""
         } else {
@@ -96,7 +208,13 @@ class GiftCardFormManager: ObservableObject {
     }
 
     func isFormValid() -> Bool {
-        return pinValid ?? false && cardNumberValid ?? false
+        (pinValid ?? false) && (cardNumberValid ?? false)
+    }
+
+    /// Revalidates all fields and updates error messages. Call before tokenisation as a backup check.
+    func revalidateAll() {
+        validateCardNumberOnDefocus()
+        validatePinOnDefocus()
     }
 
     // MARK: - Formatting
@@ -116,9 +234,14 @@ class GiftCardFormManager: ObservableObject {
     // MARK: - Editing
 
     func endEditing() {
+        if editingCardNumber { validateCardNumberOnDefocus() }
+        if editingPin { validatePinOnDefocus() }
+
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         editingCardNumber = false
         editingPin = false
+        isCardNumberBeingEdited = false
+        isPinBeingEdited = false
     }
 }
 

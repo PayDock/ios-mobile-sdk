@@ -138,18 +138,16 @@ public struct ClickToPayWidget: UIViewRepresentable {
         public func webView(_ webView: WKWebView,
                             authenticationChallenge challenge: URLAuthenticationChallenge,
                             shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
-            decisionHandler(true)
+            // Reject deprecated TLS versions for PCI DSS compliance
+            decisionHandler(false)
         }
 
         public func webView(_ webView: WKWebView,
                             didReceive challenge: URLAuthenticationChallenge,
                             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-            DispatchQueue.global(qos: .background).async {
-                let trust = challenge.protectionSpace.serverTrust!
-                let exceptions = SecTrustCopyExceptions(trust)
-                SecTrustSetExceptions(trust, exceptions)
-                completionHandler(.useCredential, URLCredential(trust: trust))
-            }
+            // Use default system SSL certificate validation for PCI DSS compliance
+            // This ensures proper certificate chain validation against system trust store
+            completionHandler(.performDefaultHandling, nil)
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -163,7 +161,9 @@ public struct ClickToPayWidget: UIViewRepresentable {
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             activityIndicator?.stopAnimating()
-            completion(.failure(.webViewFailed(error: error as NSError)))
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
+            completion(.failure(.webViewFailed(error: nsError)))
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -182,7 +182,9 @@ public struct ClickToPayWidget: UIViewRepresentable {
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             activityIndicator?.stopAnimating()
-            completion(.failure(.webViewFailed(error: error as NSError)))
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
+            completion(.failure(.webViewFailed(error: nsError)))
         }
 
         public func webView(_ webView: WKWebView,

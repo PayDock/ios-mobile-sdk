@@ -10,6 +10,8 @@
 	<string>$(SERVICE_ID_AFTERPAY)</string>
 	<key>SERVICE_ID_APPLE_PAY_MPGS</key>
 	<string>$(SERVICE_ID_APPLE_PAY_MPGS)</string>
+	<key>SERVICE_ID_APPLE_PAY</key>
+	<string>$(SERVICE_ID_APPLE_PAY)</string>
 	<key>CONFIGURATION</key>
 	<string>$(CONFIGURATION)</string>
 	<key>WALLET_ID_COLES_PAY</key>
@@ -24,6 +26,8 @@
 	<string>$(SERVICE_ID_PAYPAL)</string>
 	<key>SERVICE_ID_GPAYMENTS</key>
 	<string>$(SERVICE_ID_GPAYMENTS)</string>
+	<key>SERVICE_ID_ZIP</key>
+	<string>$(SERVICE_ID_ZIP)</string>
 	<key>MERCHANT_ID_APPLE_PAY</key>
 	<string>$(MERCHANT_ID_APPLE_PAY)</string>
 	<key>CFBundleIconName</key>

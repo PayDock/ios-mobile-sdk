@@ -2,14 +2,13 @@
 //  CardDetailsVM.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 02.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import SwiftUI
 import Combine
 import NetworkingLib
+import DataPaymentSources
 
 @MainActor
 class CardDetailsVM: ObservableObject {
@@ -17,7 +16,7 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Dependencies
 
     @Published var cardDetailsFormManager: CardDetailsFormManager
-    private let cardService: CardService
+    private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     let config: CardDetailsWidgetConfig
     let appearance: CardDetailsWidgetAppearance
 
@@ -41,14 +40,14 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Initialisation
 
-    init(cardService: CardService = CardServiceImpl(),
+    init(paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          viewState: ViewState,
          config: CardDetailsWidgetConfig,
          appearance: CardDetailsWidgetAppearance,
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
-        self.cardService = cardService
+        self.paymentSourcesService = paymentSourcesService
         self.viewState = viewState
         self.config = config
         self.appearance = appearance
@@ -67,13 +66,20 @@ class CardDetailsVM: ObservableObject {
         }
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
+            // Defer to avoid publishing during view updates
+            Task {
+                self?.objectWillChange.send()
+            }
         }
     }
 
     // MARK: - Api Calls
 
     func tokeniseCardDetails() {
+        guard cardDetailsFormManager.isFormValid() else {
+            return
+        }
+
         Task {
             guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
@@ -83,19 +89,22 @@ class CardDetailsVM: ObservableObject {
             let trimmedCardName = cardDetailsFormManager.cardholderNameText.trimmingCharacters(in: .whitespacesAndNewlines)
             let cardName = trimmedCardName.isEmpty ? nil : trimmedCardName
 
-            let tokeniseCardDetailsReq = TokeniseCardDetailsReq(
+            let tokeniseCardDetailsReq = DataPaymentSources.CreatePaymentSourceTokenReq(
+                type: "card",
                 gatewayId: config.gatewayId,
-                cardName: cardName,
                 cardNumber: cardDetailsFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
+                cardName: cardName,
                 expireMonth: String(expireMonth),
                 expireYear: String(expireYear),
-                cardCcv: cardDetailsFormManager.securityCodeText)
+                cardCcv: cardDetailsFormManager.securityCodeText,
+                storeCcv: config.storeSecurityCode,
+                savedCardConsentAccepted: config.allowSaveCard != nil ? policyAccepted : nil)
 
             do {
                 updateLoadingState(isLoading: true)
-                let cardToken = try await cardService.createToken(
+                let cardToken = try await paymentSourcesService.createToken(
                     tokeniseCardDetailsReq: tokeniseCardDetailsReq,
-                    accessToken: config.accessToken)
+                    widgetAccessToken: config.accessToken)
 
                 updateLoadingState(isLoading: false)
                 completion(.success(createResult(token: cardToken)))
@@ -145,15 +154,24 @@ class CardDetailsVM: ObservableObject {
     func getSchemeIcon(for scheme: CardScheme) -> Image {
         switch scheme {
         case .amex: Image("american-express", bundle: Bundle.module)
-        case .ausbc: Image("australian-commonwealth-bank", bundle: Bundle.module)
         case .diners: Image("diners", bundle: Bundle.module)
         case .discover: Image("discover", bundle: Bundle.module)
         case .japcb: Image("jcb", bundle: Bundle.module)
         case .mastercard: Image("mastercard", bundle: Bundle.module)
-        case .solo: Image("solo", bundle: Bundle.module)
         case .visa: Image("visa", bundle: Bundle.module)
         case .unionpay: Image("unionpay", bundle: Bundle.module)
         }
+    }
+
+    func isValidURLString(_ string: String?) -> Bool {
+        guard let string else { return false }
+        guard let url = URL(string: string) else { return false }
+        guard let scheme = url.scheme,
+              let host = url.host,
+              !scheme.isEmpty,
+              !host.isEmpty else { return false }
+
+        return true
     }
 
     // MARK: - Analytics Handling

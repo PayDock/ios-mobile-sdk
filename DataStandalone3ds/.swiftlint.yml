@@ -1,0 +1,40 @@
+disabled_rules:
+  - todo
+  - inclusive_language
+
+excluded:
+  - .build
+
+line_length:
+  warning: 140
+
+identifier_name:
+  max_length:
+    warning: 45
+    error: 60
+  min_length: 2
+
+cyclomatic_complexity:
+  warning: 25
+  error: 30
+
+file_length:
+  warning: 800
+  error: 1000
+
+type_body_length:
+  warning: 500
+  error: 2000
+
+function_parameter_count:
+  warning: 10
+  error: 15
+
+type_name:
+  max_length:
+    warning: 60
+    error: 100
+  min_length:
+    warning: 3
+    error: 1
+

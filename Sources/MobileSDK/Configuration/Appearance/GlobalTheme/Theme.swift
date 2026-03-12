@@ -19,8 +19,12 @@ public struct Theme:
     DropdownStylableAppearance,
     TitleStylableAppearance,
     LinkTextStylableAppearance,
-    ToggleTextStylableAppearance {
+    ToggleTextStylableAppearance,
+    SpacingStylableAppearance {
 
+    public var horizontalSpacing: CGFloat
+    public var verticalSpacing: CGFloat
+    public var textFieldVerticalSpacing: CGFloat
     public var textField: TextFieldAppearance
     public var searchDropdown: SearchDropdownAppearance
     public var actionButton: ButtonAppearance
@@ -32,7 +36,10 @@ public struct Theme:
     public var toggleText: TextAppearance
     public var title: TextAppearance
 
-    public init(textField: TextFieldAppearance = TextFieldAppearance(),
+    public init(horizontalSpacing: CGFloat = 16,
+                verticalSpacing: CGFloat = 16,
+                textFieldVerticalSpacing: CGFloat = 8,
+                textField: TextFieldAppearance = TextFieldAppearance(),
                 searchDropdown: SearchDropdownAppearance = SearchDropdownAppearance(),
                 actionButton: ButtonAppearance = ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
                 expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
@@ -49,6 +56,9 @@ public struct Theme:
                 toggleText: TextAppearance = TextAppearance(text: .init(textColor: .defaultText)),
                 description: TextAppearance = TextAppearance(),
                 title: TextAppearance = TextAppearance(text: TextAttributes(font: .init(size: 16.0)))) {
+        self.horizontalSpacing = horizontalSpacing
+        self.verticalSpacing = verticalSpacing
+        self.textFieldVerticalSpacing = textFieldVerticalSpacing
         self.textField = textField
         self.searchDropdown = searchDropdown
         self.actionButton = actionButton

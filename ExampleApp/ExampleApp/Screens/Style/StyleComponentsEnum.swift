@@ -24,6 +24,7 @@ enum StyleComponentsEnum {
     case payPal
     case spacings
     case buttonLoader
+    case zip
 
     var title: String {
         switch self {
@@ -42,6 +43,7 @@ enum StyleComponentsEnum {
         case .payPal: return "PayPal Button"
         case .spacings: return "Spacings"
         case .buttonLoader: return "Button Loader"
+        case .zip: return "Zip Button"
         }
     }
 
@@ -77,6 +79,8 @@ enum StyleComponentsEnum {
             return AnyView(SpacingsStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .buttonLoader:
             return AnyView(ButtonLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .zip:
+            return AnyView(ZipStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         }
     }
 
@@ -173,20 +177,8 @@ enum StyleComponentsEnum {
                 stylingDarkMode: stylingDarkMode,
                 textKeyPath: \.title,
                 title: title))
-        case .card:
-            return AnyView(TextStyleView<CardDetailsWidgetAppearance>(
-                selectedWidget: selectedWidget,
-                stylingDarkMode: stylingDarkMode,
-                textKeyPath: \.title,
-                title: title))
         case .address:
             return AnyView(TextStyleView<AddressWidgetAppearance>(
-                selectedWidget: selectedWidget,
-                stylingDarkMode: stylingDarkMode,
-                textKeyPath: \.title,
-                title: title))
-        case .giftCard:
-            return AnyView(TextStyleView<GiftCardWidgetAppearance>(
                 selectedWidget: selectedWidget,
                 stylingDarkMode: stylingDarkMode,
                 textKeyPath: \.title,

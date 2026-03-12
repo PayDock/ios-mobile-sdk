@@ -20,8 +20,9 @@ enum WidgetsEnum {
     case afterPay
     case clickToPay
     case applePay
-    case integrated3ds
+    case mpgs3ds
     case standalone3ds
+    case zip
 
     var title: String {
         switch self {
@@ -35,8 +36,9 @@ enum WidgetsEnum {
         case .afterPay: return "Afterpay"
         case .clickToPay: return "Click to Pay"
         case .applePay: return "Apple Pay"
-        case .integrated3ds: return "Integrated 3DS"
+        case .mpgs3ds: return "MPGS 3DS"
         case .standalone3ds: return "Standalone 3DS"
+        case .zip: return "Zip"
         }
     }
 
@@ -52,8 +54,9 @@ enum WidgetsEnum {
         case .afterPay: Image("afterpay-style")
         case .clickToPay: Image("click-to-pay-style")
         case .applePay: Image("apple-pay-style")
-        case .integrated3ds: Image("integrated-3ds-style")
+        case .mpgs3ds: Image("integrated-3ds-style")
         case .standalone3ds: Image("standalone-3ds-style")
+        case .zip: Image("zip")
         }
     }
 }

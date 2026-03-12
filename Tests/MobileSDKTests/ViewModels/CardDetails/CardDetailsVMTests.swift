@@ -9,12 +9,13 @@ import XCTest
 import Combine
 import NetworkingLib
 @testable import MobileSDK
+@testable import DataPaymentSources
 
 // swiftlint:disable all
 @MainActor
 class CardDetailsVMTests: XCTestCase {
     private var viewModel: CardDetailsVM!
-    private var mockService: CardServiceMock!
+    private var mockService: PaymentSourcesMockService!
     private var config: SaveCardConfig!
     private var viewState: ViewState!
     private var loadingDelegate: WidgetLoadingDelegateUtil!
@@ -24,7 +25,7 @@ class CardDetailsVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockService = CardServiceMock()
+        mockService = PaymentSourcesMockService()
         config = SaveCardConfig(
             consentText: "Remember",
             privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
@@ -35,12 +36,11 @@ class CardDetailsVMTests: XCTestCase {
         eventDelegate = WidgetEventDelegateUtil()
         completionResult = nil
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
             ),
@@ -66,12 +66,11 @@ class CardDetailsVMTests: XCTestCase {
     }
 
     func testInitialisationWithOptionsStateDisabled() {
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: ViewState(state: .disabled),
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
@@ -89,12 +88,11 @@ class CardDetailsVMTests: XCTestCase {
     }
 
     func testInitialisationWithoutDelegateShowLoader() {
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
@@ -109,12 +107,11 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
@@ -135,12 +132,11 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToTrueWithoutDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
@@ -163,12 +159,11 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToFalseWithDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
@@ -191,12 +186,11 @@ class CardDetailsVMTests: XCTestCase {
 
     func testUpdateLoadingStateToFalseWithoutDelegate() {
         // Given
-        viewModel = CardDetailsVM(cardService: mockService,
+        viewModel = CardDetailsVM(paymentSourcesService: mockService,
                                   viewState: viewState,
                                   config: CardDetailsWidgetConfig(
                                     gatewayId: "gatewayId",
                                     accessToken: "accessToken",
-                                    showCardTitle: true,
                                     collectCardholderName: false,
                                     allowSaveCard: config
                                   ),
@@ -226,7 +220,7 @@ class CardDetailsVMTests: XCTestCase {
     }
 
     
-    private class ErroringCardServiceMock: CardService {
+    private class ErroringPaymentSourcesServiceMock: PaymentSourcesService {
         enum FailureType {
             case requestError(message: String, code: String)
             case connectionError(URLError)
@@ -239,7 +233,7 @@ class CardDetailsVMTests: XCTestCase {
             self.failure = failure
         }
 
-        func createToken(tokeniseCardDetailsReq: TokeniseCardDetailsReq, accessToken: String) async throws -> String {
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
             switch failure {
 
             case .connectionError(let urlError):
@@ -253,24 +247,39 @@ class CardDetailsVMTests: XCTestCase {
             }
         }
 
-        func createGiftCardToken(tokeniseGiftCardReq: TokeniseGiftCardReq, accessToken: String) async throws -> String {
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
             return ""
+        }
+
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
+            fatalError("Not implemented")
         }
     }
 
     func testTokeniseCardDetails_CompletesWithUnknownError_OnConnectionError() async {
         // Given
         let urlError = URLError(.notConnectedToInternet)
-        let failingService = ErroringCardServiceMock(failure: .connectionError(urlError))
+        let failingService = ErroringPaymentSourcesServiceMock(failure: .connectionError(urlError))
         let expectation = XCTestExpectation(description: "Completion called with unknownError")
 
         viewModel = CardDetailsVM(
-            cardService: failingService,
+            paymentSourcesService: failingService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
             ),
@@ -311,12 +320,11 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         let appearance = CardDetailsWidgetAppearance()
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
             ),
@@ -347,12 +355,11 @@ class CardDetailsVMTests: XCTestCase {
         // Given
         let appearance = CardDetailsWidgetAppearance()
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
             ),
@@ -383,12 +390,11 @@ class CardDetailsVMTests: XCTestCase {
             // Given
             let appearance = CardDetailsWidgetAppearance()
             viewModel = CardDetailsVM(
-                cardService: mockService,
+                paymentSourcesService: mockService,
                 viewState: viewState,
                 config: CardDetailsWidgetConfig(
                     gatewayId: "gatewayId",
                     accessToken: "accessToken",
-                    showCardTitle: true,
                     collectCardholderName: false,
                     allowSaveCard: config
                 ),
@@ -418,12 +424,11 @@ class CardDetailsVMTests: XCTestCase {
     func testEventDelegateWithoutDelegate() {
         // Given
         viewModel = CardDetailsVM(
-            cardService: mockService,
+            paymentSourcesService: mockService,
             viewState: viewState,
             config: CardDetailsWidgetConfig(
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
-                showCardTitle: true,
                 collectCardholderName: false,
                 allowSaveCard: config
             ),
@@ -442,6 +447,240 @@ class CardDetailsVMTests: XCTestCase {
         // Then
         XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
         XCTAssertNil(eventDelegate.lastEvent)
+    }
+
+    // MARK: - Store Security Code Tests
+
+    private class CapturingPaymentSourcesServiceMock: PaymentSourcesService {
+        var capturedRequest: CreatePaymentSourceTokenReq?
+        var tokenToReturn: String = "mock-token-123"
+
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
+            capturedRequest = tokeniseCardDetailsReq
+            return tokenToReturn
+        }
+
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
+            fatalError("Not implemented")
+        }
+    }
+
+    func testTokeniseCardDetails_WithStoreSecurityCodeNil_PassesNilToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertNil(capturingService.capturedRequest?.storeCcv, "storeCcv should be nil when storeSecurityCode is nil")
+    }
+
+    func testTokeniseCardDetails_WithStoreSecurityCodeTrue_PassesTrueToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: true
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.storeCcv, true, "storeCcv should be true when storeSecurityCode is true")
+    }
+
+    func testTokeniseCardDetails_WithStoreSecurityCodeFalse_PassesFalseToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: false
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.storeCcv, false, "storeCcv should be false when storeSecurityCode is false")
+    }
+
+    // MARK: - Save Card Consent Tests
+
+    func testTokeniseCardDetails_WithAllowSaveCardNil_PassesNilToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: nil,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertNil(capturingService.capturedRequest?.savedCardConsentAccepted, "savedCardConsentAccepted should be nil when allowSaveCard is nil")
+    }
+
+    func testTokeniseCardDetails_WithSaveCardToggleOn_PassesTrueToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: config,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+        viewModel.policyAccepted = true
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.savedCardConsentAccepted, true, "savedCardConsentAccepted should be true when save card toggle is on")
+    }
+
+    func testTokeniseCardDetails_WithSaveCardToggleOff_PassesFalseToRequest() async {
+        // Given
+        let capturingService = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Tokenization completes")
+        
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: config,
+                storeSecurityCode: nil
+            ),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+
+        populateValidFormFields()
+        viewModel.policyAccepted = false
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(capturingService.capturedRequest)
+        XCTAssertEqual(capturingService.capturedRequest?.savedCardConsentAccepted, false, "savedCardConsentAccepted should be false when save card toggle is off")
     }
 }
 // swiftlint:enable all

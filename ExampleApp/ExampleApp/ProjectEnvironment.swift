@@ -26,6 +26,7 @@ struct ProjectEnvironment {
         static let clickToPayServiceId = "SERVICE_ID_CLICK_TO_PAY"
         static let colesPayClientId = "WALLET_ID_COLES_PAY"
         static let applePayMerchantId = "MERCHANT_ID_APPLE_PAY"
+        static let zipGatewayId = "SERVICE_ID_ZIP"
     }
 
     private static let infoDictionary: [String: Any] = {
@@ -97,7 +98,7 @@ struct ProjectEnvironment {
 
     func getMPGSGatewayId() -> String? {
         guard let gatewayId = Self.infoDictionary[Keys.mpgsGatewayId] as? String else {
-            print("Integrated 3DS gateway ID not found in .plist!")
+            print("MPGS gateway ID not found in .plist!")
             return nil
         }
         return gatewayId
@@ -105,7 +106,7 @@ struct ProjectEnvironment {
 
     func getMPGSTestGatewayId() -> String? {
         guard let gatewayId = Self.infoDictionary[Keys.mpgsTestGatewayId] as? String else {
-            print("Integrated 3DS gateway ID not found in .plist!")
+            print("MPGS test gateway ID not found in .plist!")
             return nil
         }
         return gatewayId
@@ -151,9 +152,17 @@ struct ProjectEnvironment {
         return clientId
     }
 
+    func getZipGatewayId() -> String? {
+        guard let gatewayId = Self.infoDictionary[Keys.zipGatewayId] as? String else {
+            print("Zip gateway ID not found in .plist!")
+            return nil
+        }
+        return gatewayId
+    }
+
     func getApplePayMerchantId() -> String? {
         guard let merchantId = Self.infoDictionary[Keys.applePayMerchantId] as? String else {
-            print("Merchant ID not found in .plist!")
+            print("Apple Pay merchant ID not found in .plist!")
             return nil
         }
         return merchantId

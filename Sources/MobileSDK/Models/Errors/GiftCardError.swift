@@ -2,9 +2,7 @@
 //  GiftCardError.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 16.05.2024..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import NetworkingLib
@@ -16,7 +14,8 @@ public enum GiftCardError: Error {
 
     public var customMessage: String {
         switch self {
-        case let .errorTokenisingCard(error): return error.error?.message ?? "Error tokenising gift card"
+        case .errorTokenisingCard(let errorRes):
+                return errorRes.apiFailureMessage(fallback: "Error tokenising gift card")
         case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
         }
     }

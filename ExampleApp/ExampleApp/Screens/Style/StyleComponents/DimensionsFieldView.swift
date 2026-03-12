@@ -32,6 +32,8 @@ struct DimensionsFieldView: View {
                         .frame(height: 40)
                         .background(Color.white)
                         .padding(.leading, 32)
+                        .accessibilityIdentifier("TextField_\(title)")
+                        .accessibilityLabel(title)
                 }
             }
         }

@@ -4,7 +4,6 @@
 //
 //  Created by Domagoj Grizelj on 01.09.2025..
 //  Copyright © 2025 Paydock Ltd.
-//
 
 import XCTest
 @testable import MobileSDK
@@ -245,6 +244,32 @@ class GiftCardFormManagerTests: XCTestCase {
 
         XCTAssertFalse(sut.cardNumberValid ?? true)
         XCTAssertEqual(sut.cardNumberError, "Invalid card number")
+    }
+
+    // MARK: - Deleting While Focused (Action Button State)
+
+    func testDeletingCardNumberWhileFocused_DisablesForm() {
+        sut.setEditingTextField(focusedField: .cardNumber)
+
+        sut.cardNumberText = "12345678901234"
+        sut.pinText = "1234"
+        XCTAssertTrue(sut.isFormValid(), "Form should be valid with complete card number and PIN")
+
+        sut.cardNumberText = "1234567890123"
+        XCTAssertNil(sut.cardNumberValid, "Deleting below valid range should clear cardNumberValid")
+        XCTAssertFalse(sut.isFormValid(), "Action button should be disabled when card number becomes invalid")
+    }
+
+    func testDeletingPinWhileFocused_DisablesForm() {
+        sut.setEditingTextField(focusedField: .pin)
+
+        sut.cardNumberText = "12345678901234"
+        sut.pinText = "1234"
+        XCTAssertTrue(sut.isFormValid(), "Form should be valid with complete card number and PIN")
+
+        sut.pinText = "123"
+        XCTAssertNil(sut.pinValid, "Deleting below 4 digits should clear pinValid")
+        XCTAssertFalse(sut.isFormValid(), "Action button should be disabled when PIN becomes invalid")
     }
 
     // MARK: - Edge Cases

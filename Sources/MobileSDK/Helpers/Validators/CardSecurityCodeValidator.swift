@@ -61,7 +61,7 @@ class CardSecurityCodeValidator {
     func requiredDigits(cardScheme: CardScheme) -> Int {
         switch cardScheme {
         case .amex: return 4
-        case .mastercard, .visa, .diners, .discover, .japcb, .solo, .ausbc, .unionpay: return 3
+        case .mastercard, .visa, .diners, .discover, .japcb, .unionpay: return 3
         }
     }
 }

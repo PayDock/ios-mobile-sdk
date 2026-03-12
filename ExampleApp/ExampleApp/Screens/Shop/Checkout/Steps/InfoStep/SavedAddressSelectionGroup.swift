@@ -34,6 +34,7 @@ struct SavedAddressSelectionGroup: View {
             }
             .font(.system(size: 14))
             .foregroundColor(.defaultPrimary)
+            .accessibilityIdentifier("Enter new address")
         }
         .padding()
         .background(Color(.systemGroupedBackground))

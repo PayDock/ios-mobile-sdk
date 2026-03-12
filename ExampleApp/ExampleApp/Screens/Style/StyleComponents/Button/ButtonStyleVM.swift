@@ -45,6 +45,7 @@ class ButtonStyleVM<T>: ObservableObject {
     @Published var imageColor: Color = .clear { didSet { updateAppearance() }}
     @Published var borderColor: Color = .clear { didSet { updateAppearance() }}
     @Published var loaderColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var disabledOpacity: Double = 0.8 { didSet { updateAppearance() }}
 
     @Published var cornerRadius: CGFloat = 0.0 { didSet { updateAppearance() }}
     @Published var borderWidth: CGFloat = 0.0 { didSet { updateAppearance() }}
@@ -80,6 +81,7 @@ class ButtonStyleVM<T>: ObservableObject {
         self.imageColor = buttonAppearance?.colors.text ?? .clear
         self.borderColor = buttonAppearance?.colors.border ?? .clear
         self.loaderColor = buttonAppearance?.loader.spinnerColor ?? .clear
+        self.disabledOpacity = buttonAppearance?.colors.disabledOpacity ?? 0.8
 
         self.cornerRadius = buttonAppearance?.dimensions.cornerRadius ?? 0
         self.borderWidth = buttonAppearance?.dimensions.borderWidth ?? 0
@@ -90,7 +92,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
         self.underlineColor = buttonAppearance?.fonts.title.underlineColor ?? .clear
         self.strikethroughColor = buttonAppearance?.fonts.title.strikethroughColor ?? .clear
-        self.fontName = buttonAppearance?.fonts.title.customFont.name ?? ""
+        self.fontName = buttonAppearance?.fonts.title.customFont.fontName ?? ""
         self.fontSize = buttonAppearance?.fonts.title.customFont.size ?? 0
 
         self.icon = buttonAppearance?.icon
@@ -104,6 +106,7 @@ class ButtonStyleVM<T>: ObservableObject {
         appearance[keyPath: buttonKeyPath].colors.text = textColor
         appearance[keyPath: buttonKeyPath].colors.image = imageColor
         appearance[keyPath: buttonKeyPath].colors.border = borderColor
+        appearance[keyPath: buttonKeyPath].colors.disabledOpacity = disabledOpacity
         appearance[keyPath: buttonKeyPath].loader.spinnerColor = loaderColor
 
         appearance[keyPath: buttonKeyPath].dimensions.cornerRadius = cornerRadius
@@ -115,7 +118,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
         appearance[keyPath: buttonKeyPath].fonts.title.underlineColor = underlineColor
         appearance[keyPath: buttonKeyPath].fonts.title.strikethroughColor = strikethroughColor
-        appearance[keyPath: buttonKeyPath].fonts.title.customFont.name = fontName
+        appearance[keyPath: buttonKeyPath].fonts.title.customFont.type = .custom(name: fontName)
         appearance[keyPath: buttonKeyPath].fonts.title.customFont.size = fontSize
 
         appearance[keyPath: buttonKeyPath].icon = icon

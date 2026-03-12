@@ -21,5 +21,6 @@ struct AnimatableCustomFontModifier: AnimatableModifier {
     func body(content: Content) -> some View {
         content
             .font(Font.custom(fontName, size: size))
+
     }
 }

@@ -2,9 +2,7 @@
 //  CardExpiryDateValidatorTests.swift
 //  MobileSDK
 //
-//  Copyright © 2025 Paydock Ltd.
-//  Created by Domagoj Grizelj on 13.01.2025..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 @testable import MobileSDK

@@ -2,9 +2,7 @@
 //  CardPaymentWidget.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 02.10.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -19,14 +17,14 @@ struct CardPaymentWidget: View {
             config: CardDetailsWidgetConfig(
                 gatewayId: nil,
                 accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-                showCardTitle: false,
                 collectCardholderName: false,
                 allowSaveCard: SaveCardConfig(
                     privacyPolicyConfig: SaveCardConfig.PrivacyPolicyConfig(
                         privacyPolicyText: "Read our privacy policy",
                         privacyPolicyURL: "https://www.paydock.com/privacy"
                     )
-                )
+                ),
+                storeSecurityCode: true
             ),
             appearance: getAppearance(),
             loadingDelegate: viewModel,

@@ -2,22 +2,22 @@
 //  PayPalVM.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 25.10.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import NetworkingLib
 import PayPalWebPayments
 import CorePayments
+import DataGateways
+import DataCharges
 
 @MainActor
 class PayPalVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
-    private let payPalVaultService: PayPalVaultService
+    private let chargesService: DataCharges.ChargesService
+    private let gatewayService: DataGateways.GatewayService
     private let config: PayPalWidgetConfig
 
     // MARK: - Properties
@@ -40,16 +40,16 @@ class PayPalVM: ObservableObject {
     init(config: PayPalWidgetConfig,
          viewState: ViewState,
          tokenRequest: @escaping (_ tokenResult: @escaping (Result<WalletTokenResult, WalletTokenError>) -> Void) -> Void,
-         walletService: WalletService = WalletServiceImpl(),
-         payPalVaultService: PayPalVaultService = PayPalVaultServiceImpl(),
+         chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
+         gatewayService: DataGateways.GatewayService = DataGateways.GatewayServiceImpl(),
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
          completion: @escaping (Result<ChargeResponse, PayPalError>) -> Void) {
         self.config = config
         self.viewState = viewState
         self.tokenRequest = tokenRequest
-        self.walletService = walletService
-        self.payPalVaultService = payPalVaultService
+        self.chargesService = chargesService
+        self.gatewayService = gatewayService
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
         self.completion = completion
@@ -64,14 +64,16 @@ class PayPalVM: ObservableObject {
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
-            switch result {
-            case .success(let response):
-                self?.token = response.token
-                self?.initializePayPalSDK()
+            Task {
+                switch result {
+                case .success(let response):
+                    self?.token = response.token
+                    self?.initializePayPalSDK()
 
-            case .failure(let failure):
-                self?.updateLoadingState(isLoading: false)
-                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                case .failure(let failure):
+                    self?.updateLoadingState(isLoading: false)
+                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                }
             }
         }
     }
@@ -112,7 +114,7 @@ class PayPalVM: ObservableObject {
     func getOrderId(token: String) async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await walletService.getCallback(token: token, shipping: false)
+            return try await chargesService.getPayPalCallback(widgetAccessToken: token, requestShipping: config.requestShipping)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             updateLoadingState(isLoading: false)
@@ -128,7 +130,7 @@ class PayPalVM: ObservableObject {
     func getClientId() async -> String? {
         updateLoadingState(isLoading: true)
         do {
-            return try await payPalVaultService.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+            return try await gatewayService.getClientId(gatewayId: config.gatewayId, widgetAccessToken: config.accessToken)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             completion(.failure(.getPayPalClientId(error: errorResponse)))
@@ -152,13 +154,17 @@ class PayPalVM: ObservableObject {
 
         Task {
             do {
-                let charge = try await walletService.captureCharge(
-                    token: token,
+                let walletChargeData = try await chargesService.captureWalletCharge(
+                    widgetAccessToken: token,
                     paymentMethodId: paymentMethodId,
-                    payerId: payerId,
                     refToken: nil)
+                let chargeResponse = ChargeResponse(
+                    status: walletChargeData.status,
+                    amount: walletChargeData.amount,
+                    currency: walletChargeData.currency
+                )
 
-                self.completion(.success(charge))
+                self.completion(.success(chargeResponse))
                 updateLoadingState(isLoading: false)
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
@@ -199,6 +205,14 @@ class PayPalVM: ObservableObject {
             properties: .button(WidgetEventButtonProperties(name: "PayPalCheckoutButton", action: .click)))
         eventDelegate?.widgetEvent(event: event)
     }
+
+    // MARK: - Test Helpers
+
+    #if DEBUG
+    func test_setToken(_ token: String) {
+        self.token = token
+    }
+    #endif
 
     // MARK: - Helpers
 

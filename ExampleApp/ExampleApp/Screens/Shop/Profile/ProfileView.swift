@@ -94,18 +94,22 @@ struct ProfileView: View {
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
                     TextField("First Name", text: $profileManager.profile.firstName)
+                        .accessibilityIdentifier("First Name Field")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
 
                     TextField("Last Name", text: $profileManager.profile.lastName)
+                        .accessibilityIdentifier("Last Name Field")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
 
                 TextField("Email", text: $profileManager.profile.email)
+                    .accessibilityIdentifier("Email Field")
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
 
                 TextField("Phone", text: $profileManager.profile.phone)
+                    .accessibilityIdentifier("Phone Field")
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .keyboardType(.phonePad)
             }
@@ -120,6 +124,7 @@ struct ProfileView: View {
                 alertMessage = "Profile updated successfully!"
                 showAlert = true
             }
+            .accessibilityIdentifier("Save Changes")
             .foregroundColor(.white)
             .font(.system(size: 16, weight: .semibold))
             .frame(height: 44)
@@ -173,6 +178,7 @@ struct ProfileView: View {
                         Button("Unlink Account") {
                             viewModel.unlinkCustomer()
                         }
+                        .accessibilityIdentifier("Unlink Account")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.red)
                         .padding(.top, 8)
@@ -210,6 +216,7 @@ struct ProfileView: View {
                     editingAddress = nil
                     showingAddressWidget = true
                 }
+                .accessibilityIdentifier("Add Address")
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.defaultPrimary)
             }
@@ -233,6 +240,7 @@ struct ProfileView: View {
                         editingAddress = nil
                         showingAddressWidget = true
                     }
+                    .accessibilityIdentifier("Add Your First Address")
                     .foregroundColor(.white)
                     .font(.system(size: 16, weight: .medium))
                     .padding(.horizontal, 20)
@@ -259,6 +267,7 @@ struct ProfileView: View {
                             showAlert = true
                         }
                     )
+                    .accessibilityIdentifier("Saved Address \(address.label)")
                 }
             }
         }

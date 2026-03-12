@@ -9,6 +9,7 @@
 import Combine
 import SwiftUI
 import NetworkingLib
+import DataPaymentSources
 
 @MainActor
 class GiftCardVM: ObservableObject {
@@ -17,7 +18,7 @@ class GiftCardVM: ObservableObject {
 
     let appearance: GiftCardWidgetAppearance
     @Published var giftCardFormManager: GiftCardFormManager
-    private let cardService: CardService
+    private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     private let config: GiftCardWidgetConfig
     var viewState: ViewState
 
@@ -38,7 +39,7 @@ class GiftCardVM: ObservableObject {
     init(appearance: GiftCardWidgetAppearance,
          viewState: ViewState,
          giftCardFormManager: GiftCardFormManager = GiftCardFormManager(),
-         cardService: CardService = CardServiceImpl(),
+         paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
          config: GiftCardWidgetConfig,
          loadingDelegate: WidgetLoadingDelegate?,
          eventDelegate: WidgetEventDelegate?,
@@ -46,31 +47,37 @@ class GiftCardVM: ObservableObject {
         self.appearance = appearance
         self.viewState = viewState
         self.giftCardFormManager = giftCardFormManager
-        self.cardService = cardService
+        self.paymentSourcesService = paymentSourcesService
         self.config = config
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
         self.completion = completion
 
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
+            // Defer to avoid publishing during view updates
+            Task {
+                self?.objectWillChange.send()
+            }
         }
     }
 
     // MARK: - Requests
 
     func tokeniseGiftCard() {
+        giftCardFormManager.revalidateAll()
+        guard giftCardFormManager.isFormValid() else { return }
+
         Task {
             updateLoadingState(isLoading: true)
-            let tokeniseGiftCardReq = TokeniseGiftCardReq(
+            let tokeniseGiftCardReq = CreateGiftCardTokenReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
-                pin: giftCardFormManager.pinText,
+                cardPin: giftCardFormManager.pinText,
                 storePin: config.storePin)
 
             do {
-                let cardToken = try await cardService.createGiftCardToken(
+                let cardToken = try await paymentSourcesService.createGiftCardToken(
                     tokeniseGiftCardReq: tokeniseGiftCardReq,
-                    accessToken: config.accessToken)
+                    widgetAccessToken: config.accessToken)
                 updateLoadingState(isLoading: false)
                 completion(.success(GiftCardResult(token: cardToken)))
 

@@ -81,4 +81,12 @@ struct Constants {
     static var payPalCallbackHost: String {
         return "paydock.com"
     }
+
+    static var zipCallbackHost: String {
+        return "paydock.com"
+    }
+
+    static var zipRedirectUrl: String {
+        return "https://paydock.com/zip/response"
+    }
 }

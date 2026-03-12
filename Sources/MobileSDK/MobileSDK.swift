@@ -9,6 +9,7 @@
 import Foundation
 import PassKit
 import NetworkingLib
+import BinProcessing
 
 public class MobileSDK {
 
@@ -31,6 +32,8 @@ public class MobileSDK {
         self.config = config
         // Once we have setup our config, we are able to setup our networking based on the environment
         setupNetworkLayer()
+        BinProcessing.startBinDataRefreshCoordinator()
+        BinProcessing.triggerBinDataRefreshAtSDKInit()
     }
 
     private func setupNetworkLayer() {

@@ -2,33 +2,30 @@
 //  WidgetsView.swift
 //  ExampleApp
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 05.07.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
 struct WidgetsView: View {
-
-    @StateObject private var viewModel = WidgetsVM()
 
     init() {
         styleNavigation()
     }
 
     let widgetItems: [WidgetItem] = [
-        WidgetItem(destination: AnyView(CardDetailsWidgetView()), title: "Card Details", subtitle: "Tokenise card details"),
-        WidgetItem(destination: AnyView(AddressWidgetView()), title: "Address", subtitle: "Capture customer address form"),
-        WidgetItem(destination: AnyView(ApplePayWidgetView()), title: "Apple Pay", subtitle: "Standalone Apple Pay flow"),
-        WidgetItem(destination: AnyView(PayPalWidgetView()), title: "PayPal", subtitle: "Standalone PayPal button"),
-        WidgetItem(destination: AnyView(GiftCardWidgetView()), title: "Gift Card", subtitle: "Standalone Gift Card form"),
-        WidgetItem(destination: AnyView(Integrated3DSWidgetView()), title: "Integrated 3DS", subtitle: "Integrated 3DS widget"),
-        WidgetItem(destination: AnyView(Standalone3DSWidgetView()), title: "Standalone 3DS", subtitle: "Standalone 3DS widget"),
-        WidgetItem(destination: AnyView(ColesPayWidgetView()), title: "Coles Pay", subtitle: "Standalone Coles Pay widget"),
-        WidgetItem(destination: AnyView(AfterpayWidgetView()), title: "Afterpay", subtitle: "Standalone Afterpay widget"),
-        WidgetItem(destination: AnyView(ClickToPayWidgetView()), title: "Click to Pay", subtitle: "ClickToPay flow"),
+        WidgetItem(destination: AnyView(CardDetailsExampleView()), title: "Card Details", subtitle: "Tokenise card details"),
+        WidgetItem(destination: AnyView(AddressExampleView()), title: "Address", subtitle: "Capture customer address form"),
+        WidgetItem(destination: AnyView(ApplePayExampleView()), title: "Apple Pay", subtitle: "Standalone Apple Pay flow"),
+        WidgetItem(destination: AnyView(PayPalExampleView()), title: "PayPal", subtitle: "Standalone PayPal button"),
+        WidgetItem(destination: AnyView(GiftCardExampleView()), title: "Gift Card", subtitle: "Standalone Gift Card form"),
+        WidgetItem(destination: AnyView(MPGS3dsExampleView()), title: "MPGS 3DS", subtitle: "MPGS Integrated 3DS widget"),
+        WidgetItem(destination: AnyView(Standalone3DSExampleView()), title: "Standalone 3DS", subtitle: "Standalone 3DS widget"),
+        WidgetItem(destination: AnyView(ColesPayExampleView()), title: "Coles Pay", subtitle: "Standalone Coles Pay widget"),
+        WidgetItem(destination: AnyView(AfterpayExampleView()), title: "Afterpay", subtitle: "Standalone Afterpay widget"),
+        WidgetItem(destination: AnyView(ClickToPayExampleView()), title: "Click to Pay", subtitle: "ClickToPay flow"),
         WidgetItem(destination:
-                    AnyView(PayPalVaultWidgetView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout")
+                    AnyView(PayPalVaultExampleView()), title: "PayPal Vault", subtitle: "Link your PayPal account for faster checkout"),
+        WidgetItem(destination: AnyView(ZipExampleView()), title: "Zip", subtitle: "Standalone Zip payment button")
     ].sorted { $0.title < $1.title }
 
     var body: some View {

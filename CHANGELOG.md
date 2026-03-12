@@ -1,5 +1,26 @@
 # Changelog
 
+## [4.3.0] - 2026-03-13
+
+### Added
+
+- Implemented 'ZipWidget' for Zip Money support
+- Disabled state alpha configurable for button appearance
+- Added config page to sample app
+
+### Changed
+
+- Updated bin processing for 'CardDetailsWidget'
+- Updated form validations for 'CardDetailsWidget' and 'GiftCardWidget'
+- Security code and Pin code entry in 'CardDetailsWidget' and 'GiftCardWidget' now use secure Textfields
+- Saving of CVV now configurable for 'CardDetailsWidget'
+- Removed title field for `CardDetailsWidget`
+- Removed legacy "Solo" and "AUSBC" from supported card schemes for 'CardDetailsWidget'
+- Removde autocorrect for cardholder name for 'CardDetailsWidget'
+- Updated Amex card scheme icon for 'CardDetailsWidget'
+- Font for widgets now defaults to system font
+- Improved NSError mappings to readable strings
+
 ## [4.2.1] - 2026-02-06
 
 ### Fixed

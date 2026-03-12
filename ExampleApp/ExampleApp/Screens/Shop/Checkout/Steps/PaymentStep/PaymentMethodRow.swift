@@ -35,5 +35,6 @@ struct PaymentMethodRow: View {
             .background(Color(.systemGroupedBackground))
             .cornerRadius(8)
         }
+        .accessibilityIdentifier(method.displayName)
     }
 }

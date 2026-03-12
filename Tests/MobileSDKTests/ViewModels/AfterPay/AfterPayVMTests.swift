@@ -11,13 +11,14 @@ import Combine
 import Afterpay
 @testable import MobileSDK
 @testable import NetworkingLib
+@testable import DataCharges
 
 @MainActor
 // swiftlint:disable file_length
 class AfterPayVMTests: XCTestCase {
 
     var viewModel: AfterpayVM!
-    var mockWalletService: WalletServiceMock!
+    var mockChargesService: ChargesMockService!
     var viewState: ViewState!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
@@ -28,19 +29,12 @@ class AfterPayVMTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mockWalletService = WalletServiceMock()
+        mockChargesService = ChargesMockService()
         viewState = ViewState()
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
 
         // Create test configuration
-        let afterpayConfig = AfterpaySdkConfig.AfterpayConfiguration(
-            minimumAmount: "10.00",
-            maximumAmount: "1000.00",
-            currency: "AUD",
-            language: "en_AU",
-            country: "AU"
-        )
         let checkoutOptions = AfterpaySdkConfig.CheckoutOptions(
             pickup: false,
             buyNow: true,
@@ -48,7 +42,6 @@ class AfterPayVMTests: XCTestCase {
             enableSingleShippingOptionUpdate: true
         )
         configuration = AfterpaySdkConfig(
-            config: afterpayConfig,
             environment: .sandbox,
             options: checkoutOptions
         )
@@ -70,7 +63,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectShippingOption: {_, _ in
             },
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -81,7 +74,7 @@ class AfterPayVMTests: XCTestCase {
 
     override func tearDown() {
         viewModel = nil
-        mockWalletService = nil
+        mockChargesService = nil
         viewState = nil
         loadingDelegate = nil
         eventDelegate = nil
@@ -112,7 +105,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -132,7 +125,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -152,7 +145,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,
             completion: { result in
@@ -184,7 +177,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: nil,
             eventDelegate: nil,
             completion: { result in
@@ -223,7 +216,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -256,55 +249,63 @@ class AfterPayVMTests: XCTestCase {
 
     func testHandleButtonTapWithFailedTokenRequest() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: "Token error"))
 
         // When
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        switch completionResult {
-        case .failure(let error):
-            switch error {
-            case .initialisingWalletToken(let reason):
-                XCTAssertEqual(reason, "Token error")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            switch self.completionResult {
+            case .failure(let error):
+                switch error {
+                case .initialisingWalletToken(let reason):
+                    XCTAssertEqual(reason, "Token error")
+                default:
+                    XCTFail("Expected initialisingWalletToken error")
+                }
             default:
-                XCTFail("Expected initialisingWalletToken error")
+                XCTFail("Expected failure result")
             }
-        default:
-            XCTFail("Expected failure result")
+            expectation.fulfill()
         }
+
+        wait(for: [expectation], timeout: 1.0)
     }
 
     func testHandleButtonTapWithNilTokenRequestReason() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: nil))
 
         // When
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        switch completionResult {
-        case .failure(let error):
-            switch error {
-            case .initialisingWalletToken(let reason):
-                XCTAssertEqual(reason, "An unexpected error occurred while retrieving token.")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            switch self.completionResult {
+            case .failure(let error):
+                switch error {
+                case .initialisingWalletToken(let reason):
+                    XCTAssertEqual(reason, "An unexpected error occurred while retrieving token.")
+                default:
+                    XCTFail("Expected initialisingWalletToken error")
+                }
             default:
-                XCTFail("Expected initialisingWalletToken error")
+                XCTFail("Expected failure result")
             }
-        default:
-            XCTFail("Expected failure result")
+            expectation.fulfill()
         }
+
+        wait(for: [expectation], timeout: 1.0)
     }
 
     // MARK: - Configuration Tests
 
     func testConfigurationIsProperlySet() {
-        XCTAssertEqual(viewModel.configuration.config.currency, "AUD")
-        XCTAssertEqual(viewModel.configuration.config.country, "AU")
-        XCTAssertEqual(viewModel.configuration.config.maximumAmount, "1000.00")
-        XCTAssertEqual(viewModel.configuration.config.minimumAmount, "10.00")
         XCTAssertEqual(viewModel.configuration.options.buyNow, true)
         XCTAssertEqual(viewModel.configuration.options.pickup, false)
     }
@@ -330,33 +331,45 @@ class AfterPayVMTests: XCTestCase {
 
     func testErrorRecoveryAfterFailedTokenRequest() {
         // Given - Initial failure
+        let firstExpectation = self.expectation(description: "First completion handler called")
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: "Initial error"))
         viewModel.handleButtonTap()
 
-        let initialError = completionResult
+        // Wait for first completion
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let initialError = self.completionResult
+            XCTAssertNotNil(initialError)
+            switch initialError {
+            case .failure:
+                XCTAssertTrue(true) // Expected initial failure
+            default:
+                XCTFail("Expected initial failure")
+            }
+            firstExpectation.fulfill()
+        }
+
+        wait(for: [firstExpectation], timeout: 1.0)
 
         // When - Retry with success
+        let secondExpectation = self.expectation(description: "Second completion handler called")
         completionResult = nil
         tokenRequestResult = .success(WalletTokenResult(token: "recovery_token"))
         viewModel.handleButtonTap()
 
-        // Then
-        XCTAssertNotNil(initialError)
-        switch initialError {
-        case .failure:
-            XCTAssertTrue(true) // Expected initial failure
-        default:
-            XCTFail("Expected initial failure")
+        // Then - Should be in loading state for successful retry
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertTrue(self.loadingDelegate.isLoading)
+            secondExpectation.fulfill()
         }
 
-        // Should be in loading state for successful retry
-        XCTAssertTrue(loadingDelegate.isLoading)
+        wait(for: [secondExpectation], timeout: 1.0)
     }
 
     // MARK: - Error Propagation Tests
 
     func testCompletionHandlerReceivesTokenInitializationError() {
         // Given
+        let expectation = self.expectation(description: "Completion handler called")
         let expectedReason = "Token initialization failed"
         tokenRequestResult = .failure(WalletTokenError.initialisingWalletToken(reason: expectedReason))
 
@@ -364,33 +377,36 @@ class AfterPayVMTests: XCTestCase {
         viewModel.handleButtonTap()
 
         // Then
-        XCTAssertNotNil(completionResult)
-        guard case .failure(let error) = completionResult else {
-            XCTFail("Expected failure result")
-            return
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertNotNil(self.completionResult)
+            guard case .failure(let error) = self.completionResult else {
+                XCTFail("Expected failure result")
+                return
+            }
+
+            guard case .initialisingWalletToken(let actualReason) = error else {
+                XCTFail("Expected initialisingWalletToken error, got \(error)")
+                return
+            }
+
+            XCTAssertEqual(actualReason, expectedReason)
+            XCTAssertFalse(self.loadingDelegate.isLoading, "Loading should be stopped after error")
+            expectation.fulfill()
         }
 
-        guard case .initialisingWalletToken(let actualReason) = error else {
-            XCTFail("Expected initialisingWalletToken error, got \(error)")
-            return
-        }
-
-        XCTAssertEqual(actualReason, expectedReason)
-        XCTAssertFalse(loadingDelegate.isLoading, "Loading should be stopped after error")
+        wait(for: [expectation], timeout: 1.0)
     }
 
-    func testCompletionHandlerReceivesWalletServiceCaptureChargeError() {
+    func testCompletionHandlerReceivesChargesServiceCaptureChargeError() {
         // Given
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Charge failed", code: "CHARGE_ERROR"),
+            error: .init(message: "Charge failed", code: "CHARGE_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
         let expectedError = AfterpayError.errorCapturingCharge(error: errorRes)
-        mockWalletService.shouldReturnError = true
-        mockWalletService.errorToReturn = expectedError
 
         // When
         viewModel.handleButtonTap()
@@ -419,13 +435,11 @@ class AfterPayVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "URL fetch failed", code: "URL_ERROR"),
+            error: .init(message: "URL fetch failed", code: "URL_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
         let expectedError = AfterpayError.errorFetchingAfterpayUrl(error: errorRes)
-        mockWalletService.shouldReturnError = true
-        mockWalletService.errorToReturn = expectedError
 
         // When
         viewModel.handleButtonTap()
@@ -454,7 +468,7 @@ class AfterPayVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 500,
-            error: ErrorRes.ErrorObj(message: "Unknown network error", code: "UNKNOWN_ERROR"),
+            error: .init(message: "Unknown network error", code: "UNKNOWN_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
@@ -516,13 +530,11 @@ class AfterPayVMTests: XCTestCase {
         tokenRequestResult = .success(WalletTokenResult(token: "test_token"))
         let errorRes = ErrorRes(
             status: 400,
-            error: ErrorRes.ErrorObj(message: "Cancel failed", code: "CANCEL_ERROR"),
+            error: .init(message: "Cancel failed", code: "CANCEL_ERROR", details: nil),
             resource: nil,
             errorSummary: nil
         )
         let expectedError = AfterpayError.errorCancelingTransaction(error: errorRes)
-        mockWalletService.shouldReturnError = true
-        mockWalletService.errorToReturn = expectedError
 
         // When
         viewModel.handleButtonTap()
@@ -544,7 +556,7 @@ class AfterPayVMTests: XCTestCase {
 
         XCTAssertEqual(actualErrorRes.error?.message, "Cancel failed")
         XCTAssertEqual(actualErrorRes.status, 400)
-        XCTAssertEqual(error.customMessage, "Unable to cancel transaction")
+        XCTAssertEqual(error.customMessage, "Cancel failed")
     }
 
     // MARK: - Success Case Tests
@@ -581,7 +593,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { _ in
@@ -610,7 +622,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: eventDelegate,
             completion: { result in
@@ -644,7 +656,7 @@ class AfterPayVMTests: XCTestCase {
             },
             selectAddress: nil,
             selectShippingOption: nil,
-            walletService: mockWalletService,
+            chargesService: mockChargesService,
             loadingDelegate: loadingDelegate,
             eventDelegate: nil,
             completion: { result in

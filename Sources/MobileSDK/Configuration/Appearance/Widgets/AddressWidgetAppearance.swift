@@ -2,9 +2,7 @@
 //  AddressWidgetAppearance.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 18.04.2025..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import SwiftUI
@@ -26,14 +24,12 @@ public struct AddressWidgetAppearance:
     public var expandSectionButton: Theme.ButtonAppearance
     public var searchDropdown: Theme.SearchDropdownAppearance
 
-    public init(horizontalSpacing: CGFloat = 16,
-                verticalSpacing: CGFloat = 16,
-                textFieldSpacing: CGFloat = 8,
+    public init(horizontalSpacing: CGFloat = GlobalTheme.shared.globalTheme.horizontalSpacing,
+                verticalSpacing: CGFloat = GlobalTheme.shared.globalTheme.verticalSpacing,
+                textFieldSpacing: CGFloat = GlobalTheme.shared.globalTheme.textFieldVerticalSpacing,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textfield: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                primaryButton: Theme.ButtonAppearance = .init(
-                    icon: Image(systemName: "plus.circle"),
-                    text: "Add"),
+                primaryButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
                 linkButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.expandSectionButton,
                 searchDropdown: Theme.SearchDropdownAppearance = GlobalTheme.shared.globalTheme.searchDropdown) {
         self.horizontalSpacing = horizontalSpacing
@@ -41,8 +37,12 @@ public struct AddressWidgetAppearance:
         self.textFieldVerticalSpacing = textFieldSpacing
         self.title = title
         self.textField = textfield
-        self.actionButton = primaryButton
         self.expandSectionButton = linkButton
         self.searchDropdown = searchDropdown
+
+        // Custom
+        self.actionButton = primaryButton
+        self.actionButton.icon = Image(systemName: "plus.circle")
+        self.actionButton.text = "Add"
     }
 }

@@ -2,9 +2,7 @@
 //  StyleThemeManager.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 09.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import Foundation
 import MobileSDK
@@ -67,8 +65,9 @@ class StyleThemeManager {
         case .afterPay: newAppearance = AfterpayWidgetAppearance()
         case .clickToPay: newAppearance = ClickToPayWidgetAppearance()
         case .applePay: newAppearance = ApplePayWidgetAppearance()
-        case .integrated3ds: newAppearance = ThreeDSWidgetAppearance()
+        case .mpgs3ds: newAppearance = ThreeDSWidgetAppearance()
         case .standalone3ds: newAppearance = ThreeDSWidgetAppearance()
+        case .zip: newAppearance = ZipWidgetAppearance()
         }
 
         setAppearance(newAppearance, for: widget, isDarkMode: isDarkMode)

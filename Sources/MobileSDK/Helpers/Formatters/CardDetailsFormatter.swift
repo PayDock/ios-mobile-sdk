@@ -10,29 +10,76 @@ import Foundation
 
 class CardDetailsFormatter {
 
+    // MARK: - Card Number Spacing Patterns
+
+    /// Space positions for different card schemes (digit count after which to insert space)
+    enum CardSpacingPattern {
+        case standard   // 4-4-4-4-3: spaces after digits 4, 8, 12, 16
+        case amex       // 4-6-5: spaces after digits 4, 10
+        case diners     // 4-6-4: spaces after digits 4, 10
+
+        var spaceAfterDigits: Set<Int> {
+            switch self {
+            case .standard: return [4, 8, 12, 16]
+            case .amex: return [4, 10]
+            case .diners: return [4, 10]
+            }
+        }
+    }
+
     // MARK: - Bank Card
 
-    func formatCardNumber(updatedText: String, cursorPosition: Int) -> (formattedText: String, newCursorPosition: Int) {
+    func formatCardNumber(
+        updatedText: String,
+        cursorPosition: Int,
+        maxDigits: Int,
+        spacingPattern: CardSpacingPattern = .standard
+    ) -> (formattedText: String, newCursorPosition: Int) {
+        let spacePositions = spacingPattern.spaceAfterDigits
+
+        // First, calculate cursor position in terms of digit count (ignoring spaces)
+        var digitCountBeforeCursor = 0
+        var charIndex = 0
+        for char in updatedText {
+            if charIndex >= cursorPosition {
+                break
+            }
+            if char.isASCII && char.isNumber {
+                digitCountBeforeCursor += 1
+            }
+            charIndex += 1
+        }
+
+        // Now build the formatted string
         var groomed = ""
-        var newCursorPosition = cursorPosition
-        var originalIndex = 0
+        var digitCount = 0
 
         for char in updatedText {
-            if char == " " && (groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19) {
-                groomed.append(char)
-            } else if char.isASCII && char.isNumber {
-                if groomed.count == 4 || groomed.count == 9 || groomed.count == 14 || groomed.count == 19 {
+            // Stop if we've reached max digits
+            if digitCount >= maxDigits {
+                break
+            }
+
+            if char.isASCII && char.isNumber {
+                // Insert space if we've reached a space position
+                if spacePositions.contains(digitCount) && digitCount > 0 {
                     groomed.append(" ")
-                    // If cursor was at or after this position, adjust it
-                    if originalIndex < cursorPosition {
-                        newCursorPosition += 1
-                    }
                 }
                 groomed.append(char)
+                digitCount += 1
             }
-            originalIndex += 1
-            if groomed.count == 23 {
+        }
+
+        // Calculate new cursor position based on digit count before cursor
+        var newCursorPosition = 0
+        var digitsEncountered = 0
+        for char in groomed {
+            if digitsEncountered >= digitCountBeforeCursor {
                 break
+            }
+            newCursorPosition += 1
+            if char.isNumber {
+                digitsEncountered += 1
             }
         }
 

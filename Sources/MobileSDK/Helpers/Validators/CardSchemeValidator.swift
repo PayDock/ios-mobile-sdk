@@ -2,33 +2,23 @@
 //  CardIssuerValidator.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 15.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
+import BinProcessing
 
 /**
- A utility object for detecting card schemes based on card numbers
+ A utility object for detecting card schemes based on card numbers.
+ Uses the BinProcessing package for BIN lookup (card-schemes.json).
  */
 class CardSchemeValidator {
 
-    private let jsonLoader: JSONLoader
-    private var binSchemas: [BinSchemaRes.BinSchema]
-    private var lastResult: LastBINResult?
+    private let binDetector: CardSchemeDetector
 
     // MARK: - Initialization
 
-    init(jsonLoader: JSONLoader = JSONLoader()) {
-        self.jsonLoader = jsonLoader
-        self.binSchemas = []
-        loadLocalBinSchema()
-    }
-
-    // MARK: - Data Loading
-
-    private func loadLocalBinSchema() {
-        binSchemas = jsonLoader.loadJSON(filename: "card-schemes", type: BinSchemaRes.self).cardSchemas
+    init(binDetector: CardSchemeDetector) {
+        self.binDetector = binDetector
     }
 
     /// Validates card PAN number using Luhn's algorithm.
@@ -73,65 +63,55 @@ class CardSchemeValidator {
     }
 
     func getCardSchemeFromBIN(cardNumber: String) -> CardScheme? {
-        let cleanNumber = cardNumber.filter { !$0.isWhitespace }
-
-        if let cachedSchema = lastResult, cachedSchema.cardNumber == cleanNumber {
-            return CardScheme(rawValue: cachedSchema.resolvedScheme ?? "")
-        }
-
-        for schema in binSchemas {
-            let binParts = schema.bin.split(separator: "~")
-
-            if binParts.count == 1 {
-                // Exact match
-                if cleanNumber.starts(with: String(binParts[0])) {
-                    lastResult = LastBINResult(cardNumber: cleanNumber, resolvedScheme: schema.schema)
-                    return CardScheme(rawValue: schema.schema)
-                }
-            } else if binParts.count == 2 {
-                // Range match
-                guard let lowerBound = Int(binParts[0]),
-                      let upperBound = Int(binParts[1]),
-                      let cardPrefix = Int(String(cleanNumber.prefix(binParts[0].count))) else { continue }
-
-                if cardPrefix >= lowerBound && cardPrefix <= upperBound {
-                    lastResult = LastBINResult(cardNumber: cleanNumber, resolvedScheme: schema.schema)
-                    return CardScheme(rawValue: schema.schema)
-                }
-            }
-        }
-        return nil
+        guard let result = binDetector.detectScheme(pan: cardNumber) else { return nil }
+        return CardScheme(rawValue: result.scheme)
     }
 
     // MARK: - Card number length
 
     func isCardNumberLengthValid(number: String, scheme: CardScheme?) -> Bool {
-        guard let scheme = scheme, let regex = cardLengthRegex(for: scheme) else { return false }
-        let cleanNumber = number.filter { !$0.isWhitespace }
-
-        let range = NSRange(location: 0, length: cleanNumber.utf16.count)
-        let matches = regex.matches(in: cleanNumber, options: [], range: range)
-
-        return !matches.isEmpty
+        guard let scheme = scheme else { return false }
+        return isDigitCountInValidRange(number: number, scheme: scheme)
     }
 
     func isUnknownCardNumberLengthValid(number: String) -> Bool {
-        let cleanNumber = number.filter { !$0.isWhitespace }
-        return cleanNumber.count >= 12 && cleanNumber.count <= 19
+        return isDigitCountInValidRange(number: number, scheme: nil)
     }
 
-    private func cardLengthRegex(for scheme: CardScheme) -> NSRegularExpression? {
+    // MARK: - Digit range helpers
+
+    /// Get minimum and maximum digit lengths for a card scheme
+    /// - Parameter scheme: The card scheme, or nil for unknown schemes
+    /// - Returns: A tuple with (min, max) digit lengths. Defaults to (12, 19) for unknown schemes.
+    func digitRange(for scheme: CardScheme?) -> (min: Int, max: Int) {
+        guard let scheme = scheme else { return (12, 19) }
         switch scheme {
-        case .amex: return try? NSRegularExpression(pattern: "^\\d{15}$")
-        case .diners: return try? NSRegularExpression(pattern: "^\\d{14}$")
-        case .visa, .discover, .unionpay: return try? NSRegularExpression(pattern: "^\\d{16,19}$")
-        case .mastercard, .japcb: return try? NSRegularExpression(pattern: "^\\d{16}$")
-        case .solo, .ausbc: return try? NSRegularExpression(pattern: "^\\d{12,19}$")
+        case .amex: return (15, 15)
+        case .diners: return (14, 14)
+        case .visa, .discover, .unionpay: return (16, 19)
+        case .mastercard, .japcb: return (16, 16)
         }
     }
 
-    struct LastBINResult {
-        var cardNumber: String
-        var resolvedScheme: String?
+    /// Check if digit count is within valid range for scheme
+    /// - Parameters:
+    ///   - number: The card number string (may contain whitespace or other characters)
+    ///   - scheme: The detected card scheme, or nil for unknown schemes
+    /// - Returns: true if digit count is within the valid range for the scheme
+    func isDigitCountInValidRange(number: String, scheme: CardScheme?) -> Bool {
+        let digitCount = number.filter { $0.isNumber }.count
+        let range = digitRange(for: scheme)
+        return digitCount >= range.min && digitCount <= range.max
+    }
+
+    /// Check if digit count meets minimum for scheme
+    /// - Parameters:
+    ///   - number: The card number string (may contain whitespace or other characters)
+    ///   - scheme: The detected card scheme, or nil for unknown schemes
+    /// - Returns: true if digit count meets or exceeds the minimum for the scheme
+    func hasMinimumDigits(number: String, scheme: CardScheme?) -> Bool {
+        let digitCount = number.filter { $0.isNumber }.count
+        let range = digitRange(for: scheme)
+        return digitCount >= range.min
     }
 }

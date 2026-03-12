@@ -18,27 +18,6 @@ extension View {
         self.modifier(CustomPaddingModifier(padding: padding))
     }
 
-    @ViewBuilder
-    func onConditionalKeyPress(key: KeyEquivalent, action: @escaping () -> Void) -> some View {
-        if #available(iOS 17.0, *) {
-            self.onKeyPress(.tab, action: {
-                action()
-                return .handled
-            })
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
-    func conditionalFocusable() -> some View {
-        if #available(iOS 17.0, *) {
-            self.focusable()
-        } else {
-            self
-        }
-    }
-
     func interactiveDismiss(canDismissSheet: Bool, onDismissalAttempt: (() -> Void)? = nil) -> some View {
         DismissDetectingView(
             view: self,

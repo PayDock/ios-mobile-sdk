@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "ios-core-networking",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PayDock/ios-core-networking",
+      "state" : {
+        "revision" : "07703d8c6c3739455405a18cb2d0a7ab6d227917",
+        "version" : "1.2.1"
+      }
+    }
+  ],
+  "version" : 2
+}

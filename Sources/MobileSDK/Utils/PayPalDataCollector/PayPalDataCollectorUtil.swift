@@ -10,6 +10,7 @@ import CorePayments
 import FraudProtection
 import NetworkingLib
 import Foundation
+import DataGateways
 
 public class PayPalDataCollectorUtil {
 
@@ -26,13 +27,15 @@ public class PayPalDataCollectorUtil {
     }
 
     public static func initialise(config: PayPalDataCollectorConfig) async throws -> PayPalDataCollectorUtil {
-        return try await initialise(config: config, service: PayPalVaultServiceImpl())
+        return try await initialise(config: config, service: DataGateways.GatewayServiceImpl())
     }
 
-    static func initialise(config: PayPalDataCollectorConfig,
-                           service: PayPalVaultService = PayPalVaultServiceImpl()) async throws -> PayPalDataCollectorUtil {
+    static func initialise(
+        config: PayPalDataCollectorConfig,
+        service: DataGateways.GatewayService = DataGateways.GatewayServiceImpl()
+    ) async throws -> PayPalDataCollectorUtil {
         do {
-            let clientId = try await service.getClientId(gatewayId: config.gatewayId, accessToken: config.accessToken)
+            let clientId = try await service.getClientId(gatewayId: config.gatewayId, widgetAccessToken: config.accessToken)
             return PayPalDataCollectorUtil(config: config, clientId: clientId)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             throw PayPalDataCollectorError.initialisationClientId(error: errorResponse)

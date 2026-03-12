@@ -12,7 +12,6 @@ public struct GiftCardWidget: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     @StateObject private var viewModel: GiftCardVM
     @FocusState private var textFieldInFocus: GiftCardFormManager.GiftCardFocusable?
-    @FocusState private var isViewFocused: Bool
 
     public init(viewState: ViewState? = nil,
                 config: GiftCardWidgetConfig,
@@ -44,7 +43,6 @@ public struct GiftCardWidget: View {
                     }
                     primaryButton
                         .accessibilityHint("Saves a gift card.")
-                    emptyFocusView
                 }
             }
             .padding(.horizontal, viewModel.appearance.horizontalSpacing)
@@ -75,17 +73,13 @@ public struct GiftCardWidget: View {
         )
         .customToolbar(
             buttonTitle: "Next",
-            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                          size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
             textFieldInFocus = .pin
             viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .pin
-            viewModel.giftCardFormManager.setEditingTextField(focusedField: .pin)
-        })
         .focused($textFieldInFocus, equals: .cardNumber)
     }
 
@@ -100,6 +94,7 @@ public struct GiftCardWidget: View {
             valid: $viewModel.giftCardFormManager.pinValid,
             disabled: $viewModel.viewState.isDisabled,
             keyboardType: .numberPad,
+            isSecureTextEntry: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .pin
@@ -111,7 +106,7 @@ public struct GiftCardWidget: View {
             })
         .customToolbar(
             buttonTitle: "Done",
-            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.name,
+            font: UIFont(name: viewModel.appearance.toolbarButton.fonts.title.customFont.fontName,
                          size: viewModel.appearance.toolbarButton.fonts.title.customFont.size),
             textColor: UIColor(viewModel.appearance.toolbarButton.colors.text)
         ) {
@@ -122,10 +117,6 @@ public struct GiftCardWidget: View {
             textFieldInFocus = nil
             viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
         }
-        .onConditionalKeyPress(key: .tab, action: {
-            textFieldInFocus = .cardNumber
-            viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
-        })
         .focused($textFieldInFocus, equals: .pin)
         .frame(width: shouldAlignVertically() ?
                UIScreen.main.bounds.width - viewModel.appearance.horizontalSpacing * 2 :
@@ -140,6 +131,8 @@ public struct GiftCardWidget: View {
                 appearance: viewModel.appearance.actionButton,
                 isDisabled: viewModel.isActionButtonDisabled())),
             shouldTemplate: true) {
+                textFieldInFocus = nil
+                viewModel.giftCardFormManager.setEditingTextField(focusedField: nil)
                 viewModel.giftCardFormManager.endEditing()
                 viewModel.tokeniseGiftCard()
                 viewModel.handleButtonTapAnalytics()
@@ -148,19 +141,6 @@ public struct GiftCardWidget: View {
             .padding(.leading, viewModel.appearance.actionButton.dimensions.padding.leading)
             .padding(.bottom, viewModel.appearance.actionButton.dimensions.padding.bottom)
             .padding(.trailing, viewModel.appearance.actionButton.dimensions.padding.trailing)
-    }
-
-    private var emptyFocusView: some View {
-        VStack {}
-            .conditionalFocusable()
-            .focused($isViewFocused)
-            .onConditionalKeyPress(key: .tab, action: {
-                textFieldInFocus = .cardNumber
-                viewModel.giftCardFormManager.setEditingTextField(focusedField: .cardNumber)
-            })
-            .onAppear {
-                isViewFocused = true
-            }
     }
 
     private func shouldAlignVertically() -> Bool {

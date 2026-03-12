@@ -39,6 +39,7 @@ struct ProductListView: View {
                             ) {
                                 cartManager.addToCart(product: product)
                             }
+                            .accessibilityIdentifier("Product Card \(product.name)")
                         }
                     }
                     .padding(.horizontal, 16)
@@ -72,12 +73,14 @@ struct ProductListView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier("Cart Button")
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: ProfileView()) {
                         Image(systemName: "person.circle")
                             .font(.system(size: 20))
                     }
+                    .accessibilityIdentifier("Profile Button")
                 }
             }
             .sheet(isPresented: $showingCart) {
@@ -98,6 +101,7 @@ struct ProductListView: View {
                 ) {
                     selectedCategory = nil
                 }
+                .accessibilityIdentifier("Category Filter All")
 
                 ForEach(ProductCategory.allCases, id: \.self) { category in
                     CategoryChip(
@@ -106,6 +110,7 @@ struct ProductListView: View {
                     ) {
                         selectedCategory = category
                     }
+                    .accessibilityIdentifier("Category Filter \(category.displayName)")
                 }
             }
             .padding(.horizontal, 16)

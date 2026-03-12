@@ -16,19 +16,23 @@ struct CustomToggleStyle: ToggleStyle {
         HStack {
             configuration.label
             Spacer()
-            RoundedRectangle(cornerRadius: 16)
-                .fill(configuration.isOn ? appearance.activeColor : (appearance.inactiveColor ?? .clear))
-                .frame(width: 51, height: 31)
-                .overlay(
-                    Circle()
-                        .fill(appearance.toggleColor ?? .clear)
-                        .frame(width: 27, height: 27)
-                        .offset(x: configuration.isOn ? 10 : -10)
-                        .animation(.easeInOut(duration: 0.2), value: configuration.isOn)
-                )
-        }
-        .onTapGesture {
-            configuration.isOn.toggle()
+            Button {
+                configuration.isOn.toggle()
+            } label: {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(configuration.isOn ? appearance.activeColor : (appearance.inactiveColor ?? .clear))
+                    .frame(width: 51, height: 31)
+                    .overlay(
+                        Circle()
+                            .fill(appearance.toggleColor ?? .clear)
+                            .frame(width: 27, height: 27)
+                            .offset(x: configuration.isOn ? 10 : -10)
+                            .animation(.easeInOut(duration: 0.2), value: configuration.isOn)
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityValue(configuration.isOn ? "On" : "Off")
         }
     }
 }

@@ -19,7 +19,10 @@ struct ResetConfirmationModifier: ViewModifier {
                 Button("Yes", role: .destructive) {
                     onConfirm()
                 }
+                .accessibilityIdentifier("Alert_Button_Yes_ResetToDefaults")
+
                 Button("No", role: .cancel) {}
+                    .accessibilityIdentifier("Alert_Button_No_ResetToDefaults")
             } message: {
                 Text("Are you sure you want to reset your settings to their original values?")
             }

@@ -47,5 +47,6 @@ struct SavedAddressSelectionView: View {
             }
             .padding(.vertical, 8)
         }
+        .accessibilityIdentifier("Save address selection")
     }
 }

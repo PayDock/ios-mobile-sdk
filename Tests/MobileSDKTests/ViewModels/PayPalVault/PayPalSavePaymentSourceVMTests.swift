@@ -2,198 +2,165 @@
 //  PayPalSavePaymentSourceVMTests.swift
 //  MobileSDK
 //
+//  Created by Domagoj Grizelj on 11.12.2025..
 //  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 30.10.2024..
 //
 
 import XCTest
 import Combine
 @testable import MobileSDK
+@testable import NetworkingLib
+@testable import DataPaymentSources
+@testable import DataGateways
 
 @MainActor
+// swiftlint:disable file_length
 class PayPalSavePaymentSourceVMTests: XCTestCase {
 
+    // MARK: - Properties
+
     var viewModel: PayPalSavePaymentSourceVM!
-    var mockService: PayPalVaultServiceMock!
+    var mockPaymentSourcesService: PaymentSourcesMockService!
+    var mockGatewayService: GatewayMockService!
     var viewState: ViewState!
-    var config: PayPalVaultConfig!
     var loadingDelegate: WidgetLoadingDelegateUtil!
     var eventDelegate: WidgetEventDelegateUtil!
+    var config: PayPalVaultConfig!
     var completionResult: Result<PayPalVaultResult, PayPalVaultError>?
     var cancellables = Set<AnyCancellable>()
 
+    // MARK: - Setup & Teardown
+
     override func setUp() {
         super.setUp()
-        mockService = PayPalVaultServiceMock()
+        mockPaymentSourcesService = PaymentSourcesMockService()
+        mockGatewayService = GatewayMockService()
         viewState = ViewState()
-        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway")
         loadingDelegate = WidgetLoadingDelegateUtil()
         eventDelegate = WidgetEventDelegateUtil()
+        config = PayPalVaultConfig(accessToken: "test_access_token", gatewayId: "test_gateway_id")
         completionResult = nil
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: ViewState(),
-            config: config,
-            payPalVaultService: mockService,
-            loadingDelegate: nil,
-            eventDelegate: eventDelegate) { result in
-                self.completionResult = result
-            }
     }
 
     override func tearDown() {
         viewModel = nil
-        mockService = nil
+        mockPaymentSourcesService = nil
+        mockGatewayService = nil
         viewState = nil
-        completionResult = nil
         loadingDelegate = nil
         eventDelegate = nil
+        config = nil
+        completionResult = nil
         cancellables.removeAll()
         super.tearDown()
     }
 
+    // MARK: - Initialization Tests
+
     func testInitialisationWithOptionsStateNone() {
-        XCTAssertEqual(viewModel.viewState.isDisabled, false)
-    }
+        // Given
+        viewState = ViewState(state: .none)
 
-    func testInitialisationWithOptionsStateDisabled() {
-        viewModel = PayPalSavePaymentSourceVM(
-            viewState: ViewState(state: .disabled),
-            config: config,
-            payPalVaultService: mockService,
-            loadingDelegate: loadingDelegate,
-            eventDelegate: eventDelegate) { result in
-                self.completionResult = result
-            }
-
-        XCTAssertEqual(viewModel.viewState.isDisabled, true)
-    }
-
-    func testInitialisationWithoutDelegateShowLoader() {
-        XCTAssertEqual(viewModel.showLoaders, true)
-    }
-
-    func testInitialisationWithDelegateShowLoader() {
+        // When
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
-            eventDelegate: eventDelegate) { result in
+            eventDelegate: eventDelegate,
+            completion: { result in
                 self.completionResult = result
             }
+        )
 
-        XCTAssertEqual(viewModel.showLoaders, false)
+        // Then
+        XCTAssertFalse(viewState.isDisabled, "View state should not be disabled")
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading")
+        XCTAssertFalse(viewModel.showLoaders, "Should not show loaders when delegate is present")
     }
 
-    // MARK: - Positive service interaction
+    func testInitialisationWithOptionsStateDisabled() {
+        // Given
+        viewState = ViewState(state: .disabled)
 
-    func testGetClientIdSuccess() async {
-        mockService.sendError = false
-        mockService.responseFilename = .getClientId
-
-        let clientId = await viewModel.getClientId()
-
-        XCTAssertEqual(clientId, "AY-iOYV1QKAX6ZRomt-gXigd0-pToRMwdoLW4UxFSITOApI2jUa5UgM39MKC0qeip3SCbPozbAusuGO0")
-        XCTAssertEqual(viewModel.isLoading, true)
-    }
-
-    func testGetSetupTokenSuccess() async {
-        mockService.sendError = false
-        mockService.responseFilename = .setupTokenSuccess
-
-        let setupTokenData = await viewModel.getSetupTokenData()
-
-        XCTAssertEqual(setupTokenData?.setupToken, "XObCsxdHXe")
-        XCTAssertEqual(viewModel.isLoading, true)
-    }
-
-    func testGetPaymentTokenSuccess() async {
-        mockService.sendError = false
-        mockService.responseFilename = .createPaymentToken
-
-        await viewModel.createPaymentToken(setupToken: "some_setup_token")
-
-        if case .success(let result) = completionResult {
-            XCTAssertEqual(result.token, "8kk8451t")
-            XCTAssertEqual(result.email, "someone@something.com")
-        } else {
-            XCTFail("Completion should return success.")
-        }
-        XCTAssertEqual(viewModel.isLoading, false)
-    }
-
-    // MARK: - Negative service interaction
-
-    func testGetClientIdSetsCompletionOnFailure() async {
-        mockService.sendError = true
-        mockService.responseFilename = .authFail
-
-        let clientId = await viewModel.getClientId()
-
-        XCTAssertNil(clientId, "Client ID should be nil on error.")
-        if case .failure(let error) = completionResult {
-            switch error {
-            case .getPayPalClientId: XCTAssert(true)
-            default: XCTFail("Error message should always be initialisationClientId.")
+        // When
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
             }
-        } else {
-            XCTFail("Expected completion to be called with a initialisationClientId failure.")
-        }
+        )
+
+        // Then
+        XCTAssertTrue(viewState.isDisabled, "View state should be disabled")
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading")
     }
 
-    func testGetSetupTokenIdSetsCompletionOnFailure() async {
-        mockService.sendError = true
-        mockService.responseFilename = .authFail
-
-        let setupToken = await viewModel.getSetupTokenData()
-
-        XCTAssertNil(setupToken, "Setup token should be nil on error.")
-        if case .failure(let error) = completionResult {
-            switch error {
-            case .createSetupToken: XCTAssert(true)
-            default: XCTFail("Error message should always be createSetupToken.")
+    func testInitialisationWithDelegateShowLoader() {
+        // When
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
             }
-        } else {
-            XCTFail("Expected completion to be called with a createSetupToken failure.")
-        }
-        XCTAssertEqual(viewModel.isLoading, false)
+        )
+
+        // Then
+        XCTAssertFalse(viewModel.showLoaders, "Should not show loaders when delegate is present")
     }
 
-    func testCreatePaymentTokenSetsCompletionOnFailure() async {
-        mockService.sendError = true
-        mockService.responseFilename = .authFail
-
-        await viewModel.createPaymentToken(setupToken: "some_setup_token")
-
-        if case .failure(let error) = completionResult {
-            switch error {
-            case .createPaymentToken: XCTAssert(true)
-            default: XCTFail("Error message should always be createPaymentToken.")
+    func testInitialisationWithoutDelegateShowLoader() {
+        // When
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: nil,
+            eventDelegate: nil,
+            completion: { result in
+                self.completionResult = result
             }
-        } else {
-            XCTFail("Expected completion to be called with a createPaymentToken failure.")
-        }
-        XCTAssertEqual(viewModel.isLoading, false)
+        )
+
+        // Then
+        XCTAssertTrue(viewModel.showLoaders, "Should show loaders when delegate is not present")
     }
+
+    // MARK: - Loading State Tests
 
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
-            eventDelegate: eventDelegate) { result in
+            eventDelegate: eventDelegate,
+            completion: { result in
                 self.completionResult = result
             }
+        )
 
         // When
         viewModel.updateLoadingState(isLoading: true)
 
         // Then
-        XCTAssertEqual(viewModel.isLoading, true)
-        XCTAssertEqual(loadingDelegate.isLoading, true)
-        XCTAssertEqual(viewModel.viewState.isDisabled, true)
+        XCTAssertTrue(viewModel.isLoading, "View model should be loading")
+        XCTAssertTrue(viewState.isDisabled, "View state should be disabled")
+        XCTAssertTrue(loadingDelegate.isLoading, "Loading delegate should be notified")
     }
 
     func testUpdateLoadingStateToTrueWithoutDelegate() {
@@ -201,21 +168,21 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
             loadingDelegate: nil,
-            eventDelegate: nil) { result in
+            eventDelegate: nil,
+            completion: { result in
                 self.completionResult = result
             }
-        viewModel.isLoading = false
-        loadingDelegate.isLoading = false
+        )
 
         // When
         viewModel.updateLoadingState(isLoading: true)
 
         // Then
-        XCTAssertEqual(viewModel.isLoading, true)
-        XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.viewState.isDisabled, true)
+        XCTAssertTrue(viewModel.isLoading, "View model should be loading")
+        XCTAssertTrue(viewState.isDisabled, "View state should be disabled")
     }
 
     func testUpdateLoadingStateToFalseWithDelegate() {
@@ -223,21 +190,23 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
-            eventDelegate: eventDelegate) { result in
+            eventDelegate: eventDelegate,
+            completion: { result in
                 self.completionResult = result
             }
-        viewModel.isLoading = false
-        loadingDelegate.isLoading = true
+        )
+        viewModel.updateLoadingState(isLoading: true)
 
         // When
         viewModel.updateLoadingState(isLoading: false)
 
         // Then
-        XCTAssertEqual(viewModel.isLoading, false)
-        XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.viewState.isDisabled, false)
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading")
+        XCTAssertFalse(viewState.isDisabled, "View state should not be disabled")
+        XCTAssertFalse(loadingDelegate.isLoading, "Loading delegate should be notified")
     }
 
     func testUpdateLoadingStateToFalseWithoutDelegate() {
@@ -245,48 +214,255 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
             loadingDelegate: nil,
-            eventDelegate: nil) { result in
+            eventDelegate: nil,
+            completion: { result in
                 self.completionResult = result
             }
-        viewModel.isLoading = true
-        loadingDelegate.isLoading = false
+        )
+        viewModel.updateLoadingState(isLoading: true)
 
         // When
         viewModel.updateLoadingState(isLoading: false)
 
         // Then
-        XCTAssertEqual(viewModel.isLoading, false)
-        XCTAssertEqual(loadingDelegate.isLoading, false)
-        XCTAssertEqual(viewModel.viewState.isDisabled, false)
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading")
+        XCTAssertFalse(viewState.isDisabled, "View state should not be disabled")
     }
 
-    // MARK: - WidgetEventDelegate Tests
+    // MARK: - Get Client ID Tests
+
+    func testGetClientIdSuccess() async {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        mockGatewayService.clientIdResult = "test_client_id_123"
+
+        // When
+        let clientId = await viewModel.getClientId()
+
+        // Then
+        XCTAssertNotNil(clientId, "Client ID should not be nil")
+        XCTAssertEqual(clientId, "test_client_id_123", "Client ID should match")
+    }
+
+    func testGetClientIdFailureWithRequestError() async {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        let testError = ErrorRes(
+            status: 400,
+            error: .init(message: "Client ID not found", code: "CLIENT_ID_ERROR", details: nil),
+            resource: nil,
+            errorSummary: nil
+        )
+        mockGatewayService.shouldReturnError = true
+        mockGatewayService.errorToReturn = testError
+
+        // When
+        let clientId = await viewModel.getClientId()
+
+        // Then
+        XCTAssertNil(clientId, "Client ID should be nil")
+        guard case .failure(let error) = completionResult else {
+            XCTFail("Expected failure result")
+            return
+        }
+        if case .getPayPalClientId(let errorRes) = error {
+            XCTAssertEqual(errorRes.status, 400, "Error status should match")
+            XCTAssertEqual(errorRes.error?.message, "Client ID not found", "Error message should match")
+        } else {
+            XCTFail("Expected getPayPalClientId error")
+        }
+    }
+
+    // MARK: - Get Setup Token Tests
+
+    func testGetSetupTokenDataSuccess() async {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        mockPaymentSourcesService.setupTokenResult = SetupTokenData(
+            setupToken: "test_setup_token_456"
+        )
+
+        // When
+        let setupTokenData = await viewModel.getSetupTokenData()
+
+        // Then
+        XCTAssertNotNil(setupTokenData, "Setup token data should not be nil")
+        XCTAssertEqual(setupTokenData?.setupToken, "test_setup_token_456", "Setup token should match")
+    }
+
+    func testGetSetupTokenDataFailureWithRequestError() async {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        let testError = ErrorRes(
+            status: 400,
+            error: .init(message: "Setup token creation failed", code: "SETUP_TOKEN_ERROR", details: nil),
+            resource: nil,
+            errorSummary: nil
+        )
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = testError
+
+        // When
+        let setupTokenData = await viewModel.getSetupTokenData()
+
+        // Then
+        XCTAssertNil(setupTokenData, "Setup token data should be nil")
+        guard case .failure(let error) = completionResult else {
+            XCTFail("Expected failure result")
+            return
+        }
+        if case .createSetupToken(let errorRes) = error {
+            XCTAssertEqual(errorRes.status, 400, "Error status should match")
+            XCTAssertEqual(errorRes.error?.message, "Setup token creation failed", "Error message should match")
+        } else {
+            XCTFail("Expected createSetupToken error")
+        }
+    }
+
+    // MARK: - Create Payment Token Tests
+
+    func testCreatePaymentTokenSuccess() async {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        mockPaymentSourcesService.paymentTokenResult = PaymentTokenData(
+            token: "test_payment_token_789",
+            email: "user@test.com"
+        )
+
+        // When
+        await viewModel.createPaymentToken(setupToken: "test_setup_token")
+
+        // Then
+        guard case .success(let result) = completionResult else {
+            XCTFail("Expected success result")
+            return
+        }
+        XCTAssertEqual(result.token, "test_payment_token_789", "Payment token should match")
+        XCTAssertEqual(result.email, "user@test.com", "Email should match")
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading after completion")
+    }
+
+    func testCreatePaymentTokenFailureWithRequestError() async {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        let testError = ErrorRes(
+            status: 400,
+            error: .init(message: "Payment token creation failed", code: "PAYMENT_TOKEN_ERROR", details: nil),
+            resource: nil,
+            errorSummary: nil
+        )
+        mockPaymentSourcesService.shouldReturnError = true
+        mockPaymentSourcesService.errorToReturn = testError
+
+        // When
+        await viewModel.createPaymentToken(setupToken: "test_setup_token")
+
+        // Then
+        guard case .failure(let error) = completionResult else {
+            XCTFail("Expected failure result")
+            return
+        }
+        if case .createPaymentToken(let errorRes) = error {
+            XCTAssertEqual(errorRes.status, 400, "Error status should match")
+            XCTAssertEqual(errorRes.error?.message, "Payment token creation failed", "Error message should match")
+        } else {
+            XCTFail("Expected createPaymentToken error")
+        }
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading after error")
+    }
+
+    // MARK: - Event Delegate Tests
 
     func testEventDelegateReceivesEvents() {
         // Given
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
             loadingDelegate: loadingDelegate,
-            eventDelegate: eventDelegate) { result in
+            eventDelegate: eventDelegate,
+            completion: { result in
                 self.completionResult = result
             }
-
-        // Reset any events from initialization
-        eventDelegate.reset()
+        )
 
         // When
-        let event = WidgetEvent(type: .button, properties: .button(WidgetEventButtonProperties(name: "PayPalVaultButton", action: .click)))
         viewModel.handleButtonTapAnalytics()
 
         // Then
-        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
-        XCTAssertEqual(eventDelegate.lastEvent, event)
-        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
-        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button), "Event delegate should receive button event")
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1, "Should receive exactly one button event")
+
+        if case .button(let properties) = eventDelegate.lastEvent?.properties {
+            XCTAssertEqual(properties.name, "PayPalVaultButton", "Button name should match")
+            XCTAssertEqual(properties.action, .click, "Button action should be click")
+        } else {
+            XCTFail("Expected button event properties")
+        }
     }
 
     func testEventDelegateWithoutDelegate() {
@@ -294,17 +470,138 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         viewModel = PayPalSavePaymentSourceVM(
             viewState: viewState,
             config: config,
-            payPalVaultService: mockService,
-            loadingDelegate: loadingDelegate,
-            eventDelegate: nil) { result in
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: nil,
+            eventDelegate: nil,
+            completion: { result in
                 self.completionResult = result
             }
+        )
 
-        // When - The view model should handle nil event delegate gracefully
-        viewModel.initializePayPalSDK()
+        // When - This should not crash
+        viewModel.handleButtonTapAnalytics()
 
-        // Then - No events should be recorded in our test delegate
-        XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
-        XCTAssertNil(eventDelegate.lastEvent)
+        // Then - No assertion needed, just verifying no crash
+    }
+
+    // MARK: - Multiple Event Tests
+
+    func testMultipleButtonTapEvents() {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // When
+        viewModel.handleButtonTapAnalytics()
+        viewModel.handleButtonTapAnalytics()
+        viewModel.handleButtonTapAnalytics()
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 3, "Should receive three events")
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 3, "Should receive exactly three button events")
+    }
+
+    // MARK: - Config Tests
+
+    func testViewModelUsesCorrectConfig() {
+        // Given
+        let customConfig = PayPalVaultConfig(
+            accessToken: "custom_access_token",
+            gatewayId: "custom_gateway_id"
+        )
+
+        // When
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: customConfig,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // Then
+        XCTAssertEqual(viewModel.config.accessToken, "custom_access_token", "Access token should match config")
+        XCTAssertEqual(viewModel.config.gatewayId, "custom_gateway_id", "Gateway ID should match config")
+    }
+
+    // MARK: - View State Tests
+
+    func testViewStateDisabledDuringLoading() {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // When
+        viewModel.updateLoadingState(isLoading: true)
+
+        // Then
+        XCTAssertTrue(viewState.isDisabled, "View state should be disabled during loading")
+        XCTAssertTrue(viewModel.isLoading, "View model should be loading")
+    }
+
+    func testViewStateEnabledAfterLoadingComplete() {
+        // Given
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+        viewModel.updateLoadingState(isLoading: true)
+
+        // When
+        viewModel.updateLoadingState(isLoading: false)
+
+        // Then
+        XCTAssertFalse(viewState.isDisabled, "View state should be enabled after loading")
+        XCTAssertFalse(viewModel.isLoading, "View model should not be loading")
+    }
+
+    // MARK: - Action Text Tests
+
+    func testActionTextInitialization() {
+        // When
+        viewModel = PayPalSavePaymentSourceVM(
+            viewState: viewState,
+            config: config,
+            paymentSourcesService: mockPaymentSourcesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            }
+        )
+
+        // Then
+        XCTAssertEqual(viewModel.actionText, "", "Action text should be empty on initialization")
     }
 }

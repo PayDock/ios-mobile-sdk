@@ -1,0 +1,37 @@
+default_platform :ios
+
+# Fastlane runs all built in actions from one directory above where the Fastfile lives 
+# so make sure all the paths are relative in that regard.
+
+# --- Code Quality Lanes ---
+
+desc "Static analysis of the project. Configure the options in .swiftlint.yml"
+lane :lint do
+  swiftlint(
+    mode: :lint,
+    config_file: ".swiftlint.yml",
+    strict: true,
+    reporter: "codeclimate",
+    output_file: "fastlane/swiftlint_report.json",
+    raise_if_swiftlint_error: true
+  )
+end
+
+# --- Test Lanes ---
+
+desc "Runs all the unit tests for the DataVault Swift Package"
+lane :testPackage do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  run_tests(
+    package_path: ".",
+    scheme: "DataVaultPackageTests",
+    destination: "platform=iOS Simulator,name=iPhone 16",
+    xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
+    result_bundle: true,
+    code_coverage: true,
+    output_types: "junit",
+    output_directory: "fastlane/test_output"
+  )
+end
+
+

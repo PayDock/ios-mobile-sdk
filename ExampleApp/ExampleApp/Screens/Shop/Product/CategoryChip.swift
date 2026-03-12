@@ -27,6 +27,7 @@ struct CategoryChip: View {
                         .stroke(isSelected ? Color.clear : Color.gray.opacity(0.2), lineWidth: 1)
                 )
         }
+        .accessibilityIdentifier("Category Chip \(title)")
         .scaleEffect(isSelected ? 1.05 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: isSelected)
     }

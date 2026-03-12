@@ -40,7 +40,7 @@ final class GiftCardWidgetUITests: XCTestCase {
         let cardNumberField = app.textFields["Card number"]
         XCTAssertTrue(cardNumberField.exists, "Card number field should exist")
 
-        let pinField = app.textFields["PIN"]
+        let pinField = app.secureTextFields["PIN"]
         XCTAssertTrue(pinField.exists, "PIN field should exist")
 
         let addButton = app.buttons["Add"]
@@ -88,7 +88,7 @@ final class GiftCardWidgetUITests: XCTestCase {
     }
 
     func testGiftCardPINValidation() throws {
-        let pinField = app.textFields["PIN"]
+        let pinField = app.secureTextFields["PIN"]
         XCTAssertTrue(pinField.exists, "PIN field should exist")
 
         // Test data: PIN, Expected Valid, Description
@@ -135,7 +135,7 @@ final class GiftCardWidgetUITests: XCTestCase {
             cardNumberField.slowTypeText(cardNumber)
 
             // Fill PIN
-            let pinField = app.textFields["PIN"]
+            let pinField = app.secureTextFields["PIN"]
             pinField.slowTypeText(pin)
             usleep(1500000) // 1.5s for form validation (increased wait time)
 

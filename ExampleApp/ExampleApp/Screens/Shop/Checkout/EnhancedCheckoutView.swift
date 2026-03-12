@@ -91,6 +91,7 @@ struct EnhancedCheckoutView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("Cancel Checkout")
                 }
             }
             .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {
@@ -118,15 +119,15 @@ struct EnhancedCheckoutView: View {
                     }
                 )
             }
-            .sheet(isPresented: $viewModel.showIntegrated3dsWebView, onDismiss: { }, content: {
+            .sheet(isPresented: $viewModel.showMPGS3dsWebView, onDismiss: { }, content: {
                 NavigationStack {
                     VStack {
-                        Integrated3DSWidget(
+                        MPGS3DSWidget(
                             config: .init(token: viewModel.token3DS),
                             completion: { result in
                                 switch result {
                                 case .success(let result):
-                                    viewModel.handleIntegrated3dsEvent(result)
+                                    viewModel.handleMPGS3dsEvent(result)
                                 case .failure(let error):
                                     Task {
                                         viewModel.alertMessage = error.localizedDescription

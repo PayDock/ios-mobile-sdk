@@ -52,6 +52,7 @@ struct CheckoutInformationStepView: View {
 
             // Use as billing address toggle
             Toggle("Use as billing address", isOn: $viewModel.useShippingAsBilling)
+                .accessibilityIdentifier("Use as billing address")
                 .padding(.top, 8)
 
             // Billing Address Section
@@ -89,6 +90,7 @@ struct CheckoutInformationStepView: View {
                     Button("Add Gift Card") {
                         showingGiftCardEntry = true
                     }
+                    .accessibilityIdentifier("Add Gift Card Checkout")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.defaultPrimary)
 

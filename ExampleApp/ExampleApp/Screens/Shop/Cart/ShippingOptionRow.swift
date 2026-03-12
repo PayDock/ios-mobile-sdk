@@ -38,5 +38,6 @@ struct ShippingOptionRow: View {
             }
             .padding(.vertical, 8)
         }
+        .accessibilityIdentifier("Shipping Option \(option.name)")
     }
 }

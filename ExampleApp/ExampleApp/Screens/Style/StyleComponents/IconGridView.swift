@@ -45,6 +45,7 @@ struct IconGridView: View {
                         onSelection(nil)
                         dismiss()
                     }
+                    .accessibilityIdentifier("IconGridItem_NoIcon")
 
                     ForEach(entries, id: \.self) { iconName in
                         VStack(spacing: 4) {
@@ -68,6 +69,7 @@ struct IconGridView: View {
                             onSelection(Image(systemName: iconName))
                             dismiss()
                         }
+                        .accessibilityIdentifier("IconGridItem_\(iconName)")
                     }
                 }
                 .padding()
@@ -79,6 +81,7 @@ struct IconGridView: View {
                     Button("Done") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("Button_IconGridDone")
                 }
             }
         }

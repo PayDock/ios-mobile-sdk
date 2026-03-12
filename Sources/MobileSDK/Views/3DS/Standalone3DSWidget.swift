@@ -123,13 +123,6 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             completion(.success(Standalone3DSResult(event: event, charge3dsId: token)))
         }
 
-        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            activityIndicator?.startAnimating()
-            DispatchQueue.main.async {
-                UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
-            }
-        }
-
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
             activityIndicator?.stopAnimating()
@@ -140,53 +133,45 @@ public struct Standalone3DSWidget: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            let nsError = error as NSError
-            if self.isNonFatalNavigationError(nsError) { return }
-
             activityIndicator?.stopAnimating()
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
             completion(.failure(.webViewFailed(error: nsError)))
+        }
+
+        public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            activityIndicator?.startAnimating()
+            DispatchQueue.main.async {
+                UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
+            }
         }
 
         /**
          This method handles errors that happen before the resource of the url can even be reached.
          These errors are mostly related to connectivity, the formatting of the url, or if using urls which are not supported.
-         Non-fatal errors (e.g. NSURLErrorCancelled during redirects) are ignored so the 3DS flow can continue.
+
+         @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            let nsError = error as NSError
-            if self.isNonFatalNavigationError(nsError) { return }
-
             activityIndicator?.stopAnimating()
+            let nsError = error as NSError
+            if nsError.isWebViewNavigationCancellation { return }
             completion(.failure(.webViewFailed(error: nsError)))
-        }
-
-        /// Returns true if the navigation error should not terminate the 3DS flow (e.g. cancelled/redirect-related).
-        /// Exposed for on-device testing of non-fatal error handling.
-        private func isNonFatalNavigationError(_ error: NSError) -> Bool {
-            if error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled {
-                return true // -999: cancelled provisional navigation during redirect
-            }
-            if error.domain == "WebKitErrorDomain" && error.code == 102 {
-                return true // Frame load interrupted
-            }
-            return false
         }
 
         public func webView(_ webView: WKWebView,
                             authenticationChallenge challenge: URLAuthenticationChallenge,
                             shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
-            decisionHandler(true)
+            // Reject deprecated TLS versions for PCI DSS compliance
+            decisionHandler(false)
         }
 
         public func webView(_ webView: WKWebView,
                             didReceive challenge: URLAuthenticationChallenge,
                             completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-            DispatchQueue.global(qos: .background).async {
-                let trust = challenge.protectionSpace.serverTrust!
-                let exceptions = SecTrustCopyExceptions(trust)
-                SecTrustSetExceptions(trust, exceptions)
-                completionHandler(.useCredential, URLCredential(trust: trust))
-            }
+            // Use default system SSL certificate validation for PCI DSS compliance
+            // This ensures proper certificate chain validation against system trust store
+            completionHandler(.performDefaultHandling, nil)
         }
     }
 

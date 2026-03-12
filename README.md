@@ -5,9 +5,9 @@ flow in your iOS app. The SDK provides a customisable experience with pre-built 
 handle and support various payment methods.
 
 Once you have setup and initialised the MobileSDK in your application, you can use the MobileSDK
-widgets to access payment flows. These include interacting with ApplePay, Paypal, Afterpay, ColesPay and Click To Pay. You can also
-complete 3DS challenges, capture addresses, securely collect gift card details, and tokenise card
-details.
+widgets to access payment flows. These include interacting with ApplePay, Paypal, Afterpay, ColesPay, Zip and 
+Click To Pay. You can also complete 3DS challenges, capture addresses, securely collect gift card details, 
+and tokenise card details.
 
 # Requirements
 
@@ -17,7 +17,7 @@ details.
 
 1. Setup the Paydock API Integration by [contacting Paydock](https://paydock.com/contact-us/) to
    signup for a sandbox account, and then following our [integration guide](https://docs.paydock.com/#getting-started) .
-2. [Setup](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/installation.md) the iOS or Android SDK.
+2. [Setup](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/installation.md) the iOS SDK.
 3. [Configure](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/installation.md#setup-the-paydock-ios-sdk) repository access.
 4. [Add](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/installation.md#step-2-add-sdk-dependency) the SDK dependency to your app.
 5. Use the following guide to [initialize](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/initialise.md#initialize-the-ios-sdk) your SDK.
@@ -59,6 +59,7 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 *   **`SERVICE_ID_COLES_PAY`:** Your Paydock service ID for the Coles Pay gateway. This ID is required to enable Coles Pay as a payment method.
 *   **`WALLET_ID_COLES_PAY`:** The client ID provided by Coles Pay. This ID is required for tagging the Wallet type and using the Coles Pay service.
 *   **`SERVICE_ID_CLICK_TO_PAY`:** Your Paydock service ID for using Click To Pay service. This ID is required to enable Click To Pay as a payment method.
+*   **`SERVICE_ID_ZIP`:** Your Powerboard service ID for the Zip gateway. This ID is required to enable Zip as a payment method.
 *   **`SERVICE_ID_MPGS`:** Your Paydock service ID for the MPGS gateway. This ID is required for 3DS check and transactions.
 *   **`SERVICE_ID_MPGS_TEST`:** Your Paydock service ID for the MPGS gateway. This ID should use an MPGS merchant id starting with "TEST" for using MPGS supported test cards and 3ds challenge emulator.
 *   **`SERVICE_ID_GPAYMENTS`:** Your Paydock service ID for the GPayments 3DS service. This ID is required to enable 3DS check.
@@ -86,6 +87,8 @@ WALLET_ID_COLES_PAY=your_wallet_id_coles_pay
 SERVICE_ID_GPAYMENTS=your_gpayments_3ds_gateway_id
 // PAYPAL
 SERVICE_ID_PAYPAL=your_gateway_id_paypal
+// ZIP
+SERVICE_ID_ZIP=your_gateway_id_zip
 
 ```
 

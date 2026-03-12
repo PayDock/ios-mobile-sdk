@@ -2,9 +2,7 @@
 //  StyleWidgetListView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 06.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import SwiftUI
 
@@ -21,12 +19,13 @@ struct StyleWidgetListView: View {
             StyleWidgetItem(widget: .applePay),
             StyleWidgetItem(widget: .paypal),
             StyleWidgetItem(widget: .giftCard),
-            StyleWidgetItem(widget: .integrated3ds),
+            StyleWidgetItem(widget: .mpgs3ds),
             StyleWidgetItem(widget: .standalone3ds),
             StyleWidgetItem(widget: .colesPay),
             StyleWidgetItem(widget: .afterPay),
             StyleWidgetItem(widget: .clickToPay),
-            StyleWidgetItem(widget: .paypalVault)
+            StyleWidgetItem(widget: .paypalVault),
+            StyleWidgetItem(widget: .zip)
         ].sorted { $0.widget.title < $1.widget.title }
 
         return [allWidgets] + otherWidgets
@@ -85,7 +84,9 @@ struct StyleWidgetListView: View {
         HStack {
             HStack {
                 icon
-                    .frame(width: 24.0, height: 24.0)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 24, height: 24)
                 Text(title)
                     .font(.title2)
                     .padding(.vertical, 6)

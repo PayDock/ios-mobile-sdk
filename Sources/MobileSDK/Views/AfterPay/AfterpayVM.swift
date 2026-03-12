@@ -9,13 +9,14 @@
 import SwiftUI
 import Afterpay
 import NetworkingLib
+import DataCharges
 
 @MainActor
 class AfterpayVM: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let walletService: WalletService
+    private let chargesService: DataCharges.ChargesService
 
     // MARK: - Properties
 
@@ -53,7 +54,7 @@ class AfterpayVM: ObservableObject {
             _ shippingOption: ShippingOption,
             _ provideShippingOptionUpdateResult: (ShippingOptionUpdate?) -> Void
         ) -> Void)?,
-        walletService: WalletService = WalletServiceImpl(),
+        chargesService: DataCharges.ChargesService = DataCharges.ChargesServiceImpl(),
         loadingDelegate: WidgetLoadingDelegate?,
         eventDelegate: WidgetEventDelegate?,
         completion: @escaping (Result<ChargeResponse, AfterpayError>) -> Void
@@ -63,7 +64,7 @@ class AfterpayVM: ObservableObject {
         self.tokenRequest = tokenRequest
         self.selectAddress = selectAddress
         self.selectShippingOption = selectShippingOption
-        self.walletService = walletService
+        self.chargesService = chargesService
         self.completion = completion
         self.loadingDelegate = loadingDelegate
         self.eventDelegate = eventDelegate
@@ -71,11 +72,12 @@ class AfterpayVM: ObservableObject {
     }
 
     private func setupConfig() {
+        // Note: Values overwritten by values setup in service on dashboard but required for SDK
         let afterpayConfig =  try? Configuration(
-            minimumAmount: configuration.config.minimumAmount,
-            maximumAmount: configuration.config.maximumAmount,
-            currencyCode: configuration.config.currency,
-            locale: Locale(identifier: configuration.config.language),
+            minimumAmount: nil,
+            maximumAmount: "1000.00",
+            currencyCode: "AUD",
+            locale: Locale(identifier: "en_AU"),
             environment: configuration.environment)
         Afterpay.setConfiguration(afterpayConfig)
     }
@@ -127,7 +129,7 @@ class AfterpayVM: ObservableObject {
         Task {
             do {
                 isLoading = true
-                let afterPayOrderId = try await walletService.getAfterpayCallback(token: token)
+                let afterPayOrderId = try await chargesService.getAfterpayCallback(widgetAccessToken: token)
                 self.isLoading = false
                 self.afterPayOrderId = afterPayOrderId
                 self.presentAfterpay()
@@ -150,11 +152,16 @@ class AfterpayVM: ObservableObject {
         isLoading = true
         Task {
             do {
-                let chargeResponse = try await self.walletService.captureCharge(
-                    token: self.token,
+                let walletChargeData = try await self.chargesService.captureWalletCharge(
+                    widgetAccessToken: self.token,
                     paymentMethodId: nil,
-                    payerId: nil,
                     refToken: self.afterPayOrderId)
+                let chargeResponse = ChargeResponse(
+                    status: walletChargeData.status,
+                    amount: walletChargeData.amount,
+                    currency: walletChargeData.currency
+                )
+
                 isLoading = false
                 completion(.success(chargeResponse))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
@@ -170,15 +177,17 @@ class AfterpayVM: ObservableObject {
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
-            switch result {
-            case .success(let response):
-                self?.token = response.token
-                self?.getAfterpayURL(token: response.token)
+            Task {
+                switch result {
+                case .success(let response):
+                    self?.token = response.token
+                    self?.getAfterpayURL(token: response.token)
 
-            case .failure(let failure):
-                self?.updateLoadingState(isLoading: false)
-                self?.showWebView = false
-                self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                case .failure(let failure):
+                    self?.updateLoadingState(isLoading: false)
+                    self?.showWebView = false
+                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                }
             }
         }
     }
@@ -188,7 +197,7 @@ class AfterpayVM: ObservableObject {
         Task {
             do {
                 guard let chargeId = decodeChargeId(jwtToken: token) else { return }
-                _ = try await walletService.declineWalletTransaction(token: self.token, chargeId: chargeId)
+                _ = try await chargesService.declineWalletTransaction(widgetAccessToken: self.token, chargeId: chargeId)
                 isLoading = false
                 completion(.failure(.transactionCanceled))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
