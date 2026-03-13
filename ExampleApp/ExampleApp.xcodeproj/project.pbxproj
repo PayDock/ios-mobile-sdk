@@ -133,7 +133,6 @@
 		28F19D2D2B029F46002F5526 /* GiftCardExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardExampleView.swift */; };
 		28FDA8BD2EEC7108005BEFC3 /* ConfigClickToPayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FDA8BC2EEC7108005BEFC3 /* ConfigClickToPayView.swift */; };
 		28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FE99432D9306050029FCC8 /* UIColor+Extensions.swift */; };
-		50BD982487A5499CAAD62216 /* DataPaymentSources in Frameworks */ = {isa = PBXBuildFile; productRef = C5D6E7F8A9B0C1D2E3F4A5B6 /* DataPaymentSources */; };
 		5820225C2E5470EF00B50B61 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5820225B2E5470EF00B50B61 /* MobileSDK */; };
 		587458282E4B397E00A24A35 /* GiftCardWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458272E4B397E00A24A35 /* GiftCardWidgetUITests.swift */; };
 		587458292E4B397E00A24A35 /* AddressWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458252E4B397E00A24A35 /* AddressWidgetUITests.swift */; };
@@ -161,12 +160,6 @@
 		58D3D0E72E8DA3190059584D /* ConfigSchemeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D02E8DA3190059584D /* ConfigSchemeView.swift */; };
 		58D3D0E82E8DA3190059584D /* ConfigAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */; };
 		58D3D0EA2E8DAD970059584D /* ConfigSaveCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0E92E8DAD970059584D /* ConfigSaveCardView.swift */; };
-		734BF2FD80D5479F9462DC49 /* DataMPGS3ds in Frameworks */ = {isa = PBXBuildFile; productRef = B4C5D6E7F8A9B0C1D2E3F4A5 /* DataMPGS3ds */; };
-		A4781BBE5D8B408CBCDD84E9 /* DataVault in Frameworks */ = {isa = PBXBuildFile; productRef = E7F8A9B0C1D2E3F4A5B6C7D8 /* DataVault */; };
-		A65EEF75ABC843D9BB693553 /* DataCharges in Frameworks */ = {isa = PBXBuildFile; productRef = F2A3B4C5D6E7F8A9B0C1D2E3 /* DataCharges */; };
-		B03E75CBDECD4EE580501DD8 /* DataCustomer in Frameworks */ = {isa = PBXBuildFile; productRef = A3B4C5D6E7F8A9B0C1D2E3F4 /* DataCustomer */; };
-		F95FDA58374F4FE39A0C35BD /* CommonModels in Frameworks */ = {isa = PBXBuildFile; productRef = E1F2A3B4C5D6E7F8A9B0C1D2 /* CommonModels */; };
-		FF165F25045C45A1B40C03FC /* DataStandalone3ds in Frameworks */ = {isa = PBXBuildFile; productRef = D6E7F8A9B0C1D2E3F4A5B6C7 /* DataStandalone3ds */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -356,13 +349,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F95FDA58374F4FE39A0C35BD /* CommonModels in Frameworks */,
-				A65EEF75ABC843D9BB693553 /* DataCharges in Frameworks */,
-				B03E75CBDECD4EE580501DD8 /* DataCustomer in Frameworks */,
-				734BF2FD80D5479F9462DC49 /* DataMPGS3ds in Frameworks */,
-				50BD982487A5499CAAD62216 /* DataPaymentSources in Frameworks */,
-				FF165F25045C45A1B40C03FC /* DataStandalone3ds in Frameworks */,
-				A4781BBE5D8B408CBCDD84E9 /* DataVault in Frameworks */,
 				5820225C2E5470EF00B50B61 /* MobileSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1003,13 +989,6 @@
 			name = ExampleApp;
 			packageProductDependencies = (
 				5820225B2E5470EF00B50B61 /* MobileSDK */,
-				E1F2A3B4C5D6E7F8A9B0C1D2 /* CommonModels */,
-				F2A3B4C5D6E7F8A9B0C1D2E3 /* DataCharges */,
-				A3B4C5D6E7F8A9B0C1D2E3F4 /* DataCustomer */,
-				B4C5D6E7F8A9B0C1D2E3F4A5 /* DataMPGS3ds */,
-				C5D6E7F8A9B0C1D2E3F4A5B6 /* DataPaymentSources */,
-				D6E7F8A9B0C1D2E3F4A5B6C7 /* DataStandalone3ds */,
-				E7F8A9B0C1D2E3F4A5B6C7D8 /* DataVault */,
 			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
@@ -1086,13 +1065,6 @@
 			mainGroup = 2889B7C82A558F1800D6C7BE;
 			packageReferences = (
 				28F8B3892D720A0D00756C44 /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */,
-				67896043676B4237A0E77167 /* XCLocalSwiftPackageReference "../CommonModels" */,
-				8A47AE43D06A4C5F9E999F7B /* XCLocalSwiftPackageReference "../DataCharges" */,
-				9D66A841A59F486BBA48AA38 /* XCLocalSwiftPackageReference "../DataCustomer" */,
-				BA50A923BED84883A0D392BA /* XCLocalSwiftPackageReference "../DataMPGS3ds" */,
-				D610431B51944A9DB428646E /* XCLocalSwiftPackageReference "../DataPaymentSources" */,
-				32D915B4943B4B399274FC97 /* XCLocalSwiftPackageReference "../DataStandalone3ds" */,
-				C852A5D9F4F645E4A88F4146 /* XCLocalSwiftPackageReference "../DataVault" */,
 			);
 			productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
 			projectDirPath = "";
@@ -2349,34 +2321,6 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../mobile-sdk-ios";
 		};
-		32D915B4943B4B399274FC97 /* XCLocalSwiftPackageReference "../DataStandalone3ds" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DataStandalone3ds;
-		};
-		67896043676B4237A0E77167 /* XCLocalSwiftPackageReference "../CommonModels" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../CommonModels;
-		};
-		8A47AE43D06A4C5F9E999F7B /* XCLocalSwiftPackageReference "../DataCharges" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DataCharges;
-		};
-		9D66A841A59F486BBA48AA38 /* XCLocalSwiftPackageReference "../DataCustomer" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DataCustomer;
-		};
-		BA50A923BED84883A0D392BA /* XCLocalSwiftPackageReference "../DataMPGS3ds" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DataMPGS3ds;
-		};
-		C852A5D9F4F645E4A88F4146 /* XCLocalSwiftPackageReference "../DataVault" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DataVault;
-		};
-		D610431B51944A9DB428646E /* XCLocalSwiftPackageReference "../DataPaymentSources" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DataPaymentSources;
-		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2384,41 +2328,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 28F8B3892D720A0D00756C44 /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */;
 			productName = MobileSDK;
-		};
-		A3B4C5D6E7F8A9B0C1D2E3F4 /* DataCustomer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9D66A841A59F486BBA48AA38 /* XCLocalSwiftPackageReference "../DataCustomer" */;
-			productName = DataCustomer;
-		};
-		B4C5D6E7F8A9B0C1D2E3F4A5 /* DataMPGS3ds */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BA50A923BED84883A0D392BA /* XCLocalSwiftPackageReference "../DataMPGS3ds" */;
-			productName = DataMPGS3ds;
-		};
-		C5D6E7F8A9B0C1D2E3F4A5B6 /* DataPaymentSources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D610431B51944A9DB428646E /* XCLocalSwiftPackageReference "../DataPaymentSources" */;
-			productName = DataPaymentSources;
-		};
-		D6E7F8A9B0C1D2E3F4A5B6C7 /* DataStandalone3ds */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 32D915B4943B4B399274FC97 /* XCLocalSwiftPackageReference "../DataStandalone3ds" */;
-			productName = DataStandalone3ds;
-		};
-		E1F2A3B4C5D6E7F8A9B0C1D2 /* CommonModels */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 67896043676B4237A0E77167 /* XCLocalSwiftPackageReference "../CommonModels" */;
-			productName = CommonModels;
-		};
-		E7F8A9B0C1D2E3F4A5B6C7D8 /* DataVault */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C852A5D9F4F645E4A88F4146 /* XCLocalSwiftPackageReference "../DataVault" */;
-			productName = DataVault;
-		};
-		F2A3B4C5D6E7F8A9B0C1D2E3 /* DataCharges */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8A47AE43D06A4C5F9E999F7B /* XCLocalSwiftPackageReference "../DataCharges" */;
-			productName = DataCharges;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

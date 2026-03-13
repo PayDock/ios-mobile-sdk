@@ -90,7 +90,8 @@ final class PaymentSourcesServiceTests: XCTestCase {
             meta: ExternalCheckoutMeta(
                 firstName: "John",
                 lastName: "Doe",
-                email: "john.doe@example.com"
+                email: "john.doe@example.com",
+                charge: ExternalCheckoutCharge(amount: 2.0, currency: "AUD")
             ),
             successRedirectUrl: "https://example.com/success",
             errorRedirectUrl: "https://example.com/error",
