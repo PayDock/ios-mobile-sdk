@@ -120,7 +120,7 @@ class EnhancedCheckoutVM: ObservableObject {
 
     // Payment
     @Published var selectedPaymentMethod: PaymentMethod?
-    @Published var cardToken = ""
+    @Published var paymentOTT = ""
     @Published var payPalToken = ""
     @Published var afterPayToken = ""
     @Published var mastercardToken = ""
@@ -236,8 +236,7 @@ class EnhancedCheckoutVM: ObservableObject {
 
     // MARK: - Gateway IDs
     let mpgsGatewayId = ProjectEnvironment.shared.getMPGSGatewayId() ?? ""
-    let applePayGatewayId = ProjectEnvironment.shared.getApplePayGatewayId() ?? ""
-    let threeDSGatewayId = ProjectEnvironment.shared.getMPGSGatewayId() ?? ""
+    let applePayServiceId = ProjectEnvironment.shared.getApplePayServiceId() ?? ""
     let payPalGatewayId = ProjectEnvironment.shared.getPayPalGatewayId() ?? ""
 
     // MARK: - Initialization
@@ -262,37 +261,84 @@ class EnhancedCheckoutVM: ObservableObject {
 
 extension EnhancedCheckoutVM {
 
-    func initializeApplePayCharge(completion: @escaping (Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) {
+    var applePayConfig: ApplePayWidgetConfig {
+        let params = ConfigManager.shared.getApplePayConfigParams()
+        let globalConfig = ConfigManager.shared.getGlobalConfig()
+
+        let pkPaymentRequest = MobileSDK.createApplePayRequest(
+            amount: Decimal(cartManager.total),
+            amountLabel: params.amountLabel,
+            countryCode: params.countryCode,
+            currencyCode: globalConfig.currency,
+            merchantIdentifier: params.merchantIdentifier,
+            requireBillingAddress: params.requireBillingAddress,
+            requireShippingAddress: params.requireShippingAddress
+        )
+
+        return ApplePayWidgetConfig(
+            pkPaymentRequest: pkPaymentRequest,
+            serviceId: ProjectEnvironment.shared.getApplePayServiceId() ?? "",
+            accessToken: ProjectEnvironment.shared.getWidgetAccessToken()
+        )
+    }
+
+    /// Handles Apple Pay OTT token result
+    func handleApplePayResult(_ result: Result<String, ApplePayError>) {
+        switch result {
+        case .success(let ottToken):
+            processApplePayOTTToken(ottToken)
+        case .failure(let error):
+            isLoading = false
+            showResultOverlay(success: false, message: error.customMessage)
+        }
+    }
+
+    /// Converts OTT token to vault token, then creates a charge
+    private func processApplePayOTTToken(_ ottToken: String) {
+        isLoading = true
+        viewState?.setState(.disabled)
+
         Task {
             do {
-                isLoading = true
-                let request = createWalletChargeRequest(gatewayId: applePayGatewayId, walletType: "apple")
-                let token = try await chargesService.initialiseWalletCharge(
-                    initializeWalletChargeReq: request,
+                // Step 1: Convert OTT to vault token
+                let vaultRequest = DataVault.ConvertToVaultTokenReq(token: ottToken, vaultType: "session")
+                let vaultToken = try await vaultService.createVaultToken(
+                    request: vaultRequest,
                     apiAccessToken: apiAccessToken
                 )
-                let applePayRequestResult = self.getApplePayRequestResult(walletToken: token)
-                completion(.success(ApplePayRequestResult(request: applePayRequestResult.request, token: applePayRequestResult.token)))
+
+                // Step 2: Create charge with vault token
+                try await createApplePayCharge(vaultToken: vaultToken)
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                isLoading = false
-                completion(.failure(.initialisingWalletToken(reason: errorResponse.error?.message)))
+                let errorMessage = errorResponse.error?.message ?? errorResponse.errorSummary?.message ?? "Unknown error"
+                showResultOverlay(success: false, message: errorMessage)
             } catch {
-                isLoading = false
-                completion(.failure(.initialisingWalletToken(reason: nil)))
+                showResultOverlay(success: false, message: "Apple Pay payment failed. Please try again.")
             }
         }
     }
 
-    func handleApplePayResult(_ result: Result<ChargeResponse, ApplePayError>) {
-        Task {
-            isLoading = false
-            switch result {
-            case .success(let chargeResponse):
-                showResultOverlay(success: true, message: "$\(chargeResponse.amount) succesfully charged!")
-            case .failure(let error):
-                showResultOverlay(success: false, message: error.customMessage)
-            }
-        }
+    /// Creates a charge using the vault token
+    private func createApplePayCharge(vaultToken: String) async throws {
+        let request = DataCharges.CaptureChargeReq(
+            amount: cartManager.stringTotal,
+            currency: "AUD",
+            reference: UUID().uuidString,
+            description: "Apple Pay Payment",
+            customer: Customer(
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                phone: phone.trimmingCharacters(in: .whitespacesAndNewlines),
+                paymentSource: PaymentSource(
+                    vaultToken: vaultToken,
+                    gatewayId: mpgsGatewayId
+                )
+            )
+        )
+
+        let result = try await chargesService.captureCharge(request: request, apiAccessToken: apiAccessToken)
+        showResultOverlay(success: true, message: "\(result.data.amount) \(result.data.currency) successfully charged!")
     }
 }
 
@@ -437,7 +483,7 @@ extension EnhancedCheckoutVM {
             switch clickToPayResult.event {
             case .checkoutCompleted:
                 showMastercardWebView = false
-                payWithCard(clickToPayResult.mastercardToken)
+                payWithOTT(clickToPayResult.mastercardToken)
             case .checkoutReady: break
             case .checkoutError:
                 showMastercardWebView = false
@@ -665,16 +711,6 @@ extension EnhancedCheckoutVM {
         )
     }
 
-    private func getApplePayRequestResult(walletToken: String) -> ApplePayRequestResult {
-        let paymentRequest = MobileSDK.createApplePayRequest(
-            amount: Decimal(cartManager.total),
-            amountLabel: "Amount",
-            countryCode: "AU",
-            currencyCode: ConfigManager.shared.getGlobalConfig().currency,
-            merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "")
-        return ApplePayRequestResult(request: paymentRequest, token: walletToken)
-    }
-
     private func countryCode(from countryName: String) -> String? {
         for code in Locale.Region.isoRegions {
             let locale = Locale(identifier: "en")   // or use Locale.current
@@ -704,16 +740,16 @@ extension EnhancedCheckoutVM: WidgetLoadingDelegate {
 extension EnhancedCheckoutVM {
 
     /// Initialized card payment using the tokenised card details
-    func payWithCard(_ token: String) {
-        self.cardToken = token
-        guard !cardToken.isEmpty else { return }
+    func payWithOTT(_ token: String) {
+        self.paymentOTT = token
+        guard !paymentOTT.isEmpty else { return }
         isLoading = true
         viewState?.setState(.disabled)
 
-        let request = DataVault.ConvertToVaultTokenReq(token: cardToken, vaultType: "session")
+        let request = DataVault.ConvertToVaultTokenReq(token: paymentOTT, vaultType: "session")
         Task {
             do {
-                let vaultToken = try await vaultService.convertCardTokenToVaultToken(request: request, apiAccessToken: apiAccessToken)
+                let vaultToken = try await vaultService.createVaultToken(request: request, apiAccessToken: apiAccessToken)
                 self.vaultToken = vaultToken
                 if useStandalone3DS {
                     attemptStandalone3dsTokenCreation()
@@ -738,7 +774,7 @@ extension EnhancedCheckoutVM {
             customer: .init(
                 paymentSource: .init(
                     vaultToken: vaultToken,
-                    gatewayId: threeDSGatewayId
+                    gatewayId: mpgsGatewayId
                 )
             ),
             threeDS: .init(browserDetails: .init()))

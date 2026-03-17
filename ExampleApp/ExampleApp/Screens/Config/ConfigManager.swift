@@ -27,6 +27,7 @@ class ConfigManager: ObservableObject {
         setupGiftCardConfiguration()
         setupPayPalConfigurations()
         setupAfterpayConfiguration()
+        setupApplePayConfiguration()
         setupColesPayConfiguration()
         setupClickToPayConfiguration()
         setupZipConfiguration()
@@ -42,7 +43,7 @@ class ConfigManager: ObservableObject {
 
     private func setupCardConfiguration() {
         configurations[.card] = CardDetailsWidgetConfig(
-            gatewayId: ProjectEnvironment.shared.getApplePayGatewayId(),
+            gatewayId: ProjectEnvironment.shared.getMPGSGatewayId(),
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
             collectCardholderName: true,
             allowSaveCard: SaveCardConfig(
@@ -116,6 +117,17 @@ class ConfigManager: ObservableObject {
         )
     }
 
+    private func setupApplePayConfiguration() {
+        configurations[.applePay] = ApplePayConfigParams(
+            serviceId: ProjectEnvironment.shared.getApplePayServiceId() ?? "",
+            amountLabel: "Amount",
+            countryCode: "AU",
+            merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "",
+            requireBillingAddress: true,
+            requireShippingAddress: false
+        )
+    }
+
     // swiftlint:disable:next function_body_length
     private func setupZipConfiguration() {
         let globalConfig = getGlobalConfig()
@@ -186,7 +198,7 @@ class ConfigManager: ObservableObject {
     // Convenience methods for widgets
     func getCardDetailsConfig() -> CardDetailsWidgetConfig {
         return getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) ?? CardDetailsWidgetConfig(
-            gatewayId: ProjectEnvironment.shared.getApplePayGatewayId(),
+            gatewayId: ProjectEnvironment.shared.getMPGSGatewayId(),
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
             collectCardholderName: true,
             allowSaveCard: SaveCardConfig(
@@ -245,6 +257,38 @@ class ConfigManager: ObservableObject {
                 shippingOptionRequired: false,
                 enableSingleShippingOptionUpdate: false
             )
+        )
+    }
+
+    func getApplePayConfigParams() -> ApplePayConfigParams {
+        return getConfiguration(for: .applePay, as: ApplePayConfigParams.self) ?? ApplePayConfigParams(
+            serviceId: ProjectEnvironment.shared.getApplePayServiceId() ?? "",
+            amountLabel: "Amount",
+            countryCode: "AU",
+            merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "",
+            requireBillingAddress: true,
+            requireShippingAddress: false
+        )
+    }
+
+    func getApplePayWidgetConfig() -> ApplePayWidgetConfig {
+        let params = getApplePayConfigParams()
+        let globalConfig = getGlobalConfig()
+
+        let pkPaymentRequest = MobileSDK.createApplePayRequest(
+            amount: Decimal(string: globalConfig.totalAmount) ?? 0,
+            amountLabel: params.amountLabel,
+            countryCode: params.countryCode,
+            currencyCode: globalConfig.currency,
+            merchantIdentifier: params.merchantIdentifier,
+            requireBillingAddress: params.requireBillingAddress,
+            requireShippingAddress: params.requireShippingAddress
+        )
+
+        return ApplePayWidgetConfig(
+            pkPaymentRequest: pkPaymentRequest,
+            serviceId: params.serviceId,
+            accessToken: ProjectEnvironment.shared.getWidgetAccessToken()
         )
     }
 

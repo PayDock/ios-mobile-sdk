@@ -2,9 +2,7 @@
 //  ApplePayWidget.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 04.10.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import PassKit
@@ -13,22 +11,26 @@ public struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
     @State var appearance: ApplePayWidgetAppearance
 
-    public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
+    /// Initializes the Apple Pay widget
+    /// - Parameters:
+    ///   - config: Configuration containing payment request, service ID, and access token
+    ///   - appearance: Optional appearance configuration for the button
+    ///   - eventDelegate: Optional delegate for widget events
+    ///   - completion: Completion handler returning the Paydock OTT token on success
+    public init(config: ApplePayWidgetConfig,
+                appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
                 eventDelegate: WidgetEventDelegate? = nil,
-                createPaymentRequest: @escaping (
-                    _ createPaymentRequestResult: @escaping (
-                        Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
-                completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
+                completion: @escaping (Result<String, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
+            config: config,
             eventDelegate: eventDelegate,
-            createPaymentRequest: createPaymentRequest,
             completion: completion))
         self.appearance = appearance
     }
 
     public var body: some View {
         ApplePayButton(appearance: appearance) {
-            viewModel.handleButtonTap()
+            viewModel.startPayment()
             viewModel.handleApplePayTapAnalytics()
         }
     }
@@ -36,6 +38,13 @@ public struct ApplePayWidget: View {
 
 struct ApplePayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayWidget(createPaymentRequest: { _ in }, completion: { _ in })
+        ApplePayWidget(
+            config: ApplePayWidgetConfig(
+                pkPaymentRequest: .init(),
+                serviceId: "test-service-id",
+                accessToken: "test-token"
+            ),
+            completion: { _ in }
+        )
     }
 }

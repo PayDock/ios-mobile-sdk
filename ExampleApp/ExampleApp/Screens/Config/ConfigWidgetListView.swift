@@ -20,6 +20,7 @@ struct ConfigWidgetListView: View {
             ConfigWidgetItem(widget: .afterPay),
             ConfigWidgetItem(widget: .colesPay),
             ConfigWidgetItem(widget: .clickToPay),
+            ConfigWidgetItem(widget: .applePay),
             ConfigWidgetItem(widget: .zip)
         ].sorted { $0.widget.title < $1.widget.title }
 
@@ -50,7 +51,7 @@ struct ConfigWidgetListView: View {
                 .listRowBackground(Color(hex: "#EAE0D7"))
 
                 ForEach(widgetItems) { item in
-                    stylizedNavigationLink(item: item, destination: item.destination)
+                    stylizedNavigationLink(item: item, destination: item.destination(viewModel: viewModel))
                 }
 
                 VStack(alignment: .center, spacing: 4) {

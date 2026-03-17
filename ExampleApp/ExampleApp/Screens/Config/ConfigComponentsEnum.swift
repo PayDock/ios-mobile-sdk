@@ -24,6 +24,7 @@ enum ConfigComponentsEnum {
     case serviceId
     case totalAmount
     case currency
+    case applePayConfig
     case firstName
     case lastName
     case email
@@ -54,6 +55,7 @@ enum ConfigComponentsEnum {
         case .serviceId: return "Service ID"
         case .totalAmount: return "Total Amount"
         case .currency: return "Currency"
+        case .applePayConfig: return "Apple Pay Configuration"
         case .firstName: return "First Name"
         case .lastName: return "Last Name"
         case .email: return "Email"
@@ -99,6 +101,8 @@ enum ConfigComponentsEnum {
             return AnyView(ConfigClickToPayView(selectedWidget: selectedWidget, title: title))
         case .checkoutOptions:
             return AnyView(ConfigCheckoutOptionsView(selectedWidget: selectedWidget, title: title))
+        case .applePayConfig:
+            return AnyView(ConfigApplePayView(selectedWidget: selectedWidget, title: title))
         }
     }
 
@@ -154,7 +158,8 @@ enum ConfigComponentsEnum {
         case .shippingType: return .shippingType
         case .dateOfBirth: return .dateOfBirth
         case .tokenize: return .tokenize
-        case .allowSaveCard, .storeSecurityCode, .schemeSupport, .address, .checkoutOptions, .clickToPayMetaConfig:
+        case .allowSaveCard, .storeSecurityCode, .schemeSupport, .address,
+                    .checkoutOptions, .clickToPayMetaConfig, .applePayConfig:
             fatalError("This component doesn't use ConfigKeys")
         }
     }

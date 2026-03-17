@@ -20,6 +20,7 @@ public class PaymentSourcesMockService: PaymentSourcesService {
 
     public var tokenResult: String?
     public var giftCardTokenResult: String?
+    public var applePayTokenResult: String?
     public var setupTokenResult: SetupTokenData?
     public var paymentTokenResult: PaymentTokenData?
     public var externalCheckoutResult: (link: String, checkoutToken: String)?
@@ -51,6 +52,20 @@ public class PaymentSourcesMockService: PaymentSourcesService {
             throw RequestError.requestError(error)
         }
         return giftCardTokenResult ?? "mock-gift-card-token-456"
+    }
+
+    // MARK: - Apple Pay token
+
+    public func createApplePayToken(
+        tokeniseApplePayReq: CreateApplePayTokenReq, widgetAccessToken: String
+    ) async throws -> String {
+        if shouldThrowUnknownError {
+            throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
+        }
+        if shouldReturnError, let error = errorToReturn {
+            throw RequestError.requestError(error)
+        }
+        return applePayTokenResult ?? "mock-apple-pay-ott-token-159"
     }
 
     // MARK: - PayPal Vault Tokens

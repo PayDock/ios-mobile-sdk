@@ -25,10 +25,10 @@ public struct CreateApplePayTokenReq: Codable {
     public let payloadFormat: String
 
     public init(serviceId: String,
-                serviceType: String,
-                serviceGroup: String,
+                serviceType: String = "ApplePay",
+                serviceGroup: String = "wallet",
                 payload: String,
-                payloadFormat: String) {
+                payloadFormat: String = "encrypted_string") {
         self.serviceId = serviceId
         self.serviceType = serviceType
         self.serviceGroup = serviceGroup
@@ -37,12 +37,22 @@ public struct CreateApplePayTokenReq: Codable {
     }
 }
 
-/// Apple Pay OTT payload structure
+/// Apple Pay OTT payload structure - contains all data to be base64-encoded as payload
 public struct ApplePayOTTPayload: Codable {
     public let shipping: ApplePayOTTShipping?
     public let billing: ApplePayOTTBilling?
     public let refToken: String
     public let cardInfo: ApplePayOTTCardInfo
+
+    public init(shipping: ApplePayOTTShipping?,
+                billing: ApplePayOTTBilling?,
+                refToken: String,
+                cardInfo: ApplePayOTTCardInfo) {
+        self.shipping = shipping
+        self.billing = billing
+        self.refToken = refToken
+        self.cardInfo = cardInfo
+    }
 }
 
 public struct ApplePayOTTShipping: Codable {
@@ -55,6 +65,26 @@ public struct ApplePayOTTShipping: Codable {
     public let addressPostcode: String?
     public let addressState: String?
     public let contact: ApplePayOTTContact?
+
+    public init(method: String? = nil,
+                options: [ApplePayOTTShippingOption]? = nil,
+                addressLine1: String? = nil,
+                addressLine2: String? = nil,
+                addressCountry: String? = nil,
+                addressCity: String? = nil,
+                addressPostcode: String? = nil,
+                addressState: String? = nil,
+                contact: ApplePayOTTContact? = nil) {
+        self.method = method
+        self.options = options
+        self.addressLine1 = addressLine1
+        self.addressLine2 = addressLine2
+        self.addressCountry = addressCountry
+        self.addressCity = addressCity
+        self.addressPostcode = addressPostcode
+        self.addressState = addressState
+        self.contact = contact
+    }
 }
 
 public struct ApplePayOTTShippingOption: Codable {
@@ -62,6 +92,13 @@ public struct ApplePayOTTShippingOption: Codable {
     public let label: String
     public let amount: String
     public let detail: String?
+
+    public init(id: String, label: String, amount: String, detail: String? = nil) {
+        self.id = id
+        self.label = label
+        self.amount = amount
+        self.detail = detail
+    }
 }
 
 public struct ApplePayOTTBilling: Codable {
@@ -71,6 +108,20 @@ public struct ApplePayOTTBilling: Codable {
     public let addressCity: String?
     public let addressPostcode: String?
     public let addressState: String?
+
+    public init(addressLine1: String? = nil,
+                addressLine2: String? = nil,
+                addressCountry: String? = nil,
+                addressCity: String? = nil,
+                addressPostcode: String? = nil,
+                addressState: String? = nil) {
+        self.addressLine1 = addressLine1
+        self.addressLine2 = addressLine2
+        self.addressCountry = addressCountry
+        self.addressCity = addressCity
+        self.addressPostcode = addressPostcode
+        self.addressState = addressState
+    }
 }
 
 public struct ApplePayOTTContact: Codable {
@@ -78,8 +129,22 @@ public struct ApplePayOTTContact: Codable {
     public let lastName: String?
     public let email: String?
     public let phone: String?
+
+    public init(firstName: String? = nil,
+                lastName: String? = nil,
+                email: String? = nil,
+                phone: String? = nil) {
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+        self.phone = phone
+    }
 }
 
 public struct ApplePayOTTCardInfo: Codable {
     public let cardScheme: String
+
+    public init(cardScheme: String) {
+        self.cardScheme = cardScheme
+    }
 }

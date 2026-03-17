@@ -7,8 +7,8 @@
 
 import XCTest
 import Combine
-import NetworkingLib
 @testable import MobileSDK
+@testable import NetworkingLib
 @testable import DataPaymentSources
 
 // swiftlint:disable all
@@ -221,6 +221,7 @@ class CardDetailsVMTests: XCTestCase {
 
     
     private class ErroringPaymentSourcesServiceMock: PaymentSourcesService {
+
         enum FailureType {
             case requestError(message: String, code: String)
             case connectionError(URLError)
@@ -245,6 +246,10 @@ class CardDetailsVMTests: XCTestCase {
             default:
                 throw CardDetailsError.unknownError(nil)
             }
+        }
+
+        func createApplePayToken(tokeniseApplePayReq: DataPaymentSources.CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
         }
 
         func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
@@ -452,6 +457,7 @@ class CardDetailsVMTests: XCTestCase {
     // MARK: - Store Security Code Tests
 
     private class CapturingPaymentSourcesServiceMock: PaymentSourcesService {
+
         var capturedRequest: CreatePaymentSourceTokenReq?
         var tokenToReturn: String = "mock-token-123"
 
@@ -461,6 +467,10 @@ class CardDetailsVMTests: XCTestCase {
         }
 
         func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createApplePayToken(tokeniseApplePayReq: DataPaymentSources.CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String {
             return ""
         }
 

@@ -1,4 +1,5 @@
 //
+//
 //  ConfigWidgetsEnum.swift
 //  ExampleApp
 //
@@ -16,6 +17,7 @@ enum ConfigWidgetsEnum {
     case afterPay
     case colesPay
     case clickToPay
+    case applePay
     case zip
 
     var title: String {
@@ -29,6 +31,7 @@ enum ConfigWidgetsEnum {
         case .afterPay: return "Afterpay"
         case .colesPay: return "Coles Pay"
         case .clickToPay: return "Click to Pay"
+        case .applePay: return "Apple Pay"
         case .zip: return "Zip"
         }
     }
@@ -44,6 +47,7 @@ enum ConfigWidgetsEnum {
         case .afterPay: Image("afterpay-style")
         case .colesPay: Image("coles-pay-style")
         case .clickToPay: Image("click-to-pay-style")
+        case .applePay: Image("apple-pay-style")
         case .zip: Image("zip")
         }
     }

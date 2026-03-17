@@ -30,6 +30,8 @@ class ConfigVM: ObservableObject {
             return [.clientId]
         case .clickToPay:
             return [.widgetAccessToken, .clickToPayMetaConfig, .serviceId]
+        case .applePay:
+            return [.applePayConfig]
         case .zip:
             return [
                 .widgetAccessToken,

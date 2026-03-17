@@ -31,7 +31,7 @@ struct CardPaymentWidget: View {
             completion: { result in
                 switch result {
                 case .success(let result):
-                    viewModel.payWithCard(result.token)
+                    viewModel.payWithOTT(result.token)
                 case .failure(let error):
                     viewModel.showResultOverlay(success: false, message: error.customMessage)
                 }
