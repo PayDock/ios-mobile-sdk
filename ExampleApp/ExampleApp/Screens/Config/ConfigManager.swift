@@ -123,8 +123,9 @@ class ConfigManager: ObservableObject {
             amountLabel: "Amount",
             countryCode: "AU",
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "",
-            requireBillingAddress: true,
-            requireShippingAddress: false
+            requireBillingAddress: false,
+            requireShippingAddress: false,
+            showSetupButtonIfRequired: false
         )
     }
 
@@ -266,8 +267,9 @@ class ConfigManager: ObservableObject {
             amountLabel: "Amount",
             countryCode: "AU",
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "",
-            requireBillingAddress: true,
-            requireShippingAddress: false
+            requireBillingAddress: false,
+            requireShippingAddress: false,
+            showSetupButtonIfRequired: false
         )
     }
 
@@ -286,9 +288,10 @@ class ConfigManager: ObservableObject {
         )
 
         return ApplePayWidgetConfig(
-            pkPaymentRequest: pkPaymentRequest,
             serviceId: params.serviceId,
-            accessToken: ProjectEnvironment.shared.getWidgetAccessToken()
+            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+            pkPaymentRequest: pkPaymentRequest,
+            showSetUpButtonWhenNoCardsEnrolled: params.showSetupButtonIfRequired
         )
     }
 

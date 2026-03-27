@@ -156,7 +156,6 @@ struct EnhancedCheckoutView: View {
                             }
                         .navigationTitle("3DS Check")
                         .navigationBarTitleDisplayMode(.inline)
-
                     }
                 }
             })

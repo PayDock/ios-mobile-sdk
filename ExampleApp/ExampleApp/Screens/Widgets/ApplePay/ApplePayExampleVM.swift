@@ -54,9 +54,9 @@ class ApplePayExampleVM: NSObject, ObservableObject {
         showAlert = true
     }
 
-    func handleSuccess(ottToken: String) {
+    func handleSuccess(data: ApplePayResult) {
         alertTitle = "Success"
-        alertMessage = "OTT Token received:\n\(ottToken)"
+        alertMessage = "OTT Token received:\n\(data.ottToken)"
         showAlert = true
     }
 }

@@ -333,9 +333,9 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardholderName() {
-        // Only check for card number if 12+ digits entered (minimum for valid card numbers)
+        // Only check for card number if 13+ digits entered (minimum for valid card numbers)
         let digitCount = cardholderNameText.filter { $0.isNumber }.count
-        if digitCount >= 12 && cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText) {
+        if digitCount >= 13 && cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText) {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
 
@@ -359,9 +359,9 @@ class CardDetailsFormManager: ObservableObject {
     private func validateCardholderNameDuringTyping() {
         guard shouldValidateCardholderName else { return }
 
-        // Check if user entered a credit card number in the name field (only after 12+ digits)
+        // Check if user entered a credit card number in the name field (only after 13+ digits)
         let digitCount = cardholderNameText.filter { $0.isNumber }.count
-        if digitCount >= 12 && cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText) {
+        if digitCount >= 13 && cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText) {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
             return
@@ -441,7 +441,7 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardNumberForUnknownScheme() {
-        // During typing: only validate if digit count is within valid range (12-19)
+        // During typing: only validate if digit count is within valid range (13-19)
         let isInValidRange = cardSchemeValidator.isDigitCountInValidRange(number: cardNumberText, scheme: nil)
 
         if isCardNumberBeingEdited && !isInValidRange {
@@ -529,7 +529,7 @@ class CardDetailsFormManager: ObservableObject {
 
     /// Validates unknown scheme card number on defocus
     private func validateCardNumberForUnknownSchemeOnDefocus() {
-        // Check minimum digits (12 for unknown schemes)
+        // Check minimum digits (13 for unknown schemes)
         if !cardSchemeValidator.hasMinimumDigits(number: cardNumberText, scheme: nil) {
             updateCardNumberValidationState(isValid: false, errorMessage: "Invalid card number")
             return

@@ -14,9 +14,16 @@ struct ApplePayPaymentWidget: View {
     var body: some View {
         ApplePayWidget(
             config: viewModel.applePayConfig,
+            onShippingContactSelected: { contact in
+                viewModel.handleApplePayShippingContactSelected(contact)
+            },
+            onShippingMethodSelected: { method in
+                viewModel.handleApplePayShippingMethodSelected(method)
+            },
             completion: { result in
                 viewModel.handleApplePayResult(result)
-            })
+            }
+        )
         .frame(height: 50)
     }
 }

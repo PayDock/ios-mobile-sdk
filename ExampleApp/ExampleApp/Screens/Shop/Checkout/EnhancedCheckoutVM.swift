@@ -262,31 +262,84 @@ class EnhancedCheckoutVM: ObservableObject {
 extension EnhancedCheckoutVM {
 
     var applePayConfig: ApplePayWidgetConfig {
-        let params = ConfigManager.shared.getApplePayConfigParams()
-        let globalConfig = ConfigManager.shared.getGlobalConfig()
-
-        let pkPaymentRequest = MobileSDK.createApplePayRequest(
-            amount: Decimal(cartManager.total),
-            amountLabel: params.amountLabel,
-            countryCode: params.countryCode,
-            currencyCode: globalConfig.currency,
-            merchantIdentifier: params.merchantIdentifier,
-            requireBillingAddress: params.requireBillingAddress,
-            requireShippingAddress: params.requireShippingAddress
-        )
-
         return ApplePayWidgetConfig(
-            pkPaymentRequest: pkPaymentRequest,
             serviceId: ProjectEnvironment.shared.getApplePayServiceId() ?? "",
-            accessToken: ProjectEnvironment.shared.getWidgetAccessToken()
+            accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
+            pkPaymentRequest: createApplePayRequest()
         )
     }
 
+    func createApplePayRequest() -> PKPaymentRequest {
+        let params = ConfigManager.shared.getApplePayConfigParams()
+        let globalConfig = ConfigManager.shared.getGlobalConfig()
+        let request = PKPaymentRequest()
+
+        request.merchantIdentifier = params.merchantIdentifier
+        request.countryCode = params.countryCode
+//        request.supportedCountries = [params.countryCode]
+        request.currencyCode = globalConfig.currency
+        request.supportedNetworks = [.visa, .masterCard, .amex]
+        request.merchantCapabilities = [.credit, .debit, .threeDSecure]
+        request.requiredBillingContactFields = [.name, .postalAddress]
+        request.requiredShippingContactFields = [.name, .postalAddress, .phoneNumber, .emailAddress]
+
+        // Convert cart items to Apple summary items
+        var items = cartManager.cartItems.map { cartItem in
+            PKPaymentSummaryItem(
+                label: cartItem.product.name,
+                amount: NSDecimalNumber(value: cartItem.product.price)
+            )
+        }
+
+        request.shippingMethods = CartShippingOption.allCases.map { option in
+            let method = PKShippingMethod(
+                label: option.name,
+                amount: NSDecimalNumber(value: option.price)
+            )
+            method.detail = option.description
+            method.identifier = option.identifer
+            return method
+        }
+
+        items.append(PKPaymentSummaryItem(
+            label: cartManager.selectedShipping.name,
+            amount: NSDecimalNumber(value: cartManager.selectedShipping.price)
+        ))
+
+        items.append( PKPaymentSummaryItem(
+            label: "Total",
+            amount: NSDecimalNumber(value: cartManager.total)
+        ))
+
+        request.paymentSummaryItems = items
+        return request
+    }
+
+    func handleApplePayShippingContactSelected(_ contact: PKContact) -> PKPaymentRequestShippingContactUpdate {
+        return PKPaymentRequestShippingContactUpdate()
+    }
+
+    func handleApplePayShippingMethodSelected(_ method: PKShippingMethod) -> PKPaymentRequestShippingMethodUpdate {
+
+        switch method.identifier {
+        case CartShippingOption.standard.identifer:
+            cartManager.selectedShipping = .standard
+        case CartShippingOption.express.identifer:
+            cartManager.selectedShipping = .express
+        default:
+            cartManager.selectedShipping = .standard
+        }
+
+        let request = createApplePayRequest()
+
+        return PKPaymentRequestShippingMethodUpdate(paymentSummaryItems: request.paymentSummaryItems)
+    }
+
     /// Handles Apple Pay OTT token result
-    func handleApplePayResult(_ result: Result<String, ApplePayError>) {
+    func handleApplePayResult(_ result: Result<ApplePayResult, ApplePayError>) {
         switch result {
-        case .success(let ottToken):
-            processApplePayOTTToken(ottToken)
+        case .success(let data):
+                processApplePayResult(data)
         case .failure(let error):
             isLoading = false
             showResultOverlay(success: false, message: error.customMessage)
@@ -294,14 +347,14 @@ extension EnhancedCheckoutVM {
     }
 
     /// Converts OTT token to vault token, then creates a charge
-    private func processApplePayOTTToken(_ ottToken: String) {
+    private func processApplePayResult(_ result: ApplePayResult) {
         isLoading = true
         viewState?.setState(.disabled)
 
         Task {
             do {
                 // Step 1: Convert OTT to vault token
-                let vaultRequest = DataVault.ConvertToVaultTokenReq(token: ottToken, vaultType: "session")
+                let vaultRequest = DataVault.ConvertToVaultTokenReq(token: result.ottToken, vaultType: "session")
                 let vaultToken = try await vaultService.createVaultToken(
                     request: vaultRequest,
                     apiAccessToken: apiAccessToken

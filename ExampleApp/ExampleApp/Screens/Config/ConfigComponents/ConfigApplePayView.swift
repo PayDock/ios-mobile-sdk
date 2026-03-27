@@ -16,8 +16,9 @@ struct ConfigApplePayView: View {
     @State private var amountLabel: String = "Amount"
     @State private var countryCode: String = "AU"
     @State private var merchantIdentifier: String = ""
-    @State private var requireBillingAddress: Bool = true
+    @State private var requireBillingAddress: Bool = false
     @State private var requireShippingAddress: Bool = false
+    @State private var showSetupButtonIfRequired: Bool = false
 
     let selectedWidget: ConfigWidgetsEnum
     let title: String
@@ -42,6 +43,12 @@ struct ConfigApplePayView: View {
                         ToggleFieldView(title: "Require Billing Address", isOn: $requireBillingAddress, onChange: updateConfiguration)
 
                         ToggleFieldView(title: "Require Shipping Address", isOn: $requireShippingAddress, onChange: updateConfiguration)
+
+                        ToggleFieldView(
+                            title: "Show Setup Button If Required",
+                            isOn: $showSetupButtonIfRequired,
+                            onChange: updateConfiguration
+                        )
                     }
                     .padding(.top, 24)
 
@@ -69,6 +76,7 @@ struct ConfigApplePayView: View {
         merchantIdentifier = paymentRequest.merchantIdentifier
         requireBillingAddress = !paymentRequest.requiredBillingContactFields.isEmpty
         requireShippingAddress = !paymentRequest.requiredShippingContactFields.isEmpty
+        showSetupButtonIfRequired = config.showSetUpButtonWhenNoCardsEnrolled
 
         // Extract amountLabel from payment summary items
         if let firstItem = paymentRequest.paymentSummaryItems.first {
@@ -83,7 +91,8 @@ struct ConfigApplePayView: View {
             countryCode: countryCode,
             merchantIdentifier: merchantIdentifier,
             requireBillingAddress: requireBillingAddress,
-            requireShippingAddress: requireShippingAddress
+            requireShippingAddress: requireShippingAddress,
+            showSetupButtonIfRequired: showSetupButtonIfRequired
         )
 
         configVM.updateConfiguration(for: .applePay, with: config)
@@ -96,6 +105,7 @@ struct ConfigApplePayView: View {
         merchantIdentifier = ProjectEnvironment.shared.getApplePayMerchantId() ?? ""
         requireBillingAddress = true
         requireShippingAddress = false
+        showSetupButtonIfRequired = false
         updateConfiguration()
     }
 }
@@ -109,4 +119,5 @@ struct ApplePayConfigParams: Codable {
     let merchantIdentifier: String
     let requireBillingAddress: Bool
     let requireShippingAddress: Bool
+    let showSetupButtonIfRequired: Bool
 }

@@ -17,7 +17,7 @@ class ApplePayVMTests: XCTestCase {
     var viewModel: ApplePayVM!
     var mockPaymentSourcesService: PaymentSourcesMockService!
     var eventDelegate: WidgetEventDelegateUtil!
-    var completionResult: Result<String, ApplePayError>?
+    var completionResult: Result<ApplePayResult, ApplePayError>?
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
@@ -38,6 +38,22 @@ class ApplePayVMTests: XCTestCase {
     }
 
     private func setupViewModel() {
+        viewModel = ApplePayVM(
+            config: ApplePayWidgetConfig(
+                serviceId: "",
+                accessToken: "",
+                pkPaymentRequest: PKPaymentRequest()
+            ),
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+            })
+    }
+
+    // MARK: - Handle Button Tap Tests
+
+    func testHandleButtonTapWithSuccessfulPaymentRequest() async {
+        // Given
         let mockPaymentRequest = PKPaymentRequest()
         mockPaymentRequest.merchantIdentifier = "test.merchant.id"
         mockPaymentRequest.countryCode = "US"
@@ -46,9 +62,9 @@ class ApplePayVMTests: XCTestCase {
         mockPaymentRequest.merchantCapabilities = .threeDSecure
 
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: mockPaymentRequest,
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: mockPaymentRequest
         )
 
         viewModel = ApplePayVM(
@@ -66,7 +82,7 @@ class ApplePayVMTests: XCTestCase {
         XCTAssertNotNil(viewModel)
         XCTAssertEqual(viewModel.paymentStatus, .failure)
         XCTAssertNil(viewModel.paymentController)
-        XCTAssertNil(viewModel.ottToken)
+        XCTAssertNil(viewModel.result)
         XCTAssertNil(viewModel.error)
     }
 
@@ -97,9 +113,9 @@ class ApplePayVMTests: XCTestCase {
         // Given
         let invalidPaymentRequest = PKPaymentRequest() // Missing required fields
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: invalidPaymentRequest,
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: invalidPaymentRequest
         )
         viewModel = ApplePayVM(
             config: config,
@@ -136,7 +152,20 @@ class ApplePayVMTests: XCTestCase {
             errorSummary: nil
         )
         let mockPayment = createMockPayment()
-        let expectation = XCTestExpectation(description: "Payment authorization completion")
+        let invalidPaymentRequest = PKPaymentRequest() // Missing required fields
+        let config = ApplePayWidgetConfig(
+            serviceId: "test-service-id",
+            accessToken: "test-widget-token",
+            pkPaymentRequest: invalidPaymentRequest
+        )
+        viewModel = ApplePayVM(
+            config: config,
+            eventDelegate: eventDelegate,
+            paymentSourcesService: mockPaymentSourcesService,
+            completion: { result in
+                self.completionResult = result
+            })
+        let expectation = XCTestExpectation(description: "Payment authorization completion failure")
 
         // When
         viewModel.paymentAuthorizationController(
@@ -167,7 +196,20 @@ class ApplePayVMTests: XCTestCase {
         // For now, we'll test the error path by making the service throw an unknown error
 
         mockPaymentSourcesService.shouldThrowUnknownError = true
-        let expectation = XCTestExpectation(description: "Payment authorization completion")
+        let invalidPaymentRequest = PKPaymentRequest() // Missing required fields
+        let config = ApplePayWidgetConfig(
+            serviceId: "test-service-id",
+            accessToken: "test-widget-token",
+            pkPaymentRequest: invalidPaymentRequest
+        )
+        viewModel = ApplePayVM(
+            config: config,
+            eventDelegate: eventDelegate,
+            paymentSourcesService: mockPaymentSourcesService,
+            completion: { result in
+                self.completionResult = result
+            })
+        let expectation = XCTestExpectation(description: "Payment authorization completion failure")
 
         // When
         viewModel.paymentAuthorizationController(
@@ -192,13 +234,10 @@ class ApplePayVMTests: XCTestCase {
     func testPaymentAuthorizationControllerDidFinishWithSuccess() async {
         // Given
         let expectation = XCTestExpectation(description: "Success completion")
-        viewModel.paymentStatus = .success
-        viewModel.ottToken = "test-ott-token-456"
-
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: PKPaymentRequest(),
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: PKPaymentRequest()
         )
         viewModel = ApplePayVM(
             config: config,
@@ -209,7 +248,7 @@ class ApplePayVMTests: XCTestCase {
                 expectation.fulfill()
             })
         viewModel.paymentStatus = .success
-        viewModel.ottToken = "test-ott-token-456"
+        viewModel.result = ApplePayResult(ottToken: "test-ott-token-456")
 
         // When
         viewModel.paymentAuthorizationControllerDidFinish(PKPaymentAuthorizationController())
@@ -218,8 +257,8 @@ class ApplePayVMTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 2.0)
 
         // Then
-        if case .success(let ottToken) = completionResult {
-            XCTAssertEqual(ottToken, "test-ott-token-456")
+        if case .success(let result) = completionResult {
+            XCTAssertEqual(result.ottToken, "test-ott-token-456")
         } else {
             XCTFail("Expected success completion result with OTT token")
         }
@@ -228,13 +267,10 @@ class ApplePayVMTests: XCTestCase {
     func testPaymentAuthorizationControllerDidFinishWithUserCancellation() async {
         // Given
         let expectation = XCTestExpectation(description: "User cancellation completion")
-        viewModel.paymentStatus = .failure
-        viewModel.error = .userCanceledPayment
-
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: PKPaymentRequest(),
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: PKPaymentRequest()
         )
         viewModel = ApplePayVM(
             config: config,
@@ -268,18 +304,10 @@ class ApplePayVMTests: XCTestCase {
     func testPaymentAuthorizationControllerDidFinishWithTokenError() async {
         // Given
         let expectation = XCTestExpectation(description: "Token error completion")
-        viewModel.paymentStatus = .failure
-        viewModel.error = .errorCreatingToken(error: ErrorRes(
-            status: 400,
-            error: .init(message: "Token error", code: "TOKEN_ERROR", details: nil),
-            resource: nil,
-            errorSummary: nil
-        ))
-
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: PKPaymentRequest(),
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: PKPaymentRequest()
         )
         viewModel = ApplePayVM(
             config: config,
@@ -318,13 +346,10 @@ class ApplePayVMTests: XCTestCase {
     func testPaymentAuthorizationControllerDidFinishWithUnknownError() async {
         // Given
         let expectation = XCTestExpectation(description: "Unknown error completion")
-        viewModel.paymentStatus = .failure
-        viewModel.error = nil
-
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: PKPaymentRequest(),
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: PKPaymentRequest()
         )
         viewModel = ApplePayVM(
             config: config,
@@ -373,9 +398,9 @@ class ApplePayVMTests: XCTestCase {
     func testEventDelegateWithoutDelegate() {
         // Given
         let config = ApplePayWidgetConfig(
-            pkPaymentRequest: PKPaymentRequest(),
             serviceId: "test-service-id",
-            accessToken: "test-widget-token"
+            accessToken: "test-widget-token",
+            pkPaymentRequest: PKPaymentRequest()
         )
         viewModel = ApplePayVM(
             config: config,
@@ -396,7 +421,6 @@ class ApplePayVMTests: XCTestCase {
 
     private func createMockPayment() -> PKPayment {
         // Create a minimal PKPayment for testing
-        // Note: PKPayment is difficult to fully mock, so we use the real object
         return PKPayment()
     }
 }

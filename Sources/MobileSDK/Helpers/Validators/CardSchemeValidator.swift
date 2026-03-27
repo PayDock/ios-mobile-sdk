@@ -82,9 +82,9 @@ class CardSchemeValidator {
 
     /// Get minimum and maximum digit lengths for a card scheme
     /// - Parameter scheme: The card scheme, or nil for unknown schemes
-    /// - Returns: A tuple with (min, max) digit lengths. Defaults to (12, 19) for unknown schemes.
+    /// - Returns: A tuple with (min, max) digit lengths. Defaults to (13, 19) for unknown schemes.
     func digitRange(for scheme: CardScheme?) -> (min: Int, max: Int) {
-        guard let scheme = scheme else { return (12, 19) }
+        guard let scheme = scheme else { return (13, 19) }
         switch scheme {
         case .amex: return (15, 15)
         case .diners: return (14, 14)

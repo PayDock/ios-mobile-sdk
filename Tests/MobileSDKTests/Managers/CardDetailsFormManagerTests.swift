@@ -1322,33 +1322,33 @@ class CardDetailsFormManagerTests: XCTestCase {
     }
 
     func testCardNumberValidation_UnknownScheme_UsesDefaultRange() {
-        // Setup: Unknown scheme, should use 12-19 digit range
+        // Setup: Unknown scheme, should use 13-19 digit range
         mockSchemeValidator.getCardSchemeFromBINResult = nil
-        mockSchemeValidator.digitRangeResult = (12, 19) // Default range
-        mockSchemeValidator.isDigitCountInValidRangeResult = true // Within 12-19 range
+        mockSchemeValidator.digitRangeResult = (13, 19) // Default range
+        mockSchemeValidator.isDigitCountInValidRangeResult = true // Within 13-19 range
         mockSchemeValidator.isPossibleCreditCardNumberResult = true
         mockSchemeValidator.isUnknownCardNumberLengthValidResult = true
 
         sut.setEditingTextField(focusedField: .cardNumber)
-        sut.cardNumberText = "123456789012" // 12 digits, within default range
+        sut.cardNumberText = "1234567890121" // 13 digits, within default range
 
-        // Should validate using default 12-19 range
+        // Should validate using default 13-19 range
         XCTAssertTrue(sut.cardNumberValid ?? false)
         XCTAssertEqual(sut.cardNumberError, "")
         XCTAssertTrue(mockSchemeValidator.isDigitCountInValidRangeCalled)
     }
 
     func testCardNumberValidation_UnknownScheme_DefocusShowsErrorBelowMinimum() {
-        // Setup: Unknown scheme, below 12 digits
+        // Setup: Unknown scheme, below 13 digits
         mockSchemeValidator.getCardSchemeFromBINResult = nil
-        mockSchemeValidator.digitRangeResult = (12, 19)
-        mockSchemeValidator.hasMinimumDigitsResult = false // Below 12 digits
+        mockSchemeValidator.digitRangeResult = (13, 19)
+        mockSchemeValidator.hasMinimumDigitsResult = false // Below 13 digits
 
         sut.setEditingTextField(focusedField: .cardNumber)
         sut.cardNumberText = "1234567890" // 10 digits, below minimum
         sut.setEditingTextField(focusedField: nil) // Defocus
 
-        // Should show error on defocus when below 12 digits
+        // Should show error on defocus when below 13 digits
         XCTAssertFalse(sut.cardNumberValid ?? true)
         XCTAssertEqual(sut.cardNumberError, "Invalid card number")
         XCTAssertTrue(mockSchemeValidator.hasMinimumDigitsCalled)
@@ -1502,7 +1502,7 @@ class MockCardSchemeValidator: CardSchemeValidator {
     var isUnknownCardNumberLengthValidResult = false
     var isCardNumberValidResult = false
     var getCardSchemeFromBINResult: CardScheme?
-    var digitRangeResult: (min: Int, max: Int) = (12, 19)
+    var digitRangeResult: (min: Int, max: Int) = (13, 19)
     var isDigitCountInValidRangeResult = false
     var hasMinimumDigitsResult = false
 

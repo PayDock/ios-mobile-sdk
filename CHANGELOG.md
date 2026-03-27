@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.4.0] - 2026-04-10
+
+### Added
+- New error in 'ApplePayWidget' for "notSupported" if Apple Pay is not supported on device
+- New error in 'ApplePayWidget' for "noSupportedCardsInWallet" if no cards are enrolled in Apple Pay for specific config passed
+- Result for 'ApplePayWidget' updated to return shipping and billing details
+- Callbacks added in 'ApplePayWidget' for contact and shipping details callbacks
+
+### Changed
+- 'ApplePayWidget' now returns a result object with a token versus previously completing the charge
+
+### Fixed
+- Removed 'PayPalVaultAppearance' overwriting appearance passed in init
+- Minimum card number length for unknown card schemes updated to 13
+
 ## [4.3.0] - 2026-03-13
 
 ### Added

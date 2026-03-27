@@ -74,6 +74,7 @@ class ApplePayStyleVM: ObservableObject {
 
     @Published var buttonType: PKPaymentButtonType = .plain { didSet { updateAppearance() }}
     @Published var buttonStyle: PKPaymentButtonStyle = .automatic { didSet { updateAppearance() }}
+    @Published var cornerRadius: Double = 4.0 { didSet { updateAppearance() }}
 
     @Published var selectedButtonTypeName: String = "Plain" {
         didSet {
@@ -107,6 +108,7 @@ class ApplePayStyleVM: ObservableObject {
     private func syncUIToAppearance() {
         self.buttonType = appearance?.type ?? .plain
         self.buttonStyle = appearance?.style ?? .automatic
+        self.cornerRadius = appearance?.cornerRadius.map { Double($0) } ?? 4.0
 
         if let typeIndex = buttonTypes.firstIndex(of: buttonType) {
             selectedButtonTypeName = buttonTypeNames[typeIndex]
@@ -122,6 +124,7 @@ class ApplePayStyleVM: ObservableObject {
 
         appearance.type = buttonType
         appearance.style = buttonStyle
+        appearance.cornerRadius = CGFloat(cornerRadius)
 
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
     }
