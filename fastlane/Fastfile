@@ -153,6 +153,7 @@ private_lane :merge_junit_reports do
   end
   
   # Write merged report
+  FileUtils.mkdir_p(File.dirname(main_report_path))
   File.write(main_report_path, merged_doc.to_s)
   UI.success("✅ Merged test reports from all packages (#{merged_testsuites.length} test suites)")
 end
@@ -1883,7 +1884,7 @@ def inject_env_vars_to_xcconfig(options)
         "SERVICE_ID_MPGS",
         "SERVICE_ID_MPGS_TEST",
         "SERVICE_ID_AFTERPAY",
-        "SERVICE_ID_APPLE_PAY_MPGS",
+        "SERVICE_ID_APPLE_PAY",
         "SERVICE_ID_CLICK_TO_PAY",
         "SERVICE_ID_COLES_PAY",
         "SERVICE_ID_GPAYMENTS",

@@ -15,6 +15,10 @@ public protocol PaymentSourcesService {
     func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String
     func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String
 
+    // MARK: - Apple Pay token
+
+    func createApplePayToken(tokeniseApplePayReq: CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String
+
     // MARK: - PayPal Vault Tokens
 
     func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData
@@ -54,6 +58,15 @@ public struct PaymentSourcesServiceImpl: HTTPClient, PaymentSourcesService {
             responseModel: PaymentSourceTokenRes.self,
             timeout: 60)
         return response.resource.data
+    }
+
+    // MARK: - Apple Pay token
+
+    public func createApplePayToken(tokeniseApplePayReq: CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String {
+        let response = try await sendRequest(
+            endpoint: PaymentSourcesEndpoints.applePayToken(tokeniseApplePayReq: tokeniseApplePayReq, widgetAccessToken: widgetAccessToken),
+            responseModel: ApplePayTokenRes.self)
+        return response.resource.data.tempToken
     }
 
     // MARK: - PayPal Vault Tokens

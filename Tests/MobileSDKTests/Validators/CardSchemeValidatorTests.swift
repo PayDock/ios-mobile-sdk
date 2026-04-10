@@ -180,7 +180,7 @@ class CardSchemeValidatorTests: XCTestCase {
 
     func testDigitRange_UnknownScheme() {
         let range = validator.digitRange(for: nil)
-        XCTAssertEqual(range.min, 12)
+        XCTAssertEqual(range.min, 13)
         XCTAssertEqual(range.max, 19)
     }
 
@@ -220,12 +220,12 @@ class CardSchemeValidatorTests: XCTestCase {
     }
 
     func testIsDigitCountInValidRange_UnknownScheme_Valid() {
-        XCTAssertTrue(validator.isDigitCountInValidRange(number: "123456789012", scheme: nil)) // 12 digits (minimum)
+        XCTAssertTrue(validator.isDigitCountInValidRange(number: "1234567890122", scheme: nil)) // 13 digits (minimum)
         XCTAssertTrue(validator.isDigitCountInValidRange(number: "1234567890123456789", scheme: nil)) // 19 digits (maximum)
     }
 
     func testIsDigitCountInValidRange_UnknownScheme_BelowMinimum() {
-        XCTAssertFalse(validator.isDigitCountInValidRange(number: "12345678901", scheme: nil)) // 11 digits
+        XCTAssertFalse(validator.isDigitCountInValidRange(number: "123456789011", scheme: nil)) // 12 digits
     }
 
     // MARK: - hasMinimumDigits Tests
@@ -251,11 +251,11 @@ class CardSchemeValidatorTests: XCTestCase {
     }
 
     func testHasMinimumDigits_UnknownScheme_AtMinimum() {
-        XCTAssertTrue(validator.hasMinimumDigits(number: "123456789012", scheme: nil)) // 12 digits
+        XCTAssertTrue(validator.hasMinimumDigits(number: "1234567890121", scheme: nil)) // 13 digits
     }
 
     func testHasMinimumDigits_UnknownScheme_BelowMinimum() {
-        XCTAssertFalse(validator.hasMinimumDigits(number: "12345678901", scheme: nil)) // 11 digits
+        XCTAssertFalse(validator.hasMinimumDigits(number: "123456789011", scheme: nil)) // 12 digits
     }
 
     func testHasMinimumDigits_WithWhitespace() {
@@ -301,8 +301,8 @@ class CardSchemeValidatorTests: XCTestCase {
     }
 
     func testHasMinimumDigits_SpecialCharactersNotCounted() {
-        // "123-456-789-012" has 12 digits with hyphens (minimum for unknown scheme)
-        XCTAssertTrue(validator.hasMinimumDigits(number: "123-456-789-012", scheme: nil))
+        // "123-456-789-012" has 13 digits with hyphens (minimum for unknown scheme)
+        XCTAssertTrue(validator.hasMinimumDigits(number: "123-456-789-0123", scheme: nil))
     }
 
     func testHasMinimumDigits_OnlyLetters_ReturnsZeroDigits() {

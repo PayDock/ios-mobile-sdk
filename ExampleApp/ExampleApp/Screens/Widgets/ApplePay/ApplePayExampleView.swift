@@ -2,12 +2,11 @@
 //  ApplePayExampleView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 04.10.2023..
-//  Copyright © 2023 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
+import PassKit
 
 struct ApplePayExampleView: View {
 
@@ -19,17 +18,18 @@ struct ApplePayExampleView: View {
         NavigationStack {
             ScrollView {
                 ApplePayWidget(
+                    config: viewModel.getConfig(),
                     appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
-                    eventDelegate: viewModel) { onApplePayButtonTap in
-                        viewModel.initializeWalletCharge(completion: onApplePayButtonTap)
-                    } completion: { result in
+                    eventDelegate: viewModel,
+                    completion: { result in
                         switch result {
-                        case .success(let chargeResponse): viewModel.handleSuccess(charge: chargeResponse)
+                        case .success(let data): viewModel.handleSuccess(data: data)
                         case .failure(let error): viewModel.handleError(error: error)
                         }
                     }
-                    .frame(height: 50)
-                    .padding()
+                )
+                .frame(height: 50)
+                .padding()
             }
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
             .background(Color(hex: "#EAE0D7"))
@@ -37,15 +37,6 @@ struct ApplePayExampleView: View {
                 Text(viewModel.alertMessage)
             })
         }
-    }
-
-    private func getAppearance() -> ApplePayWidgetAppearance {
-        let appearance = StyleThemeManager.getAppearance(
-            for: .applePay,
-            isDarkMode: colorScheme == .dark,
-            as: ApplePayWidgetAppearance.self,
-            shouldCreateDefaultIfNeeded: false)
-        return appearance ?? ApplePayWidgetAppearance()
     }
 }
 

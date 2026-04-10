@@ -2,9 +2,7 @@
 //  MobileSDK.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 05.07.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import PassKit
@@ -53,7 +51,7 @@ extension MobileSDK {
         merchantIdentifier: String,
         merchantCapabilities: PKMerchantCapability = [.capabilityCredit, .capabilityDebit, .capability3DS],
         supportedNetworks: [PKPaymentNetwork] = [.visa, .masterCard, .amex, .discover],
-        requireBillingAddress: Bool = true,
+        requireBillingAddress: Bool = false,
         requireShippingAddress: Bool = false,
         shippingOptions: [PKShippingMethod]? = nil) -> PKPaymentRequest {
             let item = PKPaymentSummaryItem(label: amountLabel, amount: amount as NSDecimalNumber, type: .final)

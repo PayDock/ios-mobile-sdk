@@ -2,40 +2,76 @@
 //  ApplePayWidget.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 04.10.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import PassKit
 
 public struct ApplePayWidget: View {
     @StateObject private var viewModel: ApplePayVM
-    @State var appearance: ApplePayWidgetAppearance
+    let appearance: ApplePayWidgetAppearance
 
-    public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
+    /// Initializes the Apple Pay widget
+    /// - Parameters:
+    ///   - config: Configuration containing payment request, service ID, and access token
+    ///   - appearance: Optional appearance configuration for the button
+    ///   - eventDelegate: Optional delegate for widget events
+    ///   - onShippingContactSelected: Optional delegate used to handle update shipping contact information
+    ///   - onShippingMethodSelected: Optional delegate used to handle user selection of different shipping methods
+    ///   - completion: Completion handler returning the Paydock OTT token on success
+    public init(config: ApplePayWidgetConfig,
+                appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
                 eventDelegate: WidgetEventDelegate? = nil,
-                createPaymentRequest: @escaping (
-                    _ createPaymentRequestResult: @escaping (
-                        Result<ApplePayRequestResult, ApplePayRequestError>) -> Void) -> Void,
-                completion: @escaping (Result<ChargeResponse, ApplePayError>) -> Void) {
+                onShippingContactSelected: ((PKContact) -> PKPaymentRequestShippingContactUpdate)? = nil,
+                onShippingMethodSelected: ((PKShippingMethod) -> PKPaymentRequestShippingMethodUpdate)? = nil,
+                completion: @escaping (Result<ApplePayResult, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
+            config: config,
             eventDelegate: eventDelegate,
-            createPaymentRequest: createPaymentRequest,
-            completion: completion))
+            onShippingContactSelected: onShippingContactSelected,
+            onShippingMethodSelected: onShippingMethodSelected,
+            completion: completion)
+        )
         self.appearance = appearance
     }
 
     public var body: some View {
-        ApplePayButton(appearance: appearance) {
-            viewModel.handleButtonTap()
-            viewModel.handleApplePayTapAnalytics()
+        if viewModel.canMakePaymentsWithConfiguredNetworksAndCapabilities() {
+            ApplePayButton(
+                appearance: appearance,
+                isDisabled: viewModel.isProcessing
+            ) {
+                viewModel.startPayment()
+                viewModel.handleApplePayTapAnalytics()
+            }
+        } else if viewModel.shouldShowSetupButton() {
+            // Open Wallet for card enrollment — do NOT run the payment flow
+            ApplePayButton(
+                appearance: setUpAppearance,
+                isDisabled: false
+            ) {
+                PKPassLibrary().openPaymentSetup()
+            }
         }
+    }
+
+    private var setUpAppearance: ApplePayWidgetAppearance {
+        var updatedAppearance = appearance
+        updatedAppearance.type = .setUp
+        return updatedAppearance
     }
 }
 
 struct ApplePayWidget_Previews: PreviewProvider {
     static var previews: some View {
-        ApplePayWidget(createPaymentRequest: { _ in }, completion: { _ in })
+        ApplePayWidget(
+            config: ApplePayWidgetConfig(
+                serviceId: "test-service-id",
+                accessToken: "test-token",
+                pkPaymentRequest: .init(),
+                showSetUpButtonWhenNoCardsEnrolled: false
+            ),
+            completion: { _ in }
+        )
     }
 }

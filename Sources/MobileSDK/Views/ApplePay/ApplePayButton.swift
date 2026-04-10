@@ -2,25 +2,26 @@
 //  ApplePayButton.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 04.10.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import PassKit
 
 struct ApplePayButton: View {
     @State var appearance: ApplePayWidgetAppearance
+    private let isDisabled: Bool
     private let action: () -> Void
 
     init(appearance: ApplePayWidgetAppearance,
+         isDisabled: Bool = false,
          action: @escaping () -> Void) {
         self.appearance = appearance
+        self.isDisabled = isDisabled
         self.action = action
     }
 
     var body: some View {
-        Representable(appearance: appearance, action: action)
+        Representable(appearance: appearance, isDisabled: isDisabled, action: action)
     }
 }
 
@@ -34,6 +35,7 @@ struct ApplePayButton_Previews: PreviewProvider {
 extension ApplePayButton {
     struct Representable: UIViewRepresentable {
         var appearance: ApplePayWidgetAppearance
+        var isDisabled: Bool
         var action: () -> Void
 
         func makeCoordinator() -> Coordinator {
@@ -46,6 +48,11 @@ extension ApplePayButton {
 
         func updateUIView(_ uiView: UIViewType, context: Context) {
             context.coordinator.action = action
+            context.coordinator.appearance = appearance
+            context.coordinator.button.isEnabled = !isDisabled
+            if let cornerRadius = appearance.cornerRadius {
+                context.coordinator.button.cornerRadius = cornerRadius
+            }
         }
     }
 
@@ -65,6 +72,9 @@ extension ApplePayButton {
 
         private func setup() {
             button.addTarget(self, action: #selector(callback(_:)), for: .touchUpInside)
+            if let cornerRadius = appearance.cornerRadius {
+                button.cornerRadius = cornerRadius
+            }
         }
 
         @objc
@@ -72,5 +82,4 @@ extension ApplePayButton {
             action()
         }
     }
-
 }

@@ -259,7 +259,7 @@ final class CardDetailsWidgetUITests: XCTestCase {
 
         // Test 2a: Too short card number (below minimum for Visa)
         cardNumberField.fastTypeText("")
-        cardNumberField.slowTypeText("411111111111") // 12 digits, below Visa minimum of 16
+        cardNumberField.slowTypeText("4111111111111") // 13 digits, below Visa minimum of 16
         expiryField.tap() // Defocus to trigger validation
         usleep(1000000) // 1s for validation
 

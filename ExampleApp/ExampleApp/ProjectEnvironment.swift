@@ -2,9 +2,7 @@
 //  Environment.swift
 //  ExampleApp
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 10.07.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 
@@ -16,7 +14,7 @@ struct ProjectEnvironment {
         static let configuration = "CONFIGURATION"
         static let apiAccessToken = "ACCESS_TOKEN_API"
         static let widgetAccessToken = "ACCESS_TOKEN_WIDGET"
-        static let applePayGatewayId = "SERVICE_ID_APPLE_PAY_MPGS"
+        static let applePayServiceId = "SERVICE_ID_APPLE_PAY"
         static let payPalGatewayId = "SERVICE_ID_PAYPAL"
         static let mpgsGatewayId = "SERVICE_ID_MPGS"
         static let mpgsTestGatewayId = "SERVICE_ID_MPGS_TEST"
@@ -80,12 +78,12 @@ struct ProjectEnvironment {
         return accessToken
     }
 
-    func getApplePayGatewayId() -> String? {
-        guard let gatewayId = Self.infoDictionary[Keys.applePayGatewayId] as? String else {
-            print("Apple Pay gateway ID not found in .plist!")
+    func getApplePayServiceId() -> String? {
+        guard let serviceId = Self.infoDictionary[Keys.applePayServiceId] as? String else {
+            print("Apple Pay service ID not found in .plist!")
             return nil
         }
-        return gatewayId
+        return serviceId
     }
 
     func getPayPalGatewayId() -> String? {

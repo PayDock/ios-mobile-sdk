@@ -173,6 +173,10 @@ class GiftCardVMTests: XCTestCase {
             }
         }
 
+        func createApplePayToken(tokeniseApplePayReq: DataPaymentSources.CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
         func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
             fatalError("Not implemented")
         }

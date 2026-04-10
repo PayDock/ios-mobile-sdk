@@ -2,9 +2,7 @@
 //  CartManager.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 02.10.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import Combine
@@ -13,7 +11,7 @@ class CartManager: ObservableObject {
     static let shared = CartManager()
 
     @Published var cartItems: [CartItem] = []
-    @Published var selectedShipping: CartShippingOption = .free
+    @Published var selectedShipping: CartShippingOption = .standard
     @Published var appliedGiftCards: [AppliedGiftCard] = []
 
     private init() {}

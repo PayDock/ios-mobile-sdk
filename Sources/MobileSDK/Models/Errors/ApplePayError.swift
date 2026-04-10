@@ -7,26 +7,29 @@
 import Foundation
 import NetworkingLib
 
-public enum ApplePayError: Error {
+public enum ApplePayError: Error, LocalizedError {
 
-    case invalidApplePayRequest
-    case errorInitializingPayment
-    case errorCompletingPayment(error: ErrorRes)
+    case notSupported
+    case noSupportedCardsInWallet
+    case errorCreatingToken(error: ErrorRes)
     case userCanceledPayment
     case unableToPresentPaymentSheet
-    case creatingPaymentRequest(reason: String)
+    case payloadEncodingFailed
     case unknownError(RequestError?)
 
     public var customMessage: String {
         switch self {
-        case .invalidApplePayRequest: return "Missing or invalid ApplePayRequest object"
-        case .errorInitializingPayment: return "Initialisation of ApplePay has failed"
-        case .errorCompletingPayment(let errorRes):
-                return errorRes.apiFailureMessage(fallback: "Payment failed")
+        case .notSupported: return "Apple Pay is not supported"
+        case .noSupportedCardsInWallet: return "No supported cards in Wallet"
+        case .errorCreatingToken(let error): return error.error?.message ?? "Failed to create Apple Pay token"
         case .userCanceledPayment: return "User has canceled the payment"
         case .unableToPresentPaymentSheet: return "Unable to present ApplePay sheet - check the provided Merchant ID"
-        case .creatingPaymentRequest(let reason): return reason
-        case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
+        case .payloadEncodingFailed: return "Failed to encode Apple Pay payment data"
+        case let .unknownError(requestError): return requestError?.uiMessage ?? "Unknown error"
         }
+    }
+
+    public var errorDescription: String? {
+        return customMessage
     }
 }

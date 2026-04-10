@@ -49,34 +49,38 @@ struct CartItem: Identifiable, Codable {
 }
 
 enum CartShippingOption: CaseIterable {
-    case free
+    case standard
     case express
 
     var name: String {
         switch self {
-        case .free: return "Standard Shipping"
+        case .standard: return "Standard Shipping"
         case .express: return "Express Shipping"
         }
     }
 
     var price: Double {
         switch self {
-        case .free: return 0.0
-        case .express: return 2.0
+        case .standard: return 5.0
+        case .express: return 15.0
         }
     }
 
     var formattedPrice: String {
-        if price == 0.0 {
-            return "Free"
-        }
         return String(format: "$%.2f", price)
     }
 
     var description: String {
         switch self {
-        case .free: return "5-7 business days"
+        case .standard: return "5-7 business days"
         case .express: return "1-2 business days"
+        }
+    }
+
+    var identifer: String {
+        switch self {
+        case .standard: return "standard_shipping"
+        case .express: return "express_shipping"
         }
     }
 }

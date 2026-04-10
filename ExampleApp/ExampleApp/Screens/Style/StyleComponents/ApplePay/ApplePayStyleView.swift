@@ -56,6 +56,19 @@ struct ApplePayStyleView: View {
                 placeholder: "Select Style") { buttonStyleName in
                     viewModel.selectedButtonStyleName = buttonStyleName
                 }
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Corner Radius")
+                        .font(.subheadline)
+                    Spacer()
+                    Text(String(format: "%.0f pt", viewModel.cornerRadius))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Slider(value: $viewModel.cornerRadius, in: 0...20, step: 1)
+            }
+            .padding(.horizontal, 16)
         }
     }
 }

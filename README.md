@@ -53,7 +53,7 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 
 *   **`ACCESS_TOKEN_API`:** The Paydock API access token for the specified environment (e.g., Sandbox, Staging, Production). This token is used by the sample app to make direct calls to the Paydock API for tasks like creating customers or managing transactions.
 *   **`ACCESS_TOKEN_WIDGET`:** The Paydock Widget/UI access token for the specified environment. This token is used by the Paydock Mobile SDK to authenticate and authorize the use of the pre-built UI widgets for payment processing.
-*   **`SERVICE_ID_APPLE_PAY_MPGS`:** Your Paydock service ID for the MPGS (Mastercard Payment Gateway Services) gateway. This ID is required to process card payments, handle 3D Secure (3DS) authentication, ApplePay and manage other card-related transactions.
+*   **`SERVICE_ID_APPLE_PAY`:** Your Paydock service ID for the Apple Pay service. This ID is required to enable Apple Pay as a payment method.
 *   **`SERVICE_ID_PAYPAL`:** Your Paydock service ID for the PayPal gateway. This ID is necessary to enable PayPal as a payment method within the sample app.
 *   **`SERVICE_ID_AFTERPAY`:** Your Paydock service ID for the Afterpay gateway. This ID is required to enable Afterpay as a payment method.
 *   **`SERVICE_ID_COLES_PAY`:** Your Paydock service ID for the Coles Pay gateway. This ID is required to enable Coles Pay as a payment method.
@@ -76,7 +76,7 @@ SERVICE_ID_MPGS_TEST=your_gateway_id_mpgs_test
 // AFTERPAY
 SERVICE_ID_AFTERPAY=your_gateway_id_afterpay
 // APPLE PAY
-SERVICE_ID_APPLE_PAY_MPGS=your_gateway_id_applepay
+SERVICE_ID_APPLE_PAY=your_gateway_id_applepay
 MERCHANT_ID_APPLE_PAY=your_merchant_id_applepay
 // CLICK TO PAY
 SERVICE_ID_CLICK_TO_PAY=your_gateway_id_click_to_pay

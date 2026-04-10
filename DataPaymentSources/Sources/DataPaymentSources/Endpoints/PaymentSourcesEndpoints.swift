@@ -14,6 +14,9 @@ public enum PaymentSourcesEndpoints {
 
     case cardToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String)
     case giftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String)
+
+    // MARK: - Apple Pay token
+
     case applePayToken(tokeniseApplePayReq: CreateApplePayTokenReq, widgetAccessToken: String)
 
     // MARK: - PayPal Vault Tokens

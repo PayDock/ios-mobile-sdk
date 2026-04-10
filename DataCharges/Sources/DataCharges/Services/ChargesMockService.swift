@@ -106,7 +106,7 @@ public class ChargesMockService: ChargesService {
                 archived: false,
                 description: request.description,
                 oneOff: true,
-                reference: request.reference ?? "mock-reference",
+                reference: request.reference,
                 items: nil,
                 transactions: [],
                 updatedAt: "2024-01-01T00:00:00Z",

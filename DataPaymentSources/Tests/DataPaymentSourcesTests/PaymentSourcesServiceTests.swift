@@ -2,11 +2,12 @@
 //  PaymentSourcesServiceTests.swift
 //  DataPaymentSourcesTests
 //
-//  Copyright © 2026 Paydock Ltd. All rights reserved.
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 @testable import DataPaymentSources
-import CommonModels
+@testable import CommonModels
+@testable import NetworkingLib
 
 final class PaymentSourcesServiceTests: XCTestCase {
 
@@ -46,6 +47,72 @@ final class PaymentSourcesServiceTests: XCTestCase {
         )
 
         XCTAssertEqual(token, "mock-gift-card-token-456")
+    }
+
+    func testPaymentSourcesMockServiceCreateApplePayToken() async throws {
+        let mockService = PaymentSourcesMockService()
+        mockService.applePayTokenResult = "test-apple-pay-ott-token-789"
+
+        let request = CreateApplePayTokenReq(
+            serviceId: "test-service-id",
+            payload: "base64-encoded-payload"
+        )
+
+        let token = try await mockService.createApplePayToken(
+            tokeniseApplePayReq: request,
+            widgetAccessToken: "test-token"
+        )
+
+        XCTAssertEqual(token, "test-apple-pay-ott-token-789")
+    }
+
+    func testPaymentSourcesMockServiceCreateApplePayTokenWithDefaultValue() async throws {
+        let mockService = PaymentSourcesMockService()
+        // Don't set applePayTokenResult, should use default
+
+        let request = CreateApplePayTokenReq(
+            serviceId: "test-service-id",
+            payload: "base64-encoded-payload"
+        )
+
+        let token = try await mockService.createApplePayToken(
+            tokeniseApplePayReq: request,
+            widgetAccessToken: "test-token"
+        )
+
+        XCTAssertEqual(token, "mock-apple-pay-ott-token-159")
+    }
+
+    func testPaymentSourcesMockServiceCreateApplePayTokenWithError() async throws {
+        let mockService = PaymentSourcesMockService()
+        mockService.shouldReturnError = true
+        mockService.errorToReturn = ErrorRes(
+            status: 400,
+            error: .init(message: "Token creation failed", code: "TOKEN_ERROR", details: nil),
+            resource: nil,
+            errorSummary: nil
+        )
+
+        let request = CreateApplePayTokenReq(
+            serviceId: "test-service-id",
+            payload: "base64-encoded-payload"
+        )
+
+        do {
+            _ = try await mockService.createApplePayToken(
+                tokeniseApplePayReq: request,
+                widgetAccessToken: "test-token"
+            )
+            XCTFail("Expected error to be thrown")
+        } catch let error as RequestError {
+            if case .requestError(let errorRes) = error {
+                XCTAssertEqual(errorRes.error?.message, "Token creation failed")
+            } else {
+                XCTFail("Expected requestError")
+            }
+        } catch {
+            XCTFail("Expected RequestError, got \(error)")
+        }
     }
 
     func testPaymentSourcesMockServiceCreateSetupToken() async throws {

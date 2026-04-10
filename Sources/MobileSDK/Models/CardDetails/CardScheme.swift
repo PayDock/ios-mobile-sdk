@@ -2,9 +2,7 @@
 //  CardScheme.swift
 //  MobileSDK
 //
-//  Created by Ricardo Da Silva on 2024/12/29.
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 
