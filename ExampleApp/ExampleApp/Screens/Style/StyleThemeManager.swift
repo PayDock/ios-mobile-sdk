@@ -2,7 +2,7 @@
 //  StyleThemeManager.swift
 //  ExampleApp
 //
-//  Copyright © 2026 Paydock Ltd. All rights reserved.
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import MobileSDK
@@ -65,8 +65,8 @@ class StyleThemeManager {
         case .afterPay: newAppearance = AfterpayWidgetAppearance()
         case .clickToPay: newAppearance = ClickToPayWidgetAppearance()
         case .applePay: newAppearance = ApplePayWidgetAppearance()
-        case .mpgs3ds: newAppearance = ThreeDSWidgetAppearance()
-        case .standalone3ds: newAppearance = ThreeDSWidgetAppearance()
+        case .mpgs3ds: newAppearance = MPG3dsWidgetAppearance()
+        case .standalone3ds: newAppearance = Standalone3dsWidgetAppearance()
         case .zip: newAppearance = ZipWidgetAppearance()
         }
 

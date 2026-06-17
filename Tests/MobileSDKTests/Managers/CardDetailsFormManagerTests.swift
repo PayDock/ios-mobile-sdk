@@ -78,10 +78,10 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.expiryDateTitle, "Expiry")
         XCTAssertEqual(sut.securityCodeTitle, "CVV")
 
-        XCTAssertEqual(sut.cardholderNamePlaceholder, "")
-        XCTAssertEqual(sut.cardNumberPlaceholder, "XXXX XXXX XXXX XXXX")
-        XCTAssertEqual(sut.expiryDatePlaceholder, "MM/YY")
-        XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
+        // Field placeholders for name/number/expiry are provided via the widget appearance, not
+        // the form manager. The form manager only owns the security-code placeholder, which starts
+        // empty and is seeded/flipped (XXX <-> XXXX) by updateSecurityCodePlaceholder().
+        XCTAssertEqual(sut.securityCodePlaceholder, "")
 
         XCTAssertEqual(sut.cardholderNameText, "")
         XCTAssertEqual(sut.cardNumberText, "")
@@ -820,46 +820,54 @@ class CardDetailsFormManagerTests: XCTestCase {
 
     // MARK: - Security Code Title and Placeholder Updates
 
-    func testUpdateSecurityCodeTitleAndPlaceholder_Visa() {
+    // The security-code title is a constant "CVV"; updateSecurityCodePlaceholder() flips the
+    // placeholder between the "XXX" and "XXXX" sentinels (amex uses 4 digits) from a seeded value,
+    // leaving any custom override untouched.
+    func testUpdateSecurityCodePlaceholder_Visa() {
         mockSchemeValidator.getCardSchemeFromBINResult = .visa
+        sut.securityCodePlaceholder = "XXX"
 
-        sut.updateSecurityCodeTitleAndPlaceholder()
+        sut.updateSecurityCodePlaceholder()
 
         XCTAssertEqual(sut.securityCodeTitle, "CVV")
         XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
     }
 
-    func testUpdateSecurityCodeTitleAndPlaceholder_Mastercard() {
+    func testUpdateSecurityCodePlaceholder_Mastercard() {
         mockSchemeValidator.getCardSchemeFromBINResult = .mastercard
+        sut.securityCodePlaceholder = "XXX"
 
-        sut.updateSecurityCodeTitleAndPlaceholder()
+        sut.updateSecurityCodePlaceholder()
 
-        XCTAssertEqual(sut.securityCodeTitle, "CVC")
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
         XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
     }
 
-    func testUpdateSecurityCodeTitleAndPlaceholder_Amex() {
+    func testUpdateSecurityCodePlaceholder_Amex() {
         mockSchemeValidator.getCardSchemeFromBINResult = .amex
+        sut.securityCodePlaceholder = "XXX"
 
-        sut.updateSecurityCodeTitleAndPlaceholder()
+        sut.updateSecurityCodePlaceholder()
 
-        XCTAssertEqual(sut.securityCodeTitle, "CID")
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
         XCTAssertEqual(sut.securityCodePlaceholder, "XXXX")
     }
 
-    func testUpdateSecurityCodeTitleAndPlaceholder_Discover() {
+    func testUpdateSecurityCodePlaceholder_Discover() {
         mockSchemeValidator.getCardSchemeFromBINResult = .discover
+        sut.securityCodePlaceholder = "XXX"
 
-        sut.updateSecurityCodeTitleAndPlaceholder()
+        sut.updateSecurityCodePlaceholder()
 
-        XCTAssertEqual(sut.securityCodeTitle, "CID")
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
         XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
     }
 
-    func testUpdateSecurityCodeTitleAndPlaceholder_None() {
+    func testUpdateSecurityCodePlaceholder_None() {
         mockSchemeValidator.getCardSchemeFromBINResult = nil
+        sut.securityCodePlaceholder = "XXX"
 
-        sut.updateSecurityCodeTitleAndPlaceholder()
+        sut.updateSecurityCodePlaceholder()
 
         XCTAssertEqual(sut.securityCodeTitle, "CVV")
         XCTAssertEqual(sut.securityCodePlaceholder, "XXX")
@@ -1004,6 +1012,123 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertFalse(sut.cardNumberValid ?? true, "Card type not accepted should set cardNumberValid to false")
         XCTAssertEqual(sut.cardNumberError, "Card type not accepted")
         XCTAssertFalse(sut.isFormValid(), "Submit should be disabled when card type is not accepted")
+    }
+
+    // MARK: - validateForm() / first-error targeting
+
+    func testValidateForm_AllValid_ReturnsTrueWithNoFirstError() {
+        // Name collection disabled so isFormValid's name check is bypassed, leaving a cleanly valid form.
+        sut = CardDetailsFormManager(
+            shouldValidateCardholderName: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .valid
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+
+        sut.cardNumberText = "4111111111111111"
+        sut.expiryDateText = "12/25"
+        sut.securityCodeText = "123"
+
+        XCTAssertTrue(sut.validateForm())
+        XCTAssertNil(sut.firstFieldWithError)
+    }
+
+    /// Regression: when cardholder-name collection is disabled, the never-validated (nil) name must
+    /// NOT be treated as the first error or counted — the first invalid *collected* field wins.
+    /// Previously `cardHolderNameValid != true` flagged the (nil) name as the first error.
+    func testValidateForm_NameCollectionDisabled_DoesNotFlagCardholderName() {
+        sut = CardDetailsFormManager(
+            shouldValidateCardholderName: false,
+            cardIssuerValidator: mockSchemeValidator,
+            cardExpiryDateValidator: mockExpiryValidator,
+            cardSecurityCodeValidator: mockSecurityCodeValidator,
+            cardExpiryDateFormatter: mockFormatter,
+            cardNameValidator: mockNameValidator
+        )
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .expired // only the expiry is invalid
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+
+        sut.cardNumberText = "4111111111111111"
+        sut.expiryDateText = "01/20"
+        sut.securityCodeText = "123"
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .expiryDate, "First error should be the expiry, not the un-collected name")
+        XCTAssertNil(sut.cardHolderNameValid, "Name should never be validated when collection is disabled")
+        XCTAssertEqual(sut.numberOfValidationFailures, 1, "The un-collected name must not be counted as an error")
+    }
+
+    func testValidateForm_NameCollected_InvalidName_FirstErrorIsCardholderName() {
+        // Default `sut` collects the cardholder name.
+        mockNameValidator.isValidNameResult = false // name invalid
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .valid
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+
+        sut.cardholderNameText = "John Doe"
+        sut.cardNumberText = "4111111111111111"
+        sut.expiryDateText = "12/25"
+        sut.securityCodeText = "123"
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .cardholderName)
+    }
+
+    func testValidateForm_InvalidExpiry_FirstErrorIsExpiry() {
+        mockNameValidator.isValidNameResult = true
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .expired
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+
+        sut.cardholderNameText = "John Doe"
+        sut.cardNumberText = "4111111111111111"
+        sut.expiryDateText = "01/20"
+        sut.securityCodeText = "123"
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .expiryDate)
+        XCTAssertEqual(sut.numberOfValidationFailures, 1)
+    }
+
+    /// Regression: `firstFieldWithError` must be recomputed each submit, not retain a stale field
+    /// from a previous submit (the cardholder name here, which is fixed before the second submit).
+    func testValidateForm_ResetsStaleFirstFieldBetweenSubmits() {
+        mockNameValidator.isValidNameResult = false // name invalid on first submit
+        mockSchemeValidator.isPossibleCreditCardNumberResult = true
+        mockSchemeValidator.isCardNumberValidResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .valid
+        mockSecurityCodeValidator.isSecurityCodeValidResult = true
+        mockSchemeValidator.getCardSchemeFromBINResult = .visa
+
+        sut.cardholderNameText = "John Doe"
+        sut.cardNumberText = "4111111111111111"
+        sut.expiryDateText = "12/25"
+        sut.securityCodeText = "123"
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .cardholderName)
+
+        // Fix the name, break only the expiry, and resubmit.
+        mockNameValidator.isValidNameResult = true
+        mockExpiryValidator.validateCreditCardExpiryResult = .expired
+        sut.expiryDateText = "01/20"
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .expiryDate, "Stale cardholderName must not survive the second submit")
     }
 
     // MARK: - Formatting Tests
@@ -1442,12 +1567,16 @@ class CardDetailsFormManagerTests: XCTestCase {
         XCTAssertEqual(sut.securityCodeTitle, "CVV")
         mockSchemeValidator.getCardSchemeFromBINCalled = false
 
+        // Seed the default placeholder so switching to Amex flips it to the 4-digit sentinel.
+        sut.securityCodePlaceholder = "XXX"
+
         // Change to Amex
         mockSchemeValidator.getCardSchemeFromBINResult = .amex
         sut.cardNumberText = "3782"
 
         XCTAssertTrue(mockSchemeValidator.getCardSchemeFromBINCalled)
-        XCTAssertEqual(sut.securityCodeTitle, "CID")
+        // The security-code title is a constant "CVV"; only the placeholder changes per scheme.
+        XCTAssertEqual(sut.securityCodeTitle, "CVV")
         XCTAssertEqual(sut.securityCodePlaceholder, "XXXX")
     }
 

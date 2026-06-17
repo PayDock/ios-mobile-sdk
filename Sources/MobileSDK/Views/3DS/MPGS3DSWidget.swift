@@ -2,9 +2,7 @@
 //  MPGS3DSWidget.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 27.11.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 @preconcurrency import WebKit
@@ -14,12 +12,12 @@ import AuthenticationServices
 public struct MPGS3DSWidget: UIViewRepresentable {
 
     private let config: ThreeDSConfig
-    private let appearance: ThreeDSWidgetAppearance
+    private let appearance: MPG3dsWidgetAppearance
     private let completion: (Result<MPGS3dsResult, MPGS3dsError>) -> Void
     private let base64Decoder: Base64Decoder = Base64Decoder()
 
     public init(config: ThreeDSConfig,
-                appearance: ThreeDSWidgetAppearance = ThreeDSWidgetAppearance(),
+                appearance: MPG3dsWidgetAppearance = MPG3dsWidgetAppearance(),
                 completion: @escaping (Result<MPGS3dsResult, MPGS3dsError>) -> Void) {
         self.config = config
         self.appearance = appearance

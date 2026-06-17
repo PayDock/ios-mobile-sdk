@@ -2,8 +2,7 @@
 //  CardDetailsVMTests.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import XCTest
 import Combine
@@ -42,7 +41,7 @@ class CardDetailsVMTests: XCTestCase {
                 gatewayId: "gatewayId",
                 accessToken: "accessToken",
                 collectCardholderName: false,
-                allowSaveCard: config
+                allowSaveCard: config,
             ),
             appearance: CardDetailsWidgetAppearance(),
             loadingDelegate: loadingDelegate,
@@ -346,8 +345,43 @@ class CardDetailsVMTests: XCTestCase {
         let event = WidgetEvent(
             type: .button,
             properties: .button(
-                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text)))
-        viewModel.handleTokenisationTapAnalytics()
+                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text, formState: .valid)))
+        viewModel.handleTokenisationTapAnalytics(isFormValid: true)
+
+        // Then
+        XCTAssertEqual(eventDelegate.receivedEvents.count, 1)
+        XCTAssertEqual(eventDelegate.lastEvent, event)
+        XCTAssertTrue(eventDelegate.hasReceivedEvent(ofType: .button))
+        XCTAssertEqual(eventDelegate.eventsCount(ofType: .button), 1)
+    }
+
+    func testEventDelegateReceivesTokenisationEvent_InvalidFormState() {
+        // Given
+        let appearance = CardDetailsWidgetAppearance()
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(
+                gatewayId: "gatewayId",
+                accessToken: "accessToken",
+                collectCardholderName: false,
+                allowSaveCard: config
+            ),
+            appearance: appearance,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate) { result in
+                self.completionResult = result
+        }
+
+        // Reset any events from initialization
+        eventDelegate.reset()
+
+        // When the button is tapped while the form is invalid, the event carries formState .invalid
+        let event = WidgetEvent(
+            type: .button,
+            properties: .button(
+                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text, formState: .invalid)))
+        viewModel.handleTokenisationTapAnalytics(isFormValid: false)
 
         // Then
         XCTAssertEqual(eventDelegate.receivedEvents.count, 1)

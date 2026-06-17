@@ -29,17 +29,19 @@ public struct GiftCardWidgetAppearance:
                 textFieldVerticalSpacing: CGFloat = GlobalTheme.shared.globalTheme.textFieldVerticalSpacing,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textField: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                actionButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                actionButton: Theme.ButtonAppearance = {
+                    var defaults = GlobalTheme.shared.globalTheme.actionButton
+                    defaults.icon = Image(systemName: "plus.circle")
+                    defaults.text = "Add"
+                    return defaults
+                }(),
                 toolbarButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.toolbarButton) {
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing
         self.textFieldVerticalSpacing = textFieldVerticalSpacing
         self.title = title
         self.textField = textField
-        self.toolbarButton = toolbarButton
-
         self.actionButton = actionButton
-        self.actionButton.icon = Image(systemName: "plus.circle")
-        self.actionButton.text = "Add"
+        self.toolbarButton = toolbarButton
     }
 }

@@ -265,7 +265,10 @@ extension EnhancedCheckoutVM {
         return ApplePayWidgetConfig(
             serviceId: ProjectEnvironment.shared.getApplePayServiceId() ?? "",
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            pkPaymentRequest: createApplePayRequest()
+            pkPaymentRequest: createApplePayRequest(),
+            // We verify Apple Pay availability ourselves before showing the widget (see
+            // ApplePayPaymentWidget), so disable the widget's own checks to avoid duplicating them.
+            performAvailabilityChecks: false
         )
     }
 
@@ -291,7 +294,7 @@ extension EnhancedCheckoutVM {
             )
         }
 
-        var shippingOptions = CartShippingOption.allCases.map { option in
+        request.shippingMethods = CartShippingOption.allCases.map { option in
             let method = PKShippingMethod(
                 label: option.name,
                 amount: NSDecimalNumber(value: option.price)
@@ -300,8 +303,6 @@ extension EnhancedCheckoutVM {
             method.identifier = option.identifer
             return method
         }
-        _ = shippingOptions.partition(by: { $0.identifier != cartManager.selectedShipping.identifer })
-        request.shippingMethods = shippingOptions
 
         items.append(PKPaymentSummaryItem(
             label: cartManager.selectedShipping.name,

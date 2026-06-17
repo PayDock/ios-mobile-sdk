@@ -2,9 +2,7 @@
 //  AddressWidget.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 21.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
@@ -100,7 +98,6 @@ public struct AddressWidget: View {
                     appearance: viewModel.appearance.textField,
                     text: $viewModel.addressFormManager.firstNameText,
                     title: viewModel.addressFormManager.firstNameTitle,
-                    placeholder: viewModel.addressFormManager.firstNamePlaceholder,
                     errorMessage: $viewModel.addressFormManager.firstNameError,
                     editing: $viewModel.addressFormManager.editingFirstName,
                     valid: $viewModel.addressFormManager.firstNameValid,
@@ -122,7 +119,6 @@ public struct AddressWidget: View {
                     appearance: viewModel.appearance.textField,
                     text: $viewModel.addressFormManager.lastNameText,
                     title: viewModel.addressFormManager.lastNameTitle,
-                    placeholder: viewModel.addressFormManager.lastNamePlaceholder,
                     errorMessage: $viewModel.addressFormManager.lastNameError,
                     editing: $viewModel.addressFormManager.editingLastName,
                     valid: $viewModel.addressFormManager.lastNameValid,
@@ -162,7 +158,6 @@ public struct AddressWidget: View {
                 appearance: viewModel.appearance.searchDropdown,
                 text: viewModel.addressSearchBinding,
                 title: viewModel.addressFormManager.addressSearchTitle,
-                placeholder: viewModel.addressFormManager.addressSearchPlaceholder,
                 errorMessage: $viewModel.addressFormManager.addressSearchError,
                 editing: $viewModel.addressFormManager.editingAddressSearch,
                 valid: $viewModel.addressFormManager.addressSearchValid,
@@ -216,7 +211,6 @@ public struct AddressWidget: View {
             appearance: viewModel.appearance.textField,
             text: $viewModel.addressFormManager.addressLine1Text,
             title: viewModel.addressFormManager.addressLine1Title,
-            placeholder: viewModel.addressFormManager.addressLine1Placeholder,
             errorMessage: $viewModel.addressFormManager.addressLine1Error,
             editing: $viewModel.addressFormManager.editingAddressLine1,
             valid: $viewModel.addressFormManager.addressLine1Valid,
@@ -240,7 +234,6 @@ public struct AddressWidget: View {
             appearance: viewModel.appearance.textField,
             text: $viewModel.addressFormManager.addressLine2Text,
             title: viewModel.addressFormManager.addressLine2Title,
-            placeholder: viewModel.addressFormManager.addressLine2Placeholder,
             errorMessage: $viewModel.addressFormManager.addressLine2Error,
             editing: $viewModel.addressFormManager.editingAddressLine2,
             valid: $viewModel.addressFormManager.addressLine2Valid,
@@ -264,7 +257,6 @@ public struct AddressWidget: View {
             appearance: viewModel.appearance.textField,
             text: $viewModel.addressFormManager.cityText,
             title: viewModel.addressFormManager.cityTitle,
-            placeholder: viewModel.addressFormManager.cityPlaceholder,
             errorMessage: $viewModel.addressFormManager.cityError,
             editing: $viewModel.addressFormManager.editingCity,
             valid: $viewModel.addressFormManager.cityValid,
@@ -288,7 +280,6 @@ public struct AddressWidget: View {
             appearance: viewModel.appearance.textField,
             text: $viewModel.addressFormManager.stateText,
             title: viewModel.addressFormManager.stateTitle,
-            placeholder: viewModel.addressFormManager.statePlaceholder,
             errorMessage: $viewModel.addressFormManager.stateError,
             editing: $viewModel.addressFormManager.editingState,
             valid: $viewModel.addressFormManager.stateValid,
@@ -312,7 +303,6 @@ public struct AddressWidget: View {
             appearance: viewModel.appearance.textField,
             text: $viewModel.addressFormManager.postcodeText,
             title: viewModel.addressFormManager.postcodeTitle,
-            placeholder: viewModel.addressFormManager.postcodePlaceholder,
             errorMessage: $viewModel.addressFormManager.postcodeError,
             editing: $viewModel.addressFormManager.editingPostcode,
             valid: $viewModel.addressFormManager.postcodeValid,
@@ -336,7 +326,6 @@ public struct AddressWidget: View {
             appearance: viewModel.appearance.searchDropdown,
             text: viewModel.countrySearchBinding,
             title: viewModel.addressFormManager.countryTitle,
-            placeholder: viewModel.addressFormManager.countryPlaceholder,
             errorMessage: $viewModel.addressFormManager.countryError,
             editing: $viewModel.addressFormManager.editingCountry,
             valid: $viewModel.addressFormManager.countryValid,

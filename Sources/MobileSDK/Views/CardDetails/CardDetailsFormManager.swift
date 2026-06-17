@@ -2,9 +2,7 @@
 //  CardDetailsFormManager.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 22.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 // swiftlint:disable file_length
 
@@ -44,16 +42,16 @@ class CardDetailsFormManager: ObservableObject {
     @Published var securityCodeValid: Bool?
 
     @Published var cardImage: Image? = Image("credit-card", bundle: Bundle.module)
+    @Published var cardImageAccessibilityLabel: String?
 
     let cardholderNameTitle = "Cardholder name"
     let cardNumberTitle = "Card number"
     let expiryDateTitle = "Expiry"
-    @Published var securityCodeTitle = "CVV"
+    let securityCodeTitle = "CVV"
+    @Published var securityCodePlaceholder = ""
 
-    var cardholderNamePlaceholder = ""
-    var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"
-    var expiryDatePlaceholder = "MM/YY"
-    @Published var securityCodePlaceholder = "XXX"
+    var numberOfValidationFailures: Int = 0
+    var firstFieldWithError: CardDetailsFocusable?
 
     var cardholderNameText: String = "" {
         didSet {
@@ -76,7 +74,7 @@ class CardDetailsFormManager: ObservableObject {
     var cardNumberText: String = "" {
         didSet {
             self.updateCardIssuerIcon()
-            self.updateSecurityCodeTitleAndPlaceholder()
+            self.updateSecurityCodePlaceholder()
             if cardNumberText.isEmpty {
                 // Clear error and reset tracking when all text is deleted
                 cardNumberWasInErrorState = false
@@ -274,35 +272,20 @@ class CardDetailsFormManager: ObservableObject {
     func updateCardIssuerIcon() {
         let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
         cardImage = getCardSchemeIcon(for: cardScheme)
+        cardImageAccessibilityLabel = getCardSchemeAccessibilityLabel(for: cardScheme)
     }
 
-    func updateSecurityCodeTitleAndPlaceholder() {
+    func updateSecurityCodePlaceholder() {
         let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
-
         switch cardScheme {
-        case .visa, .diners, .japcb:
-            securityCodeTitle = "CVV"
-            securityCodePlaceholder = "XXX"
-
-        case .mastercard:
-            securityCodeTitle = "CVC"
-            securityCodePlaceholder = "XXX"
-
+        case .visa, .diners, .japcb, .mastercard, .discover, .unionpay, .none:
+            if securityCodePlaceholder == "XXXX" {
+                securityCodePlaceholder = "XXX"
+            }
         case .amex:
-            securityCodeTitle = "CID"
-            securityCodePlaceholder = "XXXX"
-
-        case .discover:
-            securityCodeTitle = "CID"
-            securityCodePlaceholder = "XXX"
-
-        case .unionpay:
-            securityCodeTitle = "CVN"
-            securityCodePlaceholder = "XXX"
-
-        case .none:
-            securityCodeTitle = "CVV"
-            securityCodePlaceholder = "XXX"
+            if securityCodePlaceholder == "XXX" {
+                securityCodePlaceholder = "XXXX"
+            }
         }
     }
 
@@ -316,6 +299,19 @@ class CardDetailsFormManager: ObservableObject {
         case .visa: return Image("visa", bundle: Bundle.module)
         case .unionpay: return Image("unionpay", bundle: Bundle.module)
         case .none: return Image("credit-card", bundle: Bundle.module)
+        }
+    }
+
+    private func getCardSchemeAccessibilityLabel(for cardScheme: CardScheme?) -> String? {
+        switch cardScheme {
+        case .amex: return "American Express"
+        case .diners: return "Diners Club"
+        case .discover: return "Discover"
+        case .japcb: return "JCB"
+        case .mastercard: return "Mastercard"
+        case .visa: return "Visa"
+        case .unionpay: return "UnionPay"
+        case .none: return nil
         }
     }
 
@@ -333,16 +329,20 @@ class CardDetailsFormManager: ObservableObject {
     }
 
     private func validateCardholderName() {
+        if cardholderNameText.isEmpty {
+            cardHolderNameValid = false
+            cardholderNameError = "Cardholder name is required"
+            return
+        }
+
         // Only check for card number if 13+ digits entered (minimum for valid card numbers)
         let digitCount = cardholderNameText.filter { $0.isNumber }.count
         if digitCount >= 13 && cardSchemeValidator.isPossibleCreditCardNumber(number: cardholderNameText) {
             cardHolderNameValid = false
             cardholderNameError = "Card number is in the wrong field!"
-
-        } else if !cardholderNameText.isEmpty && cardNameValidator.isValidName(cardholderNameText) {
+        } else if cardNameValidator.isValidName(cardholderNameText) {
             cardHolderNameValid = true
             cardholderNameError = ""
-
         } else {
             cardHolderNameValid = false
             cardholderNameError = "Invalid name"
@@ -397,6 +397,11 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Validate card number
 
     private func validateCardNumber() {
+        if cardNumberText.isEmpty {
+            updateCardNumberValidationState(isValid: false, errorMessage: "Card number is required")
+            return
+        }
+
         // During typing: only validate if digit count is within valid range for scheme
         // This prevents false positives from Luhn check on incomplete card numbers
         let scheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText)
@@ -553,6 +558,12 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Validate expiry date
 
     private func validateExpiryDate() {
+        if expiryDateText.isEmpty {
+            expiryDateValid = false
+            expiryDateError = "Expiry date is required"
+            return
+        }
+
         let expiryValidation = cardExpiryDateValidator.validateCreditCardExpiry(stringDate: expiryDateText)
         switch expiryValidation {
         case .valid:
@@ -643,6 +654,12 @@ class CardDetailsFormManager: ObservableObject {
     // MARK: - Validate security code
 
     private func validateSecurityCode() {
+        if securityCodeText.isEmpty {
+            securityCodeValid = false
+            securityCodeError = "Security code is required"
+            return
+        }
+
         if let cardScheme = cardSchemeValidator.getCardSchemeFromBIN(cardNumber: cardNumberText) {
             validateSecurityCodeForDetectedScheme(scheme: cardScheme)
         } else {
@@ -702,6 +719,52 @@ class CardDetailsFormManager: ObservableObject {
         }
 
         return cardHolderNameValid && creditCardValid && expiryValidation && securityCodeValidation
+    }
+
+    func validateForm() -> Bool {
+        self.validateTextField(.cardholderName)
+        self.validateTextField(.cardNumber)
+        self.validateTextField(.expiryDate)
+        self.validateTextField(.securityCode)
+
+        if isFormValid() {
+            return true
+        } else {
+            var count: Int = 0
+            // Reset first so a stale field from a previous submit can't keep focus, and so the
+            // `firstFieldWithError == nil` guards below resolve to the actual first errored field.
+            firstFieldWithError = nil
+            // Only treat the cardholder name as errored when it is genuinely invalid (== false).
+            // A nil value means it was never validated — e.g. name collection is disabled — and
+            // must NOT count as an error or steal accessibility focus. (nil != true is true, which
+            // was the bug: the name field was always becoming the "first error".)
+            if self.cardHolderNameValid == false {
+                firstFieldWithError = .cardholderName
+                count += 1
+            }
+            if self.cardNumberValid != true {
+                if firstFieldWithError == nil {
+                    firstFieldWithError = .cardNumber
+                }
+                count += 1
+            }
+            if self.expiryDateValid != true {
+                if firstFieldWithError == nil {
+                    firstFieldWithError = .expiryDate
+                }
+                count += 1
+            }
+            if self.securityCodeValid != true {
+                if firstFieldWithError == nil {
+                    firstFieldWithError = .securityCode
+                }
+                count += 1
+            }
+
+            numberOfValidationFailures = count
+
+            return false
+        }
     }
 
     // MARK: - Formatting
@@ -765,15 +828,5 @@ class CardDetailsFormManager: ObservableObject {
         isCardNumberBeingEdited = false
         isExpiryDateBeingEdited = false
         isSecurityCodeBeingEdited = false
-    }
-}
-
-extension CardDetailsFormManager {
-
-    enum CardDetailsFocusable: Hashable {
-        case cardholderName
-        case cardNumber
-        case expiryDate
-        case securityCode
     }
 }

@@ -31,7 +31,6 @@ struct ConfigToggleView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         ToggleFieldView(title: title, isOn: $toggleValue, onChange: {
                             updateConfiguration(with: toggleValue)
-
                         })
                     }
 
@@ -57,6 +56,8 @@ struct ConfigToggleView: View {
                 switch configKey {
                 case .collectCardholderName:
                     toggleValue = config.collectCardholderName
+                case .activePrimaryButton:
+                    toggleValue = config.activePrimaryButton
                 default:
                     break
                 }
@@ -123,7 +124,18 @@ struct ConfigToggleView: View {
                 collectCardholderName: value,
                 allowSaveCard: config.allowSaveCard,
                 storeSecurityCode: config.storeSecurityCode,
-                schemeSupport: config.schemeSupport
+                schemeSupport: config.schemeSupport,
+                activePrimaryButton: config.activePrimaryButton
+            )
+        case .activePrimaryButton:
+            config = CardDetailsWidgetConfig(
+                gatewayId: config.gatewayId,
+                accessToken: config.accessToken,
+                collectCardholderName: config.collectCardholderName,
+                allowSaveCard: config.allowSaveCard,
+                storeSecurityCode: config.storeSecurityCode,
+                schemeSupport: config.schemeSupport,
+                activePrimaryButton: value
             )
         default:
             return
@@ -200,6 +212,8 @@ struct ConfigToggleView: View {
             if let configKey = configKey {
                 switch configKey {
                 case .collectCardholderName:
+                    toggleValue = true
+                case .activePrimaryButton:
                     toggleValue = true
                 default:
                     break

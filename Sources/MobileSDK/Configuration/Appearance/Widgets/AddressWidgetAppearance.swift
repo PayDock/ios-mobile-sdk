@@ -29,7 +29,12 @@ public struct AddressWidgetAppearance:
                 textFieldSpacing: CGFloat = GlobalTheme.shared.globalTheme.textFieldVerticalSpacing,
                 title: Theme.TextAppearance = GlobalTheme.shared.globalTheme.title,
                 textfield: Theme.TextFieldAppearance = GlobalTheme.shared.globalTheme.textField,
-                primaryButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.actionButton,
+                primaryButton: Theme.ButtonAppearance = {
+                    var defaults = GlobalTheme.shared.globalTheme.actionButton
+                    defaults.icon = Image(systemName: "plus.circle")
+                    defaults.text = "Add"
+                    return defaults
+                }(),
                 linkButton: Theme.ButtonAppearance = GlobalTheme.shared.globalTheme.expandSectionButton,
                 searchDropdown: Theme.SearchDropdownAppearance = GlobalTheme.shared.globalTheme.searchDropdown) {
         self.horizontalSpacing = horizontalSpacing
@@ -37,12 +42,8 @@ public struct AddressWidgetAppearance:
         self.textFieldVerticalSpacing = textFieldSpacing
         self.title = title
         self.textField = textfield
+        self.actionButton = primaryButton
         self.expandSectionButton = linkButton
         self.searchDropdown = searchDropdown
-
-        // Custom
-        self.actionButton = primaryButton
-        self.actionButton.icon = Image(systemName: "plus.circle")
-        self.actionButton.text = "Add"
     }
 }

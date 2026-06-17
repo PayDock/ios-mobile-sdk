@@ -32,6 +32,15 @@ class CardDetailsVM: ObservableObject {
     var viewState: ViewState
     var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
+    var numberOfValidationErrors: Int {
+        get { return cardDetailsFormManager.numberOfValidationFailures }
+        set { cardDetailsFormManager.numberOfValidationFailures = newValue }
+    }
+    var firstTextFieldWithError: CardDetailsFocusable? {
+        get { return cardDetailsFormManager.firstFieldWithError }
+        set { cardDetailsFormManager.firstFieldWithError = newValue }
+    }
+
     // MARK: - Handlers
 
     private weak var loadingDelegate: WidgetLoadingDelegate?
@@ -60,6 +69,7 @@ class CardDetailsVM: ObservableObject {
             supportedSchemes: config.schemeSupport.supportedSchemes,
             enableCardValidation: config.schemeSupport.enableValidation
         )
+        self.cardDetailsFormManager.securityCodePlaceholder = appearance.cardSecurityTextField.placeholderText ?? ""
 
         if loadingDelegate != nil {
             showLoaders = false
@@ -75,11 +85,19 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Api Calls
 
-    func tokeniseCardDetails() {
-        guard cardDetailsFormManager.isFormValid() else {
-            return
+    func ctaButtonTapped() -> Bool {
+        guard cardDetailsFormManager.validateForm() else {
+            handleTokenisationTapAnalytics(isFormValid: false)
+            return false
         }
 
+        handleTokenisationTapAnalytics(isFormValid: true)
+        tokeniseCardDetails()
+
+        return true
+    }
+
+    func tokeniseCardDetails() {
         Task {
             guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
@@ -108,11 +126,9 @@ class CardDetailsVM: ObservableObject {
 
                 updateLoadingState(isLoading: false)
                 completion(.success(createResult(token: cardToken)))
-
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
                 completion(.failure(.errorTokenisingCard(error: errorResponse)))
-
             } catch {
                 updateLoadingState(isLoading: false)
                 completion(.failure(.unknownError(error as? RequestError)))
@@ -123,6 +139,10 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Validation
 
     func isActionButtonDisabled() -> Bool {
+        if config.activePrimaryButton {
+            return false
+        }
+
         return viewState.isDisabled || !cardDetailsFormManager.isFormValid()
     }
 
@@ -176,11 +196,19 @@ class CardDetailsVM: ObservableObject {
 
     // MARK: - Analytics Handling
 
-    func handleTokenisationTapAnalytics() {
+    func handleTokenisationTapAnalytics(isFormValid: Bool) {
+        let formState = isFormValid ? WidgetEventFormState.valid : WidgetEventFormState.invalid
         let event = WidgetEvent(
             type: .button,
             properties: .button(
-                WidgetEventButtonProperties(name: "TokenisationButton", action: .click, text: appearance.actionButton.text)))
+                WidgetEventButtonProperties(
+                    name: "TokenisationButton",
+                    action: .click,
+                    text: appearance.actionButton.text,
+                    formState: formState
+                )
+            )
+        )
         eventDelegate?.widgetEvent(event: event)
     }
 

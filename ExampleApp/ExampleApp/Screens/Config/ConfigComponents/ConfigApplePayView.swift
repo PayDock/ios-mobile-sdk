@@ -19,6 +19,7 @@ struct ConfigApplePayView: View {
     @State private var requireBillingAddress: Bool = false
     @State private var requireShippingAddress: Bool = false
     @State private var showSetupButtonIfRequired: Bool = false
+    @State private var performAvailabilityChecks: Bool = true
 
     let selectedWidget: ConfigWidgetsEnum
     let title: String
@@ -49,6 +50,12 @@ struct ConfigApplePayView: View {
                             isOn: $showSetupButtonIfRequired,
                             onChange: updateConfiguration
                         )
+
+                        ToggleFieldView(
+                            title: "Perform Availability Checks",
+                            isOn: $performAvailabilityChecks,
+                            onChange: updateConfiguration
+                        )
                     }
                     .padding(.top, 24)
 
@@ -77,6 +84,7 @@ struct ConfigApplePayView: View {
         requireBillingAddress = !paymentRequest.requiredBillingContactFields.isEmpty
         requireShippingAddress = !paymentRequest.requiredShippingContactFields.isEmpty
         showSetupButtonIfRequired = config.showSetUpButtonWhenNoCardsEnrolled
+        performAvailabilityChecks = config.performAvailabilityChecks
 
         // Extract amountLabel from payment summary items
         if let firstItem = paymentRequest.paymentSummaryItems.first {
@@ -92,7 +100,8 @@ struct ConfigApplePayView: View {
             merchantIdentifier: merchantIdentifier,
             requireBillingAddress: requireBillingAddress,
             requireShippingAddress: requireShippingAddress,
-            showSetupButtonIfRequired: showSetupButtonIfRequired
+            showSetupButtonIfRequired: showSetupButtonIfRequired,
+            performAvailabilityChecks: performAvailabilityChecks
         )
 
         configVM.updateConfiguration(for: .applePay, with: config)
@@ -106,6 +115,7 @@ struct ConfigApplePayView: View {
         requireBillingAddress = true
         requireShippingAddress = false
         showSetupButtonIfRequired = false
+        performAvailabilityChecks = true
         updateConfiguration()
     }
 }
@@ -120,4 +130,5 @@ struct ApplePayConfigParams: Codable {
     let requireBillingAddress: Bool
     let requireShippingAddress: Bool
     let showSetupButtonIfRequired: Bool
+    let performAvailabilityChecks: Bool
 }

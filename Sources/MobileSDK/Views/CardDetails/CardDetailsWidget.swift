@@ -2,9 +2,7 @@
 //  CardDetailsWidget.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 01.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
@@ -15,7 +13,12 @@ public struct CardDetailsWidget: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     @ScaledMetric private var cardIconWidth: CGFloat = 26.0
     @StateObject var viewModel: CardDetailsVM
-    @FocusState private var textFieldInFocus: CardDetailsFormManager.CardDetailsFocusable?
+    @FocusState private var textFieldInFocus: CardDetailsFocusable?
+    @AccessibilityFocusState private var voiceOverFocusedField: CardDetailsFocusable?
+    @State private var announcing: Bool = false
+
+    // Callback for scroll requests
+    private let onScrollToField: ((CardDetailsFocusable) -> Void)?
 
     // MARK: - Initialisation
 
@@ -24,7 +27,9 @@ public struct CardDetailsWidget: View {
                 appearance: CardDetailsWidgetAppearance = CardDetailsWidgetAppearance(),
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 eventDelegate: WidgetEventDelegate? = nil,
+                onScrollToField: ((CardDetailsFocusable) -> Void)? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
+        self.onScrollToField = onScrollToField
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
             viewState: viewState ?? ViewState(state: .none),
             config: config,
@@ -45,8 +50,10 @@ public struct CardDetailsWidget: View {
             VStack(spacing: viewModel.appearance.textFieldVerticalSpacing) {
                 if viewModel.config.collectCardholderName {
                     cardholderNameTextField
+                        .id(CardDetailsFocusable.cardholderName)
                 }
                 cardNumberTextField
+                    .id(CardDetailsFocusable.cardNumber)
                 expiryDateAndSecurityCodeLayout
             }
 
@@ -69,10 +76,9 @@ public struct CardDetailsWidget: View {
 
     private var cardholderNameTextField: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: viewModel.appearance.cardNameTextField,
             text: $viewModel.cardDetailsFormManager.cardholderNameText,
             title: viewModel.cardDetailsFormManager.cardholderNameTitle,
-            placeholder: viewModel.cardDetailsFormManager.cardholderNamePlaceholder,
             errorMessage: $viewModel.cardDetailsFormManager.cardholderNameError,
             editing: $viewModel.cardDetailsFormManager.editingCardholderName,
             valid: $viewModel.cardDetailsFormManager.cardHolderNameValid,
@@ -100,15 +106,20 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = .cardNumber
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .cardNumber)
         }
+        .onChange(of: viewModel.cardDetailsFormManager.cardholderNameError) { newValue in
+            if !newValue.isEmpty && !announcing {
+                announceFieldError(newValue)
+            }
+        }
         .focused($textFieldInFocus, equals: .cardholderName)
+        .accessibilityFocused($voiceOverFocusedField, equals: .cardholderName)
     }
 
     private var cardNumberTextField: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: viewModel.appearance.cardNumberTextField,
             text: $viewModel.cardDetailsFormManager.cardNumberText,
             title: viewModel.cardDetailsFormManager.cardNumberTitle,
-            placeholder: viewModel.cardDetailsFormManager.cardNumberPlaceholder,
             errorMessage: $viewModel.cardDetailsFormManager.cardNumberError,
             leftImage: $viewModel.cardDetailsFormManager.cardImage,
             editing: $viewModel.cardDetailsFormManager.editingCardNumber,
@@ -116,6 +127,9 @@ public struct CardDetailsWidget: View {
             disabled: $viewModel.viewState.isDisabled,
             textContentType: .creditCardNumber,
             keyboardType: .numberPad,
+            accessibilityValue: String(viewModel.cardDetailsFormManager.cardNumberText.filter { $0.isNumber }),
+            spellOutValue: true,
+            leftImageAccessibilityLabel: $viewModel.cardDetailsFormManager.cardImageAccessibilityLabel,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .cardNumber
@@ -136,21 +150,28 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = .expiryDate
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .expiryDate)
         }
+        .onChange(of: viewModel.cardDetailsFormManager.cardNumberError) { newValue in
+            if !newValue.isEmpty && !announcing {
+                announceFieldError(newValue)
+            }
+        }
         .focused($textFieldInFocus, equals: .cardNumber)
+        .accessibilityFocused($voiceOverFocusedField, equals: .cardNumber)
     }
 
     private var expiryDateTextField: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: viewModel.appearance.cardExpiryTextField,
             text: $viewModel.cardDetailsFormManager.expiryDateText,
             title: viewModel.cardDetailsFormManager.expiryDateTitle,
-            placeholder: viewModel.cardDetailsFormManager.expiryDatePlaceholder,
             errorMessage: $viewModel.cardDetailsFormManager.expiryDateError,
             editing: $viewModel.cardDetailsFormManager.editingExpiryDate,
             valid: $viewModel.cardDetailsFormManager.expiryDateValid,
             disabled: $viewModel.viewState.isDisabled,
             textContentType: getCreditCardExpiryDate(),
             keyboardType: .numberPad,
+            accessibilityValue: viewModel.cardDetailsFormManager.expiryDateText,
+            spellOutValue: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .expiryDate
@@ -171,15 +192,22 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = .securityCode
             viewModel.cardDetailsFormManager.setEditingTextField(focusedField: .securityCode)
         }
+        .onChange(of: viewModel.cardDetailsFormManager.expiryDateError) { newValue in
+            if !newValue.isEmpty && !announcing {
+                announceFieldError(newValue)
+            }
+        }
         .focused($textFieldInFocus, equals: .expiryDate)
+        .accessibilityFocused($voiceOverFocusedField, equals: .expiryDate)
     }
 
     private var securityCodeTextField: some View {
-        OutlineTextField(
-            appearance: viewModel.appearance.textField,
+        var fieldAppearance = viewModel.appearance.cardSecurityTextField
+        fieldAppearance.placeholderText = viewModel.cardDetailsFormManager.securityCodePlaceholder
+        return OutlineTextField(
+            appearance: fieldAppearance,
             text: $viewModel.cardDetailsFormManager.securityCodeText,
             title: viewModel.cardDetailsFormManager.securityCodeTitle,
-            placeholder: viewModel.cardDetailsFormManager.securityCodePlaceholder,
             errorMessage: $viewModel.cardDetailsFormManager.securityCodeError,
             editing: $viewModel.cardDetailsFormManager.editingSecurityCode,
             valid: $viewModel.cardDetailsFormManager.securityCodeValid,
@@ -188,6 +216,8 @@ public struct CardDetailsWidget: View {
             keyboardType: .numberPad,
             // Mask the security code input for PCI DSS compliance
             isSecureTextEntry: true,
+            accessibilityValue: viewModel.cardDetailsFormManager.securityCodeText,
+            spellOutValue: true,
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .securityCode
@@ -208,7 +238,13 @@ public struct CardDetailsWidget: View {
             textFieldInFocus = nil
             viewModel.cardDetailsFormManager.endEditing()
         }
+        .onChange(of: viewModel.cardDetailsFormManager.securityCodeError) { newValue in
+            if !newValue.isEmpty && !announcing {
+                announceFieldError(newValue)
+            }
+        }
         .focused($textFieldInFocus, equals: .securityCode)
+        .accessibilityFocused($voiceOverFocusedField, equals: .securityCode)
     }
 
     private var expiryDateAndSecurityCodeLayout: some View {
@@ -217,26 +253,121 @@ public struct CardDetailsWidget: View {
             AnyLayout(HStackLayout(alignment: .top, spacing: viewModel.appearance.horizontalSpacing))
         return layout {
             expiryDateTextField
+                .id(CardDetailsFocusable.expiryDate)
             securityCodeTextField
+                .id(CardDetailsFocusable.securityCode)
         }
     }
 
     private var primaryButton: some View {
-        SDKButton(title: viewModel.appearance.actionButton.text,
-                  isLoading: viewModel.isLoading && viewModel.showLoaders,
-                  style: .custom(
-                    CustomButtonStyle(
-                        appearance: viewModel.appearance.actionButton,
-                        isDisabled: viewModel.isActionButtonDisabled())),
-                  shouldTemplate: true) {
+        let dynamicHint: String? = {
+            if viewModel.isActionButtonDisabled() {
+                return "Complete all required fields to enable submission."
+            } else if viewModel.isLoading {
+                return "Processing your card details"
+            } else {
+                // Use custom hint from appearance, or let SDKButton provide smart default
+                return viewModel.appearance.actionButton.accessibilityHint
+            }
+        }()
+
+        return SDKButton(
+            title: viewModel.appearance.actionButton.text,
+            isLoading: viewModel.isLoading && viewModel.showLoaders,
+            style: .custom(
+                CustomButtonStyle(
+                    appearance: viewModel.appearance.actionButton,
+                    isDisabled: viewModel.isActionButtonDisabled())),
+            shouldTemplate: true,
+            accessibilityHint: dynamicHint
+        ) {
+            // Move focus to primary button
             textFieldInFocus = nil
+
+            // Suppress per-field error announcements before they're triggered by endEditing()
+            // and validateForm(). Both mutate @Published error strings whose .onChange handlers
+            // would otherwise fire announceFieldError at high priority and drown out the count.
+            let voiceOverRunning = UIAccessibility.isVoiceOverRunning
+            if voiceOverRunning {
+                self.announcing = true
+            }
+
             viewModel.cardDetailsFormManager.endEditing()
-            viewModel.tokeniseCardDetails()
-            viewModel.handleTokenisationTapAnalytics()
+
+            // Only scroll and refocus in voiceover mode
+            if !viewModel.ctaButtonTapped() && voiceOverRunning {
+                let errorCount = viewModel.numberOfValidationErrors
+
+                Task { @MainActor in
+                    // Wait for VoiceOver to finish whatever it was speaking when the button
+                    // was activated (button label/hint, "activated", etc.) before announcing
+                    // the count — otherwise the default-priority count gets queued behind
+                    // the in-progress speech and discarded when focus subsequently moves.
+                    try? await Task.sleep(for: .seconds(1))
+                    announceErrorCount(errorCount)
+
+                    // Give the count time to be spoken in full before moving focus, since
+                    // focus-change events also trigger VoiceOver speech and would cut it off.
+                    try? await Task.sleep(for: .seconds(2))
+
+                    // Request scroll to the first field with an error
+                    if let firstInvalid = viewModel.firstTextFieldWithError {
+                        // Call the scroll callback if provided
+                        onScrollToField?(firstInvalid)
+
+                        // Wait for the scroll animation to settle before flipping focus.
+                        // VoiceOver silently drops a focus request to an off-screen element, so
+                        // focusing mid-scroll fails. The worst case is the topmost field
+                        // (cardholder name) when submitting from the bottom of the form at large
+                        // Dynamic Type sizes — that scroll covers the greatest distance, so the
+                        // previous short delay (tuned for the nearer fields) left the name field
+                        // still off-screen when focus was applied. This delay must comfortably
+                        // outlast the scroll animation for the longest-distance field.
+                        try? await Task.sleep(for: .milliseconds(600))
+
+                        voiceOverFocusedField = firstInvalid
+                    }
+
+                    self.announcing = false
+                }
+            } else if voiceOverRunning {
+                // Form was valid (or VoiceOver wasn't relevant) — reset so future field changes
+                // can announce normally.
+                self.announcing = false
+            }
         }
-                  .customPadding(viewModel.appearance.actionButton.dimensions.padding)
-                  .accessibilityHint("Submits card details information.")
+        .disabled(viewModel.isActionButtonDisabled())
+        .customPadding(viewModel.appearance.actionButton.dimensions.padding)
+    }
+
+    private func announceErrorCount(_ count: Int) {
+        let message: String
+        switch count {
+        case 0: return
+        case 1: message = "There is 1 error in form"
+        default: message = "There are \(count) errors in form"
         }
+
+        if #available(iOS 17.0, *) {
+            var attributed = AttributedString(message)
+            // Use `.high` only if you want to cut off whatever VoiceOver is saying.
+            attributed.accessibilitySpeechAnnouncementPriority = .default
+            AccessibilityNotification.Announcement(attributed).post()
+        } else {
+            UIAccessibility.post(notification: .announcement, argument: message)
+        }
+    }
+
+    private func announceFieldError(_ message: String) {
+        let prefixed = "Error: \(message)"
+        if #available(iOS 17.0, *) {
+            var attributed = AttributedString(prefixed)
+            attributed.accessibilitySpeechAnnouncementPriority = .high
+            AccessibilityNotification.Announcement(attributed).post()
+        } else {
+            UIAccessibility.post(notification: .announcement, argument: prefixed)
+        }
+    }
 
     private var saveCardViewWithPrivacyPolicy: some View {
         HStack(alignment: .center) {
@@ -258,6 +389,9 @@ public struct CardDetailsWidget: View {
                     .simultaneousGesture(TapGesture().onEnded {
                         viewModel.handleLinkTapAnalytics(url: url)
                     })
+                    .accessibilityLabel(text)
+                    .accessibilityHint("Opens \(text) in browser")
+                    .accessibilityAddTraits(.isLink)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -345,7 +479,48 @@ public struct CardDetailsWidget: View {
 
 struct CardDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        CardDetailsWidget(config: CardDetailsWidgetConfig(gatewayId: "", accessToken: ""), completion: { _ in })
-            .previewLayout(.sizeThatFits)
+        Group {
+            // Recommended: With scroll-to-error support
+            ScrollViewReader { proxy in
+                ScrollView {
+                    CardDetailsWidget(
+                        config: CardDetailsWidgetConfig(gatewayId: "", accessToken: ""),
+                        onScrollToField: { field in
+                            withAnimation {
+                                proxy.scrollTo(field, anchor: .center)
+                            }
+                        },
+                        completion: { _ in }
+                    )
+                    .padding()
+                }
+            }
+            .previewDisplayName("With Scroll-to-Error")
+
+            // In a larger form
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 20) {
+                        Text("Order Summary")
+                            .font(.headline)
+
+                        CardDetailsWidget(
+                            config: CardDetailsWidgetConfig(gatewayId: "", accessToken: ""),
+                            onScrollToField: { field in
+                                withAnimation {
+                                    proxy.scrollTo(field, anchor: .center)
+                                }
+                            },
+                            completion: { _ in }
+                        )
+
+                        Text("Terms and Conditions")
+                            .font(.headline)
+                    }
+                    .padding()
+                }
+            }
+            .previewDisplayName("In Larger Form")
+        }
     }
 }

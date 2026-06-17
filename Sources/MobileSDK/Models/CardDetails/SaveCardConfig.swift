@@ -2,9 +2,7 @@
 //  SaveCardConfig.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 23.05.2024..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 

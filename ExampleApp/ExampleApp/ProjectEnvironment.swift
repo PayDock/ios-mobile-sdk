@@ -60,7 +60,7 @@ struct ProjectEnvironment {
         switch environment {
         case .production: return "api.paydock.com"
         case .sandbox: return "api-sandbox.paydock.com"
-        case .staging: return "apista.paydock.com"
+        case .staging: return "apista-11.paydock.com"
         }
     }
 

@@ -36,7 +36,10 @@ public struct ApplePayWidget: View {
     }
 
     public var body: some View {
-        if viewModel.canMakePaymentsWithConfiguredNetworksAndCapabilities() {
+        // When availability checks are disabled the integrator has already verified support
+        // (e.g. via MobileSDK.canMakeApplePayPayments(...)), so render the pay button directly
+        // and skip the internal gating/setup-button/error path.
+        if !viewModel.availabilityChecksEnabled || viewModel.canMakePaymentsWithConfiguredNetworksAndCapabilities() {
             ApplePayButton(
                 appearance: appearance,
                 isDisabled: viewModel.isProcessing
@@ -46,19 +49,8 @@ public struct ApplePayWidget: View {
             }
         } else if viewModel.shouldShowSetupButton() {
             // Open Wallet for card enrollment — do NOT run the payment flow
-            ApplePayButton(
-                appearance: setUpAppearance,
-                isDisabled: false
-            ) {
-                PKPassLibrary().openPaymentSetup()
-            }
+            ApplePaySetupWidget(appearance: appearance)
         }
-    }
-
-    private var setUpAppearance: ApplePayWidgetAppearance {
-        var updatedAppearance = appearance
-        updatedAppearance.type = .setUp
-        return updatedAppearance
     }
 }
 

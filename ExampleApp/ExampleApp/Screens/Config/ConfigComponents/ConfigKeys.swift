@@ -11,6 +11,7 @@ enum ConfigKeys {
     case gatewayId
     case collectCardholderName
     case allowSaveCard
+    case activePrimaryButton
     case storePin
     case requestShipping
     case fundingSource

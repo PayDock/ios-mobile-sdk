@@ -61,6 +61,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
     @Published var icon: Image? { didSet { updateAppearance() }}
     @Published var buttonText: String = "" { didSet { updateAppearance() }}
+    @Published var accessibilityHint: String = "" { didSet { updateAppearance() }}
 
     // MARK: - Initialization
 
@@ -97,6 +98,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
         self.icon = buttonAppearance?.icon
         self.buttonText = buttonAppearance?.text ?? ""
+        self.accessibilityHint = buttonAppearance?.accessibilityHint ?? ""
     }
 
     private func updateAppearance() {
@@ -123,6 +125,7 @@ class ButtonStyleVM<T>: ObservableObject {
 
         appearance[keyPath: buttonKeyPath].icon = icon
         appearance[keyPath: buttonKeyPath].text = buttonText
+        appearance[keyPath: buttonKeyPath].accessibilityHint = accessibilityHint.isEmpty ? nil : accessibilityHint
 
         self.appearance = appearance
         StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)

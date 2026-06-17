@@ -2,11 +2,10 @@
 //  TextFieldStyleView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 11.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
+import MobileSDK
 
 struct TextFieldStyleView: View {
 
@@ -14,10 +13,13 @@ struct TextFieldStyleView: View {
 
     // MARK: - Initialization
 
-    init(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) {
+    init(selectedWidget: WidgetsEnum,
+         stylingDarkMode: Bool,
+         cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>? = nil) {
         _viewModel = StateObject(wrappedValue: TextFieldStyleVM(
             selectedWidget: selectedWidget,
-            stylingDarkMode: stylingDarkMode))
+            stylingDarkMode: stylingDarkMode,
+            cardTextFieldKeyPath: cardTextFieldKeyPath))
     }
 
     // MARK: - View
@@ -34,6 +36,10 @@ struct TextFieldStyleView: View {
                     paddingListView
                     SectionTitleView(title: "Fonts")
                     fontListView
+                    SectionTitleView(title: "Text Content")
+                    textContentListView
+                    SectionTitleView(title: "Message Padding")
+                    messagePaddingListView
                     ResetStyleButton {
                         viewModel.showResetConfirmation = true
                     }
@@ -92,6 +98,20 @@ struct TextFieldStyleView: View {
                     get: { viewModel.placeholderColor.toHex() },
                     set: { viewModel.placeholderColor = Color(hex: $0) }),
                 pickedColor: $viewModel.placeholderColor)
+
+            ColorPickerView(
+                title: "Hint color",
+                text: Binding(
+                    get: { viewModel.hintColor.toHex() },
+                    set: { viewModel.hintColor = Color(hex: $0) }),
+                pickedColor: $viewModel.hintColor)
+
+            ColorPickerView(
+                title: "Icon color",
+                text: Binding(
+                    get: { viewModel.iconColor.toHex() },
+                    set: { viewModel.iconColor = Color(hex: $0) }),
+                pickedColor: $viewModel.iconColor)
 
             ColorPickerView(
                 title: "Background color",
@@ -276,6 +296,87 @@ struct TextFieldStyleView: View {
                 text: Binding(
                     get: { "\(viewModel.errorFontSize)" },
                     set: { viewModel.errorFontSize = CGFloat(Double($0) ?? 0) }))
+
+            // MARK: - Hint
+
+            SubsectionTitleView(title: "Hint")
+            ColorPickerView(
+                title: "Hint underline color",
+                text: Binding(
+                    get: { viewModel.hintUnderlineColor.toHex() },
+                    set: { viewModel.hintUnderlineColor = Color(hex: $0) }),
+                pickedColor: $viewModel.hintUnderlineColor)
+
+            ColorPickerView(
+                title: "Hint strikethrough color",
+                text: Binding(
+                    get: { viewModel.hintStrikethroughColor.toHex() },
+                    set: { viewModel.hintStrikethroughColor = Color(hex: $0) }),
+                pickedColor: $viewModel.hintStrikethroughColor)
+
+            PickerView(
+                entries: viewModel.allFontNames,
+                selected: $viewModel.hintFont,
+                placeholder: "Hint font",
+                onSelection: { fontName in
+                    viewModel.hintFont = fontName
+                })
+
+            DimensionsFieldView(
+                title: "Hint font size",
+                text: Binding(
+                    get: { "\(viewModel.hintFontSize)" },
+                    set: { viewModel.hintFontSize = CGFloat(Double($0) ?? 0) }))
+        }
+    }
+
+    private var textContentListView: some View {
+        VStack(spacing: 16) {
+            DimensionsFieldView(
+                title: "Placeholder Text",
+                text: Binding(
+                    get: { viewModel.placeholderText },
+                    set: { viewModel.placeholderText = $0 }))
+
+            DimensionsFieldView(
+                title: "Hint Text",
+                text: Binding(
+                    get: { viewModel.hintText },
+                    set: { viewModel.hintText = $0 }))
+
+            DimensionsFieldView(
+                title: "Accessibility Hint",
+                text: Binding(
+                    get: { viewModel.accessibilityHintText },
+                    set: { viewModel.accessibilityHintText = $0 }))
+        }
+    }
+
+    private var messagePaddingListView: some View {
+        VStack(spacing: 16) {
+            DimensionsFieldView(
+                title: "Top padding",
+                text: Binding(
+                    get: { "\(viewModel.messageTopPadding)" },
+                    set: { viewModel.messageTopPadding = CGFloat(Double($0) ?? 0) }))
+
+            DimensionsFieldView(
+                title: "Leading padding",
+                text: Binding(
+                    get: { "\(viewModel.messageLeadingPadding)" },
+                    set: { viewModel.messageLeadingPadding = CGFloat(Double($0) ?? 0) }))
+
+            DimensionsFieldView(
+                title: "Bottom padding",
+                text: Binding(
+                    get: { "\(viewModel.messageBottomPadding)" },
+                    set: { viewModel.messageBottomPadding = CGFloat(Double($0) ?? 0) }))
+
+            DimensionsFieldView(
+                title: "Trailing padding",
+                text: Binding(
+                    get: { "\(viewModel.messageTrailingPadding)" },
+                    set: { viewModel.messageTrailingPadding = CGFloat(Double($0) ?? 0) }))
         }
     }
 }

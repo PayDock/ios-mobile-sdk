@@ -16,6 +16,8 @@ struct WidgetsView: View {
         WidgetItem(destination: AnyView(CardDetailsExampleView()), title: "Card Details", subtitle: "Tokenise card details"),
         WidgetItem(destination: AnyView(AddressExampleView()), title: "Address", subtitle: "Capture customer address form"),
         WidgetItem(destination: AnyView(ApplePayExampleView()), title: "Apple Pay", subtitle: "Standalone Apple Pay flow"),
+        WidgetItem(destination:
+                    AnyView(ApplePaySetupExampleView()), title: "Apple Pay Setup", subtitle: "Apple Pay Wallet setup button"),
         WidgetItem(destination: AnyView(PayPalExampleView()), title: "PayPal", subtitle: "Standalone PayPal button"),
         WidgetItem(destination: AnyView(GiftCardExampleView()), title: "Gift Card", subtitle: "Standalone Gift Card form"),
         WidgetItem(destination: AnyView(MPGS3dsExampleView()), title: "MPGS 3DS", subtitle: "MPGS Integrated 3DS widget"),

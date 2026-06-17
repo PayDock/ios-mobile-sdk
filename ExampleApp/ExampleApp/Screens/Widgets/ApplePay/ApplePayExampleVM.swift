@@ -48,16 +48,20 @@ class ApplePayExampleVM: NSObject, ObservableObject {
     // MARK: - Handle Callbacks
 
     func handleError(error: ApplePayError) {
-        isLoading = false
-        alertTitle = "Error"
-        alertMessage = "\(error.customMessage)"
-        showAlert = true
+        Task { @MainActor in
+            isLoading = false
+            alertTitle = "Error"
+            alertMessage = "\(error.customMessage)"
+            showAlert = true
+        }
     }
 
     func handleSuccess(data: ApplePayResult) {
-        alertTitle = "Success"
-        alertMessage = "OTT Token received:\n\(data.ottToken)"
-        showAlert = true
+        Task { @MainActor in
+            alertTitle = "Success"
+            alertMessage = "OTT Token received:\n\(data.ottToken)"
+            showAlert = true
+        }
     }
 }
 

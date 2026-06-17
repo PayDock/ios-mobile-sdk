@@ -133,6 +133,8 @@
 		28F19D2D2B029F46002F5526 /* GiftCardExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F19D2C2B029F46002F5526 /* GiftCardExampleView.swift */; };
 		28FDA8BD2EEC7108005BEFC3 /* ConfigClickToPayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FDA8BC2EEC7108005BEFC3 /* ConfigClickToPayView.swift */; };
 		28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FE99432D9306050029FCC8 /* UIColor+Extensions.swift */; };
+		581E29EC2FC493C1004E325A /* OverlayLoaderStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581E29EB2FC493C1004E325A /* OverlayLoaderStyleView.swift */; };
+		581E29EE2FC493D1004E325A /* OverlayLoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581E29ED2FC493D1004E325A /* OverlayLoaderStyleVM.swift */; };
 		5820225C2E5470EF00B50B61 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5820225B2E5470EF00B50B61 /* MobileSDK */; };
 		587458282E4B397E00A24A35 /* GiftCardWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458272E4B397E00A24A35 /* GiftCardWidgetUITests.swift */; };
 		587458292E4B397E00A24A35 /* AddressWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458252E4B397E00A24A35 /* AddressWidgetUITests.swift */; };
@@ -160,6 +162,7 @@
 		58D3D0E72E8DA3190059584D /* ConfigSchemeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D02E8DA3190059584D /* ConfigSchemeView.swift */; };
 		58D3D0E82E8DA3190059584D /* ConfigAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */; };
 		58D3D0EA2E8DAD970059584D /* ConfigSaveCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0E92E8DAD970059584D /* ConfigSaveCardView.swift */; };
+		AAAAB0010000000000000002 /* ApplePaySetupExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAAB0010000000000000001 /* ApplePaySetupExampleView.swift */; };
 		AE9ADB0F2EEC7108005BEFC4 /* ConfigApplePayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9ADB0E2EEC7108005BEFC4 /* ConfigApplePayView.swift */; };
 /* End PBXBuildFile section */
 
@@ -317,6 +320,8 @@
 		28F19D2C2B029F46002F5526 /* GiftCardExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardExampleView.swift; sourceTree = "<group>"; };
 		28FDA8BC2EEC7108005BEFC3 /* ConfigClickToPayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigClickToPayView.swift; sourceTree = "<group>"; };
 		28FE99432D9306050029FCC8 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		581E29EB2FC493C1004E325A /* OverlayLoaderStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayLoaderStyleView.swift; sourceTree = "<group>"; };
+		581E29ED2FC493D1004E325A /* OverlayLoaderStyleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayLoaderStyleVM.swift; sourceTree = "<group>"; };
 		587458252E4B397E00A24A35 /* AddressWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressWidgetUITests.swift; sourceTree = "<group>"; };
 		587458262E4B397E00A24A35 /* CardDetailsWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailsWidgetUITests.swift; sourceTree = "<group>"; };
 		587458272E4B397E00A24A35 /* GiftCardWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCardWidgetUITests.swift; sourceTree = "<group>"; };
@@ -343,6 +348,7 @@
 		58D3D0D82E8DA3190059584D /* ConfigWidgetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWidgetListView.swift; sourceTree = "<group>"; };
 		58D3D0D92E8DA3190059584D /* ConfigWidgetsEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWidgetsEnum.swift; sourceTree = "<group>"; };
 		58D3D0E92E8DAD970059584D /* ConfigSaveCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigSaveCardView.swift; sourceTree = "<group>"; };
+		AAAAB0010000000000000001 /* ApplePaySetupExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePaySetupExampleView.swift; sourceTree = "<group>"; };
 		AE9ADB0E2EEC7108005BEFC4 /* ConfigApplePayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigApplePayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -630,6 +636,7 @@
 			isa = PBXGroup;
 			children = (
 				2867ADD52ACEE52200DB5319 /* ApplePayExampleView.swift */,
+				AAAAB0010000000000000001 /* ApplePaySetupExampleView.swift */,
 				2838F0462ACEF584006B23E2 /* ApplePayExampleVM.swift */,
 			);
 			path = ApplePay;
@@ -678,6 +685,8 @@
 			children = (
 				287F39772DF76C5C00F4D771 /* LoaderStyleView.swift */,
 				287F397C2DF76F3D00F4D771 /* LoaderStyleVM.swift */,
+				581E29EB2FC493C1004E325A /* OverlayLoaderStyleView.swift */,
+				581E29ED2FC493D1004E325A /* OverlayLoaderStyleVM.swift */,
 			);
 			path = Loader;
 			sourceTree = "<group>";
@@ -1152,6 +1161,7 @@
 				285C14392E95D7A8007ECC80 /* CategoryChip.swift in Sources */,
 				285C143A2E95D7A8007ECC80 /* ColesPayPaymentWidget.swift in Sources */,
 				285C143B2E95D7A8007ECC80 /* CartManager.swift in Sources */,
+				581E29EE2FC493D1004E325A /* OverlayLoaderStyleVM.swift in Sources */,
 				285C143C2E95D7A8007ECC80 /* CheckoutStep.swift in Sources */,
 				285C143D2E95D7A8007ECC80 /* ProductListView.swift in Sources */,
 				285C143E2E95D7A8007ECC80 /* GiftCardRowView.swift in Sources */,
@@ -1236,6 +1246,7 @@
 				58D3D0DF2E8DA3190059584D /* ConfigWidgetListView.swift in Sources */,
 				58D3D0E12E8DA3190059584D /* ConfigToggleView.swift in Sources */,
 				58D3D0E22E8DA3190059584D /* ConfigWidgetItem.swift in Sources */,
+				581E29EC2FC493C1004E325A /* OverlayLoaderStyleView.swift in Sources */,
 				28C65E762EEA177D001790CE /* ConfigManager.swift in Sources */,
 				58D3D0E32E8DA3190059584D /* ConfigComponentsEnum.swift in Sources */,
 				58D3D0E42E8DA3190059584D /* ConfigPickerView.swift in Sources */,
@@ -1258,6 +1269,7 @@
 				28A2DB532E0B556900A94753 /* ButtonLoaderStyleVM.swift in Sources */,
 				287F39452DF25A0D00F4D771 /* StyleWidgetsEnum.swift in Sources */,
 				2867ADD62ACEE52200DB5319 /* ApplePayExampleView.swift in Sources */,
+				AAAAB0010000000000000002 /* ApplePaySetupExampleView.swift in Sources */,
 				28D51D4C2DFC6FFA0095CDE5 /* TextFieldStyleView.swift in Sources */,
 				280EB39F2AFE42BC0036E575 /* PayPalExampleVM.swift in Sources */,
 				28D51D562DFF61960095CDE5 /* TextStyleView.swift in Sources */,
@@ -1413,7 +1425,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.4.0;
+				MARKETING_VERSION = 4.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1574,7 +1586,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.4.0;
+				MARKETING_VERSION = 4.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1728,7 +1740,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.4.0;
+				MARKETING_VERSION = 4.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1882,7 +1894,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.4.0;
+				MARKETING_VERSION = 4.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2099,7 +2111,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.4.0;
+				MARKETING_VERSION = 4.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2146,7 +2158,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.4.0;
+				MARKETING_VERSION = 4.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

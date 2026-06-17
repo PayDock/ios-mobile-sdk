@@ -16,19 +16,22 @@ extension Theme {
         public var loader: ButtonLoader
         public var icon: Image?
         public var text: String
+        public var accessibilityHint: String?
 
         public init(colors: ButtonColors = ButtonColors(),
                     dimensions: ButtonDimensions = ButtonDimensions(),
                     fonts: ButtonFonts = ButtonFonts(),
                     loader: ButtonLoader = ButtonLoader(),
                     icon: Image? = nil,
-                    text: String = "") {
+                    text: String = "",
+                    accessibilityHint: String? = nil) {
             self.colors = colors
             self.dimensions = dimensions
             self.fonts = fonts
             self.loader = loader
             self.icon = icon
             self.text = text
+            self.accessibilityHint = accessibilityHint
         }
     }
 }

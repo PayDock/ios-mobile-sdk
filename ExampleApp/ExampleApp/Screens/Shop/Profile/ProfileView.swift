@@ -33,6 +33,7 @@ struct ProfileView: View {
         }
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.large)
+        .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
         .sheet(isPresented: $showingAddressWidget) {
             AddressWidgetFormView(
                 editingAddress: nil,
@@ -279,6 +280,7 @@ struct ProfileView: View {
     private func vaultWidget() -> some View {
         PayPalSavePaymentSourceWidget(
             config: viewModel.getVaultConfig(),
+            loadingDelegate: viewModel,
             appearance: viewModel.getVaultAppearance()) { result in
             switch result {
             case let .success(result):

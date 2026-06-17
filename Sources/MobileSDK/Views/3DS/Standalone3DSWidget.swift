@@ -2,9 +2,7 @@
 //  Standalone3DSWidget.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 23.02.2025..
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 @preconcurrency import WebKit
@@ -13,15 +11,18 @@ import AuthenticationServices
 @MainActor
 public struct Standalone3DSWidget: UIViewRepresentable {
     private let config: ThreeDSConfig
-    private let appearance: ThreeDSWidgetAppearance
+    private let appearance: Standalone3dsWidgetAppearance
+    private weak var loadingDelegate: WidgetLoadingDelegate?
     private let base64Decoder: Base64Decoder = Base64Decoder()
     private let completion: (Result<Standalone3DSResult, Standalone3DSError>) -> Void
 
     public init(config: ThreeDSConfig,
-                appearance: ThreeDSWidgetAppearance = ThreeDSWidgetAppearance(),
+                appearance: Standalone3dsWidgetAppearance = Standalone3dsWidgetAppearance(),
+                loadingDelegate: WidgetLoadingDelegate? = nil,
                 completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void) {
         self.config = config
         self.appearance = appearance
+        self.loadingDelegate = loadingDelegate
         self.completion = completion
 
         validateToken()
@@ -44,43 +45,39 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
 
-        let activityIndicator = UIActivityIndicatorView(style: .large)
-        activityIndicator.color = UIColor(appearance.loader.color)
-        activityIndicator.backgroundColor = UIColor(appearance.loader.overlayColor)
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout
-        activityIndicator.startAnimating()  // Start animating initially
-        activityIndicator.isAccessibilityElement = true
-        activityIndicator.accessibilityLabel = "3DS Check Loading"
-
-        context.coordinator.activityIndicator = activityIndicator
-
         containerView.addSubview(webView)
-        containerView.addSubview(activityIndicator)
-
-        // Set up constraints for activity indicator
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            activityIndicator.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            activityIndicator.topAnchor.constraint(equalTo: containerView.topAnchor),
-            activityIndicator.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
-
-        // Set up constraints for webView
         webView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            webView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            webView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
 
-        // Set up constraints for activityIndicator to be centered
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: containerView.centerYAnchor)
-        ])
+        // WebView fills entire container.
+        var layoutConstraints: [NSLayoutConstraint] = [
+            webView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            webView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+        ]
+
+        // Only embed the internal progress overlay when the host hasn't supplied a loading delegate.
+        // When a delegate is provided, the host app drives its own loading UI (same pattern as
+        // CardDetailsWidget's `showLoaders` suppression).
+        if loadingDelegate == nil {
+            let progressView = DynamicProgressView(frame: .zero, appearance: appearance.overlayLoader)
+            context.coordinator.loader = progressView
+            containerView.addSubview(progressView)
+            progressView.translatesAutoresizingMaskIntoConstraints = false
+
+            layoutConstraints.append(contentsOf: [
+                progressView.topAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.topAnchor),
+                progressView.bottomAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.bottomAnchor),
+                progressView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+                progressView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+            ])
+        }
+
+        NSLayoutConstraint.activate(layoutConstraints)
+
+        // Loading is in progress from the moment the widget is shown — webView starts loading
+        // its HTML shell on the next `updateUIView` pass.
+        context.coordinator.notifyLoadingStart()
 
         return containerView
     }
@@ -96,16 +93,39 @@ public struct Standalone3DSWidget: UIViewRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(completion: completion)
+        .init(completion: completion, loadingDelegate: loadingDelegate)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         private let completion: (Result<Standalone3DSResult, Standalone3DSError>) -> Void
+        private weak var loadingDelegate: WidgetLoadingDelegate?
         var isLoaded = false
-        var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
+        var loader: DynamicProgressView?  // Store a reference to the activity indicator
 
-        init(completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void) {
+        init(completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void,
+             loadingDelegate: WidgetLoadingDelegate? = nil) {
             self.completion = completion
+            self.loadingDelegate = loadingDelegate
+        }
+
+        /// Notify whichever owner is driving the loading UI that a load just started.
+        /// When a `WidgetLoadingDelegate` was supplied to the widget the host app takes over;
+        /// otherwise the internal `DynamicProgressView` is used.
+        func notifyLoadingStart() {
+            if let loadingDelegate = loadingDelegate {
+                loadingDelegate.loadingDidStart()
+            } else {
+                loader?.startAnimating()
+            }
+        }
+
+        /// Counterpart to ``notifyLoadingStart()``.
+        func notifyLoadingFinish() {
+            if let loadingDelegate = loadingDelegate {
+                loadingDelegate.loadingDidFinish()
+            } else {
+                loader?.stopAnimating()
+            }
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -114,18 +134,20 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                   let event = Standalone3DSResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
+                notifyLoadingFinish()
                 completion(.failure(.mappingFailed))
                 return
             }
 
             let statusRaw = data["status"] as? String
             _ = Standalone3DSStatus(rawValue: statusRaw ?? "") // Not used currently
+
+            notifyLoadingFinish()
             completion(.success(Standalone3DSResult(event: event, charge3dsId: token)))
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
-            activityIndicator?.stopAnimating()
         }
 
         /**
@@ -133,14 +155,14 @@ public struct Standalone3DSWidget: UIViewRepresentable {
          These are usually errors caused by the content of the page, like invalid code in the page itself that the parser can't handle.
          **/
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            activityIndicator?.stopAnimating()
+            notifyLoadingFinish()
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
             completion(.failure(.webViewFailed(error: nsError)))
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            activityIndicator?.startAnimating()
+            notifyLoadingStart()
             DispatchQueue.main.async {
                 UIAccessibility.post(notification: .announcement, argument: "3DS Check Loading")
             }
@@ -153,7 +175,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
          @see https://developer.apple.com/documentation/cfnetwork/cfnetworkerrors
          */
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            activityIndicator?.stopAnimating()
+            notifyLoadingFinish()
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
             completion(.failure(.webViewFailed(error: nsError)))

@@ -17,6 +17,7 @@ public extension Color {
     static var defaultBackground: Color { Color(.background) }
     static var defaultBorder: Color { Color(.border) }
     static var defaultPlaceholder: Color { Color(.placeholder) }
+    static var defaultHint: Color { Color(.hint) }
     static var defaultLoaderOverlay: Color { .black.opacity(0.3)}
 }
 

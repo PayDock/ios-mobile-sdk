@@ -2,9 +2,7 @@
 //  PayPalSavePaymentSourceWidget.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 16.10.2024..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
@@ -32,10 +30,12 @@ public struct PayPalSavePaymentSourceWidget: View {
             title: appearance.actionButton.text,
             isLoading: viewModel.isLoading && viewModel.showLoaders,
             style: .custom(CustomButtonStyle(appearance: appearance.actionButton, isDisabled: viewModel.viewState.isDisabled)),
-            shouldTemplate: true) {
-                viewModel.initializePayPalSDK()
-                viewModel.handleButtonTapAnalytics()
-            }
+            shouldTemplate: true,
+            accessibilityHint: appearance.actionButton.accessibilityHint
+        ) {
+            viewModel.initializePayPalSDK()
+            viewModel.handleButtonTapAnalytics()
+        }
     }
 }
 

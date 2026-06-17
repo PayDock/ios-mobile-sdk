@@ -2,15 +2,14 @@
 //  Theme.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 18.04.2025..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 import SwiftUI
 
 public struct Theme:
     LoaderStylableAppearance,
+    OverlayLoaderStylableAppearance,
     ToggleStylableAppearance,
     ActionButtonStylableAppearance,
     ExpandSectionButtonStylableAppearance,
@@ -30,7 +29,8 @@ public struct Theme:
     public var actionButton: ButtonAppearance
     public var expandSectionButton: ButtonAppearance
     public var toolbarButton: ButtonAppearance
-    public var loader: OverlayLoaderAppearance
+    public var loader: LoaderAppearance
+    public var overlayLoader: OverlayLoaderAppearance
     public var toggle: ToggleAppearance
     public var linkText: TextAppearance
     public var toggleText: TextAppearance
@@ -41,7 +41,7 @@ public struct Theme:
                 textFieldVerticalSpacing: CGFloat = 8,
                 textField: TextFieldAppearance = TextFieldAppearance(),
                 searchDropdown: SearchDropdownAppearance = SearchDropdownAppearance(),
-                actionButton: ButtonAppearance = ButtonAppearance(dimensions: .init(padding: .init(top: 16))),
+                actionButton: ButtonAppearance = ButtonAppearance(),
                 expandSectionButton: Theme.ButtonAppearance = Theme.ButtonAppearance(
                     colors: .init(background: .defaultBackground, text: .defaultPrimary, border: .clear),
                     fonts: .init(title: .init(isUnderlined: true, underlineColor: .defaultPrimary))),
@@ -49,7 +49,8 @@ public struct Theme:
                     background: .clear,
                     text: .defaultPrimary,
                     border: .clear)),
-                loader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
+                loader: LoaderAppearance = LoaderAppearance(),
+                overlayLoader: OverlayLoaderAppearance = OverlayLoaderAppearance(),
                 toggle: ToggleAppearance = ToggleAppearance(),
                 linkText: Theme.TextAppearance = Theme.TextAppearance(text:
                         .init(font: .init(size: 14), textColor: .defaultPrimary, isUnderlined: true, underlineColor: .defaultPrimary)),
@@ -65,6 +66,7 @@ public struct Theme:
         self.expandSectionButton = expandSectionButton
         self.toolbarButton = toolbarButton
         self.loader = loader
+        self.overlayLoader = overlayLoader
         self.toggle = toggle
         self.linkText = linkText
         self.toggleText = toggleText

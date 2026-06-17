@@ -47,13 +47,13 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
 
     // MARK: - Config
 
-    func getAppearance(isDarkMode: Bool) -> ThreeDSWidgetAppearance {
+    func getAppearance(isDarkMode: Bool) -> Standalone3dsWidgetAppearance {
         let appearance = StyleThemeManager.getAppearance(
             for: .standalone3ds,
             isDarkMode: isDarkMode,
-            as: ThreeDSWidgetAppearance.self,
+            as: Standalone3dsWidgetAppearance.self,
             shouldCreateDefaultIfNeeded: false)
-        return appearance ?? ThreeDSWidgetAppearance()
+        return appearance ?? Standalone3dsWidgetAppearance()
     }
 
     // MARK: - Tokenisation

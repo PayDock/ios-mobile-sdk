@@ -14,6 +14,7 @@ enum ConfigComponentsEnum {
     case allowSaveCard
     case storeSecurityCode
     case schemeSupport
+    case activePrimaryButton
     case storePin
     case requestShipping
     case fundingSource
@@ -45,6 +46,7 @@ enum ConfigComponentsEnum {
         case .allowSaveCard: return "Allow Save Card"
         case .storeSecurityCode: return "Store Security Code"
         case .schemeSupport: return "Scheme Support"
+        case .activePrimaryButton: return "Active Primary Button"
         case .storePin: return "Store PIN"
         case .requestShipping: return "Request Shipping"
         case .fundingSource: return "Funding Source"
@@ -83,7 +85,7 @@ enum ConfigComponentsEnum {
         case .widgetAccessToken, .apiAccessToken, .gatewayId, .clientId, .serviceId, .totalAmount, .currency,
                     .firstName, .lastName, .email, .phoneNumber, .dateOfBirth:
             return createTextFieldView(selectedWidget: selectedWidget)
-        case .collectCardholderName, .storePin, .requestShipping, .tokenize:
+        case .collectCardholderName, .storePin, .requestShipping, .tokenize, .activePrimaryButton:
             return createToggleView(selectedWidget: selectedWidget)
         case .fundingSource, .gender, .shippingType:
             return createPickerView(selectedWidget: selectedWidget)
@@ -141,6 +143,7 @@ enum ConfigComponentsEnum {
         case .apiAccessToken: return .apiAccessToken
         case .gatewayId: return .gatewayId
         case .collectCardholderName: return .collectCardholderName
+        case .activePrimaryButton: return .activePrimaryButton
         case .storePin: return .storePin
         case .requestShipping: return .requestShipping
         case .fundingSource: return .fundingSource

@@ -2,16 +2,14 @@
 //  ClickToPayWidgetAppearance.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 24.04.2025..
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
 public struct ClickToPayWidgetAppearance: LoaderStylableAppearance {
-    public var loader: Theme.OverlayLoaderAppearance
+    public var loader: Theme.LoaderAppearance
 
-    public init(loader: Theme.OverlayLoaderAppearance = .init(
+    public init(loader: Theme.LoaderAppearance = .init(
         color: GlobalTheme.shared.globalTheme.loader.color,
         overlayColor: .clear)) {
             self.loader = loader

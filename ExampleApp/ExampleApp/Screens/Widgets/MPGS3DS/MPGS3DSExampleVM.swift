@@ -44,13 +44,13 @@ class MPGS3dsExampleVM: NSObject, ObservableObject {
 
     // MARK: - Config
 
-    func getAppearance(isDarkMode: Bool) -> ThreeDSWidgetAppearance {
+    func getAppearance(isDarkMode: Bool) -> MPG3dsWidgetAppearance {
         let appearance = StyleThemeManager.getAppearance(
             for: .mpgs3ds,
             isDarkMode: isDarkMode,
-            as: ThreeDSWidgetAppearance.self,
+            as: MPG3dsWidgetAppearance.self,
             shouldCreateDefaultIfNeeded: false)
-        return appearance ?? ThreeDSWidgetAppearance()
+        return appearance ?? MPG3dsWidgetAppearance()
     }
 
     // MARK: - Tokenisation

@@ -2,9 +2,7 @@
 //  CustomToggleStyle.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 10.11.2025..
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 

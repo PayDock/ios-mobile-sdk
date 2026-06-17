@@ -256,7 +256,8 @@ struct ConfigTextFieldView: View {
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
                 storeSecurityCode: config.storeSecurityCode,
-                schemeSupport: config.schemeSupport
+                schemeSupport: config.schemeSupport,
+                activePrimaryButton: config.activePrimaryButton
             )
         case .gatewayId:
             config = CardDetailsWidgetConfig(
@@ -265,7 +266,8 @@ struct ConfigTextFieldView: View {
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
                 storeSecurityCode: config.storeSecurityCode,
-                schemeSupport: config.schemeSupport
+                schemeSupport: config.schemeSupport,
+                activePrimaryButton: config.activePrimaryButton
             )
         default:
             return
@@ -374,7 +376,7 @@ struct ConfigTextFieldView: View {
     // swiftlint:disable:next function_body_length
     private func updateZipConfiguration(with value: String) {
         guard let configKey = configKey,
-              var config = configVM.getConfiguration(for: .zip, as: ZipWidgetConfig.self) else { return }
+              let config = configVM.getConfiguration(for: .zip, as: ZipWidgetConfig.self) else { return }
 
         let updatedConfig: ZipWidgetConfig
 

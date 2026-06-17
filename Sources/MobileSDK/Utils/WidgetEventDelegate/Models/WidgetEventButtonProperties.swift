@@ -2,9 +2,7 @@
 //  WidgetEventButtonProperties.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 04.11.2025..
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 
@@ -13,10 +11,15 @@ public struct WidgetEventButtonProperties: Codable, Equatable {
     public let name: String
     public let action: WidgetEventActionType
     public let text: String?
+    public let formState: WidgetEventFormState?
 
-    init(name: String, action: WidgetEventActionType, text: String? = nil) {
+    init(name: String,
+         action: WidgetEventActionType,
+         text: String? = nil,
+         formState: WidgetEventFormState? = nil) {
         self.name = name
         self.action = action
         self.text = text
+        self.formState = formState
     }
 }
