@@ -75,7 +75,8 @@ struct ConfigStoreSecurityCodeView: View {
                 collectCardholderName: config.collectCardholderName,
                 allowSaveCard: config.allowSaveCard,
                 storeSecurityCode: storeSecurityCode,
-                schemeSupport: config.schemeSupport
+                schemeSupport: config.schemeSupport,
+                activePrimaryButton: config.activePrimaryButton
             )
             configVM.updateConfiguration(for: .card, with: config)
         }

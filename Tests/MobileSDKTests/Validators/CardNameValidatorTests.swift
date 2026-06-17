@@ -36,6 +36,12 @@ final class CardNameValidatorTests: XCTestCase {
         XCTAssertTrue(sut.isValidName("O'Brien"))
     }
 
+    func testIsValidName_ValidNameWithCurlyApostrophe() {
+        // iOS smart punctuation substitutes a straight apostrophe (') with a curly one (U+2019),
+        // so names like "D’Angelo" must still be accepted.
+        XCTAssertTrue(sut.isValidName("D\u{2019}Angelo"))
+    }
+
     func testIsValidName_ValidNameWithHyphen() {
         XCTAssertTrue(sut.isValidName("Mary-Jane"))
     }
@@ -89,6 +95,11 @@ final class CardNameValidatorTests: XCTestCase {
 
     func testContainsOnlyAllowedCharacters_ValidWithApostrophe() {
         XCTAssertTrue(sut.containsOnlyAllowedCharacters("O'Brien"))
+    }
+
+    func testContainsOnlyAllowedCharacters_ValidWithCurlyApostrophe() {
+        // The curly apostrophe (U+2019) produced by iOS smart punctuation must be allowed.
+        XCTAssertTrue(sut.containsOnlyAllowedCharacters("D\u{2019}Angelo"))
     }
 
     func testContainsOnlyAllowedCharacters_ValidWithHyphen() {

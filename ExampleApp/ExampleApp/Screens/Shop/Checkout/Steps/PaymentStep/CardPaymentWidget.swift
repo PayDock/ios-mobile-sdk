@@ -24,7 +24,8 @@ struct CardPaymentWidget: View {
                         privacyPolicyURL: "https://www.paydock.com/privacy"
                     )
                 ),
-                storeSecurityCode: true
+                storeSecurityCode: true,
+                activePrimaryButton: true
             ),
             appearance: getAppearance(),
             loadingDelegate: viewModel,

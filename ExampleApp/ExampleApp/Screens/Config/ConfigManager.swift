@@ -57,7 +57,8 @@ class ConfigManager: ObservableObject {
             schemeSupport: SupportedSchemesConfig(
                 supportedSchemes: Set(CardScheme.allCases),
                 enableValidation: true
-            )
+            ),
+            activePrimaryButton: true
         )
     }
 
@@ -125,7 +126,8 @@ class ConfigManager: ObservableObject {
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "",
             requireBillingAddress: false,
             requireShippingAddress: false,
-            showSetupButtonIfRequired: false
+            showSetupButtonIfRequired: false,
+            performAvailabilityChecks: true
         )
     }
 
@@ -213,7 +215,8 @@ class ConfigManager: ObservableObject {
             schemeSupport: SupportedSchemesConfig(
                 supportedSchemes: Set(CardScheme.allCases),
                 enableValidation: true
-            )
+            ),
+            activePrimaryButton: true
         )
     }
 
@@ -269,7 +272,8 @@ class ConfigManager: ObservableObject {
             merchantIdentifier: ProjectEnvironment.shared.getApplePayMerchantId() ?? "",
             requireBillingAddress: false,
             requireShippingAddress: false,
-            showSetupButtonIfRequired: false
+            showSetupButtonIfRequired: false,
+            performAvailabilityChecks: true
         )
     }
 
@@ -291,7 +295,8 @@ class ConfigManager: ObservableObject {
             serviceId: params.serviceId,
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
             pkPaymentRequest: pkPaymentRequest,
-            showSetUpButtonWhenNoCardsEnrolled: params.showSetupButtonIfRequired
+            showSetUpButtonWhenNoCardsEnrolled: params.showSetupButtonIfRequired,
+            performAvailabilityChecks: params.performAvailabilityChecks
         )
     }
 

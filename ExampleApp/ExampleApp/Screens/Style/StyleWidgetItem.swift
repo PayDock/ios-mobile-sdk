@@ -2,9 +2,7 @@
 //  StyleWidgetItem.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 06.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 

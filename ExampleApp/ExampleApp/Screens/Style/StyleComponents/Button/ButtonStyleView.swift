@@ -185,6 +185,11 @@ struct ButtonStyleView<T>: View {
                                 text: Binding(
                                     get: { viewModel.buttonText },
                                     set: { viewModel.buttonText = $0 }))
+
+            DimensionsFieldView(title: "Accessibility Hint",
+                                text: Binding(
+                                    get: { viewModel.accessibilityHint },
+                                    set: { viewModel.accessibilityHint = $0 }))
         }
     }
 }

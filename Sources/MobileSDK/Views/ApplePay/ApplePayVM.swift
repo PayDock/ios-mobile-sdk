@@ -73,12 +73,18 @@ class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - Apple Pay Availability
 
+    // Whether the widget should run its own availability checks (vs. trusting the integrator)
+    var availabilityChecksEnabled: Bool {
+        config.performAvailabilityChecks
+    }
+
     // True when the hardware supports Apple Pay (regardless of enrolled cards)
     func deviceSupportsApplePay() -> Bool {
-        return PKPaymentAuthorizationController.canMakePayments()
+        MobileSDK.deviceSupportsApplePay()
     }
 
     // Check to see if there cards already in wallet for default supported card schemes
+    // (networks only — no capability filtering, so the setup-button decision isn't narrowed)
     func canMakePaymentsWithDefaultNetworks() -> Bool {
         PKPaymentAuthorizationController.canMakePayments(
             usingNetworks: [.visa, .masterCard, .amex, .discover, .JCB, .chinaUnionPay]
@@ -88,10 +94,7 @@ class ApplePayVM: NSObject, ObservableObject {
     // True when the hardware supports Apple Pay (regardless of enrolled cards)
     // "and" cards in wallet support set network and capabilities
     func canMakePaymentsWithConfiguredNetworksAndCapabilities() -> Bool {
-        return PKPaymentAuthorizationController.canMakePayments(
-            usingNetworks: config.pkPaymentRequest.supportedNetworks,
-            capabilities: config.pkPaymentRequest.merchantCapabilities
-        )
+        MobileSDK.canMakeApplePayPayments(for: config.pkPaymentRequest)
     }
 
     // Whether the device is capable but has no eligible cards enrolled

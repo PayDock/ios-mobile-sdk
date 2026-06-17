@@ -2,9 +2,7 @@
 //  ToggleFieldView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 10.12.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 

@@ -2,11 +2,10 @@
 //  OutlineTextField.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 01.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
+import UIKit
 
 struct OutlineTextField: View {
 
@@ -17,7 +16,7 @@ struct OutlineTextField: View {
 
     // MARK: Properties
 
-    @State private var appearance: Theme.TextFieldAppearance
+    private let appearance: Theme.TextFieldAppearance
 
     @State private var borderColor = Color.clear
     @State private var borderWidth: CGFloat = 0.0
@@ -26,6 +25,7 @@ struct OutlineTextField: View {
     @State private var titleColor = Color.clear
     @State private var titleFontSize = 0.0
     @State private var animatableEditingState = false
+    @State private var showPlaceholder = false
 
     private var titleLeadingPadding: Double {
         let isActive = animatableEditingState || !text.isEmpty
@@ -54,6 +54,11 @@ struct OutlineTextField: View {
         }
     }
 
+    private var effectivePlaceholder: String {
+        // Only show placeholder when editing, text field is empty, and animation has completed
+        return (showPlaceholder && text.isEmpty) ? appearance.placeholderText ?? "" : ""
+    }
+
     @State private var validationIconState: ValidationIconState = .none
 
     @State private var errorViewOpacity: Double = 0
@@ -65,10 +70,12 @@ struct OutlineTextField: View {
     @Binding private var leftImage: Image?
     @Binding private var editing: Bool
     @Binding private var errorMessage: String
+    private var accessibilityValue: String?
+    private let spellOutValue: Bool
     @Binding private var disabled: Bool
+    @Binding private var leftImageAccessibilityLabel: String?
 
     private let title: String
-    private let placeholder: String
     private let validationIconEnabled: Bool
     private let textContentType: UITextContentType?
     private let returnKeyType: UIReturnKeyType
@@ -85,7 +92,6 @@ struct OutlineTextField: View {
     /// - Parameters:
     ///   - text: The text field contents.
     ///   - title: The title string.
-    ///   - placeholder: Placeholder that appears when field is active.
     ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
@@ -102,7 +108,6 @@ struct OutlineTextField: View {
     public init(appearance: Theme.TextFieldAppearance = Theme.TextFieldAppearance(),
                 text: Binding<String>,
                 title: String,
-                placeholder: String,
                 errorMessage: Binding<String>,
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
@@ -114,13 +119,15 @@ struct OutlineTextField: View {
                 returnKeyType: UIReturnKeyType = .default,
                 isSecureTextEntry: Bool = false,
                 autocorrectionDisabled: Bool = false,
+                accessibilityValue: String? = nil,
+                spellOutValue: Bool = false,
+                leftImageAccessibilityLabel: Binding<String?>? = nil,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
                 onSubmit: (() -> Void)? = nil) {
         self.appearance = appearance
         self._text = text
         self.title = title
-        self.placeholder = placeholder
         self._errorMessage = errorMessage
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
@@ -132,6 +139,9 @@ struct OutlineTextField: View {
         self.returnKeyType = returnKeyType
         self.isSecureTextEntry = isSecureTextEntry
         self.autocorrectionDisabled = autocorrectionDisabled
+        self.accessibilityValue = accessibilityValue
+        self.spellOutValue = spellOutValue
+        self._leftImageAccessibilityLabel = leftImageAccessibilityLabel ?? .constant(nil)
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
@@ -148,23 +158,33 @@ struct OutlineTextField: View {
             }
             if showErrorView {
                 errorView()
-            } else {
-                Spacer()
+                    .accessibilityHidden(true)
+            } else if !(appearance.hintText ?? "").isEmpty {
+                hintView()
+                    .accessibilityHidden(true)
             }
         }
         .contentShape(Rectangle())
-        .padding(.top, appearance.dimensions.padding.top)
-        .padding(.leading, appearance.dimensions.padding.leading)
-        .padding(.bottom, appearance.dimensions.padding.bottom)
-        .padding(.trailing, appearance.dimensions.padding.trailing)
+        .padding(appearance.dimensions.padding)
         .onTapGesture {
             onTapGesture()
         }
-        .onChange(of: editing) { _ in
+        .onChange(of: editing) { newValue in
             withAnimation(.easeOut(duration: 0.15)) {
                 animatableEditingState = editing
                 updateBorder()
                 updateTitle()
+            }
+
+            // Delay placeholder appearance to sync with title animation
+            if newValue {
+                // Show placeholder after animation completes (0.15s + small buffer)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    showPlaceholder = true
+                }
+            } else {
+                // Hide placeholder immediately when editing ends
+                showPlaceholder = false
             }
         }
         .onChange(of: valid) { _ in
@@ -182,11 +202,18 @@ struct OutlineTextField: View {
         .onChange(of: text) { _ in
             updateTitle()
         }
+        .onChange(of: leftImageAccessibilityLabel) { newValue in
+            // Announce the detected card scheme once (e.g. "Visa") as it's recognised, mirroring
+            // Android. Fires on the change to a non-empty scheme, not per keystroke.
+            if let scheme = newValue, !scheme.isEmpty {
+                UIAccessibility.post(notification: .announcement, argument: scheme)
+            }
+        }
         .onChange(of: sizeCategory) { _ in
             updateTitleFontSize()
         }
         .onAppear {
-            titleColor = appearance.colors.placeholder
+            titleColor = appearance.colors.hint
             titleFontSize = appearance.fonts.title.customFont.size
             borderColor = appearance.colors.inactive
             borderWidth = appearance.dimensions.borderWidth
@@ -199,12 +226,12 @@ struct OutlineTextField: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: leftIconWidth, height: leftIconHeight)
-                .foregroundColor(appearance.colors.placeholder)
+                .foregroundColor(appearance.colors.icon)
                 .accessibilityHidden(true)
 
             CursorPositionTextField(
                 text: $text,
-                placeholder: editing ? placeholder : "",
+                placeholder: effectivePlaceholder,
                 keyboardType: keyboardType,
                 textContentType: textContentType,
                 returnKeyType: returnKeyType,
@@ -216,6 +243,14 @@ struct OutlineTextField: View {
                 isStrikethrough: appearance.fonts.text.isStrikethrough,
                 strikethroughColor: UIColor(appearance.fonts.text.strikethroughColor),
                 isItalic: appearance.fonts.text.isItalic,
+                placeholderFont: UIFont(descriptor: appearance.fonts.placeholder.customFont.fontDescriptor,
+                                        size: appearance.fonts.placeholder.customFont.size),
+                placeholderColor: UIColor(appearance.colors.placeholder),
+                placeholderIsUnderlined: appearance.fonts.placeholder.isUnderlined,
+                placeholderUnderlineColor: UIColor(appearance.fonts.placeholder.underlineColor),
+                placeholderIsStrikethrough: appearance.fonts.placeholder.isStrikethrough,
+                placeholderStrikethroughColor: UIColor(appearance.fonts.placeholder.strikethroughColor),
+                placeholderIsItalic: appearance.fonts.placeholder.isItalic,
                 isSecureTextEntry: isSecureTextEntry,
                 autocorrectionDisabled: autocorrectionDisabled,
                 accessibilityLabel: title,
@@ -234,7 +269,11 @@ struct OutlineTextField: View {
             .layoutPriority(0)
             .disabled(disabled)
             .accessibilityLabel(title)
-            .accessibilityHint(getValidMessage())
+            .accessibilityValue(spellOutValue
+                ? Text(accessibilityValue ?? text).speechSpellsOutCharacters()
+                : Text(accessibilityValue ?? text))
+            .accessibilityHint(getAccessibilityHint())
+            .accessibilityAddTraits(getAccessibilityTraits())
 
             if validationIconEnabled {
                 validationIconView
@@ -269,27 +308,24 @@ struct OutlineTextField: View {
     }
 
     private func errorView() -> some View {
-        HStack {
-            VStack {
-                Text(errorMessage)
-                    .font(appearance.fonts.error.customFont.scaledFont)
-                    .foregroundColor(appearance.colors.error)
-                    .padding(.leading, 16.0)
-            }
-            Spacer()
-        }
-        .padding(.bottom, 10)
-        .opacity(errorViewOpacity)
-        .onAppear {
-            withAnimation(.easeOut(duration: 0.15)) {
-                errorViewOpacity = 1
-            }
-        }
-        .onDisappear {
-            withAnimation(.easeOut(duration: 0.15)) {
-                errorViewOpacity = 0
-            }
-        }
+        Text(errorMessage)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(appearance.fonts.error.customFont.scaledFont)
+            .foregroundColor(appearance.colors.error)
+            .padding(appearance.dimensions.messagePadding)
+            .transition(.opacity) // Smooth transition when appearing/disappearing
+    }
+
+    private func hintView() -> some View {
+        Text(appearance.hintText ?? "")
+            .strikethrough(appearance.fonts.hint.isStrikethrough, color: appearance.fonts.hint.strikethroughColor)
+            .underline(appearance.fonts.hint.isUnderlined, color: appearance.fonts.hint.underlineColor)
+            .italic(appearance.fonts.hint.isItalic)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(appearance.fonts.hint.customFont.scaledFont)
+            .foregroundColor(appearance.colors.hint)
+            .padding(appearance.dimensions.messagePadding)
+            .transition(.opacity) // Smooth transition when appearing/disappearing
     }
 
     private var validationIconView: some View {
@@ -310,7 +346,6 @@ struct OutlineTextField: View {
             }
         }
     }
-
 }
 
 // MARK: - Private methods
@@ -360,13 +395,13 @@ private extension OutlineTextField {
 
     func updateTitleColor() {
         guard let valid = valid else {
-            titleColor = editing ? appearance.colors.active : appearance.colors.placeholder
+            titleColor = editing ? appearance.colors.active : appearance.colors.hint
             return
         }
         if valid {
-            titleColor = editing ? appearance.colors.active : appearance.colors.placeholder
+            titleColor = editing ? appearance.colors.active : appearance.colors.hint
         } else if text.isEmpty {
-            titleColor = editing ? appearance.colors.error : appearance.colors.placeholder
+            titleColor = editing ? appearance.colors.error : appearance.colors.hint
         } else {
             titleColor = appearance.colors.error
         }
@@ -429,9 +464,68 @@ extension OutlineTextField {
         }
     }
 
-    private func getValidMessage() -> String {
-        guard let valid = valid else { return "" }
-        return valid ? "Valid" : "Invalid. \(errorMessage)"
+    private func getAccessibilityHint() -> String {
+        // In error state, only the error message is announced — no hint, no "required",
+        // and no contextual extras (card scheme, "Valid", placeholder example). Keeps the
+        // VoiceOver readout focused on what the user has to fix.
+        if !errorMessage.isEmpty {
+            return "Error: \(errorMessage)"
+        }
+
+        // Non-error state — build the regular contextual hint.
+        var hintComponents: [String] = []
+
+        // A custom accessibility hint overrides ONLY the visual hint text; the placeholder example
+        // (and card scheme, "Valid", "required") are still announced. 
+        let customHint = appearance.accessibilityHintText?.isEmpty == false
+            ? appearance.accessibilityHintText
+            : nil
+
+        // Add card scheme information if available
+        if let cardScheme = leftImageAccessibilityLabel, !cardScheme.isEmpty {
+            hintComponents.append(cardScheme)
+        }
+
+        // Add validation status only when the valid icon is actually shown — i.e. not while
+        // editing (see updateBorderColor) — so VoiceOver doesn't announce "Valid" before the
+        // tick appears on unfocus.
+        if validationIconState == .valid {
+            hintComponents.append("Valid")
+        }
+
+        // Add placeholder information when field is empty. Always announced, regardless of any
+        // custom accessibility hint.
+        if let placeholderText = appearance.placeholderText, !placeholderText.isEmpty {
+            if editing && text.isEmpty {
+                hintComponents.append("Example: \(placeholderText)")
+            }
+        }
+
+        // Use the custom accessibility hint if provided, otherwise fall back to the visual hint.
+        if let customHint = customHint {
+            hintComponents.append(customHint)
+        } else if let hintMessage = appearance.hintText, !hintMessage.isEmpty {
+            hintComponents.append(hintMessage)
+        }
+
+        // Add required suffix if field is not optional
+        let isOptional = title.lowercased().contains("(optional)")
+        if !isOptional && !hintComponents.isEmpty {
+            hintComponents.append("required")
+        }
+
+        return hintComponents.joined(separator: ", ")
+    }
+
+    private func getAccessibilityTraits() -> AccessibilityTraits {
+        var traits: AccessibilityTraits = []
+
+        // Mark as updated when validation state changes
+        if let valid = valid, !text.isEmpty {
+            traits.insert(.updatesFrequently)
+        }
+
+        return traits
     }
 }
 
@@ -443,7 +537,6 @@ struct OutlineTextField_Previews: PreviewProvider {
         OutlineTextField(
             text: .constant("Text"),
             title: "Title",
-            placeholder: "Placeholder",
             errorMessage: .constant("Error message"),
             editing: .constant(false),
             valid: .constant(false),

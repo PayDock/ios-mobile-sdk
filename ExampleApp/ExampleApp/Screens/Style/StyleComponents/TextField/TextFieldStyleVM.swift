@@ -2,9 +2,7 @@
 //  TextFieldStyleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 11.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -15,11 +13,12 @@ class TextFieldStyleVM: ObservableObject {
 
     private let selectedWidget: WidgetsEnum
     private let stylingDarkMode: Bool
+    private let cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>?
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
 
     // MARK: - Variables
 
-    private var appearance: TextFieldStylableAppearance?
+    private var appearance: Any?
     @Published var showResetConfirmation = false
 
     // Colors
@@ -29,6 +28,8 @@ class TextFieldStyleVM: ObservableObject {
     @Published var successColor: Color = .clear { didSet { updateAppearance() }}
     @Published var textColor: Color = .clear { didSet { updateAppearance() }}
     @Published var placeholderColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var hintColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var iconColor: Color = .clear { didSet { updateAppearance() }}
     @Published var backgroundColor: Color = .clear { didSet { updateAppearance() }}
 
     // Dimensions
@@ -61,106 +62,201 @@ class TextFieldStyleVM: ObservableObject {
     @Published var errorFont: String = "" { didSet { updateAppearance() }}
     @Published var errorFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
 
+    @Published var hintUnderlineColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var hintStrikethroughColor: Color = .clear { didSet { updateAppearance() }}
+    @Published var hintFont: String = "" { didSet { updateAppearance() }}
+    @Published var hintFontSize: CGFloat = 0.0 { didSet { updateAppearance() }}
+
+    // Text Content
+    @Published var placeholderText: String = "" { didSet { updateAppearance() }}
+    @Published var hintText: String = "" { didSet { updateAppearance() }}
+    @Published var accessibilityHintText: String = "" { didSet { updateAppearance() }}
+
+    // Message Padding
+    @Published var messageTopPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var messageLeadingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var messageBottomPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+    @Published var messageTrailingPadding: CGFloat = 0.0 { didSet { updateAppearance() }}
+
     // MARK: - Initialization
 
     init(selectedWidget: WidgetsEnum,
-         stylingDarkMode: Bool) {
+         stylingDarkMode: Bool,
+         cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>? = nil) {
         self.selectedWidget = selectedWidget
         self.stylingDarkMode = stylingDarkMode
-        self.appearance = StyleThemeManager.getAppearance(
-            for: selectedWidget,
-            isDarkMode: stylingDarkMode,
-            as: TextFieldStylableAppearance.self)
+        self.cardTextFieldKeyPath = cardTextFieldKeyPath
+
+        // Load appropriate appearance based on widget type
+        if selectedWidget == .card, cardTextFieldKeyPath != nil {
+            self.appearance = StyleThemeManager.getAppearance(
+                for: selectedWidget,
+                isDarkMode: stylingDarkMode,
+                as: CardDetailsWidgetAppearance.self)
+        } else {
+            self.appearance = StyleThemeManager.getAppearance(
+                for: selectedWidget,
+                isDarkMode: stylingDarkMode,
+                as: TextFieldStylableAppearance.self)
+        }
         syncUIToAppearance()
     }
 
     private func syncUIToAppearance() {
-        self.activeColor = appearance?.textField.colors.active ?? .clear
-        self.inactiveColor = appearance?.textField.colors.inactive ?? .clear
-        self.errorColor = appearance?.textField.colors.error ?? .clear
-        self.successColor = appearance?.textField.colors.success ?? .clear
-        self.textColor = appearance?.textField.colors.text ?? .clear
-        self.placeholderColor = appearance?.textField.colors.placeholder ?? .clear
-        self.backgroundColor = appearance?.textField.colors.background ?? .clear
+        guard let textField = getCurrentTextField() else { return }
 
-        self.cornerRadius = appearance?.textField.dimensions.cornerRadius ?? 0
-        self.borderWidth = appearance?.textField.dimensions.borderWidth ?? 0
-        self.activeBorderWidth = appearance?.textField.dimensions.activeBorderWidth ?? 0
-        self.topPadding = appearance?.textField.dimensions.padding.top ?? 0
-        self.leadingPadding = appearance?.textField.dimensions.padding.leading ?? 0
-        self.bottomPadding = appearance?.textField.dimensions.padding.bottom ?? 0
-        self.trailingPadding = appearance?.textField.dimensions.padding.trailing ?? 0
+        self.activeColor = textField.colors.active
+        self.inactiveColor = textField.colors.inactive
+        self.errorColor = textField.colors.error
+        self.successColor = textField.colors.success
+        self.textColor = textField.colors.text
+        self.placeholderColor = textField.colors.placeholder
+        self.hintColor = textField.colors.hint
+        self.iconColor = textField.colors.icon
+        self.backgroundColor = textField.colors.background
 
-        self.textUnderlineColor = appearance?.textField.fonts.text.underlineColor ?? .clear
-        self.textStrikethroughColor = appearance?.textField.fonts.text.strikethroughColor ?? .clear
-        self.textFont = appearance?.textField.fonts.text.customFont.fontName ?? ""
-        self.textFontSize = appearance?.textField.fonts.text.customFont.size ?? 0.0
+        self.cornerRadius = textField.dimensions.cornerRadius
+        self.borderWidth = textField.dimensions.borderWidth
+        self.activeBorderWidth = textField.dimensions.activeBorderWidth
+        self.topPadding = textField.dimensions.padding.top
+        self.leadingPadding = textField.dimensions.padding.leading
+        self.bottomPadding = textField.dimensions.padding.bottom
+        self.trailingPadding = textField.dimensions.padding.trailing
 
-        self.titleUnderlineColor = appearance?.textField.fonts.title.underlineColor ?? .clear
-        self.titleStrikethroughColor = appearance?.textField.fonts.title.strikethroughColor ?? .clear
-        self.titleFont = appearance?.textField.fonts.title.customFont.fontName ?? ""
-        self.titleFontSize = appearance?.textField.fonts.title.customFont.size ?? 0.0
+        self.textUnderlineColor = textField.fonts.text.underlineColor
+        self.textStrikethroughColor = textField.fonts.text.strikethroughColor
+        self.textFont = textField.fonts.text.customFont.fontName
+        self.textFontSize = textField.fonts.text.customFont.size
 
-        self.placeholderUnderlineColor = appearance?.textField.fonts.placeholder.underlineColor ?? .clear
-        self.placeholderStrikethroughColor = appearance?.textField.fonts.placeholder.strikethroughColor ?? .clear
-        self.placeholderFont = appearance?.textField.fonts.placeholder.customFont.fontName ?? ""
-        self.placeholderFontSize = appearance?.textField.fonts.placeholder.customFont.size ?? 0.0
+        self.titleUnderlineColor = textField.fonts.title.underlineColor
+        self.titleStrikethroughColor = textField.fonts.title.strikethroughColor
+        self.titleFont = textField.fonts.title.customFont.fontName
+        self.titleFontSize = textField.fonts.title.customFont.size
 
-        self.errorUnderlineColor = appearance?.textField.fonts.error.underlineColor ?? .clear
-        self.errorStrikethroughColor = appearance?.textField.fonts.error.strikethroughColor ?? .clear
-        self.errorFont = appearance?.textField.fonts.error.customFont.fontName ?? ""
-        self.errorFontSize = appearance?.textField.fonts.error.customFont.size ?? 0.0
+        self.placeholderUnderlineColor = textField.fonts.placeholder.underlineColor
+        self.placeholderStrikethroughColor = textField.fonts.placeholder.strikethroughColor
+        self.placeholderFont = textField.fonts.placeholder.customFont.fontName
+        self.placeholderFontSize = textField.fonts.placeholder.customFont.size
+
+        self.errorUnderlineColor = textField.fonts.error.underlineColor
+        self.errorStrikethroughColor = textField.fonts.error.strikethroughColor
+        self.errorFont = textField.fonts.error.customFont.fontName
+        self.errorFontSize = textField.fonts.error.customFont.size
+
+        self.hintUnderlineColor = textField.fonts.hint.underlineColor
+        self.hintStrikethroughColor = textField.fonts.hint.strikethroughColor
+        self.hintFont = textField.fonts.hint.customFont.fontName
+        self.hintFontSize = textField.fonts.hint.customFont.size
+
+        self.placeholderText = textField.placeholderText ?? ""
+        self.hintText = textField.hintText ?? ""
+        self.accessibilityHintText = textField.accessibilityHintText ?? ""
+
+        self.messageTopPadding = textField.dimensions.messagePadding.top
+        self.messageLeadingPadding = textField.dimensions.messagePadding.leading
+        self.messageBottomPadding = textField.dimensions.messagePadding.bottom
+        self.messageTrailingPadding = textField.dimensions.messagePadding.trailing
+    }
+
+    // MARK: - Helper Methods
+
+    /// Gets the current text field appearance based on widget type and keyPath
+    private func getCurrentTextField() -> Theme.TextFieldAppearance? {
+        if let cardAppearance = appearance as? CardDetailsWidgetAppearance,
+           let keyPath = cardTextFieldKeyPath {
+            return cardAppearance[keyPath: keyPath]
+        } else if let textFieldAppearance = appearance as? TextFieldStylableAppearance {
+            return textFieldAppearance.textField
+        }
+        return nil
     }
 
     private func updateAppearance() {
-        guard var appearance = appearance else { return }
+        // Handle CardDetailsWidgetAppearance with specific text field
+        if var cardAppearance = appearance as? CardDetailsWidgetAppearance,
+           let keyPath = cardTextFieldKeyPath {
+            updateTextField(&cardAppearance[keyPath: keyPath])
+            StyleThemeManager.setAppearance(cardAppearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+            self.appearance = cardAppearance
+        }
+        // Handle TextFieldStylableAppearance
+        else if var textFieldAppearance = appearance as? TextFieldStylableAppearance {
+            updateTextField(&textFieldAppearance.textField)
+            StyleThemeManager.setAppearance(textFieldAppearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+            self.appearance = textFieldAppearance
+        }
+    }
 
-        appearance.textField.colors.active = activeColor
-        appearance.textField.colors.inactive = inactiveColor
-        appearance.textField.colors.error = errorColor
-        appearance.textField.colors.success = successColor
-        appearance.textField.colors.text = textColor
-        appearance.textField.colors.placeholder = placeholderColor
-        appearance.textField.colors.background = backgroundColor
+    /// Updates the text field appearance with current values
+    private func updateTextField(_ textField: inout Theme.TextFieldAppearance) {
+        textField.colors.active = activeColor
+        textField.colors.inactive = inactiveColor
+        textField.colors.error = errorColor
+        textField.colors.success = successColor
+        textField.colors.text = textColor
+        textField.colors.placeholder = placeholderColor
+        textField.colors.hint = hintColor
+        textField.colors.icon = iconColor
+        textField.colors.background = backgroundColor
 
-        appearance.textField.dimensions.cornerRadius = cornerRadius
-        appearance.textField.dimensions.borderWidth = borderWidth
-        appearance.textField.dimensions.activeBorderWidth = activeBorderWidth
-        appearance.textField.dimensions.padding.top = topPadding
-        appearance.textField.dimensions.padding.leading = leadingPadding
-        appearance.textField.dimensions.padding.bottom = bottomPadding
-        appearance.textField.dimensions.padding.trailing = trailingPadding
+        textField.dimensions.cornerRadius = cornerRadius
+        textField.dimensions.borderWidth = borderWidth
+        textField.dimensions.activeBorderWidth = activeBorderWidth
+        textField.dimensions.padding.top = topPadding
+        textField.dimensions.padding.leading = leadingPadding
+        textField.dimensions.padding.bottom = bottomPadding
+        textField.dimensions.padding.trailing = trailingPadding
 
-        appearance.textField.fonts.text.underlineColor = textUnderlineColor
-        appearance.textField.fonts.text.strikethroughColor = textStrikethroughColor
-        appearance.textField.fonts.text.customFont.type = .custom(name: textFont)
+        textField.fonts.text.underlineColor = textUnderlineColor
+        textField.fonts.text.strikethroughColor = textStrikethroughColor
+        textField.fonts.text.customFont.type = .custom(name: textFont)
+        textField.fonts.text.customFont.size = textFontSize
 
-        appearance.textField.fonts.text.customFont.size = textFontSize
+        textField.fonts.title.underlineColor = titleUnderlineColor
+        textField.fonts.title.strikethroughColor = titleStrikethroughColor
+        textField.fonts.title.customFont.type = .custom(name: titleFont)
+        textField.fonts.title.customFont.size = titleFontSize
 
-        appearance.textField.fonts.title.underlineColor = titleUnderlineColor
-        appearance.textField.fonts.title.strikethroughColor = titleStrikethroughColor
-        appearance.textField.fonts.title.customFont.type = .custom(name: titleFont)
-        appearance.textField.fonts.title.customFont.size = titleFontSize
+        textField.fonts.placeholder.underlineColor = placeholderUnderlineColor
+        textField.fonts.placeholder.strikethroughColor = placeholderStrikethroughColor
+        textField.fonts.placeholder.customFont.type = .custom(name: placeholderFont)
+        textField.fonts.placeholder.customFont.size = placeholderFontSize
 
-        appearance.textField.fonts.placeholder.underlineColor = placeholderUnderlineColor
-        appearance.textField.fonts.placeholder.strikethroughColor = placeholderStrikethroughColor
-        appearance.textField.fonts.placeholder.customFont.type = .custom(name: placeholderFont)
-        appearance.textField.fonts.placeholder.customFont.size = placeholderFontSize
+        textField.fonts.error.underlineColor = errorUnderlineColor
+        textField.fonts.error.strikethroughColor = errorStrikethroughColor
+        textField.fonts.error.customFont.type = .custom(name: errorFont)
+        textField.fonts.error.customFont.size = errorFontSize
 
-        appearance.textField.fonts.error.underlineColor = errorUnderlineColor
-        appearance.textField.fonts.error.strikethroughColor = errorStrikethroughColor
-        appearance.textField.fonts.error.customFont.type = .custom(name: errorFont)
-        appearance.textField.fonts.error.customFont.size = errorFontSize
+        textField.fonts.hint.underlineColor = hintUnderlineColor
+        textField.fonts.hint.strikethroughColor = hintStrikethroughColor
+        textField.fonts.hint.customFont.type = .custom(name: hintFont)
+        textField.fonts.hint.customFont.size = hintFontSize
 
-        StyleThemeManager.setAppearance(appearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+        textField.placeholderText = placeholderText.isEmpty ? nil : placeholderText
+        textField.hintText = hintText.isEmpty ? nil : hintText
+        textField.accessibilityHintText = accessibilityHintText.isEmpty ? nil : accessibilityHintText
+
+        textField.dimensions.messagePadding.top = messageTopPadding
+        textField.dimensions.messagePadding.leading = messageLeadingPadding
+        textField.dimensions.messagePadding.bottom = messageBottomPadding
+        textField.dimensions.messagePadding.trailing = messageTrailingPadding
     }
 
     func resetAppearance() {
         StyleThemeManager.resetAppearance(for: selectedWidget, isDarkMode: stylingDarkMode)
-        self.appearance = StyleThemeManager.getAppearance(
-            for: selectedWidget,
-            isDarkMode: stylingDarkMode,
-            as: TextFieldStylableAppearance.self)
+
+        // Reload appropriate appearance based on widget type
+        if selectedWidget == .card, cardTextFieldKeyPath != nil {
+            self.appearance = StyleThemeManager.getAppearance(
+                for: selectedWidget,
+                isDarkMode: stylingDarkMode,
+                as: CardDetailsWidgetAppearance.self)
+        } else {
+            self.appearance = StyleThemeManager.getAppearance(
+                for: selectedWidget,
+                isDarkMode: stylingDarkMode,
+                as: TextFieldStylableAppearance.self)
+        }
 
         syncUIToAppearance()
     }

@@ -14,6 +14,12 @@ public struct ApplePayResult {
     public let shippingAddress: ApplePayOTTShipping?
     public let billingAddress: ApplePayOTTBilling?
 
+    /// Initializes the Apple Pay result object
+    /// - Parameters:
+    ///   - ottToken: The OTT token created using Apple Pay Wallet
+    ///   - cardInfo: Optional info on the selected user's card
+    ///   - shippingAddress: Optional info on the user's shipping address
+    ///   - billingAddress: Optional info on the user's billing address
     public init(ottToken: String,
                 cardInfo: ApplePayOTTCardInfo? = nil,
                 shippingAddress: ApplePayOTTShipping? = nil,

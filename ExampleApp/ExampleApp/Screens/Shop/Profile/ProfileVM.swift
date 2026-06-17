@@ -20,6 +20,7 @@ class ProfileVM: ObservableObject {
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
+    @Published var isLoading = false
 
     // Computed properties that delegate to UserProfileManager
     var isCustomerLinked: Bool {
@@ -98,5 +99,18 @@ class ProfileVM: ObservableObject {
     }
     func clearPersistedData() {
         profileManager.clearAllData()
+    }
+}
+
+// MARK: - WidgetLoadingDelegate
+
+extension ProfileVM: WidgetLoadingDelegate {
+
+    func loadingDidStart() {
+        isLoading = true
+    }
+
+    func loadingDidFinish() {
+        isLoading = false
     }
 }

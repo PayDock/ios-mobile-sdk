@@ -11,11 +11,11 @@ import Afterpay
 
 public struct AfterpayWidgetAppearance: LoaderStylableAppearance {
     public var colorScheme: Afterpay.ColorScheme
-    public var loader: Theme.OverlayLoaderAppearance
+    public var loader: Theme.LoaderAppearance
     public var type: ButtonKind
 
     public init(colorScheme: ColorScheme = .static(.blackOnMint),
-                loader: Theme.OverlayLoaderAppearance = GlobalTheme.shared.globalTheme.loader,
+                loader: Theme.LoaderAppearance = GlobalTheme.shared.globalTheme.loader,
                 type: ButtonKind = .buyNow) {
         self.colorScheme = colorScheme
         self.loader = loader

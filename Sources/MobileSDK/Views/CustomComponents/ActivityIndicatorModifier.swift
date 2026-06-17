@@ -2,19 +2,17 @@
 //  ActivityIndicatorModifier.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 08.12.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
 public struct ActivityIndicatorModifier: AnimatableModifier {
-    private let appearance: Theme.OverlayLoaderAppearance
+    private let appearance: Theme.LoaderAppearance
     public var isLoading: Bool
     @State private var hostingController: UIHostingController<ActivityIndicator>?
     @StateObject private var announcementManager = LoadingAnnouncementManager()
 
-    public init(appearance: Theme.OverlayLoaderAppearance = Theme.OverlayLoaderAppearance(),
+    public init(appearance: Theme.LoaderAppearance = Theme.LoaderAppearance(),
                 isLoading: Bool) {
         self.appearance = appearance
         self.isLoading = isLoading

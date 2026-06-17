@@ -2,9 +2,7 @@
 //  OpacitySliderView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 23.12.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 

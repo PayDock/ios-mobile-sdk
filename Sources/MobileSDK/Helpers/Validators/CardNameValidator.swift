@@ -10,15 +10,17 @@ class CardNameValidator {
 
     func isValidName(_ name: String) -> Bool {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let regex = #"^\p{L}(?:[\p{L}'`.\-]*(?: [\p{L}'`.\-]+)*)$"#
+        // Apostrophes include the straight quote (') and the curly quotes (‘ ’) iOS smart
+        // punctuation may produce, so names like "D'Angelo" are accepted however they're entered.
+        let regex = #"^\p{L}(?:[\p{L}'`‘’.\-]*(?: [\p{L}'`‘’.\-]+)*)$"#
         return trimmed.range(of: regex, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     /// Checks if the input contains only characters allowed in a cardholder name.
-    /// Allowed: Unicode letters, space, apostrophe, backtick, period, hyphen.
+    /// Allowed: Unicode letters, space, apostrophe (straight or curly), backtick, period, hyphen.
     /// Used for active validation during typing.
     func containsOnlyAllowedCharacters(_ name: String) -> Bool {
-        let allowedPattern = #"^[\p{L} '`.\-]*$"#
+        let allowedPattern = #"^[\p{L} '`‘’.\-]*$"#
         return name.range(of: allowedPattern, options: .regularExpression) != nil
     }
 

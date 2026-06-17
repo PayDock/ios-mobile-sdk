@@ -2,9 +2,7 @@
 //  AutocompleteTextField.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 21.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
@@ -22,7 +20,6 @@ struct AutocompleteTextField: View {
     @Binding private var editing: Bool
     @Binding private var errorMessage: String
     private let title: String
-    private let placeholder: String
     private let onTapGesture: () -> Void
     private let validationIconEnabled: Bool
     private let returnKeyType: UIReturnKeyType
@@ -48,7 +45,6 @@ struct AutocompleteTextField: View {
     /// - Parameters:
     ///   - text: The text field contents.
     ///   - title: The title string.
-    ///   - placeholder: Placeholder that appears when field is active.
     ///   - errorMessage: The field error message string.
     ///   - editing: Whether the field is in the editing state.
     ///   - valid: Whether the field is in the valid state.
@@ -60,7 +56,6 @@ struct AutocompleteTextField: View {
     public init(appearance: Theme.SearchDropdownAppearance = Theme.SearchDropdownAppearance(),
                 text: Binding<String>,
                 title: String,
-                placeholder: String,
                 errorMessage: Binding<String>,
                 leftImage: Binding<Image?>? = nil,
                 editing: Binding<Bool>,
@@ -79,7 +74,6 @@ struct AutocompleteTextField: View {
         self.appearance = appearance
         self._text = text
         self.title = title
-        self.placeholder = placeholder
         self._errorMessage = errorMessage
         self._leftImage = leftImage ?? .constant(nil)
         self._editing = editing
@@ -103,7 +97,6 @@ struct AutocompleteTextField: View {
                 appearance: appearance.textField,
                 text: $text,
                 title: title,
-                placeholder: placeholder,
                 errorMessage: $errorMessage,
                 editing: $editing,
                 valid: $valid,
@@ -156,12 +149,12 @@ struct AutocompleteTextField: View {
     }
 
     private var emptyStateView: some View {
-        Text("No results")
+        Text("No address found")
             .font(appearance.dropdown.text.listText.text.customFont.scaledFont)
             .foregroundColor(appearance.dropdown.text.listText.text.textColor)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .accessibilityLabel(Text("Dropdown menu has no results."))
+            .accessibilityLabel(Text("No address found."))
             .transition(.opacity)
     }
 
@@ -212,7 +205,6 @@ struct AutocompleteTextField_Previews: PreviewProvider {
         AutocompleteTextField(
             text: .constant("Search countries here"),
             title: "Select countries",
-            placeholder: "",
             errorMessage: .constant(""),
             editing: .constant(true),
             valid: .constant(true),

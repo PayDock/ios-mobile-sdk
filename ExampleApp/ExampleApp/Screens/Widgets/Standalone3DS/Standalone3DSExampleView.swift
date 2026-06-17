@@ -41,6 +41,7 @@ struct Standalone3DSExampleView: View {
                                     .navigationTitle("3DS Check")
                                     .navigationBarTitleDisplayMode(.inline)
                                 }
+                                .ignoresSafeArea(.all, edges: .bottom)
                             }
                         })
                     if viewModel.isLoading {

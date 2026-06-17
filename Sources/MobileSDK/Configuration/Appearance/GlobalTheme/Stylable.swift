@@ -2,14 +2,16 @@
 //  Stylable.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 09.06.2025..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 
 public protocol LoaderStylableAppearance {
-    var loader: Theme.OverlayLoaderAppearance { get set }
+    var loader: Theme.LoaderAppearance { get set }
+}
+
+public protocol OverlayLoaderStylableAppearance {
+    var overlayLoader: Theme.OverlayLoaderAppearance { get set }
 }
 
 public protocol ToggleStylableAppearance {

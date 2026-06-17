@@ -16,15 +16,18 @@ extension Theme {
         public var title: TextAttributes
         public var placeholder: TextAttributes
         public var error: TextAttributes
+        public var hint: TextAttributes
 
         public init(text: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
                     title: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
                     placeholder: TextAttributes = TextAttributes(font: CustomFont(size: 16)),
-                    error: TextAttributes = TextAttributes(font: CustomFont(size: 12))) {
+                    error: TextAttributes = TextAttributes(font: CustomFont(size: 12)),
+                    hint: TextAttributes = TextAttributes(font: CustomFont(size: 12))) {
             self.text = text
             self.title = title
             self.placeholder = placeholder
             self.error = error
+            self.hint = hint
         }
     }
 }

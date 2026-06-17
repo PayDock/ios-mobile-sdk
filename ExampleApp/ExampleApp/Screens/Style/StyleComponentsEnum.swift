@@ -2,19 +2,23 @@
 //  StyleComponentsEnum.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 06.06.2025..
-//  Copyright 2025 Paydock Ltd. All rights reserved.
+//  Copyright 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
 
 enum StyleComponentsEnum {
     case textField
+    case cardNameTextField
+    case cardNumberTextField
+    case cardExpiryTextField
+    case cardSecurityTextField
     case searchDropdown
     case actionButton
     case expandSectionButton
     case toolbarButton
     case loader
+    case overlayLoader
     case toggle
     case linkText
     case toggleText
@@ -29,11 +33,16 @@ enum StyleComponentsEnum {
     var title: String {
         switch self {
         case .textField: return "Text Field"
+        case .cardNameTextField: return "Card Name Text Field"
+        case .cardNumberTextField: return "Card Number Text Field"
+        case .cardExpiryTextField: return "Card Expiry Text Field"
+        case .cardSecurityTextField: return "Card Security Text Field"
         case .searchDropdown: return "Search Dropdown"
         case .actionButton: return "Action Button"
         case .expandSectionButton: return "Link Button"
         case .toolbarButton: return "Toolbar Button"
         case .loader: return "Loader"
+        case .overlayLoader: return "Overlay Loader"
         case .toggle: return "Toggle"
         case .linkText: return "Link Text"
         case .toggleText: return "Toggle Text"
@@ -47,10 +56,13 @@ enum StyleComponentsEnum {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func destinationView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
         switch self {
         case .loader:
             return AnyView(LoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .overlayLoader:
+            return AnyView(OverlayLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .toggle:
             return AnyView(ToggleStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .actionButton:
@@ -61,6 +73,42 @@ enum StyleComponentsEnum {
             return AnyView(createToolbarButtonView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .textField:
             return AnyView(TextFieldStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .cardNameTextField:
+            return AnyView(
+                createCardTextFieldView(
+                    selectedWidget: selectedWidget,
+                    stylingDarkMode: stylingDarkMode,
+                    keyPath: \.cardNameTextField,
+                    title: "Card Name Text Field"
+                )
+            )
+        case .cardNumberTextField:
+            return AnyView(
+                createCardTextFieldView(
+                    selectedWidget: selectedWidget,
+                    stylingDarkMode: stylingDarkMode,
+                    keyPath: \.cardNumberTextField,
+                    title: "Card Number Text Field"
+                )
+            )
+        case .cardExpiryTextField:
+            return AnyView(
+                createCardTextFieldView(
+                    selectedWidget: selectedWidget,
+                    stylingDarkMode: stylingDarkMode,
+                    keyPath: \.cardExpiryTextField,
+                    title: "Card Expiry Text Field"
+                )
+            )
+        case .cardSecurityTextField:
+            return AnyView(
+                createCardTextFieldView(
+                    selectedWidget: selectedWidget,
+                    stylingDarkMode: stylingDarkMode,
+                    keyPath: \.cardSecurityTextField,
+                    title: "Card Security Text Field"
+                )
+            )
         case .searchDropdown:
             return AnyView(DropdownStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .title:
@@ -224,5 +272,20 @@ enum StyleComponentsEnum {
         default:
             return AnyView(EmptyView())
         }
+    }
+
+    // MARK: - TextField Helper Methods
+
+    private func createCardTextFieldView(selectedWidget: WidgetsEnum,
+                                         stylingDarkMode: Bool,
+                                         keyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>,
+                                         title: String) -> AnyView {
+        return AnyView(
+            TextFieldStyleView(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                cardTextFieldKeyPath: keyPath
+            )
+        )
     }
 }

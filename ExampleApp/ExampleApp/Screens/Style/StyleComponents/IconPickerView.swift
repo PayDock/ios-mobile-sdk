@@ -2,9 +2,7 @@
 //  IconPickerView.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 17.10.2025.
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 

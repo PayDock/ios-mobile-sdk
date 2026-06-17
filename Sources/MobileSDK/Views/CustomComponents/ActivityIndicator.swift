@@ -1,22 +1,20 @@
 //
-//  ActiviryIndicator.swift
+//  ActivityIndicator.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 08.12.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 
 struct ActivityIndicator: UIViewRepresentable {
 
-    private let appearance: Theme.OverlayLoaderAppearance
+    private let appearance: Theme.LoaderAppearance
     @Binding var isAnimating: Bool
     let style: UIActivityIndicatorView.Style
 
     // MARK: - Initialization
 
-    init(appearance: Theme.OverlayLoaderAppearance,
+    init(appearance: Theme.LoaderAppearance,
          isAnimating: Binding<Bool>,
          style: UIActivityIndicatorView.Style) {
         self.appearance = appearance

@@ -2,9 +2,7 @@
 //  CursorPositionTextField.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 16.07.2025..
-//  Copyright © 2025 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import UIKit
 import SwiftUI
@@ -33,6 +31,13 @@ struct CursorPositionTextField: UIViewRepresentable {
     let isStrikethrough: Bool
     let strikethroughColor: UIColor?
     let isItalic: Bool
+    let placeholderFont: UIFont?
+    let placeholderColor: UIColor?
+    let placeholderIsUnderlined: Bool
+    let placeholderUnderlineColor: UIColor?
+    let placeholderIsStrikethrough: Bool
+    let placeholderStrikethroughColor: UIColor?
+    let placeholderIsItalic: Bool
     let isSecureTextEntry: Bool
     let autocorrectionDisabled: Bool
     let accessibilityLabelText: String?
@@ -54,6 +59,13 @@ struct CursorPositionTextField: UIViewRepresentable {
          isStrikethrough: Bool = false,
          strikethroughColor: UIColor? = nil,
          isItalic: Bool = false,
+         placeholderFont: UIFont? = nil,
+         placeholderColor: UIColor? = nil,
+         placeholderIsUnderlined: Bool = false,
+         placeholderUnderlineColor: UIColor? = nil,
+         placeholderIsStrikethrough: Bool = false,
+         placeholderStrikethroughColor: UIColor? = nil,
+         placeholderIsItalic: Bool = false,
          isSecureTextEntry: Bool = false,
          autocorrectionDisabled: Bool = false,
          accessibilityLabel: String? = nil,
@@ -74,6 +86,13 @@ struct CursorPositionTextField: UIViewRepresentable {
         self.isStrikethrough = isStrikethrough
         self.strikethroughColor = strikethroughColor
         self.isItalic = isItalic
+        self.placeholderFont = placeholderFont
+        self.placeholderColor = placeholderColor
+        self.placeholderIsUnderlined = placeholderIsUnderlined
+        self.placeholderUnderlineColor = placeholderUnderlineColor
+        self.placeholderIsStrikethrough = placeholderIsStrikethrough
+        self.placeholderStrikethroughColor = placeholderStrikethroughColor
+        self.placeholderIsItalic = placeholderIsItalic
         self.isSecureTextEntry = isSecureTextEntry
         self.autocorrectionDisabled = autocorrectionDisabled
         self.accessibilityLabelText = accessibilityLabel
@@ -86,7 +105,7 @@ struct CursorPositionTextField: UIViewRepresentable {
     func makeUIView(context: Context) -> UITextField {
         let textField = UITextField()
         textField.delegate = context.coordinator
-        textField.placeholder = placeholder
+        updatePlaceholderStyling(textField)
         textField.keyboardType = keyboardType
         textField.textContentType = textContentType
         textField.returnKeyType = returnKeyType
@@ -108,6 +127,12 @@ struct CursorPositionTextField: UIViewRepresentable {
         if autocorrectionDisabled {
             textField.autocorrectionType = .no
             textField.spellCheckingType = .no
+            // Also disable smart punctuation so a typed apostrophe stays a straight quote (')
+            // rather than being substituted with a curly quote (’). Names like "D'Angelo" then
+            // validate consistently (and match Android, which inserts a straight apostrophe).
+            textField.smartQuotesType = .no
+            textField.smartDashesType = .no
+            textField.smartInsertDeleteType = .no
         }
 
         // Prevent the text field from expanding
@@ -133,6 +158,10 @@ struct CursorPositionTextField: UIViewRepresentable {
             updateTextStyling(uiView)
         }
 
+        // Always refresh the attributed placeholder so style updates (font, color,
+        // underline, strikethrough, italic) take effect on subsequent recompositions.
+        updatePlaceholderStyling(uiView)
+
         // Update accessibility label if it changed
         if let accessibilityLabel = accessibilityLabelText {
             uiView.accessibilityLabel = accessibilityLabel
@@ -150,7 +179,7 @@ struct CursorPositionTextField: UIViewRepresentable {
         // Update toolbar based on environment
         if let toolbarInfo = toolbarButton {
             if uiView.inputAccessoryView == nil {
-                let toolbar = UIToolbar()
+                let toolbar = PassthroughToolbar()
                 toolbar.sizeToFit()
 
                 let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
@@ -178,6 +207,51 @@ struct CursorPositionTextField: UIViewRepresentable {
             uiView.inputAccessoryView = nil
             context.coordinator.toolbarAction = nil
         }
+    }
+
+    private func updatePlaceholderStyling(_ textField: UITextField) {
+        // UITextField ignores font/color etc. on the plain `placeholder` string — they only
+        // apply via `attributedPlaceholder`. Always build the attributed string so callers'
+        // appearance overrides (font, color, underline, strikethrough, italic) actually render.
+        guard !placeholder.isEmpty else {
+            textField.attributedPlaceholder = nil
+            textField.placeholder = nil
+            return
+        }
+
+        var attributes: [NSAttributedString.Key: Any] = [:]
+
+        if let placeholderFont = placeholderFont {
+            let scaledSize = UIFontMetrics.default.scaledValue(for: placeholderFont.pointSize)
+            var descriptor = placeholderFont.fontDescriptor
+            if placeholderIsItalic {
+                if let italicDescriptor = descriptor.withSymbolicTraits(
+                    [descriptor.symbolicTraits, .traitItalic]) {
+                    descriptor = italicDescriptor
+                }
+            }
+            attributes[.font] = UIFont(descriptor: descriptor, size: scaledSize)
+        }
+
+        if let placeholderColor = placeholderColor {
+            attributes[.foregroundColor] = placeholderColor
+        }
+
+        if placeholderIsUnderlined {
+            attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
+            if let placeholderUnderlineColor = placeholderUnderlineColor {
+                attributes[.underlineColor] = placeholderUnderlineColor
+            }
+        }
+
+        if placeholderIsStrikethrough {
+            attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+            if let placeholderStrikethroughColor = placeholderStrikethroughColor {
+                attributes[.strikethroughColor] = placeholderStrikethroughColor
+            }
+        }
+
+        textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: attributes)
     }
 
     private func updateFont(_ textField: UITextField) {

@@ -265,7 +265,10 @@ extension EnhancedCheckoutVM {
         return ApplePayWidgetConfig(
             serviceId: ProjectEnvironment.shared.getApplePayServiceId() ?? "",
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            pkPaymentRequest: createApplePayRequest()
+            pkPaymentRequest: createApplePayRequest(),
+            // We verify Apple Pay availability ourselves before showing the widget (see
+            // ApplePayPaymentWidget), so disable the widget's own checks to avoid duplicating them.
+            performAvailabilityChecks: false
         )
     }
 

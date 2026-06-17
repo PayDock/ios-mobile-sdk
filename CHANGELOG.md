@@ -1,5 +1,23 @@
 # Changelog
 
+## [4.5.0] - 2026-06-16
+
+### Added
+- New 'ApplePaySetupWidget' to send users to wallet setup
+- New Apple Pay helper functions to identify availability accessible from "MobileSDK", "deviceSupportsApplePay" and "canMakeApplePayPayments"
+- Added "activePrimaryButton" to 'CardDetailsWidgetConfig' which defaults to "true" to allow submit button to be actionable when fields do not yet have valid entries
+- New customisable "hintText" field for textfields in 'CardDetailsWidget'
+- Added Voiceover readout for 'CardDetailsWidget' for validation errors on submit
+- Added scroll callback "onScrollToField" for 'CardDetailsWidget' to allow scrolling to validation error when off screen
+- Added VoiceOver readouts for fields that are required in a form
+- Added accessibility options in styles for custom VoiceOver readouts
+- "formState" added to 'CardDetailsWidget' event 'WidgetEvent' on submit action
+- 'Standalone3dsWidget' now uses a new overlay loader component
+- Added a "loadingDelegate" to 'Standalone3dsWidget' for custom loader control
+
+### Fixed
+- "placeholderText" was not being shown in Textfields correctly
+
 ## [4.4.0] - 2026-04-10
 
 ### Added

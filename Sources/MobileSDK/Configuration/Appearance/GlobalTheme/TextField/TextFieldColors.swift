@@ -18,6 +18,8 @@ extension Theme {
         public var success: Color
         public var text: Color
         public var placeholder: Color
+        public var hint: Color
+        public var icon: Color
         public var background: Color
 
         public init(active: Color = .defaultPrimary,
@@ -26,6 +28,8 @@ extension Theme {
                     success: Color = .defaultSuccess,
                     text: Color = .defaultText,
                     placeholder: Color = .defaultPlaceholder,
+                    hint: Color = .defaultHint,
+                    icon: Color = .defaultHint,
                     background: Color = .defaultBackground) {
             self.active = active
             self.inactive = inactive
@@ -33,6 +37,8 @@ extension Theme {
             self.success = success
             self.text = text
             self.placeholder = placeholder
+            self.hint = hint
+            self.icon = icon
             self.background = background
         }
     }
