@@ -20,6 +20,16 @@ public struct CardDetailsWidget: View {
     // Callback for scroll requests
     private let onScrollToField: ((CardDetailsFocusable) -> Void)?
 
+    // External submit trigger, for hosts using `config.showSubmitButton = false` to supply their own
+    // submit UI. See `CardDetailsWidgetConfig.showSubmitButton`.
+    // - onFormValidityChange: raw form validity — NOT gated on `activePrimaryButton`. A host driving
+    //   its own button's enabled state should branch on its own `activePrimaryButton` choice: if
+    //   `true`, its button should stay enabled (matching the internal button's tap-to-validate
+    //   behaviour); if `false`, disable it until this reports `true`. A submitting/loading signal is
+    //   already available via `loadingDelegate` (`loadingDidStart()`/`loadingDidFinish()`).
+    private let submitTrigger: Binding<Bool>
+    private let onFormValidityChange: ((Bool) -> Void)?
+
     // MARK: - Initialisation
 
     public init(viewState: ViewState? = nil,
@@ -28,8 +38,12 @@ public struct CardDetailsWidget: View {
                 loadingDelegate: WidgetLoadingDelegate? = nil,
                 eventDelegate: WidgetEventDelegate? = nil,
                 onScrollToField: ((CardDetailsFocusable) -> Void)? = nil,
+                submitTrigger: Binding<Bool> = .constant(false),
+                onFormValidityChange: ((Bool) -> Void)? = nil,
                 completion: @escaping (Result<CardResult, CardDetailsError>) -> Void) {
         self.onScrollToField = onScrollToField
+        self.submitTrigger = submitTrigger
+        self.onFormValidityChange = onFormValidityChange
         _viewModel = StateObject(wrappedValue: CardDetailsVM(
             viewState: viewState ?? ViewState(state: .none),
             config: config,
@@ -42,8 +56,10 @@ public struct CardDetailsWidget: View {
     // MARK: - View protocol properties
 
     public var body: some View {
-        VStack(spacing: viewModel.appearance.verticalSpacing) {
-            if let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
+        let isValid = viewModel.cardDetailsFormManager.isFormValid()
+        return VStack(spacing: viewModel.appearance.verticalSpacing) {
+            if viewModel.config.schemeSupport.showSchemeList,
+               let supportedSchemes = viewModel.config.schemeSupport.supportedSchemes, !supportedSchemes.isEmpty {
                 getCardSchemeIconList(supportedSchemes: supportedSchemes)
             }
 
@@ -69,9 +85,18 @@ public struct CardDetailsWidget: View {
                 }
             }
 
-            primaryButton
+            if viewModel.config.showSubmitButton {
+                primaryButton
+            }
         }
         .padding(.horizontal, viewModel.appearance.horizontalSpacing)
+        .onChange(of: submitTrigger.wrappedValue) { shouldSubmit in
+            if shouldSubmit {
+                submitTapped()
+                submitTrigger.wrappedValue = false
+            }
+        }
+        .onChange(of: isValid) { onFormValidityChange?($0) }
     }
 
     private var cardholderNameTextField: some View {
@@ -86,6 +111,7 @@ public struct CardDetailsWidget: View {
             textContentType: getCreditCardName(),
             returnKeyType: .next,
             autocorrectionDisabled: true,
+            accessibilityIdentifier: "cardholderNameField",
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .cardholderName
@@ -130,6 +156,7 @@ public struct CardDetailsWidget: View {
             accessibilityValue: String(viewModel.cardDetailsFormManager.cardNumberText.filter { $0.isNumber }),
             spellOutValue: true,
             leftImageAccessibilityLabel: $viewModel.cardDetailsFormManager.cardImageAccessibilityLabel,
+            accessibilityIdentifier: "cardNumberField",
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .cardNumber
@@ -172,6 +199,7 @@ public struct CardDetailsWidget: View {
             keyboardType: .numberPad,
             accessibilityValue: viewModel.cardDetailsFormManager.expiryDateText,
             spellOutValue: true,
+            accessibilityIdentifier: "expiryField",
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .expiryDate
@@ -218,6 +246,7 @@ public struct CardDetailsWidget: View {
             isSecureTextEntry: true,
             accessibilityValue: viewModel.cardDetailsFormManager.securityCodeText,
             spellOutValue: true,
+            accessibilityIdentifier: "securityCodeField",
             onTapGesture: {
                 if !viewModel.viewState.isDisabled {
                     self.textFieldInFocus = .securityCode
@@ -281,92 +310,88 @@ public struct CardDetailsWidget: View {
             shouldTemplate: true,
             accessibilityHint: dynamicHint
         ) {
-            // Move focus to primary button
-            textFieldInFocus = nil
-
-            // Suppress per-field error announcements before they're triggered by endEditing()
-            // and validateForm(). Both mutate @Published error strings whose .onChange handlers
-            // would otherwise fire announceFieldError at high priority and drown out the count.
-            let voiceOverRunning = UIAccessibility.isVoiceOverRunning
-            if voiceOverRunning {
-                self.announcing = true
-            }
-
-            viewModel.cardDetailsFormManager.endEditing()
-
-            // Only scroll and refocus in voiceover mode
-            if !viewModel.ctaButtonTapped() && voiceOverRunning {
-                let errorCount = viewModel.numberOfValidationErrors
-
-                Task { @MainActor in
-                    // Wait for VoiceOver to finish whatever it was speaking when the button
-                    // was activated (button label/hint, "activated", etc.) before announcing
-                    // the count — otherwise the default-priority count gets queued behind
-                    // the in-progress speech and discarded when focus subsequently moves.
-                    try? await Task.sleep(for: .seconds(1))
-                    announceErrorCount(errorCount)
-
-                    // Give the count time to be spoken in full before moving focus, since
-                    // focus-change events also trigger VoiceOver speech and would cut it off.
-                    try? await Task.sleep(for: .seconds(2))
-
-                    // Request scroll to the first field with an error
-                    if let firstInvalid = viewModel.firstTextFieldWithError {
-                        // Call the scroll callback if provided
-                        onScrollToField?(firstInvalid)
-
-                        // Wait for the scroll animation to settle before flipping focus.
-                        // VoiceOver silently drops a focus request to an off-screen element, so
-                        // focusing mid-scroll fails. The worst case is the topmost field
-                        // (cardholder name) when submitting from the bottom of the form at large
-                        // Dynamic Type sizes — that scroll covers the greatest distance, so the
-                        // previous short delay (tuned for the nearer fields) left the name field
-                        // still off-screen when focus was applied. This delay must comfortably
-                        // outlast the scroll animation for the longest-distance field.
-                        try? await Task.sleep(for: .milliseconds(600))
-
-                        voiceOverFocusedField = firstInvalid
-                    }
-
-                    self.announcing = false
-                }
-            } else if voiceOverRunning {
-                // Form was valid (or VoiceOver wasn't relevant) — reset so future field changes
-                // can announce normally.
-                self.announcing = false
-            }
+            submitTapped()
         }
         .disabled(viewModel.isActionButtonDisabled())
         .customPadding(viewModel.appearance.actionButton.dimensions.padding)
     }
 
-    private func announceErrorCount(_ count: Int) {
-        let message: String
-        switch count {
-        case 0: return
-        case 1: message = "There is 1 error in form"
-        default: message = "There are \(count) errors in form"
+    /// Validates and, if valid, tokenises the card details. Shared by the internal submit button and
+    /// the external `submitTrigger` binding, so both entry points behave identically (error
+    /// announcements, focus-to-first-error, VoiceOver) — see `CardDetailsWidgetConfig.showSubmitButton`.
+    private func submitTapped() {
+        // The external trigger bypasses the button's own `.disabled(isActionButtonDisabled())` guard,
+        // so both signals it's built from must be re-checked here: `isLoading` catches a request
+        // genuinely in flight (immune to external tampering, unlike `viewState.isDisabled` — a host
+        // can legitimately call `viewState.setState(.none)` at any time, including mid-request), and
+        // `viewState.isDisabled` catches a host's deliberate external disable via `setState(.disabled)`
+        // that isn't tied to any request of this widget's own.
+        guard !viewModel.isLoading, !viewModel.viewState.isDisabled else { return }
+
+        // Move focus to primary button
+        textFieldInFocus = nil
+
+        // Suppress per-field error announcements before they're triggered by endEditing()
+        // and validateForm(). Both mutate @Published error strings whose .onChange handlers
+        // would otherwise fire announceFieldError at high priority and drown out the count.
+        let voiceOverRunning = UIAccessibility.isVoiceOverRunning
+        if voiceOverRunning {
+            self.announcing = true
         }
 
-        if #available(iOS 17.0, *) {
-            var attributed = AttributedString(message)
-            // Use `.high` only if you want to cut off whatever VoiceOver is saying.
-            attributed.accessibilitySpeechAnnouncementPriority = .default
-            AccessibilityNotification.Announcement(attributed).post()
-        } else {
-            UIAccessibility.post(notification: .announcement, argument: message)
+        viewModel.cardDetailsFormManager.endEditing()
+
+        // Only scroll and refocus in voiceover mode
+        if !viewModel.ctaButtonTapped() && voiceOverRunning {
+            let errorCount = viewModel.numberOfValidationErrors
+
+            Task { @MainActor in
+                // Wait for VoiceOver to finish whatever it was speaking when the button
+                // was activated (button label/hint, "activated", etc.) before announcing
+                // the count — otherwise the default-priority count gets queued behind
+                // the in-progress speech and discarded when focus subsequently moves.
+                try? await Task.sleep(for: .seconds(1))
+                announceErrorCount(errorCount)
+
+                // Give the count time to be spoken in full before moving focus, since
+                // focus-change events also trigger VoiceOver speech and would cut it off.
+                try? await Task.sleep(for: .seconds(2))
+
+                // Request scroll to the first field with an error
+                if let firstInvalid = viewModel.firstTextFieldWithError {
+                    // Call the scroll callback if provided
+                    onScrollToField?(firstInvalid)
+
+                    // Wait for the scroll animation to settle before flipping focus.
+                    // VoiceOver silently drops a focus request to an off-screen element, so
+                    // focusing mid-scroll fails. The worst case is the topmost field
+                    // (cardholder name) when submitting from the bottom of the form at large
+                    // Dynamic Type sizes — that scroll covers the greatest distance, so the
+                    // previous short delay (tuned for the nearer fields) left the name field
+                    // still off-screen when focus was applied. This delay must comfortably
+                    // outlast the scroll animation for the longest-distance field.
+                    try? await Task.sleep(for: .milliseconds(600))
+
+                    voiceOverFocusedField = firstInvalid
+                }
+
+                self.announcing = false
+            }
+        } else if voiceOverRunning {
+            // Form was valid (or VoiceOver wasn't relevant) — reset so future field changes
+            // can announce normally.
+            self.announcing = false
         }
     }
 
+    private func announceErrorCount(_ count: Int) {
+        guard let message = viewModel.errorCountAnnouncement(count) else { return }
+        // Queued (not interrupting) so the count doesn't cut off in-progress speech.
+        AccessibilityAnnouncer.post(message, priority: .queued)
+    }
+
     private func announceFieldError(_ message: String) {
-        let prefixed = "Error: \(message)"
-        if #available(iOS 17.0, *) {
-            var attributed = AttributedString(prefixed)
-            attributed.accessibilitySpeechAnnouncementPriority = .high
-            AccessibilityNotification.Announcement(attributed).post()
-        } else {
-            UIAccessibility.post(notification: .announcement, argument: prefixed)
-        }
+        AccessibilityAnnouncer.announceFieldError(message)
     }
 
     private var saveCardViewWithPrivacyPolicy: some View {
@@ -385,13 +410,18 @@ public struct CardDetailsWidget: View {
                     .accentColor(viewModel.appearance.linkText.text.textColor)
                     .disabled(viewModel.viewState.isDisabled)
                     .frame(minHeight: 24.0)
-                    .contentShape(Rectangle())
-                    .simultaneousGesture(TapGesture().onEnded {
-                        viewModel.handleLinkTapAnalytics(url: url)
-                    })
                     .accessibilityLabel(text)
                     .accessibilityHint("Opens \(text) in browser")
                     .accessibilityAddTraits(.isLink)
+                    // Intercept the Text's built-in Markdown-link tap via the `openURL` environment
+                    // action, rather than a competing `.simultaneousGesture(TapGesture())` on the same
+                    // Text — two gesture recognizers firing on the same tap (the Link's own plus ours)
+                    // triggers SwiftUI's "Publishing changes from within view updates" runtime warning,
+                    // since both get processed within the same view-update transaction.
+                    .environment(\.openURL, OpenURLAction { tappedURL in
+                        viewModel.handleLinkTapAnalytics(url: tappedURL.absoluteString)
+                        return .systemAction
+                    })
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -430,22 +460,13 @@ public struct CardDetailsWidget: View {
             }
         }
         .accessibilityElement()
-        .accessibilityLabel(
-            "Supported card schemes: " +
-            CardScheme.sortedArray(from: supportedSchemes)
-                .map(\.voiceoverName)
-                .joined(separator: ", ")
-        )
+        .accessibilityLabel(viewModel.supportedSchemesAccessibilityLabel(for: supportedSchemes))
         .accessibilityRespondsToUserInteraction(false)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func shouldAlignVertically() -> Bool {
-        switch sizeCategory {
-        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
-        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
-        @unknown default: return false
-        }
+        viewModel.shouldAlignVertically(for: sizeCategory)
     }
 
     // MARK: - Autofill

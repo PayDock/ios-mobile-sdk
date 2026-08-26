@@ -283,7 +283,8 @@ struct ConfigTextFieldView: View {
         case .widgetAccessToken:
             config = GiftCardWidgetConfig(
                 accessToken: value,
-                storePin: config.storePin
+                storePin: config.storePin,
+                activePrimaryButton: config.activePrimaryButton
             )
         default:
             return

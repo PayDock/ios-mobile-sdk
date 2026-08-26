@@ -58,18 +58,21 @@ class ConfigManager: ObservableObject {
                 supportedSchemes: Set(CardScheme.allCases),
                 enableValidation: true
             ),
-            activePrimaryButton: true
+            activePrimaryButton: true,
+            showSubmitButton: true
         )
     }
 
     private func setupAddressConfiguration() {
-        configurations[.address] = AddressWidgetConfig(address: nil)
+        configurations[.address] = AddressWidgetConfig(address: nil, activePrimaryButton: true)
     }
 
     private func setupGiftCardConfiguration() {
         configurations[.giftCard] = GiftCardWidgetConfig(
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            storePin: false
+            storePin: false,
+            activePrimaryButton: true,
+            showSubmitButton: true
         )
     }
 
@@ -216,14 +219,17 @@ class ConfigManager: ObservableObject {
                 supportedSchemes: Set(CardScheme.allCases),
                 enableValidation: true
             ),
-            activePrimaryButton: true
+            activePrimaryButton: true,
+            showSubmitButton: true
         )
     }
 
     func getGiftCardConfig() -> GiftCardWidgetConfig {
         return getConfiguration(for: .giftCard, as: GiftCardWidgetConfig.self) ?? GiftCardWidgetConfig(
             accessToken: ProjectEnvironment.shared.getWidgetAccessToken(),
-            storePin: false
+            storePin: false,
+            activePrimaryButton: true,
+            showSubmitButton: true
         )
     }
 
@@ -237,7 +243,7 @@ class ConfigManager: ObservableObject {
     }
 
     func getAddressConfig() -> AddressWidgetConfig {
-        return getConfiguration(for: .address, as: AddressWidgetConfig.self) ?? AddressWidgetConfig(address: nil)
+        return getConfiguration(for: .address, as: AddressWidgetConfig.self) ?? AddressWidgetConfig(address: nil, activePrimaryButton: true)
     }
 
     func getPayPalVaultConfig() -> PayPalVaultConfig {

@@ -9,7 +9,7 @@
 import Foundation
 import NetworkingLib
 
-public enum PayPalError: Error {
+public enum PayPalError: Error, WidgetError {
 
     case getPayPalClientId(error: ErrorRes)
     case errorFetchingOrderId(error: ErrorRes)
@@ -31,6 +31,32 @@ public enum PayPalError: Error {
         case .initialisingWalletToken(let reason): return reason
         case .sdkException(let description): return description
         case .unknownError(let requestError): return requestError?.uiMessage ?? "Unknown error"
+        }
+    }
+
+    public var code: String {
+        switch self {
+        case .getPayPalClientId: return "PAYPAL_CLIENT_ID_ERROR"
+        case .errorFetchingOrderId: return "PAYPAL_FETCH_ORDER_ERROR"
+        case .errorCapturingCharge: return "PAYPAL_CAPTURE_CHARGE_ERROR"
+        case .userCancelled: return "PAYPAL_USER_CANCELED"
+        case .initialisingWalletToken: return "PAYPAL_WALLET_TOKEN_ERROR"
+        case .sdkException: return "PAYPAL_SDK_EXCEPTION"
+        case let .unknownError(requestError): return "PAYPAL_" + (requestError?.diagnosticCode ?? "UNKNOWN")
+        }
+    }
+
+    public var debugDescription: String {
+        switch self {
+        case .getPayPalClientId(let errorRes),
+             .errorFetchingOrderId(let errorRes),
+             .errorCapturingCharge(let errorRes):
+            return "\(code): \(customMessage) [\(errorRes.technicalDetail)]"
+        case let .unknownError(requestError):
+            let detail = requestError?.technicalDescription ?? "no underlying error"
+            return "\(code): \(customMessage) [\(detail)]"
+        default:
+            return "\(code): \(customMessage)"
         }
     }
 }

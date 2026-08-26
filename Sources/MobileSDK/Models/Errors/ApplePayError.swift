@@ -7,7 +7,7 @@
 import Foundation
 import NetworkingLib
 
-public enum ApplePayError: Error, LocalizedError {
+public enum ApplePayError: Error, LocalizedError, WidgetError {
 
     case notSupported
     case noSupportedCardsInWallet
@@ -26,6 +26,30 @@ public enum ApplePayError: Error, LocalizedError {
         case .unableToPresentPaymentSheet: return "Unable to present ApplePay sheet - check the provided Merchant ID"
         case .payloadEncodingFailed: return "Failed to encode Apple Pay payment data"
         case let .unknownError(requestError): return requestError?.uiMessage ?? "Unknown error"
+        }
+    }
+
+    public var code: String {
+        switch self {
+        case .notSupported: return "APPLE_PAY_NOT_SUPPORTED"
+        case .noSupportedCardsInWallet: return "APPLE_PAY_NO_SUPPORTED_CARDS"
+        case .errorCreatingToken: return "APPLE_PAY_TOKEN_ERROR"
+        case .userCanceledPayment: return "APPLE_PAY_USER_CANCELED"
+        case .unableToPresentPaymentSheet: return "APPLE_PAY_PRESENT_FAILED"
+        case .payloadEncodingFailed: return "APPLE_PAY_PAYLOAD_ENCODING_FAILED"
+        case let .unknownError(requestError): return "APPLE_PAY_" + (requestError?.diagnosticCode ?? "UNKNOWN")
+        }
+    }
+
+    public var debugDescription: String {
+        switch self {
+        case .errorCreatingToken(let error):
+            return "\(code): \(customMessage) [\(error.technicalDetail)]"
+        case let .unknownError(requestError):
+            let detail = requestError?.technicalDescription ?? "no underlying error"
+            return "\(code): \(customMessage) [\(detail)]"
+        default:
+            return "\(code): \(customMessage)"
         }
     }
 

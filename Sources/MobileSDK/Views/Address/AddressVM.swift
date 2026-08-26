@@ -29,6 +29,13 @@ class AddressVM: NSObject, ObservableObject {
     var mkLocalSearchCompletions: [MKLocalSearchCompletion] = []
     var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
 
+    var numberOfValidationErrors: Int {
+        addressFormManager.numberOfValidationFailures
+    }
+    var firstTextFieldWithError: AddressFormManager.AddressFocusable? {
+        addressFormManager.firstFieldWithError
+    }
+
     // MARK: - Completion Handlers
 
     private weak var eventDelegate: WidgetEventDelegate?
@@ -132,7 +139,9 @@ class AddressVM: NSObject, ObservableObject {
                     }
 
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
-                    Task {
+                    // CLGeocoder's completion isn't guaranteed to run on the main actor, so the Task
+                    // must explicitly hop onto it before touching `self`'s main-actor-isolated state.
+                    Task { @MainActor in
                         self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
                         self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
                     }
@@ -174,12 +183,16 @@ class AddressVM: NSObject, ObservableObject {
 
     // MARK: - Logic
 
-    func saveAddress() {
+    /// Validates the form and, only when valid, emits the address via `completion`.
+    /// Returns whether the form was valid so the widget can drive VoiceOver error feedback.
+    @discardableResult
+    func saveAddress() -> Bool {
         addressFormManager.setEditingTextField(focusedField: nil)
         addressFormManager.endEditing()
         addressFormManager.addressSearchText = ""
 
-        addressFormManager.validateAllTextFields()
+        guard addressFormManager.validateForm() else { return false }
+
         let address = Address(
             firstName: addressFormManager.firstNameText,
             lastName: addressFormManager.lastNameText,
@@ -191,6 +204,7 @@ class AddressVM: NSObject, ObservableObject {
             country: addressFormManager.countryText)
 
         completion(address)
+        return true
     }
 
     func updateAddress() {
@@ -204,6 +218,9 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Validation
 
     func isActionButtonDisabled() -> Bool {
+        if config.activePrimaryButton {
+            return false
+        }
         return !addressFormManager.isFormValid()
     }
 

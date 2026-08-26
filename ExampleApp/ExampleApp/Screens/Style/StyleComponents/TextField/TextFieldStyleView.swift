@@ -15,11 +15,15 @@ struct TextFieldStyleView: View {
 
     init(selectedWidget: WidgetsEnum,
          stylingDarkMode: Bool,
-         cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>? = nil) {
+         cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>? = nil,
+         giftCardTextFieldKeyPath: WritableKeyPath<GiftCardWidgetAppearance, Theme.TextFieldAppearance?>? = nil,
+         addressTextFieldKeyPath: WritableKeyPath<AddressWidgetAppearance, Theme.TextFieldAppearance?>? = nil) {
         _viewModel = StateObject(wrappedValue: TextFieldStyleVM(
             selectedWidget: selectedWidget,
             stylingDarkMode: stylingDarkMode,
-            cardTextFieldKeyPath: cardTextFieldKeyPath))
+            cardTextFieldKeyPath: cardTextFieldKeyPath,
+            giftCardTextFieldKeyPath: giftCardTextFieldKeyPath,
+            addressTextFieldKeyPath: addressTextFieldKeyPath))
     }
 
     // MARK: - View

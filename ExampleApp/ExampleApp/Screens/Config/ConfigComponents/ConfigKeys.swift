@@ -12,6 +12,7 @@ enum ConfigKeys {
     case collectCardholderName
     case allowSaveCard
     case activePrimaryButton
+    case showSubmitButton
     case storePin
     case requestShipping
     case fundingSource

@@ -27,8 +27,12 @@ class StyleVM: ObservableObject {
                            .textField, .title, .toggle, .toggleText, .toolbarButton]
         case .card: return [.cardNameTextField, .cardNumberTextField, .cardExpiryTextField, .cardSecurityTextField,
                             .actionButton, .linkText, .spacings, .toggle, .toggleText, .toolbarButton]
-        case .giftCard: return [.actionButton, .spacings, .textField, .toolbarButton]
-        case .address: return [.actionButton, .expandSectionButton, .searchDropdown, .spacings, .textField, .title]
+        case .giftCard: return [.actionButton, .spacings, .textField, .giftCardNumberTextField,
+                                .giftCardPinTextField, .toolbarButton]
+        case .address: return [.actionButton, .expandSectionButton, .searchDropdown, .spacings, .textField,
+                               .addressFirstNameTextField, .addressLastNameTextField, .addressLine1TextField,
+                               .addressLine2TextField, .addressCityTextField, .addressStateTextField,
+                               .addressPostcodeTextField, .title]
         case .applePay: return [.applePay]
         case .paypal: return [.payPal]
         case .paypalVault: return [.actionButton]

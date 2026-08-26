@@ -14,6 +14,9 @@ class TextFieldStyleVM: ObservableObject {
     private let selectedWidget: WidgetsEnum
     private let stylingDarkMode: Bool
     private let cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>?
+    // Per-field overrides on GiftCard/Address are optional (nil falls back to the base `textField`).
+    private let giftCardTextFieldKeyPath: WritableKeyPath<GiftCardWidgetAppearance, Theme.TextFieldAppearance?>?
+    private let addressTextFieldKeyPath: WritableKeyPath<AddressWidgetAppearance, Theme.TextFieldAppearance?>?
     let allFontNames =  UIFont.familyNames.flatMap { UIFont.fontNames(forFamilyName: $0) }
 
     // MARK: - Variables
@@ -82,24 +85,45 @@ class TextFieldStyleVM: ObservableObject {
 
     init(selectedWidget: WidgetsEnum,
          stylingDarkMode: Bool,
-         cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>? = nil) {
+         cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>? = nil,
+         giftCardTextFieldKeyPath: WritableKeyPath<GiftCardWidgetAppearance, Theme.TextFieldAppearance?>? = nil,
+         addressTextFieldKeyPath: WritableKeyPath<AddressWidgetAppearance, Theme.TextFieldAppearance?>? = nil) {
         self.selectedWidget = selectedWidget
         self.stylingDarkMode = stylingDarkMode
         self.cardTextFieldKeyPath = cardTextFieldKeyPath
+        self.giftCardTextFieldKeyPath = giftCardTextFieldKeyPath
+        self.addressTextFieldKeyPath = addressTextFieldKeyPath
 
-        // Load appropriate appearance based on widget type
-        if selectedWidget == .card, cardTextFieldKeyPath != nil {
-            self.appearance = StyleThemeManager.getAppearance(
-                for: selectedWidget,
-                isDarkMode: stylingDarkMode,
-                as: CardDetailsWidgetAppearance.self)
-        } else {
-            self.appearance = StyleThemeManager.getAppearance(
-                for: selectedWidget,
-                isDarkMode: stylingDarkMode,
-                as: TextFieldStylableAppearance.self)
-        }
+        self.appearance = TextFieldStyleVM.loadAppearance(
+            for: selectedWidget,
+            stylingDarkMode: stylingDarkMode,
+            cardTextFieldKeyPath: cardTextFieldKeyPath,
+            giftCardTextFieldKeyPath: giftCardTextFieldKeyPath,
+            addressTextFieldKeyPath: addressTextFieldKeyPath)
         syncUIToAppearance()
+    }
+
+    /// Loads the concrete appearance when a per-field keyPath is supplied, otherwise the generic
+    /// `TextFieldStylableAppearance` (base `textField`) for the widget.
+    private static func loadAppearance(
+        for selectedWidget: WidgetsEnum,
+        stylingDarkMode: Bool,
+        cardTextFieldKeyPath: WritableKeyPath<CardDetailsWidgetAppearance, Theme.TextFieldAppearance>?,
+        giftCardTextFieldKeyPath: WritableKeyPath<GiftCardWidgetAppearance, Theme.TextFieldAppearance?>?,
+        addressTextFieldKeyPath: WritableKeyPath<AddressWidgetAppearance, Theme.TextFieldAppearance?>?) -> Any? {
+        if selectedWidget == .card, cardTextFieldKeyPath != nil {
+            return StyleThemeManager.getAppearance(
+                for: selectedWidget, isDarkMode: stylingDarkMode, as: CardDetailsWidgetAppearance.self)
+        } else if giftCardTextFieldKeyPath != nil {
+            return StyleThemeManager.getAppearance(
+                for: selectedWidget, isDarkMode: stylingDarkMode, as: GiftCardWidgetAppearance.self)
+        } else if addressTextFieldKeyPath != nil {
+            return StyleThemeManager.getAppearance(
+                for: selectedWidget, isDarkMode: stylingDarkMode, as: AddressWidgetAppearance.self)
+        } else {
+            return StyleThemeManager.getAppearance(
+                for: selectedWidget, isDarkMode: stylingDarkMode, as: TextFieldStylableAppearance.self)
+        }
     }
 
     private func syncUIToAppearance() {
@@ -160,11 +184,19 @@ class TextFieldStyleVM: ObservableObject {
 
     // MARK: - Helper Methods
 
-    /// Gets the current text field appearance based on widget type and keyPath
+    /// Gets the current text field appearance based on widget type and keyPath.
+    /// For the optional GiftCard/Address overrides, falls back to the base `textField` so the editor
+    /// opens showing the effective values.
     private func getCurrentTextField() -> Theme.TextFieldAppearance? {
         if let cardAppearance = appearance as? CardDetailsWidgetAppearance,
            let keyPath = cardTextFieldKeyPath {
             return cardAppearance[keyPath: keyPath]
+        } else if let giftAppearance = appearance as? GiftCardWidgetAppearance,
+                  let keyPath = giftCardTextFieldKeyPath {
+            return giftAppearance[keyPath: keyPath] ?? giftAppearance.textField
+        } else if let addressAppearance = appearance as? AddressWidgetAppearance,
+                  let keyPath = addressTextFieldKeyPath {
+            return addressAppearance[keyPath: keyPath] ?? addressAppearance.textField
         } else if let textFieldAppearance = appearance as? TextFieldStylableAppearance {
             return textFieldAppearance.textField
         }
@@ -172,14 +204,32 @@ class TextFieldStyleVM: ObservableObject {
     }
 
     private func updateAppearance() {
-        // Handle CardDetailsWidgetAppearance with specific text field
+        // Handle CardDetailsWidgetAppearance with a specific (non-optional) text field.
         if var cardAppearance = appearance as? CardDetailsWidgetAppearance,
            let keyPath = cardTextFieldKeyPath {
             updateTextField(&cardAppearance[keyPath: keyPath])
             StyleThemeManager.setAppearance(cardAppearance, for: selectedWidget, isDarkMode: stylingDarkMode)
             self.appearance = cardAppearance
         }
-        // Handle TextFieldStylableAppearance
+        // Handle GiftCard per-field override (optional keyPath).
+        else if var giftAppearance = appearance as? GiftCardWidgetAppearance,
+                let keyPath = giftCardTextFieldKeyPath {
+            var field = giftAppearance[keyPath: keyPath] ?? giftAppearance.textField
+            updateTextField(&field)
+            giftAppearance[keyPath: keyPath] = field
+            StyleThemeManager.setAppearance(giftAppearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+            self.appearance = giftAppearance
+        }
+        // Handle Address per-field override (optional keyPath).
+        else if var addressAppearance = appearance as? AddressWidgetAppearance,
+                let keyPath = addressTextFieldKeyPath {
+            var field = addressAppearance[keyPath: keyPath] ?? addressAppearance.textField
+            updateTextField(&field)
+            addressAppearance[keyPath: keyPath] = field
+            StyleThemeManager.setAppearance(addressAppearance, for: selectedWidget, isDarkMode: stylingDarkMode)
+            self.appearance = addressAppearance
+        }
+        // Handle the generic base `textField`.
         else if var textFieldAppearance = appearance as? TextFieldStylableAppearance {
             updateTextField(&textFieldAppearance.textField)
             StyleThemeManager.setAppearance(textFieldAppearance, for: selectedWidget, isDarkMode: stylingDarkMode)
@@ -245,18 +295,12 @@ class TextFieldStyleVM: ObservableObject {
     func resetAppearance() {
         StyleThemeManager.resetAppearance(for: selectedWidget, isDarkMode: stylingDarkMode)
 
-        // Reload appropriate appearance based on widget type
-        if selectedWidget == .card, cardTextFieldKeyPath != nil {
-            self.appearance = StyleThemeManager.getAppearance(
-                for: selectedWidget,
-                isDarkMode: stylingDarkMode,
-                as: CardDetailsWidgetAppearance.self)
-        } else {
-            self.appearance = StyleThemeManager.getAppearance(
-                for: selectedWidget,
-                isDarkMode: stylingDarkMode,
-                as: TextFieldStylableAppearance.self)
-        }
+        self.appearance = TextFieldStyleVM.loadAppearance(
+            for: selectedWidget,
+            stylingDarkMode: stylingDarkMode,
+            cardTextFieldKeyPath: cardTextFieldKeyPath,
+            giftCardTextFieldKeyPath: giftCardTextFieldKeyPath,
+            addressTextFieldKeyPath: addressTextFieldKeyPath)
 
         syncUIToAppearance()
     }

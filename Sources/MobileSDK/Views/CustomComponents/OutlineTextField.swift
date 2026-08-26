@@ -84,6 +84,7 @@ struct OutlineTextField: View {
     private let onTapGesture: () -> Void
     private let onTextChange: ((String, Int) -> Int)?
     private let onSubmit: (() -> Void)?
+    private let fieldAccessibilityIdentifier: String?
     private let keyboardType: UIKeyboardType
 
     // MARK: - Initialization
@@ -122,6 +123,7 @@ struct OutlineTextField: View {
                 accessibilityValue: String? = nil,
                 spellOutValue: Bool = false,
                 leftImageAccessibilityLabel: Binding<String?>? = nil,
+                accessibilityIdentifier: String? = nil,
                 onTapGesture: @escaping (() -> Void),
                 onTextChange: ((String, Int) -> Int)? = nil,
                 onSubmit: (() -> Void)? = nil) {
@@ -145,6 +147,7 @@ struct OutlineTextField: View {
         self.onTapGesture = onTapGesture
         self.onTextChange = onTextChange
         self.onSubmit = onSubmit
+        self.fieldAccessibilityIdentifier = accessibilityIdentifier
     }
 
     // MARK: - View protocol properties
@@ -254,6 +257,7 @@ struct OutlineTextField: View {
                 isSecureTextEntry: isSecureTextEntry,
                 autocorrectionDisabled: autocorrectionDisabled,
                 accessibilityLabel: title,
+                accessibilityIdentifier: fieldAccessibilityIdentifier,
                 onEditingChanged: { isEditing in
                     editing = isEditing
                 },
@@ -521,8 +525,8 @@ extension OutlineTextField {
         var traits: AccessibilityTraits = []
 
         // Mark as updated when validation state changes
-        if let valid = valid, !text.isEmpty {
-            traits.insert(.updatesFrequently)
+        if valid != nil, !text.isEmpty {
+            _ = traits.insert(.updatesFrequently)
         }
 
         return traits

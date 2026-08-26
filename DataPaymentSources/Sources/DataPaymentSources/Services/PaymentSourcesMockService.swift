@@ -16,6 +16,14 @@ public class PaymentSourcesMockService: PaymentSourcesService {
     public var errorToReturn: ErrorRes?
     public var shouldThrowUnknownError = false
 
+    /// An arbitrary error to throw from `createApplePayToken` (e.g. a genuine `DecodingError`
+    /// as produced by a response-schema mismatch). Takes precedence over the flags above.
+    public var applePayErrorToThrow: Error?
+
+    /// An arbitrary error to throw from `createToken` (e.g. `RequestError.decode` from a
+    /// response-schema mismatch). Takes precedence over the flags above.
+    public var cardTokenErrorToThrow: Error?
+
     // MARK: - Configurable Results
 
     public var tokenResult: String?
@@ -33,6 +41,9 @@ public class PaymentSourcesMockService: PaymentSourcesService {
     public func createToken(
         tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String
     ) async throws -> String {
+        if let error = cardTokenErrorToThrow {
+            throw error
+        }
         if shouldThrowUnknownError {
             throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
         }
@@ -59,6 +70,9 @@ public class PaymentSourcesMockService: PaymentSourcesService {
     public func createApplePayToken(
         tokeniseApplePayReq: CreateApplePayTokenReq, widgetAccessToken: String
     ) async throws -> String {
+        if let error = applePayErrorToThrow {
+            throw error
+        }
         if shouldThrowUnknownError {
             throw NSError(domain: "MockError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
         }

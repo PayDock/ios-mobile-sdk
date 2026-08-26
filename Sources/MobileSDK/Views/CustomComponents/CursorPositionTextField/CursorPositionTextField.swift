@@ -41,6 +41,7 @@ struct CursorPositionTextField: UIViewRepresentable {
     let isSecureTextEntry: Bool
     let autocorrectionDisabled: Bool
     let accessibilityLabelText: String?
+    let accessibilityIdentifierText: String?
     let onEditingChanged: (Bool) -> Void
     let onCommit: () -> Void
     let onSubmit: (() -> Void)?
@@ -69,6 +70,7 @@ struct CursorPositionTextField: UIViewRepresentable {
          isSecureTextEntry: Bool = false,
          autocorrectionDisabled: Bool = false,
          accessibilityLabel: String? = nil,
+         accessibilityIdentifier: String? = nil,
          onEditingChanged: @escaping (Bool) -> Void = { _ in },
          onCommit: @escaping () -> Void = {},
          onSubmit: (() -> Void)? = nil,
@@ -96,6 +98,7 @@ struct CursorPositionTextField: UIViewRepresentable {
         self.isSecureTextEntry = isSecureTextEntry
         self.autocorrectionDisabled = autocorrectionDisabled
         self.accessibilityLabelText = accessibilityLabel
+        self.accessibilityIdentifierText = accessibilityIdentifier
         self.onEditingChanged = onEditingChanged
         self.onCommit = onCommit
         self.onSubmit = onSubmit
@@ -117,6 +120,11 @@ struct CursorPositionTextField: UIViewRepresentable {
         // Set accessibility label for UI testing
         if let accessibilityLabel = accessibilityLabelText {
             textField.accessibilityLabel = accessibilityLabel
+        }
+
+        // Set a stable accessibility identifier for UI test targeting (locale-independent)
+        if let accessibilityIdentifier = accessibilityIdentifierText {
+            textField.accessibilityIdentifier = accessibilityIdentifier
         }
 
         // Configure accessibility to work properly with Full Keyboard Access
@@ -165,6 +173,11 @@ struct CursorPositionTextField: UIViewRepresentable {
         // Update accessibility label if it changed
         if let accessibilityLabel = accessibilityLabelText {
             uiView.accessibilityLabel = accessibilityLabel
+        }
+
+        // Keep the accessibility identifier in sync
+        if let accessibilityIdentifier = accessibilityIdentifierText {
+            uiView.accessibilityIdentifier = accessibilityIdentifier
         }
 
         // Update font when dynamic type size changes

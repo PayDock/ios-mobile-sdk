@@ -13,6 +13,10 @@ struct ApplePayExampleView: View {
     @StateObject private var viewModel = ApplePayExampleVM()
     @State var isSheetPresented = false
     @Environment(\.colorScheme) var colorScheme
+    // Scales the Apple Pay button height with the system text size so it stays consistent with
+    // the SDK's other buttons at larger Dynamic Type sizes. Capped so it doesn't become an
+    // oversized empty pill — the PKPaymentButton logo itself is fixed-size and won't scale.
+    @ScaledMetric private var applePayHeight: CGFloat = 50
 
     var body: some View {
         NavigationStack {
@@ -28,7 +32,8 @@ struct ApplePayExampleView: View {
                         }
                     }
                 )
-                .frame(height: 50)
+                .frame(height: min(applePayHeight, 64))
+                .accessibilityIdentifier("applePayButton")
                 .padding()
             }
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))

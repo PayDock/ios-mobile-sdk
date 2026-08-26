@@ -13,15 +13,15 @@ class AddressFormManager: ObservableObject {
 
     // MARK: - Properties
 
-    @Published var firstNameError = " "
-    @Published var lastNameError = " "
-    @Published var addressSearchError = " "
-    @Published var addressLine1Error = " "
-    @Published var addressLine2Error = " "
-    @Published var cityError = " "
-    @Published var stateError = " "
-    @Published var postcodeError = " "
-    @Published var countryError = " "
+    @Published var firstNameError = ""
+    @Published var lastNameError = ""
+    @Published var addressSearchError = ""
+    @Published var addressLine1Error = ""
+    @Published var addressLine2Error = ""
+    @Published var cityError = ""
+    @Published var stateError = ""
+    @Published var postcodeError = ""
+    @Published var countryError = ""
 
     @Published var editingFirstName = false
     @Published var editingLastName = false
@@ -52,16 +52,6 @@ class AddressFormManager: ObservableObject {
     let stateTitle = "State"
     let postcodeTitle = "Postal Code"
     let countryTitle = "Country"
-
-    let firstNamePlaceholder = ""
-    let lastNamePlaceholder = ""
-    let addressSearchPlaceholder = ""
-    let addressLine1Placeholder = ""
-    let addressLine2Placeholder = ""
-    let cityPlaceholder = ""
-    let statePlaceholder = ""
-    let postcodePlaceholder = ""
-    let countryPlaceholder = ""
 
     @Published var firstNameText = "" {
         didSet {
@@ -123,6 +113,9 @@ class AddressFormManager: ObservableObject {
     @Published var showAddressSearchPopup = false
     @Published var showCountrySearchPopup = false
     @Published var isAddressFormExpanded = false
+
+    var numberOfValidationFailures: Int = 0
+    var firstFieldWithError: AddressFocusable?
 
     // MARK: - Methods
 
@@ -215,6 +208,31 @@ class AddressFormManager: ObservableObject {
     private func isCountryValid() -> Bool {
         let trimmedInput = countryText.trimmingCharacters(in: .whitespacesAndNewlines)
         return getCountryList().contains { $0.caseInsensitiveCompare(trimmedInput) == .orderedSame }
+    }
+
+    /// Full-form validation for submit: validates every field, records the first invalid field (in
+    /// visual/tab order) and the total error count, and returns whether the form is valid. Used when
+    /// the primary button stays active (`activePrimaryButton`) so validation runs on tap.
+    func validateForm() -> Bool {
+        validateAllTextFields()
+
+        firstFieldWithError = nil
+        var count = 0
+        let orderedFields: [(isValid: Bool, field: AddressFocusable)] = [
+            (firstNameValid == true, .firstName),
+            (lastNameValid == true, .lastName),
+            (addressLine1Valid == true, .addressLine1),
+            (cityValid == true, .city),
+            (stateValid == true, .state),
+            (postcodeValid == true, .postcode),
+            (countryValid == true, .country)
+        ]
+        for entry in orderedFields where !entry.isValid {
+            if firstFieldWithError == nil { firstFieldWithError = entry.field }
+            count += 1
+        }
+        numberOfValidationFailures = count
+        return isFormValid()
     }
 
     func isFormValid() -> Bool {

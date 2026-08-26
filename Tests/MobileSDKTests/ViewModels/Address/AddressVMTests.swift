@@ -107,18 +107,33 @@ final class AddressVMTests: XCTestCase {
     // MARK: - Validation / Button State
 
     func testIsActionButtonDisabledReflectsFormValidity() {
+        // Gated mode (activePrimaryButton == false): the button tracks form validity.
+        let gatedManager = TestAddressFormManager()
+        let gatedViewModel = AddressVM(
+            config: AddressWidgetConfig(address: nil, activePrimaryButton: false),
+            appearance: AddressWidgetAppearance(),
+            eventDelegate: nil,
+            addressFormManager: gatedManager,
+            localSearchCompleter: MKLocalSearchCompleter(),
+            completion: { _ in })
+
         // Initially invalid
-        XCTAssertTrue(viewModel.isActionButtonDisabled())
+        XCTAssertTrue(gatedViewModel.isActionButtonDisabled())
 
         // Fill in required fields to make it valid
-        formManager.firstNameText = "John"
-        formManager.lastNameText = "Doe"
-        formManager.addressLine1Text = "123 Main St"
-        formManager.cityText = "Sydney"
-        formManager.stateText = "NSW"
-        formManager.postcodeText = "2000"
-        formManager.countryText = "Australia" // Valid per TestAddressFormManager
+        gatedManager.firstNameText = "John"
+        gatedManager.lastNameText = "Doe"
+        gatedManager.addressLine1Text = "123 Main St"
+        gatedManager.cityText = "Sydney"
+        gatedManager.stateText = "NSW"
+        gatedManager.postcodeText = "2000"
+        gatedManager.countryText = "Australia" // Valid per TestAddressFormManager
 
+        XCTAssertFalse(gatedViewModel.isActionButtonDisabled())
+    }
+
+    func testActivePrimaryButtonKeepsButtonEnabledWhenInvalid() {
+        // Default config uses activePrimaryButton == true, so the button stays enabled even when invalid.
         XCTAssertFalse(viewModel.isActionButtonDisabled())
     }
 
@@ -150,6 +165,39 @@ final class AddressVMTests: XCTestCase {
         XCTAssertEqual(completionAddress?.country, "United States")
         // Search text should be cleared by saveAddress
         XCTAssertEqual(formManager.addressSearchText, "")
+    }
+
+    func testSaveAddress_ValidForm_ReturnsTrue() {
+        formManager.firstNameText = "Jane"
+        formManager.lastNameText = "Smith"
+        formManager.addressLine1Text = "1 Infinite Loop"
+        formManager.cityText = "Cupertino"
+        formManager.stateText = "CA"
+        formManager.postcodeText = "95014"
+        formManager.countryText = "United States"
+
+        XCTAssertTrue(viewModel.saveAddress())
+        XCTAssertNotNil(completionAddress)
+    }
+
+    func testSaveAddress_InvalidForm_ReturnsFalse_DoesNotComplete() {
+        // Empty form (default config uses activePrimaryButton == true, so save can be attempted).
+        XCTAssertFalse(viewModel.saveAddress())
+        XCTAssertNil(completionAddress, "completion must not fire for an invalid form")
+    }
+
+    func testSaveAddress_InvalidForm_PopulatesValidationPassthroughs() {
+        _ = viewModel.saveAddress() // invalid, empty
+
+        XCTAssertEqual(viewModel.numberOfValidationErrors, formManager.numberOfValidationFailures)
+        XCTAssertEqual(viewModel.numberOfValidationErrors, 7)
+        XCTAssertEqual(viewModel.firstTextFieldWithError, formManager.firstFieldWithError)
+        XCTAssertEqual(viewModel.firstTextFieldWithError, .firstName)
+    }
+
+    func testConfig_activePrimaryButton_defaultsTrue() {
+        XCTAssertTrue(AddressWidgetConfig().activePrimaryButton)
+        XCTAssertFalse(AddressWidgetConfig(activePrimaryButton: false).activePrimaryButton)
     }
 
     func testUpdateAddressLoadsFromConfig() async throws {
