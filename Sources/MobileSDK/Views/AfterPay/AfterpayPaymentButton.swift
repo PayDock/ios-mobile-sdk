@@ -2,9 +2,7 @@
 //  AfterpayPaymentButton.swift
 //  MobileSDK
 //
-//  Created by Domagoj Grizelj on 22.04.2024..
-//  Copyright © 2024 Paydock Ltd.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import UIKit
@@ -23,7 +21,7 @@ struct AfterpayPaymentButton: View {
 
 struct AfterpayPaymentButton_Previews: PreviewProvider {
     static var previews: some View {
-        AfterpayPaymentButton(colorScheme: .static(.blackOnMint), type: .buyNow, action: {})
+        AfterpayPaymentButton(colorScheme: .static(.default), type: .buyNow, action: {})
             .previewLayout(.sizeThatFits)
     }
 }

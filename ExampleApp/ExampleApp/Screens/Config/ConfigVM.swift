@@ -17,12 +17,12 @@ class ConfigVM: ObservableObject {
         case .card:
             return [
                 .widgetAccessToken, .gatewayId, .collectCardholderName, .allowSaveCard,
-                .storeSecurityCode, .schemeSupport, .activePrimaryButton
+                .storeSecurityCode, .schemeSupport, .activePrimaryButton, .showSubmitButton
             ]
         case .address:
-            return [.address]
+            return [.address, .activePrimaryButton]
         case .giftCard:
-            return [.widgetAccessToken, .storePin]
+            return [.widgetAccessToken, .storePin, .activePrimaryButton, .showSubmitButton]
         case .paypal:
             return [.widgetAccessToken, .gatewayId, .requestShipping, .fundingSource]
         case .paypalVault:

@@ -20,6 +20,10 @@ class CardDetailsExampleVM: ObservableObject {
     @Published var showAlert = false
     @Published var alertTitle = ""
     @Published var alertMessage = ""
+    // Demo of `loadingDelegate` — the signal a host uses to show its own loading UI when driving
+    // submission externally (`config.showSubmitButton = false`). See `CardDetailsExampleView`'s
+    // "Tokenise External Button".
+    @Published var isSubmitting = false
 
     init(configManager: ConfigManager = .shared) {
         self.configManager = configManager
@@ -61,5 +65,18 @@ extension CardDetailsExampleVM: WidgetEventDelegate {
 
     func widgetEvent(event: WidgetEvent) {
         os_log(.info, "Widget event received: \(event.jsonDescription)")
+    }
+}
+
+// MARK: - WidgetLoadingDelegate
+
+extension CardDetailsExampleVM: WidgetLoadingDelegate {
+
+    func loadingDidStart() {
+        isSubmitting = true
+    }
+
+    func loadingDidFinish() {
+        isSubmitting = false
     }
 }

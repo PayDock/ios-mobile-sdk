@@ -13,6 +13,15 @@ enum StyleComponentsEnum {
     case cardNumberTextField
     case cardExpiryTextField
     case cardSecurityTextField
+    case giftCardNumberTextField
+    case giftCardPinTextField
+    case addressFirstNameTextField
+    case addressLastNameTextField
+    case addressLine1TextField
+    case addressLine2TextField
+    case addressCityTextField
+    case addressStateTextField
+    case addressPostcodeTextField
     case searchDropdown
     case actionButton
     case expandSectionButton
@@ -37,6 +46,15 @@ enum StyleComponentsEnum {
         case .cardNumberTextField: return "Card Number Text Field"
         case .cardExpiryTextField: return "Card Expiry Text Field"
         case .cardSecurityTextField: return "Card Security Text Field"
+        case .giftCardNumberTextField: return "Card Number Text Field"
+        case .giftCardPinTextField: return "PIN Text Field"
+        case .addressFirstNameTextField: return "First Name Text Field"
+        case .addressLastNameTextField: return "Last Name Text Field"
+        case .addressLine1TextField: return "Address Line 1 Text Field"
+        case .addressLine2TextField: return "Address Line 2 Text Field"
+        case .addressCityTextField: return "City Text Field"
+        case .addressStateTextField: return "State Text Field"
+        case .addressPostcodeTextField: return "Postcode Text Field"
         case .searchDropdown: return "Search Dropdown"
         case .actionButton: return "Action Button"
         case .expandSectionButton: return "Link Button"
@@ -56,8 +74,10 @@ enum StyleComponentsEnum {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     func destinationView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView {
+        if let textFieldView = textFieldDestinationView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode) {
+            return textFieldView
+        }
         switch self {
         case .loader:
             return AnyView(LoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
@@ -71,6 +91,40 @@ enum StyleComponentsEnum {
             return AnyView(createExpandSectionButtonView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .toolbarButton:
             return AnyView(createToolbarButtonView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .searchDropdown:
+            return AnyView(DropdownStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .title:
+            return AnyView(createTitleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .linkText:
+            return AnyView(createLinkTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .toggleText:
+            return AnyView(createToggleTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .applePay:
+            return AnyView(ApplePayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .afterpay:
+            return AnyView(AfterpayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .payPal:
+            return AnyView(PayPalStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .spacings:
+            return AnyView(SpacingsStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .buttonLoader:
+            return AnyView(ButtonLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .zip:
+            return AnyView(ZipStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .textField, .cardNameTextField, .cardNumberTextField, .cardExpiryTextField, .cardSecurityTextField,
+             .giftCardNumberTextField, .giftCardPinTextField, .addressFirstNameTextField, .addressLastNameTextField,
+             .addressLine1TextField, .addressLine2TextField, .addressCityTextField, .addressStateTextField,
+             .addressPostcodeTextField:
+            // Handled by the `textFieldDestinationView` guard above — unreachable here.
+            return AnyView(EmptyView())
+        }
+    }
+
+    // The text-field-style cases of `destinationView`, split out to keep that function's cyclomatic
+    // complexity within SwiftLint's limit. Returns `nil` for any non-text-field case.
+    // swiftlint:disable:next function_body_length
+    private func textFieldDestinationView(selectedWidget: WidgetsEnum, stylingDarkMode: Bool) -> AnyView? {
+        switch self {
         case .textField:
             return AnyView(TextFieldStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
         case .cardNameTextField:
@@ -109,26 +163,35 @@ enum StyleComponentsEnum {
                     title: "Card Security Text Field"
                 )
             )
-        case .searchDropdown:
-            return AnyView(DropdownStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .title:
-            return AnyView(createTitleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .linkText:
-            return AnyView(createLinkTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .toggleText:
-            return AnyView(createToggleTextView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .applePay:
-            return AnyView(ApplePayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .afterpay:
-            return AnyView(AfterpayStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .payPal:
-            return AnyView(PayPalStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .spacings:
-            return AnyView(SpacingsStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .buttonLoader:
-            return AnyView(ButtonLoaderStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
-        case .zip:
-            return AnyView(ZipStyleView(selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode))
+        case .giftCardNumberTextField:
+            return createGiftCardTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.cardNumberTextField)
+        case .giftCardPinTextField:
+            return createGiftCardTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.pinTextField)
+        case .addressFirstNameTextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.firstNameTextField)
+        case .addressLastNameTextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.lastNameTextField)
+        case .addressLine1TextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.addressLine1TextField)
+        case .addressLine2TextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.addressLine2TextField)
+        case .addressCityTextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.cityTextField)
+        case .addressStateTextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.stateTextField)
+        case .addressPostcodeTextField:
+            return createAddressTextFieldView(
+                selectedWidget: selectedWidget, stylingDarkMode: stylingDarkMode, keyPath: \.postcodeTextField)
+        default:
+            return nil
         }
     }
 
@@ -285,6 +348,32 @@ enum StyleComponentsEnum {
                 selectedWidget: selectedWidget,
                 stylingDarkMode: stylingDarkMode,
                 cardTextFieldKeyPath: keyPath
+            )
+        )
+    }
+
+    private func createGiftCardTextFieldView(
+        selectedWidget: WidgetsEnum,
+        stylingDarkMode: Bool,
+        keyPath: WritableKeyPath<GiftCardWidgetAppearance, Theme.TextFieldAppearance?>) -> AnyView {
+        return AnyView(
+            TextFieldStyleView(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                giftCardTextFieldKeyPath: keyPath
+            )
+        )
+    }
+
+    private func createAddressTextFieldView(
+        selectedWidget: WidgetsEnum,
+        stylingDarkMode: Bool,
+        keyPath: WritableKeyPath<AddressWidgetAppearance, Theme.TextFieldAppearance?>) -> AnyView {
+        return AnyView(
+            TextFieldStyleView(
+                selectedWidget: selectedWidget,
+                stylingDarkMode: stylingDarkMode,
+                addressTextFieldKeyPath: keyPath
             )
         )
     }

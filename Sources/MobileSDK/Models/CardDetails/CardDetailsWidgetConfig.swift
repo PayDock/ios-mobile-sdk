@@ -36,6 +36,11 @@ public struct CardDetailsWidgetConfig {
     /// If `false`, the button remains disabled until all fields are valid. Defaults to `true`.
     public let activePrimaryButton: Bool
 
+    /// Specifies whether the widget renders its own built-in primary (Submit) button.
+    /// If `false`, the widget hides its button entirely so a host app can supply its own trigger UI —
+    /// see `CardDetailsWidget`'s `submitTrigger`/`onFormValidityChange` parameters. Defaults to `true`.
+    public let showSubmitButton: Bool
+
     public init(
         gatewayId: String? = nil,
         accessToken: String,
@@ -43,7 +48,8 @@ public struct CardDetailsWidgetConfig {
         allowSaveCard: SaveCardConfig? = nil,
         storeSecurityCode: Bool? = nil,
         schemeSupport: SupportedSchemesConfig = SupportedSchemesConfig(),
-        activePrimaryButton: Bool = true
+        activePrimaryButton: Bool = true,
+        showSubmitButton: Bool = true
     ) {
         self.accessToken = accessToken
         self.gatewayId = gatewayId
@@ -52,5 +58,6 @@ public struct CardDetailsWidgetConfig {
         self.storeSecurityCode = storeSecurityCode
         self.schemeSupport = schemeSupport
         self.activePrimaryButton = activePrimaryButton
+        self.showSubmitButton = showSubmitButton
     }
 }

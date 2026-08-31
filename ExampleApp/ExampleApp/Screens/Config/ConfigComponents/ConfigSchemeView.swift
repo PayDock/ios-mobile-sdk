@@ -11,6 +11,7 @@ struct ConfigSchemeView: View {
     @EnvironmentObject var configVM: ConfigVM
     @State private var supportedSchemes: Set<CardScheme> = Set(CardScheme.allCases)
     @State private var enableValidation: Bool = true
+    @State private var showSchemeList: Bool = true
 
     let selectedWidget: ConfigWidgetsEnum
     let title: String
@@ -49,6 +50,12 @@ struct ConfigSchemeView: View {
                         onChange: updateConfiguration
                     )
 
+                    ToggleFieldView(
+                        title: "Show Scheme List",
+                        isOn: $showSchemeList,
+                        onChange: updateConfiguration
+                    )
+
                     ResetStyleButton {
                         resetToDefault()
                     }
@@ -68,6 +75,7 @@ struct ConfigSchemeView: View {
         if let config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) {
             supportedSchemes = config.schemeSupport.supportedSchemes ?? Set(CardScheme.allCases)
             enableValidation = config.schemeSupport.enableValidation
+            showSchemeList = config.schemeSupport.showSchemeList
         }
     }
 
@@ -75,7 +83,8 @@ struct ConfigSchemeView: View {
         if var config = configVM.getConfiguration(for: .card, as: CardDetailsWidgetConfig.self) {
             let schemeSupport = SupportedSchemesConfig(
                 supportedSchemes: supportedSchemes,
-                enableValidation: enableValidation
+                enableValidation: enableValidation,
+                showSchemeList: showSchemeList
             )
             config = CardDetailsWidgetConfig(
                 gatewayId: config.gatewayId,
@@ -93,6 +102,7 @@ struct ConfigSchemeView: View {
     private func resetToDefault() {
         supportedSchemes = Set(CardScheme.allCases)
         enableValidation = true
+        showSchemeList = true
         updateConfiguration()
     }
 }

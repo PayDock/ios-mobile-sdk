@@ -135,7 +135,6 @@
 		28FE99442D93060A0029FCC8 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FE99432D9306050029FCC8 /* UIColor+Extensions.swift */; };
 		581E29EC2FC493C1004E325A /* OverlayLoaderStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581E29EB2FC493C1004E325A /* OverlayLoaderStyleView.swift */; };
 		581E29EE2FC493D1004E325A /* OverlayLoaderStyleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581E29ED2FC493D1004E325A /* OverlayLoaderStyleVM.swift */; };
-		5820225C2E5470EF00B50B61 /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 5820225B2E5470EF00B50B61 /* MobileSDK */; };
 		587458282E4B397E00A24A35 /* GiftCardWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458272E4B397E00A24A35 /* GiftCardWidgetUITests.swift */; };
 		587458292E4B397E00A24A35 /* AddressWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458252E4B397E00A24A35 /* AddressWidgetUITests.swift */; };
 		5874582A2E4B397E00A24A35 /* CardDetailsWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587458262E4B397E00A24A35 /* CardDetailsWidgetUITests.swift */; };
@@ -148,6 +147,8 @@
 		58A2472C2F32197D003210DF /* ConfigStoreSecurityCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A2472B2F32197D003210DF /* ConfigStoreSecurityCodeView.swift */; };
 		58A90DAE2F1546970012D4C9 /* MPGS3dsExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */; };
 		58A90DAF2F1546970012D4C9 /* MPGS3dsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */; };
+		58BCC64D2FF7CA580056D69A /* ApplePaySetupWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BCC6472FF7CA580056D69A /* ApplePaySetupWidgetUITests.swift */; };
+		58BCC64E2FF7CA580056D69A /* ApplePayWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BCC6482FF7CA580056D69A /* ApplePayWidgetUITests.swift */; };
 		58D3D0DB2E8DA3190059584D /* ConfigComponentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D42E8DA3190059584D /* ConfigComponentListView.swift */; };
 		58D3D0DC2E8DA3190059584D /* ConfigVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D62E8DA3190059584D /* ConfigVM.swift */; };
 		58D3D0DD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0CD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift */; };
@@ -162,6 +163,7 @@
 		58D3D0E72E8DA3190059584D /* ConfigSchemeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0D02E8DA3190059584D /* ConfigSchemeView.swift */; };
 		58D3D0E82E8DA3190059584D /* ConfigAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */; };
 		58D3D0EA2E8DAD970059584D /* ConfigSaveCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D3D0E92E8DAD970059584D /* ConfigSaveCardView.swift */; };
+		73EEF0AC300E6D3000F983AE /* MobileSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 73EEF0AB300E6D3000F983AE /* MobileSDK */; };
 		AAAAB0010000000000000002 /* ApplePaySetupExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAAB0010000000000000001 /* ApplePaySetupExampleView.swift */; };
 		AE9ADB0F2EEC7108005BEFC4 /* ConfigApplePayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9ADB0E2EEC7108005BEFC4 /* ConfigApplePayView.swift */; };
 /* End PBXBuildFile section */
@@ -334,6 +336,8 @@
 		58A2472B2F32197D003210DF /* ConfigStoreSecurityCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigStoreSecurityCodeView.swift; sourceTree = "<group>"; };
 		58A90DAC2F1546970012D4C9 /* MPGS3dsExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleVM.swift; sourceTree = "<group>"; };
 		58A90DAD2F1546970012D4C9 /* MPGS3dsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPGS3dsExampleView.swift; sourceTree = "<group>"; };
+		58BCC6472FF7CA580056D69A /* ApplePaySetupWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePaySetupWidgetUITests.swift; sourceTree = "<group>"; };
+		58BCC6482FF7CA580056D69A /* ApplePayWidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayWidgetUITests.swift; sourceTree = "<group>"; };
 		58D3D0CB2E8DA3190059584D /* ConfigAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigAddressView.swift; sourceTree = "<group>"; };
 		58D3D0CD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigCheckoutOptionsView.swift; sourceTree = "<group>"; };
 		58D3D0CE2E8DA3190059584D /* ConfigKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigKeys.swift; sourceTree = "<group>"; };
@@ -357,7 +361,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5820225C2E5470EF00B50B61 /* MobileSDK in Frameworks */,
+				73EEF0AC300E6D3000F983AE /* MobileSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -769,6 +773,8 @@
 		2889B7EF2A558F1A00D6C7BE /* ExampleAppUITests */ = {
 			isa = PBXGroup;
 			children = (
+				58BCC6472FF7CA580056D69A /* ApplePaySetupWidgetUITests.swift */,
+				58BCC6482FF7CA580056D69A /* ApplePayWidgetUITests.swift */,
 				5874582B2E5370B700A24A35 /* PayPalWidgetUITests.swift */,
 				587458252E4B397E00A24A35 /* AddressWidgetUITests.swift */,
 				587458262E4B397E00A24A35 /* CardDetailsWidgetUITests.swift */,
@@ -1000,7 +1006,7 @@
 			);
 			name = ExampleApp;
 			packageProductDependencies = (
-				5820225B2E5470EF00B50B61 /* MobileSDK */,
+				73EEF0AB300E6D3000F983AE /* MobileSDK */,
 			);
 			productName = ExampleApp;
 			productReference = 2889B7D12A558F1800D6C7BE /* ExampleApp.app */;
@@ -1076,7 +1082,7 @@
 			);
 			mainGroup = 2889B7C82A558F1800D6C7BE;
 			packageReferences = (
-				28F8B3892D720A0D00756C44 /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */,
+				73EEF0AA300E6D3000F983AE /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */,
 			);
 			productRefGroup = 2889B7D22A558F1800D6C7BE /* Products */;
 			projectDirPath = "";
@@ -1307,6 +1313,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				58BCC64D2FF7CA580056D69A /* ApplePaySetupWidgetUITests.swift in Sources */,
+				58BCC64E2FF7CA580056D69A /* ApplePayWidgetUITests.swift in Sources */,
 				587458282E4B397E00A24A35 /* GiftCardWidgetUITests.swift in Sources */,
 				587458292E4B397E00A24A35 /* AddressWidgetUITests.swift in Sources */,
 				5874582C2E5370B700A24A35 /* PayPalWidgetUITests.swift in Sources */,
@@ -1425,7 +1433,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.5.0;
+				MARKETING_VERSION = 4.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1586,7 +1594,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.5.0;
+				MARKETING_VERSION = 4.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1740,7 +1748,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.5.0;
+				MARKETING_VERSION = 4.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.sandbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1894,7 +1902,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.5.0;
+				MARKETING_VERSION = 4.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2111,7 +2119,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.5.0;
+				MARKETING_VERSION = 4.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2158,7 +2166,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 4.5.0;
+				MARKETING_VERSION = 4.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.paydock.multitenant.prod;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2333,16 +2341,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		28F8B3892D720A0D00756C44 /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */ = {
+		73EEF0AA300E6D3000F983AE /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../mobile-sdk-ios";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		5820225B2E5470EF00B50B61 /* MobileSDK */ = {
+		73EEF0AB300E6D3000F983AE /* MobileSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 28F8B3892D720A0D00756C44 /* XCLocalSwiftPackageReference "../../mobile-sdk-ios" */;
 			productName = MobileSDK;
 		};
 /* End XCSwiftPackageProductDependency section */

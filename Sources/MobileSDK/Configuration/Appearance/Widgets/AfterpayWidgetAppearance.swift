@@ -14,7 +14,9 @@ public struct AfterpayWidgetAppearance: LoaderStylableAppearance {
     public var loader: Theme.LoaderAppearance
     public var type: ButtonKind
 
-    public init(colorScheme: ColorScheme = .static(.blackOnMint),
+    // Afterpay 5.9.0 rebranded its ColorPalette: the former `.blackOnMint` (the default
+    // black-on-mint Afterpay look) is now expressed as `.default`.
+    public init(colorScheme: ColorScheme = .static(.default),
                 loader: Theme.LoaderAppearance = GlobalTheme.shared.globalTheme.loader,
                 type: ButtonKind = .buyNow) {
         self.colorScheme = colorScheme

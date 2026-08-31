@@ -6,7 +6,7 @@
 
 import Foundation
 
-public enum MPGS3dsError: Error, Equatable {
+public enum MPGS3dsError: Error, Equatable, WidgetError {
     case webViewFailed(error: NSError)
     case invalidToken
     case mappingFailed
@@ -17,6 +17,23 @@ public enum MPGS3dsError: Error, Equatable {
             return nsError.webViewFailureMessage(fallback: "3DS WebView widget has failed")
         case .invalidToken: return "Provided 3DS token is not valid"
         case .mappingFailed: return "3DS response mapping failed"
+        }
+    }
+
+    public var code: String {
+        switch self {
+        case .webViewFailed: return "MPGS_3DS_WEBVIEW_FAILED"
+        case .invalidToken: return "MPGS_3DS_INVALID_TOKEN"
+        case .mappingFailed: return "MPGS_3DS_RESPONSE_MAPPING_FAILED"
+        }
+    }
+
+    public var debugDescription: String {
+        switch self {
+        case .webViewFailed(let nsError):
+            return "\(code): \(customMessage) [\(nsError.domain) code \(nsError.code)]"
+        default:
+            return "\(code): \(customMessage)"
         }
     }
 }

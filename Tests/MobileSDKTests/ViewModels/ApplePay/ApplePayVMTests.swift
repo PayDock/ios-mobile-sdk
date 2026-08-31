@@ -6,6 +6,7 @@
 
 import XCTest
 import PassKit
+import Contacts
 import Combine
 @testable import MobileSDK
 @testable import DataPaymentSources
@@ -81,7 +82,7 @@ class ApplePayVMTests: XCTestCase {
     func testInitializationSetsPropertiesCorrectly() {
         XCTAssertNotNil(viewModel)
         XCTAssertEqual(viewModel.paymentStatus, .failure)
-        XCTAssertNil(viewModel.paymentController)
+        XCTAssertNil(viewModel.presenter)
         XCTAssertNil(viewModel.result)
         XCTAssertNil(viewModel.error)
     }
@@ -96,7 +97,7 @@ class ApplePayVMTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         // Then
-        XCTAssertNotNil(viewModel.paymentController)
+        XCTAssertNotNil(viewModel.presenter)
         // In test environment, presentation may fail, but the controller should still be created
         // The error might be .unableToPresentPaymentSheet due to test environment limitations
         if let error = viewModel.error {

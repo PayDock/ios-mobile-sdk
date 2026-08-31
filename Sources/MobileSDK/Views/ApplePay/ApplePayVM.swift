@@ -16,10 +16,12 @@ class ApplePayVM: NSObject, ObservableObject {
 
     private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
     private let config: ApplePayWidgetConfig
+    private let availabilityChecker: ApplePayAvailabilityChecking
+    private let presenterFactory: PaymentAuthorizationPresenterFactory
 
     // MARK: - Properties
 
-    var paymentController: PKPaymentAuthorizationController?
+    private(set) var presenter: PaymentAuthorizationPresenting?
     var paymentStatus = PKPaymentAuthorizationStatus.failure
     var result: ApplePayResult?
     var error: ApplePayError?
@@ -40,21 +42,26 @@ class ApplePayVM: NSObject, ObservableObject {
     init(config: ApplePayWidgetConfig,
          eventDelegate: WidgetEventDelegate?,
          paymentSourcesService: DataPaymentSources.PaymentSourcesService = DataPaymentSources.PaymentSourcesServiceImpl(),
+         availabilityChecker: ApplePayAvailabilityChecking = DefaultApplePayAvailabilityChecker(),
+         presenterFactory: PaymentAuthorizationPresenterFactory = DefaultPaymentAuthorizationPresenterFactory(),
          onShippingContactSelected: ((PKContact) -> PKPaymentRequestShippingContactUpdate)? = nil,
          onShippingMethodSelected: ((PKShippingMethod) -> PKPaymentRequestShippingMethodUpdate)? = nil,
          completion: @escaping (Result<ApplePayResult, ApplePayError>) -> Void) {
         self.config = config
         self.eventDelegate = eventDelegate
         self.paymentSourcesService = paymentSourcesService
+        self.availabilityChecker = availabilityChecker
+        self.presenterFactory = presenterFactory
         self.onShippingContactSelected = onShippingContactSelected
         self.onShippingMethodSelected = onShippingMethodSelected
         self.completion = completion
     }
 
     func startPayment() {
-        paymentController = PKPaymentAuthorizationController(paymentRequest: config.pkPaymentRequest)
-        paymentController?.delegate = self
-        paymentController?.present(completion: { [weak self] success in
+        let presenter = presenterFactory.makePresenter(for: config.pkPaymentRequest)
+        presenter.delegate = self
+        self.presenter = presenter
+        presenter.present(completion: { [weak self] success in
             if !success {
                 Task { @MainActor in
                     self?.isProcessing = false
@@ -80,21 +87,19 @@ class ApplePayVM: NSObject, ObservableObject {
 
     // True when the hardware supports Apple Pay (regardless of enrolled cards)
     func deviceSupportsApplePay() -> Bool {
-        MobileSDK.deviceSupportsApplePay()
+        availabilityChecker.deviceSupportsApplePay()
     }
 
     // Check to see if there cards already in wallet for default supported card schemes
     // (networks only — no capability filtering, so the setup-button decision isn't narrowed)
     func canMakePaymentsWithDefaultNetworks() -> Bool {
-        PKPaymentAuthorizationController.canMakePayments(
-            usingNetworks: [.visa, .masterCard, .amex, .discover, .JCB, .chinaUnionPay]
-        )
+        availabilityChecker.canMakePaymentsWithDefaultNetworks()
     }
 
     // True when the hardware supports Apple Pay (regardless of enrolled cards)
     // "and" cards in wallet support set network and capabilities
     func canMakePaymentsWithConfiguredNetworksAndCapabilities() -> Bool {
-        MobileSDK.canMakeApplePayPayments(for: config.pkPaymentRequest)
+        availabilityChecker.canMakePayments(for: config.pkPaymentRequest)
     }
 
     // Whether the device is capable but has no eligible cards enrolled
@@ -119,22 +124,32 @@ class ApplePayVM: NSObject, ObservableObject {
 
     // MARK: - OTT Token Creation
 
-    // swiftlint:disable:next function_body_length
+    /// Glue that extracts values from the (non-constructible-in-tests) `PKPayment` and delegates
+    /// to the value-based `createOTTToken`. This is the only OTT step that touches PassKit types.
     private func createOTTToken(payment: PKPayment) async {
-        // Build shipping from shippingContact
         let shipping = buildShipping(from: payment.shippingContact)
-
-        // Build billing from billingContact
         let billing = buildBilling(from: payment.billingContact)
-
-        // Get card scheme from payment method network
+        // Card scheme from payment method network
         let cardScheme = payment.token.paymentMethod.network?.rawValue ?? ""
-        let cardInfo = ApplePayOTTCardInfo(cardScheme: cardScheme)
-
         // The ref_token is the JSON stringified payment data
         let refToken = String(data: payment.token.paymentData, encoding: .utf8) ?? ""
 
-        // Create the payload
+        await createOTTToken(
+            shipping: shipping,
+            billing: billing,
+            cardScheme: cardScheme,
+            refToken: refToken
+        )
+    }
+
+    /// Builds the OTT payload (snake_case JSON, base64-encoded) from already-mapped values.
+    /// Pure and free of PassKit types, so it can be unit-tested directly.
+    /// - Returns: the base64 payload string, or `.payloadEncodingFailed` if encoding fails.
+    func makeApplePayPayload(shipping: ApplePayOTTShipping?,
+                             billing: ApplePayOTTBilling?,
+                             cardScheme: String,
+                             refToken: String) -> Result<String, ApplePayError> {
+        let cardInfo = ApplePayOTTCardInfo(cardScheme: cardScheme)
         let payload = ApplePayOTTPayload(
             shipping: shipping,
             billing: billing,
@@ -147,13 +162,31 @@ class ApplePayVM: NSObject, ObservableObject {
         jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
         guard let payloadData = try? jsonEncoder.encode(payload),
               let payloadString = String(data: payloadData, encoding: .utf8) else {
-            self.error = .payloadEncodingFailed
+            return .failure(.payloadEncodingFailed)
+        }
+        return .success(Data(payloadString.utf8).base64EncodedString())
+    }
+
+    /// Encodes the payload, calls the token service and maps the outcome onto
+    /// `result`/`error`/`paymentStatus`. Value-based (no PassKit types) so it is unit-testable
+    /// via a mocked `PaymentSourcesService`.
+    func createOTTToken(shipping: ApplePayOTTShipping?,
+                        billing: ApplePayOTTBilling?,
+                        cardScheme: String,
+                        refToken: String) async {
+        let cardInfo = ApplePayOTTCardInfo(cardScheme: cardScheme)
+
+        let base64Payload: String
+        switch makeApplePayPayload(shipping: shipping, billing: billing, cardScheme: cardScheme, refToken: refToken) {
+        case .success(let payload):
+            base64Payload = payload
+        case .failure(let payloadError):
+            self.error = payloadError
             self.paymentStatus = .failure
             self.pkPaymentCompletion?(.failure)
             return
         }
 
-        let base64Payload = Data(payloadString.utf8).base64EncodedString()
         let request = CreateApplePayTokenReq(
             serviceId: config.serviceId,
             payload: base64Payload
@@ -181,13 +214,14 @@ class ApplePayVM: NSObject, ObservableObject {
             self.paymentStatus = .failure
             self.pkPaymentCompletion?(.failure)
         } catch {
-            self.error = .unknownError(nil)
+            // Preserve any RequestError so its diagnostic code survives (matches the sibling VMs).
+            self.error = .unknownError(error as? RequestError)
             self.paymentStatus = .failure
             self.pkPaymentCompletion?(.failure)
         }
     }
 
-    private func buildShipping(from contact: PKContact?) -> ApplePayOTTShipping? {
+    func buildShipping(from contact: PKContact?) -> ApplePayOTTShipping? {
         guard let contact = contact else { return nil }
 
         let postalAddress = contact.postalAddress
@@ -208,7 +242,7 @@ class ApplePayVM: NSObject, ObservableObject {
         )
     }
 
-    private func buildBilling(from contact: PKContact?) -> ApplePayOTTBilling? {
+    func buildBilling(from contact: PKContact?) -> ApplePayOTTBilling? {
         guard let contact = contact else { return nil }
 
         let postalAddress = contact.postalAddress
@@ -249,12 +283,19 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     nonisolated func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
             Task { @MainActor in
-                if self.paymentStatus == .success, let result = self.result {
-                    self.callCompletion(.success(result))
-                } else {
-                    self.callCompletion(.failure(self.error ?? .userCanceledPayment))
-                }
+                self.finishAndComplete()
             }
+        }
+    }
+
+    /// Selects the terminal completion based on the payment outcome. Extracted from the delegate
+    /// callback (which requires a system-dismissed controller) so it can be unit-tested directly.
+    @MainActor
+    func finishAndComplete() {
+        if paymentStatus == .success, let result = result {
+            callCompletion(.success(result))
+        } else {
+            callCompletion(.failure(error ?? .userCanceledPayment))
         }
     }
 
@@ -265,7 +306,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
             if let update = self.onShippingContactSelected?(contact) {
                 handler(update)
             } else {
-                // Default: no errors, use existing summary itemse¯#
+                // Default: no errors, use existing summary items from the payment request
                 handler(PKPaymentRequestShippingContactUpdate())
             }
         }

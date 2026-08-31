@@ -156,7 +156,9 @@ struct ConfigAddressView: View {
             country: country.isEmpty ? "" : country
         )
 
-        let config = AddressWidgetConfig(address: address)
+        // Preserve the current activePrimaryButton setting when the prefilled address changes.
+        let activePrimaryButton = configVM.getConfiguration(for: .address, as: AddressWidgetConfig.self)?.activePrimaryButton ?? true
+        let config = AddressWidgetConfig(address: address, activePrimaryButton: activePrimaryButton)
         configVM.updateConfiguration(for: .address, with: config)
     }
 

@@ -52,6 +52,23 @@ class GiftCardVMTests: XCTestCase {
         super.tearDown()
     }
 
+    func testInitialisationWithDelegateShowLoader() {
+        XCTAssertEqual(viewModel.showLoaders, false)
+    }
+
+    func testInitialisationWithoutDelegateShowLoader() {
+        viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                               viewState: viewState,
+                               paymentSourcesService: mockService,
+                               config: config,
+                               loadingDelegate: nil,
+                               eventDelegate: nil) { result in
+            self.completionResult = result
+        }
+
+        XCTAssertEqual(viewModel.showLoaders, true)
+    }
+
     func testUpdateLoadingStateToTrueWithDelegate() {
         // Given
         viewModel = GiftCardVM(appearance: GiftCardWidgetAppearance(),
@@ -67,7 +84,10 @@ class GiftCardVMTests: XCTestCase {
         viewModel.updateLoadingState(isLoading: true)
 
         // Then
-        XCTAssertEqual(viewModel.isLoading, false)
+        // isLoading is always kept accurate regardless of delegate presence, so it remains usable
+        // as a re-entrancy guard; `showLoaders` (not this) is what suppresses the internal button's
+        // own spinner when a delegate is supplied — see testShowLoadersFalseWithDelegate.
+        XCTAssertEqual(viewModel.isLoading, true)
         XCTAssertEqual(loadingDelegate.isLoading, true)
     }
 
@@ -194,6 +214,71 @@ class GiftCardVMTests: XCTestCase {
         }
     }
 
+    // swiftlint:disable:next nesting
+    /// Counts `createGiftCardToken` invocations, to verify `tokeniseGiftCard()`'s re-entrancy guard.
+    private class CountingPaymentSourcesServiceMock: PaymentSourcesService {
+        private(set) var createGiftCardTokenCallCount = 0
+
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
+            createGiftCardTokenCallCount += 1
+            return "mock-gift-card-token"
+        }
+
+        func createApplePayToken(tokeniseApplePayReq: DataPaymentSources.CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
+            fatalError("Not implemented")
+        }
+    }
+
+    // MARK: - Re-entrancy
+
+    func testTokeniseGiftCard_CalledTwiceBeforeTaskStarts_OnlyCallsServiceOnce() async {
+        // Regression test: a fast double-submit (e.g. the internal button and an external
+        // submitTrigger racing) must not fire two tokenisation requests.
+        let countingService = CountingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Completion called")
+
+        viewModel = GiftCardVM(
+            appearance: GiftCardWidgetAppearance(),
+            viewState: viewState,
+            paymentSourcesService: countingService,
+            config: config,
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        viewModel.tokeniseGiftCard()
+        // isLoading is now true synchronously (set before the Task is dispatched), so this second
+        // call must be a no-op rather than racing the first.
+        XCTAssertTrue(viewModel.isLoading)
+        viewModel.tokeniseGiftCard()
+
+        await fulfillment(of: [expectation], timeout: 2)
+        XCTAssertEqual(countingService.createGiftCardTokenCallCount, 1)
+    }
+
     // MARK: - Completion Error Tests
 
     func testTokeniseGiftCard_CompletesWithUnknownError_OnConnectionError() async {
@@ -290,6 +375,63 @@ class GiftCardVMTests: XCTestCase {
         // Then
         XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
         XCTAssertNil(eventDelegate.lastEvent)
+    }
+
+    // MARK: - activePrimaryButton / isActionButtonDisabled
+
+    private func makeVM(config: GiftCardWidgetConfig) -> GiftCardVM {
+        GiftCardVM(
+            appearance: GiftCardWidgetAppearance(),
+            viewState: viewState,
+            paymentSourcesService: mockService,
+            config: config,
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+            }
+    }
+
+    func testConfig_activePrimaryButton_defaultsTrue() {
+        XCTAssertTrue(GiftCardWidgetConfig(accessToken: "").activePrimaryButton)
+        XCTAssertFalse(GiftCardWidgetConfig(accessToken: "", activePrimaryButton: false).activePrimaryButton)
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryTrue_InvalidForm_Enabled() {
+        viewModel = makeVM(config: GiftCardWidgetConfig(accessToken: "", activePrimaryButton: true))
+        // Empty/invalid form but the button stays enabled so validation runs on tap.
+        XCTAssertFalse(viewModel.isActionButtonDisabled())
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryTrue_LoadingDisables() {
+        viewModel = makeVM(config: GiftCardWidgetConfig(accessToken: "", activePrimaryButton: true))
+        viewModel.updateLoadingState(isLoading: true)
+        // Even in active mode, a re-tap is blocked while a request is in flight.
+        XCTAssertTrue(viewModel.isActionButtonDisabled())
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryFalse_InvalidForm_Disabled() {
+        viewModel = makeVM(config: GiftCardWidgetConfig(accessToken: "", activePrimaryButton: false))
+        XCTAssertTrue(viewModel.isActionButtonDisabled())
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryFalse_ValidForm_Enabled() {
+        viewModel = makeVM(config: GiftCardWidgetConfig(accessToken: "", activePrimaryButton: false))
+        viewModel.giftCardFormManager.cardNumberText = "12345678901234"
+        viewModel.giftCardFormManager.pinText = "1234"
+        XCTAssertFalse(viewModel.isActionButtonDisabled())
+    }
+
+    // MARK: - Validation passthroughs
+
+    func testValidationPassthroughs_MirrorFormManager() {
+        viewModel = makeVM(config: GiftCardWidgetConfig(accessToken: "", activePrimaryButton: true))
+
+        _ = viewModel.giftCardFormManager.validateForm() // invalid empty form
+
+        XCTAssertEqual(viewModel.numberOfValidationErrors, viewModel.giftCardFormManager.numberOfValidationFailures)
+        XCTAssertEqual(viewModel.numberOfValidationErrors, 2)
+        XCTAssertEqual(viewModel.firstTextFieldWithError, viewModel.giftCardFormManager.firstFieldWithError)
+        XCTAssertEqual(viewModel.firstTextFieldWithError, .cardNumber)
     }
 }
 // swiftlint:enable all

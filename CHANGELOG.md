@@ -1,5 +1,58 @@
 # Changelog
 
+## [4.6.0] - 2026-08-27
+
+### Added
+- Added `showSubmitButton` to `CardDetailsWidgetConfig` and `GiftCardWidgetConfig` (default `true`).
+  When `false`, the widget hides its own built-in submit button entirely, so a host app can supply its own trigger UI. `CardDetailsWidget` and `GiftCardWidget` gain new init parameters to support this: `submitTrigger: Binding<Bool>` and `onFormValidityChange: ((Bool) -> Void)?` (fired whenever the form's validity changes).
+- Added `showSchemeList` to `SupportedSchemesConfig` (default `true`). When `false`, `CardDetailsWidget` hides its row of supported card scheme icons entirely, regardless of `supportedSchemes`.
+- Added `activePrimaryButton` to `GiftCardWidgetConfig` and `AddressWidgetConfig` (matching
+  `CardDetailsWidgetConfig`). When `true`, the primary button stays enabled and validation runs on tap, including a VoiceOver "N errors in form" summary and focus moving to the first invalid field; when `false`, the button remains disabled until the form is valid.
+- Per-field text-field theming for `GiftCardWidget` and `AddressWidget`, matching `CardDetailsWidget`.
+  `GiftCardWidgetAppearance` gains optional `cardNumberTextField` / `pinTextField`; `AddressWidgetAppearance`
+  gains optional `firstNameTextField`, `lastNameTextField`, `addressLine1TextField`, `addressLine2TextField`,
+  `cityTextField`, `stateTextField`, `postcodeTextField`. Each falls back to the shared `textField` when
+  `nil`, so existing configurations are unaffected. `AddressWidgetAppearance`'s per-field overrides default
+  to `nil`; `GiftCardWidgetAppearance`'s `cardNumberTextField` / `pinTextField` default to a seeded
+  appearance carrying the field's default placeholder/hint text (see below) rather than `nil`, so the
+  effective values are discoverable via the appearance object (e.g. in a styling screen) instead of only
+  as fallbacks inside the widget's rendering code. Pass `nil` explicitly to opt out.
+- `GiftCardWidget` now shows field placeholders ("XXXX XXXX XXXX XXXX", "XXXX") and hints, and exposes
+  digit-by-digit VoiceOver values plus per-field accessibility identifiers (`giftCardNumberField`,
+  `giftCardPinField`).
+- `AddressWidget` now exposes per-field accessibility identifiers (`firstNameField`, `lastNameField`,
+  `addressLine1Field`, `addressLine2Field`, `cityField`, `stateField`, `postcodeField`).
+- `GiftCardWidget` and `AddressWidget` now announce validation errors via VoiceOver as they occur,
+  matching `CardDetailsWidget`.
+
+### Changed
+- Bumped `ios-core-networking` dependency to `1.3.0` (adds `DecodingFailureContext` on
+  `RequestError.decode`; `.decode` now has an associated value).
+- **Breaking:** `AddressWidgetAppearance.init` parameter labels renamed for consistency with the property
+  names and the other widgets: `textfield:` → `textField:`, `primaryButton:` → `actionButton:`,
+  `linkButton:` → `expandSectionButton:`. Call sites that passed these labels must be updated; property
+  names are unchanged.
+- **Behaviour change:** `GiftCardWidget` and `AddressWidget` now default to `activePrimaryButton: true`
+  (matching `CardDetailsWidget`), so their primary button is enabled from the start and validates on tap
+  rather than staying disabled until the form is valid. Pass `activePrimaryButton: false` in the config
+  to restore the previous disabled-until-valid behaviour.
+- Removed unused placeholder constants on `GiftCardFormManager` (`cardNumberPlaceholder`, `pinPlaceholder`) and
+  `AddressFormManager` (the nine `*Placeholder` constants) — placeholders are now configured via the
+  widget appearance.
+
+### Fixed
+- `GiftCardWidget`'s re-entrancy guard against double-submission relied on `isLoading`, which
+  `GiftCardVM` never updated when a `loadingDelegate` was supplied — a host using a `loadingDelegate`
+  had no protection against a double-tap or overlapping `submitTrigger` call. `isLoading` is now always
+  kept accurate regardless of delegate presence (a new `showLoaders` flag, matching `CardDetailsWidget`,
+  now separately controls whether the internal button's own spinner renders when a delegate is present).
+- `CardDetailsWidget` and `GiftCardWidget`'s `submitTapped()` now also blocks while the widget has been
+  externally disabled via `ViewState.setState(.disabled)`, not just while a request is in flight —
+  previously the external `submitTrigger` path ignored that host-initiated disable entirely.
+- Both widgets now guard against re-entrancy synchronously in the view model (`tokeniseCardDetails()`/
+  `tokeniseGiftCard()`), rather than relying solely on the view layer's guard, closing a narrow window
+  where two calls arriving before the first `Task` had started could both proceed.
+
 ## [4.5.0] - 2026-06-16
 
 ### Added

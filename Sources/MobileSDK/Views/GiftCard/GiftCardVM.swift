@@ -19,7 +19,7 @@ class GiftCardVM: ObservableObject {
     let appearance: GiftCardWidgetAppearance
     @Published var giftCardFormManager: GiftCardFormManager
     private let paymentSourcesService: DataPaymentSources.PaymentSourcesService
-    private let config: GiftCardWidgetConfig
+    let config: GiftCardWidgetConfig
     var viewState: ViewState
 
     // MARK: - Handlers
@@ -29,10 +29,22 @@ class GiftCardVM: ObservableObject {
     // MARK: - Properties
 
     @Published var isLoading = false
+    // Set false when a loadingDelegate is supplied, so the internal button doesn't show its own
+    // spinner on top of whatever loading UI the host's delegate is driving. `isLoading` itself is
+    // still always kept accurate (see updateLoadingState) so it remains usable as a reentrancy guard
+    // regardless of delegate presence — only its effect on the button's spinner is gated separately.
+    @Published var showLoaders = true
     private weak var loadingDelegate: WidgetLoadingDelegate?
     private weak var eventDelegate: WidgetEventDelegate?
 
     var anyCancellable: AnyCancellable? // Required to allow updating the view from nested observable objects - SwiftUI quirk
+
+    var numberOfValidationErrors: Int {
+        giftCardFormManager.numberOfValidationFailures
+    }
+    var firstTextFieldWithError: GiftCardFormManager.GiftCardFocusable? {
+        giftCardFormManager.firstFieldWithError
+    }
 
     // MARK: - Initialisation
 
@@ -53,6 +65,10 @@ class GiftCardVM: ObservableObject {
         self.eventDelegate = eventDelegate
         self.completion = completion
 
+        if loadingDelegate != nil {
+            showLoaders = false
+        }
+
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
             // Defer to avoid publishing during view updates
             Task {
@@ -66,9 +82,13 @@ class GiftCardVM: ObservableObject {
     func tokeniseGiftCard() {
         giftCardFormManager.revalidateAll()
         guard giftCardFormManager.isFormValid() else { return }
+        // Transition to loading synchronously (before dispatching the Task), so a second call
+        // arriving before the Task body has actually started still sees isLoading == true rather
+        // than racing it — this is what makes callers' own re-entrancy guards durable.
+        guard !isLoading else { return }
+        updateLoadingState(isLoading: true)
 
         Task {
-            updateLoadingState(isLoading: true)
             let tokeniseGiftCardReq = CreateGiftCardTokenReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 cardPin: giftCardFormManager.pinText,
@@ -101,13 +121,18 @@ class GiftCardVM: ObservableObject {
             } else {
                 loadingDelegate?.loadingDidFinish()
             }
-        } else {
-            self.isLoading = isLoading
         }
+        // Always kept accurate regardless of delegate presence — showLoaders (not this) is what
+        // gates whether the internal button's own spinner renders when a delegate is supplied.
+        self.isLoading = isLoading
         viewState.isDisabled = isLoading
     }
 
     func isActionButtonDisabled() -> Bool {
+        if config.activePrimaryButton {
+            // Keep the button tappable so validation runs on tap; still block re-taps while loading.
+            return viewState.isDisabled
+        }
         return !giftCardFormManager.isFormValid() || viewState.isDisabled
     }
 

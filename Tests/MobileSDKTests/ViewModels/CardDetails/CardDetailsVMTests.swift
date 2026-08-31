@@ -272,6 +272,70 @@ class CardDetailsVMTests: XCTestCase {
         }
     }
 
+    /// Counts `createToken` invocations, to verify `tokeniseCardDetails()`'s re-entrancy guard.
+    private class CountingPaymentSourcesServiceMock: PaymentSourcesService {
+        private(set) var createTokenCallCount = 0
+
+        func createToken(tokeniseCardDetailsReq: CreatePaymentSourceTokenReq, widgetAccessToken: String) async throws -> String {
+            createTokenCallCount += 1
+            return "mock-card-token"
+        }
+
+        func createApplePayToken(tokeniseApplePayReq: DataPaymentSources.CreateApplePayTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createGiftCardToken(tokeniseGiftCardReq: CreateGiftCardTokenReq, widgetAccessToken: String) async throws -> String {
+            return ""
+        }
+
+        func createSetupTokenData(req: CreatePayPalVaultSetupTokenReq, widgetAccessToken: String) async throws -> SetupTokenData {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentToken(request: CreatePayPalVaultPaymentTokenReq, setupToken: String, widgetAccessToken: String) async throws -> PaymentTokenData {
+            fatalError("Not implemented")
+        }
+
+        func initialiseExternalCheckout(widgetAccessToken: String, request: CreateExternalCheckoutReq) async throws -> (link: String, checkoutToken: String) {
+            fatalError("Not implemented")
+        }
+
+        func createPaymentSourceToken(checkoutToken: String, gatewayId: String, widgetAccessToken: String) async throws -> String {
+            fatalError("Not implemented")
+        }
+    }
+
+    // MARK: - Re-entrancy
+
+    func testTokeniseCardDetails_CalledTwiceBeforeTaskStarts_OnlyCallsServiceOnce() async {
+        // Regression test: a fast double-submit (e.g. the internal button and an external
+        // submitTrigger racing) must not fire two tokenisation requests.
+        let countingService = CountingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "Completion called")
+
+        viewModel = CardDetailsVM(
+            paymentSourcesService: countingService,
+            viewState: viewState,
+            config: CardDetailsWidgetConfig(gatewayId: "gatewayId", accessToken: "accessToken", collectCardholderName: false),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: nil,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+        }
+        populateValidFormFields()
+
+        viewModel.tokeniseCardDetails()
+        // isLoading is now true synchronously (set before the Task is dispatched), so this second
+        // call must be a no-op rather than racing the first.
+        XCTAssertTrue(viewModel.isLoading)
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2)
+        XCTAssertEqual(countingService.createTokenCallCount, 1)
+    }
+
     func testTokeniseCardDetails_CompletesWithUnknownError_OnConnectionError() async {
         // Given
         let urlError = URLError(.notConnectedToInternet)
@@ -725,6 +789,310 @@ class CardDetailsVMTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 2.0)
         XCTAssertNotNil(capturingService.capturedRequest)
         XCTAssertEqual(capturingService.capturedRequest?.savedCardConsentAccepted, false, "savedCardConsentAccepted should be false when save card toggle is off")
+    }
+
+    // MARK: - Helpers (Part A additions)
+
+    private func makeConfig(collectName: Bool = false,
+                            allowSaveCard saveCard: SaveCardConfig? = nil,
+                            activePrimaryButton: Bool = true,
+                            storeSecurityCode: Bool? = nil) -> CardDetailsWidgetConfig {
+        CardDetailsWidgetConfig(
+            gatewayId: "gatewayId",
+            accessToken: "accessToken",
+            collectCardholderName: collectName,
+            allowSaveCard: saveCard,
+            storeSecurityCode: storeSecurityCode,
+            activePrimaryButton: activePrimaryButton)
+    }
+
+    private func makeVM(service: PaymentSourcesService,
+                        config: CardDetailsWidgetConfig,
+                        viewState: ViewState? = nil,
+                        event: WidgetEventDelegateUtil? = nil) -> CardDetailsVM {
+        CardDetailsVM(
+            paymentSourcesService: service,
+            viewState: viewState ?? ViewState(),
+            config: config,
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: event) { result in
+                self.completionResult = result
+            }
+    }
+
+    // MARK: - Tokenisation result mapping
+
+    func testTokeniseCardDetails_Success_CompletesWithCardResult() async {
+        // Given
+        mockService.tokenResult = "tok_success_123"
+        let expectation = XCTestExpectation(description: "success")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(allowSaveCard: nil),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .success(let cardResult) = completionResult else {
+            return XCTFail("Expected success, got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(cardResult.token, "tok_success_123")
+        XCTAssertNil(cardResult.saveCard, "saveCard should be nil when allowSaveCard is nil")
+        XCTAssertEqual(viewModel.isLoading, false)
+    }
+
+    func testTokeniseCardDetails_Success_SaveCardOn_ResultSaveCardTrue() async {
+        mockService.tokenResult = "tok_1"
+        let expectation = XCTestExpectation(description: "success")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(allowSaveCard: config),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+        viewModel.policyAccepted = true
+
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .success(let cardResult) = completionResult else {
+            return XCTFail("Expected success")
+        }
+        XCTAssertEqual(cardResult.saveCard, true)
+    }
+
+    func testTokeniseCardDetails_Success_SaveCardOff_ResultSaveCardFalse() async {
+        mockService.tokenResult = "tok_1"
+        let expectation = XCTestExpectation(description: "success")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(allowSaveCard: config),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+        viewModel.policyAccepted = false
+
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .success(let cardResult) = completionResult else {
+            return XCTFail("Expected success")
+        }
+        XCTAssertEqual(cardResult.saveCard, false)
+    }
+
+    func testTokeniseCardDetails_RequestError_MapsToErrorTokenisingCard() async {
+        // Given a structured API error from the service
+        mockService.shouldReturnError = true
+        mockService.errorToReturn = ErrorRes(
+            status: 400,
+            error: .init(message: "Card declined", code: "E123", details: nil),
+            resource: nil,
+            errorSummary: nil)
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(let error) = completionResult,
+              case .errorTokenisingCard(let errorRes) = error else {
+            return XCTFail("Expected errorTokenisingCard, got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(errorRes.error?.message, "Card declined")
+        XCTAssertEqual(error.code, "CARD_TOKENISE_ERROR")
+    }
+
+    func testTokeniseCardDetails_ResponseDecodeFailure_IsIdentifiable() async {
+        // Given the networking layer surfaces a response-schema mismatch as RequestError.decode
+        mockService.cardTokenErrorToThrow = RequestError.decode(nil)
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then — maps to unknownError, preserving the decode class via a stable, identifiable code
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(let error) = completionResult,
+              case .unknownError(let requestError) = error else {
+            return XCTFail("Expected unknownError, got: \(String(describing: completionResult))")
+        }
+        guard case .decode = requestError else {
+            return XCTFail("Expected wrapped RequestError.decode")
+        }
+        XCTAssertEqual(error.code, "CARD_RESPONSE_DECODE")
+    }
+
+    func testTokeniseCardDetails_RequestMapping_StripsPanSpaces_SplitsExpiry_TrimsName() async {
+        // Given
+        let capturing = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "completes")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturing,
+            viewState: viewState,
+            config: makeConfig(collectName: true),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        viewModel.cardDetailsFormManager.cardholderNameText = "  John Doe  "
+        viewModel.cardDetailsFormManager.cardNumberText = "4111 1111 1111 1111"
+        viewModel.cardDetailsFormManager.expiryDateText = "12/30"
+        viewModel.cardDetailsFormManager.securityCodeText = "123"
+
+        // When
+        viewModel.tokeniseCardDetails()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        let req = capturing.capturedRequest
+        XCTAssertEqual(req?.cardNumber, "4111111111111111", "spaces should be stripped from PAN")
+        XCTAssertEqual(req?.expireMonth, "12")
+        XCTAssertEqual(req?.expireYear, "30")
+        XCTAssertEqual(req?.cardName, "John Doe", "cardholder name should be trimmed")
+        XCTAssertEqual(req?.gatewayId, "gatewayId")
+    }
+
+    func testTokeniseCardDetails_EmptyName_PassesNilCardName() async {
+        let capturing = CapturingPaymentSourcesServiceMock()
+        let expectation = XCTestExpectation(description: "completes")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: capturing,
+            viewState: viewState,
+            config: makeConfig(collectName: true),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        viewModel.cardDetailsFormManager.cardholderNameText = "   " // whitespace only
+        viewModel.cardDetailsFormManager.cardNumberText = "4111111111111111"
+        viewModel.cardDetailsFormManager.expiryDateText = "12/30"
+        viewModel.cardDetailsFormManager.securityCodeText = "123"
+
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNil(capturing.capturedRequest?.cardName, "blank cardholder name should map to nil")
+    }
+
+    // MARK: - ctaButtonTapped
+
+    func testCtaButtonTapped_InvalidForm_ReturnsFalse_DoesNotTokenise_FiresInvalidAnalytics() {
+        // Given an empty (invalid) form
+        let capturing = CapturingPaymentSourcesServiceMock()
+        eventDelegate.reset()
+        viewModel = makeVM(service: capturing, config: makeConfig(), event: eventDelegate)
+
+        // When
+        let started = viewModel.ctaButtonTapped()
+
+        // Then
+        XCTAssertFalse(started, "should return false for an invalid form")
+        XCTAssertNil(capturing.capturedRequest, "tokenisation must not run for an invalid form")
+        guard case .button(let props)? = eventDelegate.lastEvent?.properties else {
+            return XCTFail("Expected a button analytics event")
+        }
+        XCTAssertEqual(props.formState, .invalid)
+    }
+
+    func testCtaButtonTapped_ValidForm_ReturnsTrue_FiresValidAnalytics() {
+        eventDelegate.reset()
+        viewModel = makeVM(service: mockService, config: makeConfig(), event: eventDelegate)
+        populateValidFormFields()
+
+        let started = viewModel.ctaButtonTapped()
+
+        XCTAssertTrue(started, "should return true for a valid form")
+        guard case .button(let props)? = eventDelegate.lastEvent?.properties else {
+            return XCTFail("Expected a button analytics event")
+        }
+        XCTAssertEqual(props.formState, .valid)
+    }
+
+    // MARK: - isActionButtonDisabled
+
+    func testIsActionButtonDisabled_ActivePrimaryButtonTrue_AlwaysEnabled() {
+        viewModel = makeVM(service: mockService, config: makeConfig(activePrimaryButton: true))
+        // Even with an empty/invalid form the button stays enabled.
+        XCTAssertFalse(viewModel.isActionButtonDisabled())
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryFalse_InvalidForm_Disabled() {
+        viewModel = makeVM(service: mockService, config: makeConfig(activePrimaryButton: false))
+        XCTAssertTrue(viewModel.isActionButtonDisabled(), "invalid form should disable the button")
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryFalse_ValidForm_Enabled() {
+        viewModel = makeVM(service: mockService, config: makeConfig(activePrimaryButton: false))
+        populateValidFormFields()
+        XCTAssertFalse(viewModel.isActionButtonDisabled(), "valid form should enable the button")
+    }
+
+    func testIsActionButtonDisabled_ActivePrimaryFalse_ViewStateDisabled_Disabled() {
+        viewModel = makeVM(service: mockService,
+                           config: makeConfig(activePrimaryButton: false),
+                           viewState: ViewState(state: .disabled))
+        populateValidFormFields()
+        XCTAssertTrue(viewModel.isActionButtonDisabled(), "disabled view state should disable the button even when valid")
+    }
+
+    // MARK: - isValidURLString
+
+    func testIsValidURLString() {
+        viewModel = makeVM(service: mockService, config: makeConfig())
+        XCTAssertTrue(viewModel.isValidURLString("https://www.example.com"))
+        XCTAssertTrue(viewModel.isValidURLString("http://example.com/policy"))
+        XCTAssertFalse(viewModel.isValidURLString("not a url"))
+        XCTAssertFalse(viewModel.isValidURLString(""))
+        XCTAssertFalse(viewModel.isValidURLString(nil))
     }
 }
 // swiftlint:enable all

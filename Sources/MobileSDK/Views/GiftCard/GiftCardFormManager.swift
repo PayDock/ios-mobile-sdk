@@ -22,8 +22,8 @@ class GiftCardFormManager: ObservableObject {
     let cardNumberTitle = "Card number"
     let pinTitle = "PIN"
 
-    var cardNumberPlaceholder = "XXXX XXXX XXXX XXXX"
-    @Published var pinPlaceholder = "XXXX"
+    var numberOfValidationFailures: Int = 0
+    var firstFieldWithError: GiftCardFocusable?
 
     private static let giftCardNumberMinDigits = 14
     private static let giftCardNumberMaxDigits = 25
@@ -215,6 +215,46 @@ class GiftCardFormManager: ObservableObject {
     func revalidateAll() {
         validateCardNumberOnDefocus()
         validatePinOnDefocus()
+    }
+
+    /// Full-form validation for submit. Unlike the on-defocus validators, this flags empty fields too,
+    /// records the first invalid field and the total error count, and returns whether the form is valid.
+    /// Used when the primary button stays active (`activePrimaryButton`) so validation runs on tap.
+    func validateForm() -> Bool {
+        validateCardNumberForSubmit()
+        validatePinForSubmit()
+
+        if isFormValid() {
+            firstFieldWithError = nil
+            numberOfValidationFailures = 0
+            return true
+        }
+
+        firstFieldWithError = nil
+        var count = 0
+        if cardNumberValid != true {
+            firstFieldWithError = .cardNumber
+            count += 1
+        }
+        if pinValid != true {
+            if firstFieldWithError == nil { firstFieldWithError = .pin }
+            count += 1
+        }
+        numberOfValidationFailures = count
+        return false
+    }
+
+    private func validateCardNumberForSubmit() {
+        let digitCount = cardNumberText.filter { $0.isNumber }.count
+        let isInValidRange = digitCount >= Self.giftCardNumberMinDigits && digitCount <= Self.giftCardNumberMaxDigits
+        updateCardNumberValidationState(isValid: isInValidRange, errorMessage: isInValidRange ? nil : "Invalid card number")
+    }
+
+    private func validatePinForSubmit() {
+        let isValid = pinText.count == Self.pinDigitCount
+            && CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: pinText))
+        pinValid = isValid
+        pinError = isValid ? "" : "Invalid PIN number"
     }
 
     // MARK: - Formatting

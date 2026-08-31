@@ -10,6 +10,8 @@ public struct AddressWidget: View {
 
     @StateObject var viewModel: AddressVM
     @FocusState private var textFieldInFocus: AddressFormManager.AddressFocusable?
+    @AccessibilityFocusState private var voiceOverFocusedField: AddressFormManager.AddressFocusable?
+    @State private var announcing: Bool = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Initialisation
@@ -95,7 +97,7 @@ public struct AddressWidget: View {
 
             layout {
                 OutlineTextField(
-                    appearance: viewModel.appearance.textField,
+                    appearance: fieldAppearance(viewModel.appearance.firstNameTextField),
                     text: $viewModel.addressFormManager.firstNameText,
                     title: viewModel.addressFormManager.firstNameTitle,
                     errorMessage: $viewModel.addressFormManager.firstNameError,
@@ -104,6 +106,7 @@ public struct AddressWidget: View {
                     disabled: $viewModel.isDisabled,
                     textContentType: .givenName,
                     returnKeyType: .next,
+                    accessibilityIdentifier: "firstNameField",
                     onTapGesture: {
                         self.textFieldInFocus = .firstName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .firstName)
@@ -112,11 +115,13 @@ public struct AddressWidget: View {
                         viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
                     }
                 )
+                .announceError($viewModel.addressFormManager.firstNameError, suppressed: announcing)
                 .focused($textFieldInFocus, equals: .firstName)
+                .accessibilityFocused($voiceOverFocusedField, equals: .firstName)
                 .id(AddressFormManager.AddressFocusable.firstName)
 
                 OutlineTextField(
-                    appearance: viewModel.appearance.textField,
+                    appearance: fieldAppearance(viewModel.appearance.lastNameTextField),
                     text: $viewModel.addressFormManager.lastNameText,
                     title: viewModel.addressFormManager.lastNameTitle,
                     errorMessage: $viewModel.addressFormManager.lastNameError,
@@ -125,6 +130,7 @@ public struct AddressWidget: View {
                     disabled: $viewModel.isDisabled,
                     textContentType: .familyName,
                     returnKeyType: .next,
+                    accessibilityIdentifier: "lastNameField",
                     onTapGesture: {
                         self.textFieldInFocus = .lastName
                         viewModel.addressFormManager.setEditingTextField(focusedField: .lastName)
@@ -133,7 +139,9 @@ public struct AddressWidget: View {
                         viewModel.addressFormManager.setEditingTextField(focusedField: .searchAddress)
                     }
                 )
+                .announceError($viewModel.addressFormManager.lastNameError, suppressed: announcing)
                 .focused($textFieldInFocus, equals: .lastName)
+                .accessibilityFocused($voiceOverFocusedField, equals: .lastName)
                 .id(AddressFormManager.AddressFocusable.lastName)
             }
         }
@@ -208,7 +216,7 @@ public struct AddressWidget: View {
 
     private var addressLine1View: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: fieldAppearance(viewModel.appearance.addressLine1TextField),
             text: $viewModel.addressFormManager.addressLine1Text,
             title: viewModel.addressFormManager.addressLine1Title,
             errorMessage: $viewModel.addressFormManager.addressLine1Error,
@@ -217,6 +225,7 @@ public struct AddressWidget: View {
             disabled: $viewModel.isDisabled,
             textContentType: .streetAddressLine1,
             returnKeyType: .next,
+            accessibilityIdentifier: "addressLine1Field",
             onTapGesture: {
                 self.textFieldInFocus = .addressLine1
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine1)
@@ -225,13 +234,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
             }
         )
+        .announceError($viewModel.addressFormManager.addressLine1Error, suppressed: announcing)
         .focused($textFieldInFocus, equals: .addressLine1)
+        .accessibilityFocused($voiceOverFocusedField, equals: .addressLine1)
         .id(AddressFormManager.AddressFocusable.addressLine1)
     }
 
     private var addressLine2View: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: fieldAppearance(viewModel.appearance.addressLine2TextField),
             text: $viewModel.addressFormManager.addressLine2Text,
             title: viewModel.addressFormManager.addressLine2Title,
             errorMessage: $viewModel.addressFormManager.addressLine2Error,
@@ -240,6 +251,7 @@ public struct AddressWidget: View {
             disabled: $viewModel.isDisabled,
             textContentType: .streetAddressLine2,
             returnKeyType: .next,
+            accessibilityIdentifier: "addressLine2Field",
             onTapGesture: {
                 self.textFieldInFocus = .addressLine2
                 viewModel.addressFormManager.setEditingTextField(focusedField: .addressLine2)
@@ -248,13 +260,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .city)
             }
         )
+        .announceError($viewModel.addressFormManager.addressLine2Error, suppressed: announcing)
         .focused($textFieldInFocus, equals: .addressLine2)
+        .accessibilityFocused($voiceOverFocusedField, equals: .addressLine2)
         .id(AddressFormManager.AddressFocusable.addressLine2)
     }
 
     private var cityView: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: fieldAppearance(viewModel.appearance.cityTextField),
             text: $viewModel.addressFormManager.cityText,
             title: viewModel.addressFormManager.cityTitle,
             errorMessage: $viewModel.addressFormManager.cityError,
@@ -263,6 +277,7 @@ public struct AddressWidget: View {
             disabled: $viewModel.isDisabled,
             textContentType: .addressCity,
             returnKeyType: .next,
+            accessibilityIdentifier: "cityField",
             onTapGesture: {
                 textFieldInFocus = .city
                 viewModel.addressFormManager.setEditingTextField(focusedField: .city)
@@ -271,13 +286,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .state)
             }
         )
+        .announceError($viewModel.addressFormManager.cityError, suppressed: announcing)
         .focused($textFieldInFocus, equals: .city)
+        .accessibilityFocused($voiceOverFocusedField, equals: .city)
         .id(AddressFormManager.AddressFocusable.city)
     }
 
     private var stateView: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: fieldAppearance(viewModel.appearance.stateTextField),
             text: $viewModel.addressFormManager.stateText,
             title: viewModel.addressFormManager.stateTitle,
             errorMessage: $viewModel.addressFormManager.stateError,
@@ -286,6 +303,7 @@ public struct AddressWidget: View {
             disabled: $viewModel.isDisabled,
             textContentType: .addressState,
             returnKeyType: .next,
+            accessibilityIdentifier: "stateField",
             onTapGesture: {
                 self.textFieldInFocus = .state
                 viewModel.addressFormManager.setEditingTextField(focusedField: .state)
@@ -294,13 +312,15 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
             }
         )
+        .announceError($viewModel.addressFormManager.stateError, suppressed: announcing)
         .focused($textFieldInFocus, equals: .state)
+        .accessibilityFocused($voiceOverFocusedField, equals: .state)
         .id(AddressFormManager.AddressFocusable.state)
     }
 
     private var postcodeView: some View {
         OutlineTextField(
-            appearance: viewModel.appearance.textField,
+            appearance: fieldAppearance(viewModel.appearance.postcodeTextField),
             text: $viewModel.addressFormManager.postcodeText,
             title: viewModel.addressFormManager.postcodeTitle,
             errorMessage: $viewModel.addressFormManager.postcodeError,
@@ -309,6 +329,7 @@ public struct AddressWidget: View {
             disabled: $viewModel.isDisabled,
             textContentType: .postalCode,
             returnKeyType: .next,
+            accessibilityIdentifier: "postcodeField",
             onTapGesture: {
                 self.textFieldInFocus = .postcode
                 viewModel.addressFormManager.setEditingTextField(focusedField: .postcode)
@@ -317,7 +338,9 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.setEditingTextField(focusedField: .country)
             }
         )
+        .announceError($viewModel.addressFormManager.postcodeError, suppressed: announcing)
         .focused($textFieldInFocus, equals: .postcode)
+        .accessibilityFocused($voiceOverFocusedField, equals: .postcode)
         .id(AddressFormManager.AddressFocusable.postcode)
     }
 
@@ -345,7 +368,9 @@ public struct AddressWidget: View {
                 viewModel.addressFormManager.endEditing()
             }
         )
+        .announceError($viewModel.addressFormManager.countryError, suppressed: announcing)
         .focused($textFieldInFocus, equals: .country)
+        .accessibilityFocused($voiceOverFocusedField, equals: .country)
         .id(AddressFormManager.AddressFocusable.country)
         .animation(.easeInOut(duration: 0.25), value: viewModel.addressFormManager.showCountrySearchPopup)
         .animation(.easeInOut(duration: 0.25), value: viewModel.countrySearchSuggestions.count)
@@ -359,11 +384,54 @@ public struct AddressWidget: View {
                     appearance: viewModel.appearance.actionButton,
                     isDisabled: viewModel.isActionButtonDisabled())),
             shouldTemplate: true) {
-                viewModel.saveAddress()
-                viewModel.handleSaveAddresTapAnalytics()
+                submitTapped()
             }
+            .disabled(viewModel.isActionButtonDisabled())
             .customPadding(viewModel.appearance.actionButton.dimensions.padding)
             .font(viewModel.appearance.actionButton.fonts.title.customFont.scaledFont)
+    }
+
+    private func submitTapped() {
+        // Suppress per-field error announcements so they don't drown out the aggregate count.
+        let voiceOverRunning = UIAccessibility.isVoiceOverRunning
+        if voiceOverRunning { self.announcing = true }
+
+        viewModel.handleSaveAddresTapAnalytics()
+
+        if viewModel.saveAddress() {
+            if voiceOverRunning { self.announcing = false }
+            return
+        }
+
+        // Invalid submit: reveal the offending fields (they're hidden while the form is collapsed).
+        if !viewModel.addressFormManager.isAddressFormExpanded {
+            viewModel.expandAddressForm()
+        }
+
+        guard voiceOverRunning else { return }
+
+        let errorCount = viewModel.numberOfValidationErrors
+        Task { @MainActor in
+            // Let VoiceOver finish the button's own utterance before announcing the count.
+            try? await Task.sleep(for: .seconds(1))
+            announceErrorCount(errorCount)
+
+            // Give the count time to be spoken before moving focus (focus changes cut off speech).
+            try? await Task.sleep(for: .seconds(2))
+            if let firstInvalid = viewModel.firstTextFieldWithError {
+                // Move keyboard focus first so the auto-scroll modifier brings the field on-screen,
+                // then move VoiceOver focus once it has settled (VoiceOver drops off-screen focus).
+                textFieldInFocus = firstInvalid
+                try? await Task.sleep(for: .milliseconds(600))
+                voiceOverFocusedField = firstInvalid
+            }
+            self.announcing = false
+        }
+    }
+
+    private func announceErrorCount(_ count: Int) {
+        guard let message = AccessibilityAnnouncer.errorCountMessage(count) else { return }
+        AccessibilityAnnouncer.post(message, priority: .queued)
     }
 
     private func shouldAlignVertically() -> Bool {
@@ -372,6 +440,11 @@ public struct AddressWidget: View {
         case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
         @unknown default: return false
         }
+    }
+
+    /// Resolves a field's appearance: the per-field override if provided, otherwise the base `textField`.
+    private func fieldAppearance(_ override: Theme.TextFieldAppearance?) -> Theme.TextFieldAppearance {
+        override ?? viewModel.appearance.textField
     }
 }
 

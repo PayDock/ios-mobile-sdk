@@ -172,6 +172,59 @@ lane :testPackage do
   )
 end
 
+# --- Minimum / maximum supported OS test matrix ---
+# MobileSDK's deployment target is iOS 16 (see Package.swift); the ceiling tracks the newest
+# simulator runtime on CI. Both runtimes must be installed on the runner (adjust the exact 16.x
+# patch to whatever iOS 16 runtime is available).
+SUPPORTED_OS_DESTINATIONS = [
+  "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=16.4", # minimum supported (iOS 16)
+  "platform=iOS Simulator,name=iPhone 17,OS=26.4.1"                 # maximum / newest tested
+]
+
+desc "Run MobileSDK package tests on the minimum and maximum supported iOS versions"
+lane :testPackageOSMatrix do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
+  SUPPORTED_OS_DESTINATIONS.each_with_index do |destination, index|
+    run_tests(
+      package_path: ".",
+      scheme: "MobileSDK",
+      destination: destination,
+      xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
+      result_bundle: true,
+      code_coverage: true,
+      output_types: "junit",
+      output_directory: "fastlane/test_output/os_matrix/package_#{index}"
+    )
+  end
+end
+
+desc "Run ExampleApp unit + UI tests on the minimum and maximum supported iOS versions"
+lane :testExampleAppOSMatrix do
+  ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "240"
+  SUPPORTED_OS_DESTINATIONS.each_with_index do |destination, index|
+    run_tests(
+      project: "ExampleApp/ExampleApp.xcodeproj",
+      scheme: "ExampleApp",
+      configuration: "Debug (Staging)",
+      destination: destination,
+      only_testing: [
+        "ExampleAppTests",
+        "ExampleAppUITests"
+      ],
+      xcargs: "SWIFTPM_ENABLE_PLUGINS=1 SWIFTPM_ENABLE_COMMAND_PLUGINS=1",
+      result_bundle: true,
+      output_types: "junit",
+      output_directory: "fastlane/test_output/os_matrix/exampleapp_#{index}"
+    )
+  end
+end
+
+desc "Run the full OS matrix (package + ExampleApp) on min and max supported iOS"
+lane :testOSMatrix do
+  testPackageOSMatrix
+  testExampleAppOSMatrix
+end
+
 # --- Bin File Management Lanes ---
 # Mirrors caching logic from BinDataCacheManager: Last-Modified preferred, ETag fallback
 

@@ -1,13 +1,13 @@
 {
-  "originHash" : "3b5fbaf93ea1649845ff86afc0cb00be03ecc48c3a09cb496c528f609f9bb37d",
+  "originHash" : "a9de9453a319a87bfc3faa3402a7763ba8926a87e03080a2b4665e8d6baaeb9b",
   "pins" : [
     {
       "identity" : "ios-core-networking",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PayDock/ios-core-networking",
       "state" : {
-        "revision" : "fee8966226092fd6dd2c73e072332d7ce1d87fab",
-        "version" : "1.2.2"
+        "revision" : "f153cc08b10c9562cf17b716dc0568dcd846d857",
+        "version" : "1.3.0"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/afterpay/sdk-ios",
       "state" : {
-        "revision" : "a43f1608155e8ab85f1ddb415ccc7c7e0b65c62a",
-        "version" : "5.7.1"
+        "revision" : "c719c5735211ee36988cb03dfa435bdb4107bbbb",
+        "version" : "5.9.0"
       }
     },
     {

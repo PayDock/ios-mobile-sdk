@@ -98,9 +98,16 @@ class CardDetailsVM: ObservableObject {
     }
 
     func tokeniseCardDetails() {
+        // Transition to loading synchronously (before dispatching the Task), so a second call
+        // arriving before the Task body has actually started still sees isLoading == true rather
+        // than racing it — this is what makes callers' own re-entrancy guards durable.
+        guard !isLoading else { return }
+        updateLoadingState(isLoading: true)
+
         Task {
             guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
+                updateLoadingState(isLoading: false)
                 return
             }
 
@@ -119,7 +126,6 @@ class CardDetailsVM: ObservableObject {
                 savedCardConsentAccepted: config.allowSaveCard != nil ? policyAccepted : nil)
 
             do {
-                updateLoadingState(isLoading: true)
                 let cardToken = try await paymentSourcesService.createToken(
                     tokeniseCardDetailsReq: tokeniseCardDetailsReq,
                     widgetAccessToken: config.accessToken)
@@ -192,6 +198,34 @@ class CardDetailsVM: ObservableObject {
               !host.isEmpty else { return false }
 
         return true
+    }
+
+    // MARK: - Accessibility Helpers
+
+    /// Whether the expiry/security-code row should stack vertically. Pure function of the Dynamic
+    /// Type size so it can be unit-tested (the view passes its `@Environment(\.dynamicTypeSize)`).
+    /// Standard sizes lay out horizontally; accessibility sizes (AX1–AX5) stack vertically.
+    func shouldAlignVertically(for size: DynamicTypeSize) -> Bool {
+        switch size {
+        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: return false
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return true
+        @unknown default: return false
+        }
+    }
+
+    /// The VoiceOver announcement for the number of validation errors after a failed submit.
+    /// Returns `nil` when there are no errors (nothing to announce).
+    func errorCountAnnouncement(_ count: Int) -> String? {
+        AccessibilityAnnouncer.errorCountMessage(count)
+    }
+
+    /// The VoiceOver label describing the supported card schemes shown above the form, e.g.
+    /// "Supported card schemes: Visa, Mastercard, American Express". Ordered by preferred order.
+    func supportedSchemesAccessibilityLabel(for schemes: Set<CardScheme>) -> String {
+        "Supported card schemes: " +
+            CardScheme.sortedArray(from: schemes)
+                .map(\.voiceoverName)
+                .joined(separator: ", ")
     }
 
     // MARK: - Analytics Handling

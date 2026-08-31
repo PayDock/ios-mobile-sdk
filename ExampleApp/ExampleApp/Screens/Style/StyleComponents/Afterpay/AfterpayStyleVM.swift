@@ -2,9 +2,7 @@
 //  AfterpayStyleVM.swift
 //  ExampleApp
 //
-//  Created by Domagoj Grizelj on 24.06.2025..
-//  Copyright © 2025 Paydock Ltd. All rights reserved.
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import SwiftUI
 import MobileSDK
@@ -21,14 +19,14 @@ class AfterpayStyleVM: ObservableObject {
         .buyNow,
         .checkout,
         .payNow,
-        .placeOrder
+        .continueWith
     ]
 
     private(set) var colorSchemes: [Afterpay.ColorScheme] = [
-        .static(.blackOnMint),
-        .static(.mintOnBlack),
-        .static(.whiteOnBlack),
-        .static(.blackOnWhite)
+        .static(.alt),
+        .static(.default),
+        .static(.darkMono),
+        .static(.lightMono)
     ]
 
     private(set) var buttonTypeNames: [String] = [
@@ -50,7 +48,7 @@ class AfterpayStyleVM: ObservableObject {
     private var appearance: AfterpayWidgetAppearance?
     @Published var showResetConfirmation = false
 
-    @Published var colorScheme: Afterpay.ColorScheme = .static(.blackOnMint) { didSet { updateAppearance() }}
+    @Published var colorScheme: Afterpay.ColorScheme = .static(.default) { didSet { updateAppearance() }}
     @Published var buttonType: ButtonKind = .buyNow { didSet { updateAppearance() }}
 
     @Published var selectedButtonTypeName: String = "Buy Now" {
@@ -83,7 +81,7 @@ class AfterpayStyleVM: ObservableObject {
     }
 
     private func syncUIToAppearance() {
-        self.colorScheme = appearance?.colorScheme ?? .static(.blackOnMint)
+        self.colorScheme = appearance?.colorScheme ?? .static(.default)
         self.buttonType = appearance?.type ?? .buyNow
 
         // Sync string properties

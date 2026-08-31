@@ -45,8 +45,6 @@ class GiftCardFormManagerTests: XCTestCase {
         XCTAssertNil(sut.pinValid)
         XCTAssertEqual(sut.cardNumberTitle, "Card number")
         XCTAssertEqual(sut.pinTitle, "PIN")
-        XCTAssertEqual(sut.cardNumberPlaceholder, "XXXX XXXX XXXX XXXX")
-        XCTAssertEqual(sut.pinPlaceholder, "XXXX")
         XCTAssertEqual(sut.cardNumberText, "")
         XCTAssertEqual(sut.pinText, "")
     }
@@ -202,6 +200,60 @@ class GiftCardFormManagerTests: XCTestCase {
     func testIsFormValid_BothFieldsNil() {
         // Default state - no validation has occurred
         XCTAssertFalse(sut.isFormValid())
+    }
+
+    // MARK: - validateForm (submit) Tests
+
+    func testValidateForm_BothFieldsValid_ReturnsTrue_NoErrorsRecorded() {
+        sut.cardNumberText = "12345678901234"
+        sut.pinText = "1234"
+
+        XCTAssertTrue(sut.validateForm())
+        XCTAssertNil(sut.firstFieldWithError)
+        XCTAssertEqual(sut.numberOfValidationFailures, 0)
+        XCTAssertEqual(sut.cardNumberError, "")
+        XCTAssertEqual(sut.pinError, "")
+    }
+
+    func testValidateForm_EmptyFields_FlagsBothInvalid_FirstIsCardNumber() {
+        // Empty fields must be flagged on submit even though the on-defocus validators skip them.
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .cardNumber)
+        XCTAssertEqual(sut.numberOfValidationFailures, 2)
+        XCTAssertEqual(sut.cardNumberError, "Invalid card number")
+        XCTAssertEqual(sut.pinError, "Invalid PIN number")
+        XCTAssertEqual(sut.cardNumberValid, false)
+        XCTAssertEqual(sut.pinValid, false)
+    }
+
+    func testValidateForm_OnlyPinInvalid_FirstFieldIsPin_CountOne() {
+        sut.cardNumberText = "12345678901234"
+        sut.pinText = "12" // too short
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .pin)
+        XCTAssertEqual(sut.numberOfValidationFailures, 1)
+    }
+
+    func testValidateForm_OnlyCardNumberInvalid_FirstFieldIsCardNumber_CountOne() {
+        sut.cardNumberText = "123" // too short
+        sut.pinText = "1234"
+
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.firstFieldWithError, .cardNumber)
+        XCTAssertEqual(sut.numberOfValidationFailures, 1)
+    }
+
+    func testValidateForm_RecoversAfterInvalid_ClearsFirstFieldAndCount() {
+        XCTAssertFalse(sut.validateForm())
+        XCTAssertEqual(sut.numberOfValidationFailures, 2)
+
+        sut.cardNumberText = "12345678901234"
+        sut.pinText = "1234"
+
+        XCTAssertTrue(sut.validateForm())
+        XCTAssertNil(sut.firstFieldWithError)
+        XCTAssertEqual(sut.numberOfValidationFailures, 0)
     }
 
     // MARK: - Formatting Tests

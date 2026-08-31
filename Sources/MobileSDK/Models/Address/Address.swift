@@ -2,9 +2,7 @@
 //  Address.swift
 //  MobileSDK
 //
-//  Copyright © 2024 Paydock Ltd.
-//  Created by Domagoj Grizelj on 28.08.2023..
-//
+//  Copyright © 2026 Paydock Ltd.
 
 import Foundation
 
