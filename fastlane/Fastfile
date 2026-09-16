@@ -604,7 +604,7 @@ private_lane :commit_file_via_api do |options|
         UI.message("Getting current file info from GitLab API...")
         
         # Use project path as fallback if project ID doesn't work
-        project_identifier = ENV['CI_PROJECT_ID'] || "paydock%2Fbounded-contexts%2Fmobile%2Fmobile-sdk-ios"
+        project_identifier = ENV['CI_PROJECT_ID'] || "paydock-rps%2Fbounded-contexts%2Fmobile%2Fmobile-sdk-ios"
         api_url = "#{ENV['CI_API_V4_URL']}/projects/#{project_identifier}/repository/files/#{file_path_encoded}?ref=#{ENV['CI_COMMIT_REF_NAME']}"
 
         # Make call
@@ -717,7 +717,7 @@ private_lane :commit_file_via_api do |options|
     unless assets_exists
         # Create new file
         UI.message("Creating file via GitLab API...")
-        project_identifier = ENV['CI_PROJECT_ID'] || "paydock%2Fbounded-contexts%2Fmobile%2Fmobile-sdk-ios"
+        project_identifier = ENV['CI_PROJECT_ID'] || "paydock-rps%2Fbounded-contexts%2Fmobile%2Fmobile-sdk-ios"
         create_url = "#{ENV['CI_API_V4_URL']}/projects/#{project_identifier}/repository/files/#{file_path_encoded}"
         
         create_data = {
@@ -1502,7 +1502,7 @@ lane :create_gitlab_release do |options|
     release_description = <<~RELEASE
         #{changelog_notes}
 
-        **Full Changelog:** [View on GitLab](https://gitlab.com/paydock/bounded-contexts/mobile/mobile-sdk-ios/-/commits/#{version_tag})
+        **Full Changelog:** [View on GitLab](https://gitlab.com/paydock-rps/bounded-contexts/mobile/mobile-sdk-ios/-/commits/#{version_tag})
     RELEASE
 
     # Define the release assets.

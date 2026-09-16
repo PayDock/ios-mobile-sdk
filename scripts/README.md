@@ -16,7 +16,7 @@ All branches must follow specific naming patterns:
 
 ### Jira Ticket Requirement
 
-Bug, task, feature, and spike branches **must** include a Jira ticket number in the format `SDK-` followed by numbers (e.g., `SDK-1234`). Release branches are exempt from this requirement.
+Bug, task, feature, and spike branches **must** include a Jira ticket number in the format `SDK-` or `PAYRAC-` followed by numbers (e.g., `SDK-1234`). Release branches are exempt from this requirement.
 
 ### Valid Branch Name Examples
 
@@ -44,7 +44,7 @@ hotfix/urgent-fix          # Invalid prefix (should be bug/)
 improvement/ui-updates     # Invalid prefix (should be feature/ or task/)
 my-branch                  # Missing required prefix and ticket
 fix-login                  # Missing prefix and ticket
-bug/PROJ-123-fix           # Wrong ticket format (should be SDK-####)
+bug/PROJ-123-fix           # Wrong ticket format (should be SDK-#### or PAYRAC-####)
 ```
 
 ## How It Works
@@ -68,7 +68,7 @@ COMMIT REJECTED: Branch validation failed
 Your current branch name does not follow the required naming conventions.
 
 Branch naming requirements:
-  • bug/, task/, feature/, spike/ branches must include Jira ticket (SDK-####)
+  • bug/, task/, feature/, spike/ branches must include Jira ticket (SDK-#### or PAYRAC-####)
   • release/ branches can be named freely
 
 Examples of valid branch names:
