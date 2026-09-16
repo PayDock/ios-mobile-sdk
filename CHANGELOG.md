@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.6.1] - Unreleased
+## [4.6.1] - 2026-09-16
 
 ### Fixed
 - `ApplePayWidget` can now be reused for several Apple Pay attempts on the same widget instance (cancel → retry, pay → pay again).
