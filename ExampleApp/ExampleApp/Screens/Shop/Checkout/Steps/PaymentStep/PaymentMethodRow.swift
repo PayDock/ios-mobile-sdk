@@ -22,7 +22,7 @@ struct PaymentMethodRow: View {
 
                 Image(method.iconName)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
                     .frame(width: 40, height: 24)
 
                 Text(method.displayName)

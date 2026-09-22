@@ -19,7 +19,7 @@ struct CartItemRowView: View {
             // Product Image
             Image(cartItem.product.imageName)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: 60, height: 60)
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)
