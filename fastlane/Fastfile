@@ -6,6 +6,7 @@ default_platform :ios
 require 'json'
 require 'rexml/document'
 require 'fileutils'
+require 'tempfile'
 
 # --- Code Quality Lanes ---
 
@@ -1530,18 +1531,41 @@ lane :create_gitlab_release do |options|
     # This is the URL that will be used to create the release via the GitLab API.
     api_url = "#{api_endpoint}/projects/#{project_id}/releases"
 
+    # Prefer the group-level GITLAB_TOKEN; fall back to the job token, which can also create releases.
+    auth_header = if gitlab_token && !gitlab_token.empty?
+        "PRIVATE-TOKEN: #{gitlab_token}"
+    else
+        "JOB-TOKEN: #{ENV['CI_JOB_TOKEN']}"
+    end
+
+    # Idempotency: a re-run of this job (or a release created by hand for the same tag)
+    # must not fail the pipeline. GitLab returns 409 on a duplicate, so check first.
+    existing_status = sh("curl --silent --output /dev/null --write-out '%{http_code}' --header '#{auth_header}' '#{api_url}/#{version_tag}'", log: false).strip
+    if existing_status == "200"
+        UI.important("ℹ️ GitLab release for tag #{version_tag} already exists, skipping creation.")
+        next
+    end
+
     # Create the release using the GitLab API. https://docs.gitlab.com/api/releases/
-    # This uses the 'curl' command to send a POST request to the GitLab API.
-    # --silent: Suppresses progress output.
-    # --header: Specifies the headers for the request (Content-Type and PRIVATE-TOKEN).
-    # --data: Specifies the data payload for the request (the release data in JSON format).
-    # --request POST: Specifies that this is a POST request.
-    response = sh("curl --silent --header 'Content-Type: application/json' --header 'PRIVATE-TOKEN: #{gitlab_token}' \
-        --data '#{release_data}' \
-        --request POST '#{api_url}'")
+    # The JSON payload is passed through a temp file so quotes/backticks in the
+    # changelog can never break shell quoting.
+    response = nil
+    Tempfile.create(["gitlab_release_", ".json"]) do |payload|
+        payload.write(release_data)
+        payload.flush
+        response = sh("curl --silent --header 'Content-Type: application/json' --header '#{auth_header}' \
+            --data @#{payload.path} \
+            --request POST '#{api_url}'", log: false)
+    end
 
     # Output the GitLab API response for debugging purposes.
     puts "📢 GitLab API Response: #{response}"
+
+    # Fail loudly if the API did not return a release object (e.g. 401/403/409 with a "message").
+    parsed = JSON.parse(response) rescue {}
+    unless parsed["tag_name"] == version_tag
+        UI.user_error!("GitLab release creation failed: #{parsed['message'] || response}")
+    end
 
     # Indicate that the GitLab release was created successfully.
     UI.success("✅ GitLab release created successfully: #{release_name}")
@@ -1567,6 +1591,24 @@ lane :create_github_release do |options|
     # Create a release on GitHub.
     repo = 'PayDock/ios-mobile-sdk' # Replace with your GitHub repository
     release_name = "v#{version_tag}" # Creates the release name (e.g., "v1.0.0").
+
+    # The GitHub mirror is pushed manually (there is no push mirror from GitLab). If the tag
+    # is not on GitHub yet, create_release would silently create it on the default branch
+    # head, i.e. on the *previous* version's code. Refuse instead.
+    begin
+        client.ref(repo, "tags/#{version_tag}")
+    rescue Octokit::NotFound
+        UI.user_error!("Tag #{version_tag} does not exist on github.com/#{repo}. Push the `release` branch and the tag to GitHub first, then retry this job.")
+    end
+
+    # Idempotency: a re-run must not fail if the release is already there.
+    begin
+        client.release_for_tag(repo, version_tag)
+        UI.important("ℹ️ GitHub release for tag #{version_tag} already exists, skipping creation.")
+        next
+    rescue Octokit::NotFound
+        # expected: no release yet
+    end
     release_body = <<~RELEASE
         #{release_notes}
 
@@ -1642,8 +1684,14 @@ end
 # @param version [String] The version number to extract release notes for (e.g., "2.3.0").
 # @return [String] The release notes for the specified version, or an empty string if no entry is found.
 def get_release_notes(version)
-    # Read the changelog file
-    changelog_path = "CHANGELOG.md"
+    # fastlane runs every lane with the working directory set to `fastlane/`, so the
+    # repo-root CHANGELOG.md is one level up. Accept both so the helper also works
+    # when the file is read from the repo root (e.g. `fastlane run` from a script).
+    candidates = ["../CHANGELOG.md", "CHANGELOG.md"]
+    changelog_path = candidates.find { |path| File.exist?(path) }
+    if changelog_path.nil?
+        UI.user_error!("CHANGELOG.md not found (looked in #{candidates.join(', ')} from #{Dir.pwd})")
+    end
     changelog_content = File.read(changelog_path)
     match = changelog_content.match(/^##\s+\[#{Regexp.escape(version)}\].*?\n(.*?)(?=\n##\s+\[|\z)/m)
     if match
