@@ -51,7 +51,7 @@ struct ProductListView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Image("demoLogo")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .scaledToFit()
                         .frame(height: 24)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {

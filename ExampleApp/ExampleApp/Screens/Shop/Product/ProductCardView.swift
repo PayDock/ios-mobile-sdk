@@ -62,7 +62,7 @@ struct ProductCardView: View {
                     // Asset Image
                     Image(product.imageName)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .scaledToFit()
                         .frame(maxHeight: imageHeight - 8)
                         .clipped()
                 }

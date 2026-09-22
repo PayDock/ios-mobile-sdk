@@ -85,7 +85,7 @@ struct StyleWidgetListView: View {
             HStack {
                 icon
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
                     .frame(width: 24, height: 24)
                 Text(title)
                     .font(.title2)
