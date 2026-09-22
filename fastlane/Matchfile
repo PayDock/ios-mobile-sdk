@@ -1,4 +1,4 @@
-gitlab_project("paydock/bounded-contexts/mobile/mobile-sdk-ios")
+gitlab_project("paydock-rps/bounded-contexts/mobile/mobile-sdk-ios")
 storage_mode("gitlab_secure_files")
 team_id("4DX7V3HMRJ")
 

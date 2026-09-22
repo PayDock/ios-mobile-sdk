@@ -287,6 +287,110 @@ extension ApplePayVMTests {
         XCTAssertEqual(completionCount, 1)
     }
 
+    // MARK: - Widget reuse across attempts (PAYRAC-2497)
+
+    /// Cancel → retry: the first attempt ends with `.userCanceledPayment`; a second `startPayment()`
+    /// must reset the once-only guard so the retry's OTT is delivered to the integrator.
+    func testCompletion_CancelThenPay_DeliversSecondResult() async {
+        var results: [Result<ApplePayResult, ApplePayError>] = []
+        viewModel = ApplePayVM(
+            config: makeConfig(),
+            eventDelegate: eventDelegate,
+            paymentSourcesService: mockPaymentSourcesService,
+            presenterFactory: FakePresenterFactory(presentSuccess: true),
+            completion: { results.append($0) })
+
+        // Attempt 1: sheet presented, user dismisses it without authorising.
+        viewModel.startPayment()
+        viewModel.finishAndComplete()
+        XCTAssertEqual(results.count, 1)
+        guard case .failure(.userCanceledPayment) = results[0] else {
+            return XCTFail("expected userCanceledPayment for the cancelled attempt")
+        }
+
+        // Attempt 2: same widget instance, user authorises and the OTT is created.
+        mockPaymentSourcesService.applePayTokenResult = "ott-second-attempt"
+        viewModel.startPayment()
+        await viewModel.createOTTToken(shipping: nil, billing: nil, cardScheme: "visa", refToken: "ref")
+        viewModel.finishAndComplete()
+
+        XCTAssertEqual(results.count, 2, "second attempt must fire completion again")
+        guard case .success(let result) = results[1] else {
+            return XCTFail("expected success on the second attempt")
+        }
+        XCTAssertEqual(result.ottToken, "ott-second-attempt")
+    }
+
+    /// Pay → pay again on the same instance: both OTTs must reach the integrator.
+    func testCompletion_PayThenPayAgain_DeliversBothResults() async {
+        var tokens: [String] = []
+        viewModel = ApplePayVM(
+            config: makeConfig(),
+            eventDelegate: eventDelegate,
+            paymentSourcesService: mockPaymentSourcesService,
+            presenterFactory: FakePresenterFactory(presentSuccess: true),
+            completion: { if case .success(let result) = $0 { tokens.append(result.ottToken) } })
+
+        for token in ["ott-1", "ott-2"] {
+            mockPaymentSourcesService.applePayTokenResult = token
+            viewModel.startPayment()
+            await viewModel.createOTTToken(shipping: nil, billing: nil, cardScheme: "visa", refToken: "ref")
+            viewModel.finishAndComplete()
+        }
+
+        XCTAssertEqual(tokens, ["ott-1", "ott-2"])
+    }
+
+    /// A new attempt must not see the previous attempt's result/error/status.
+    func testStartPayment_ResetsStaleStateFromPreviousAttempt() async {
+        viewModel = ApplePayVM(
+            config: makeConfig(),
+            eventDelegate: eventDelegate,
+            paymentSourcesService: mockPaymentSourcesService,
+            presenterFactory: FakePresenterFactory(presentSuccess: true),
+            completion: { _ in })
+
+        mockPaymentSourcesService.applePayTokenResult = "ott-stale"
+        viewModel.startPayment()
+        await viewModel.createOTTToken(shipping: nil, billing: nil, cardScheme: "visa", refToken: "ref")
+        viewModel.finishAndComplete()
+        XCTAssertEqual(viewModel.paymentStatus, .success)
+        XCTAssertNotNil(viewModel.result)
+
+        viewModel.startPayment()
+
+        XCTAssertEqual(viewModel.paymentStatus, .failure, "status must return to the not-yet-authorised default")
+        XCTAssertNil(viewModel.result)
+        XCTAssertNil(viewModel.error)
+    }
+
+    /// Guard still holds within one attempt: dismissing after an `.unableToPresentPaymentSheet`
+    /// failure must not fire completion a second time until a new attempt starts.
+    func testCompletion_WithinOneAttempt_StillFiresOnce_ThenResetsOnNextAttempt() async {
+        let firstCompletion = XCTestExpectation(description: "first completion")
+        var completionCount = 0
+        viewModel = ApplePayVM(
+            config: makeConfig(),
+            eventDelegate: eventDelegate,
+            paymentSourcesService: mockPaymentSourcesService,
+            presenterFactory: FakePresenterFactory(presentSuccess: false),
+            completion: { _ in
+                completionCount += 1
+                firstCompletion.fulfill()
+            })
+
+        viewModel.startPayment()
+        await fulfillment(of: [firstCompletion], timeout: 2.0)
+        viewModel.finishAndComplete()
+        XCTAssertEqual(completionCount, 1)
+
+        // New attempt → guard reset → the terminal signal of this attempt fires again.
+        viewModel.startPayment()
+        // present fails again asynchronously; wait for it
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(completionCount, 2)
+    }
+
     // MARK: - Helper Methods
 
     fileprivate func makeConfig(showSetup: Bool = false,

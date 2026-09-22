@@ -58,6 +58,7 @@ class ApplePayVM: NSObject, ObservableObject {
     }
 
     func startPayment() {
+        resetAttemptState()
         let presenter = presenterFactory.makePresenter(for: config.pkPaymentRequest)
         presenter.delegate = self
         self.presenter = presenter
@@ -70,6 +71,19 @@ class ApplePayVM: NSObject, ObservableObject {
                 }
             }
         })
+    }
+
+    /// Clears the per-attempt state so one widget instance can run several Apple Pay attempts
+    /// (cancel → retry, pay → pay again). The `ApplePayVM` is held as a `@StateObject` by
+    /// `ApplePayWidget`, so it outlives a single payment; without this reset the once-only guard in
+    /// `callCompletion` swallowed every result after the first one and the freshly minted OTT was
+    /// never delivered to the integrator (PAYRAC-2497).
+    private func resetAttemptState() {
+        isCompletionCalled = false
+        paymentStatus = .failure
+        result = nil
+        error = nil
+        pkPaymentCompletion = nil
     }
 
     private func callCompletion(_ completion: (Result<ApplePayResult, ApplePayError>)) {

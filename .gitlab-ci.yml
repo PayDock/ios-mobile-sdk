@@ -12,7 +12,7 @@ stages:
   - github_release # Stage for creating a release in GitHub.
 
 include:
-  - project: 'paydock/platform/gitlab-templates'
+  - project: 'paydock-rps/platform/gitlab-templates'
     ref: main
     file: '/security/gitlab-defectdojo.yaml'
 

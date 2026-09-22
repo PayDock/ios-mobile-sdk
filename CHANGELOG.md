@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.6.1] - 2026-09-16
+
+### Fixed
+- `ApplePayWidget` can now be reused for several Apple Pay attempts on the same widget instance (cancel → retry, pay → pay again).
+
 ## [4.6.0] - 2026-08-27
 
 ### Added
@@ -320,7 +325,7 @@
 
 ### Added
 
-- `enableTestMode` flag to `MobileSDKConfig` initialisation 
+- `enableTestMode` flag to `MobileSDKConfig` initialisation
 - `transactionCanceled` to FlyPay and PayPal
 
 ### Changed
@@ -361,4 +366,3 @@
 - Renamed "MastercardSRC" to "ClickToPay"
 - Improved error handling for WebView and NetworkLib
 - Added initial loader state to WebView (3DS & ClickToPay)
-
