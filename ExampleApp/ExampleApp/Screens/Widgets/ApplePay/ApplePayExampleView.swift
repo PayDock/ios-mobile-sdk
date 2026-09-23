@@ -25,6 +25,7 @@ struct ApplePayExampleView: View {
                     config: viewModel.getConfig(),
                     appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
                     eventDelegate: viewModel,
+                    onShouldPresentPaymentSheet: viewModel.presentationHook,
                     completion: { result in
                         switch result {
                         case .success(let data): viewModel.handleSuccess(data: data)
@@ -34,6 +35,8 @@ struct ApplePayExampleView: View {
                 )
                 .frame(height: min(applePayHeight, 64))
                 .accessibilityIdentifier("applePayButton")
+                // The widget captures the hook when it is created, so rebuild it when the mode changes.
+                .id(viewModel.validationMode)
                 .padding()
             }
             .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))

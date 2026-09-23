@@ -45,6 +45,34 @@ class ApplePayExampleVM: NSObject, ObservableObject {
         return appearance ?? ApplePayWidgetAppearance()
     }
 
+    // MARK: - Pre-presentation validation hook
+
+    var validationMode: ApplePayValidationMode {
+        configManager.getApplePayConfigParams().validationMode
+    }
+
+    /// `nil` when no callback should be attached, otherwise the fake validation below.
+    var presentationHook: ApplePayPresentationDecision? {
+        guard validationMode != .none else { return nil }
+        return { [weak self] in await self?.shouldPresentPaymentSheet() ?? true }
+    }
+
+    /// Fake app-side validation passed to `ApplePayWidget(onShouldPresentPaymentSheet:)`.
+    func shouldPresentPaymentSheet() async -> Bool {
+        isLoading = true
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // simulate a network call
+        isLoading = false
+
+        guard validationMode != .fail else {
+            alertTitle = "Blocked by validation"
+            alertMessage = "App-side validation returned false, so the SDK did not present the Apple Pay sheet " +
+                "and did not call the completion handler."
+            showAlert = true
+            return false
+        }
+        return true
+    }
+
     // MARK: - Handle Callbacks
 
     func handleError(error: ApplePayError) {

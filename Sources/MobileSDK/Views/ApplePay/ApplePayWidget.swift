@@ -18,18 +18,21 @@ public struct ApplePayWidget: View {
     ///   - eventDelegate: Optional delegate for widget events
     ///   - onShippingContactSelected: Optional delegate used to handle update shipping contact information
     ///   - onShippingMethodSelected: Optional delegate used to handle user selection of different shipping methods
+    ///   - onShouldPresentPaymentSheet: Optional async hook run on tap before the sheet is presented; return `false` to skip it
     ///   - completion: Completion handler returning the Paydock OTT token on success
     public init(config: ApplePayWidgetConfig,
                 appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance(),
                 eventDelegate: WidgetEventDelegate? = nil,
                 onShippingContactSelected: ((PKContact) -> PKPaymentRequestShippingContactUpdate)? = nil,
                 onShippingMethodSelected: ((PKShippingMethod) -> PKPaymentRequestShippingMethodUpdate)? = nil,
+                onShouldPresentPaymentSheet: ApplePayPresentationDecision? = nil,
                 completion: @escaping (Result<ApplePayResult, ApplePayError>) -> Void) {
         _viewModel = StateObject(wrappedValue: ApplePayVM(
             config: config,
             eventDelegate: eventDelegate,
             onShippingContactSelected: onShippingContactSelected,
             onShippingMethodSelected: onShippingMethodSelected,
+            onShouldPresentPaymentSheet: onShouldPresentPaymentSheet,
             completion: completion)
         )
         self.appearance = appearance
@@ -44,8 +47,7 @@ public struct ApplePayWidget: View {
                 appearance: appearance,
                 isDisabled: viewModel.isProcessing
             ) {
-                viewModel.startPayment()
-                viewModel.handleApplePayTapAnalytics()
+                viewModel.handleButtonTap()
             }
         } else if viewModel.shouldShowSetupButton() {
             // Open Wallet for card enrollment — do NOT run the payment flow
