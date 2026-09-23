@@ -20,6 +20,7 @@ struct ConfigApplePayView: View {
     @State private var requireShippingAddress: Bool = false
     @State private var showSetupButtonIfRequired: Bool = false
     @State private var performAvailabilityChecks: Bool = true
+    @State private var validationMode: String = ApplePayValidationMode.none.rawValue
 
     let selectedWidget: ConfigWidgetsEnum
     let title: String
@@ -56,6 +57,13 @@ struct ConfigApplePayView: View {
                             isOn: $performAvailabilityChecks,
                             onChange: updateConfiguration
                         )
+
+                        PickerView(
+                            entries: ApplePayValidationMode.allCases.map(\.rawValue),
+                            selected: $validationMode,
+                            placeholder: "Validation Callback",
+                            onSelection: { _ in updateConfiguration() }
+                        )
                     }
                     .padding(.top, 24)
 
@@ -85,6 +93,7 @@ struct ConfigApplePayView: View {
         requireShippingAddress = !paymentRequest.requiredShippingContactFields.isEmpty
         showSetupButtonIfRequired = config.showSetUpButtonWhenNoCardsEnrolled
         performAvailabilityChecks = config.performAvailabilityChecks
+        validationMode = ConfigManager.shared.getApplePayConfigParams().validationMode.rawValue
 
         // Extract amountLabel from payment summary items
         if let firstItem = paymentRequest.paymentSummaryItems.first {
@@ -101,7 +110,8 @@ struct ConfigApplePayView: View {
             requireBillingAddress: requireBillingAddress,
             requireShippingAddress: requireShippingAddress,
             showSetupButtonIfRequired: showSetupButtonIfRequired,
-            performAvailabilityChecks: performAvailabilityChecks
+            performAvailabilityChecks: performAvailabilityChecks,
+            validationMode: ApplePayValidationMode(rawValue: validationMode) ?? .none
         )
 
         configVM.updateConfiguration(for: .applePay, with: config)
@@ -116,6 +126,7 @@ struct ConfigApplePayView: View {
         requireShippingAddress = false
         showSetupButtonIfRequired = false
         performAvailabilityChecks = true
+        validationMode = ApplePayValidationMode.none.rawValue
         updateConfiguration()
     }
 }
@@ -131,4 +142,48 @@ struct ApplePayConfigParams: Codable {
     let requireShippingAddress: Bool
     let showSetupButtonIfRequired: Bool
     let performAvailabilityChecks: Bool
+    let validationMode: ApplePayValidationMode
+
+    init(serviceId: String,
+         amountLabel: String,
+         countryCode: String,
+         merchantIdentifier: String,
+         requireBillingAddress: Bool,
+         requireShippingAddress: Bool,
+         showSetupButtonIfRequired: Bool,
+         performAvailabilityChecks: Bool,
+         validationMode: ApplePayValidationMode = .none) {
+        self.serviceId = serviceId
+        self.amountLabel = amountLabel
+        self.countryCode = countryCode
+        self.merchantIdentifier = merchantIdentifier
+        self.requireBillingAddress = requireBillingAddress
+        self.requireShippingAddress = requireShippingAddress
+        self.showSetupButtonIfRequired = showSetupButtonIfRequired
+        self.performAvailabilityChecks = performAvailabilityChecks
+        self.validationMode = validationMode
+    }
+
+    // Configs saved before validationMode existed decode with the default.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        serviceId = try container.decode(String.self, forKey: .serviceId)
+        amountLabel = try container.decode(String.self, forKey: .amountLabel)
+        countryCode = try container.decode(String.self, forKey: .countryCode)
+        merchantIdentifier = try container.decode(String.self, forKey: .merchantIdentifier)
+        requireBillingAddress = try container.decode(Bool.self, forKey: .requireBillingAddress)
+        requireShippingAddress = try container.decode(Bool.self, forKey: .requireShippingAddress)
+        showSetupButtonIfRequired = try container.decode(Bool.self, forKey: .showSetupButtonIfRequired)
+        performAvailabilityChecks = try container.decode(Bool.self, forKey: .performAvailabilityChecks)
+        validationMode = try container.decodeIfPresent(ApplePayValidationMode.self, forKey: .validationMode) ?? .none
+    }
+}
+
+// MARK: - ApplePayValidationMode
+
+/// Which `onShouldPresentPaymentSheet` hook the sample attaches to `ApplePayWidget`.
+enum ApplePayValidationMode: String, Codable, CaseIterable {
+    case none = "No validation callback"
+    case succeed = "Validation succeeds"
+    case fail = "Validation fails"
 }

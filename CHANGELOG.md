@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.7.0] - 2026-09-23
+
+### Added
+- `ApplePayWidget` gains an optional `onShouldPresentPaymentSheet: ApplePayPresentationDecision?` init parameter
+  (`@MainActor () async -> Bool`). When supplied it runs on the main actor when the user taps the Apple Pay button,
+  *before* the payment sheet is presented, so the host app can perform its own (possibly asynchronous) validation.
+  `true` presents the sheet and continues the normal authorisation → OTT → `completion` flow; `false` silently
+  skips presentation and does **not** call `completion` or emit any error. No SDK-side timeout is applied. When
+  omitted, tap-to-present behaviour is unchanged. `ApplePaySetupWidget` is unaffected.
+
+### Fixed
+- `ApplePayWidget` now disables its button while an attempt is in flight (pending presentation decision or
+  presented sheet), so rapid or repeated taps cannot run the host's validation twice or present two sheets.
+  The `isProcessing` flag that drove the disabled state was previously never set.
+
 ## [4.6.1] - 2026-09-16
 
 ### Fixed

@@ -35,6 +35,7 @@ class ApplePayVM: NSObject, ObservableObject {
     private weak var eventDelegate: WidgetEventDelegate?
     private let onShippingContactSelected: ((PKContact) -> PKPaymentRequestShippingContactUpdate)?
     private let onShippingMethodSelected: ((PKShippingMethod) -> PKPaymentRequestShippingMethodUpdate)?
+    private let onShouldPresentPaymentSheet: ApplePayPresentationDecision?
     private let completion: (Result<ApplePayResult, ApplePayError>) -> Void
 
     // MARK: - Initialisation
@@ -46,6 +47,7 @@ class ApplePayVM: NSObject, ObservableObject {
          presenterFactory: PaymentAuthorizationPresenterFactory = DefaultPaymentAuthorizationPresenterFactory(),
          onShippingContactSelected: ((PKContact) -> PKPaymentRequestShippingContactUpdate)? = nil,
          onShippingMethodSelected: ((PKShippingMethod) -> PKPaymentRequestShippingMethodUpdate)? = nil,
+         onShouldPresentPaymentSheet: ApplePayPresentationDecision? = nil,
          completion: @escaping (Result<ApplePayResult, ApplePayError>) -> Void) {
         self.config = config
         self.eventDelegate = eventDelegate
@@ -54,11 +56,38 @@ class ApplePayVM: NSObject, ObservableObject {
         self.presenterFactory = presenterFactory
         self.onShippingContactSelected = onShippingContactSelected
         self.onShippingMethodSelected = onShippingMethodSelected
+        self.onShouldPresentPaymentSheet = onShouldPresentPaymentSheet
         self.completion = completion
+    }
+
+    // MARK: - Button Tap
+
+    /// Runs the optional `onShouldPresentPaymentSheet` hook before `startPayment()`.
+    /// Taps are ignored while a decision is pending or the sheet is up.
+    func handleButtonTap() {
+        guard !isProcessing else { return }
+        handleApplePayTapAnalytics()
+
+        guard let onShouldPresentPaymentSheet else {
+            startPayment()
+            return
+        }
+
+        isProcessing = true
+        Task { @MainActor [weak self] in
+            let shouldPresent = await onShouldPresentPaymentSheet()
+            guard let self else { return }
+            if shouldPresent {
+                self.startPayment()
+            } else {
+                self.isProcessing = false
+            }
+        }
     }
 
     func startPayment() {
         resetAttemptState()
+        isProcessing = true
         let presenter = presenterFactory.makePresenter(for: config.pkPaymentRequest)
         presenter.delegate = self
         self.presenter = presenter
@@ -306,6 +335,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     /// callback (which requires a system-dismissed controller) so it can be unit-tested directly.
     @MainActor
     func finishAndComplete() {
+        isProcessing = false
         if paymentStatus == .success, let result = result {
             callCompletion(.success(result))
         } else {

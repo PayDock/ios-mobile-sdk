@@ -6,6 +6,8 @@ excluded:
   - "**/.build"
   - "**/.swiftpm"
   - "**/vendor"
+  - "**/build"
+  - "**/DerivedData"
 
 line_length:
   warning: 140
