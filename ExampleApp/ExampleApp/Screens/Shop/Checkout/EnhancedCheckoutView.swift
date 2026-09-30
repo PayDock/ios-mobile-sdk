@@ -141,29 +141,10 @@ struct EnhancedCheckoutView: View {
                     }
                 }
             })
-            .sheet(isPresented: $viewModel.showStandalone3dsWebView, onDismiss: { }, content: {
-                NavigationStack {
-                    VStack {
-                        Standalone3DSWidget(
-                            config: .init(token: viewModel.token3DS),
-                            loadingDelegate: viewModel) { result in
-                                switch result {
-                                case let .success(result):
-                                    viewModel.handleStandalone3dsEvent(result)
-                                case let .failure(error):
-                                    viewModel.alertMessage = error.customMessage
-                                    viewModel.showAlert = true
-                                }
-                            }
-                        .navigationTitle("3DS Check")
-                        .navigationBarTitleDisplayMode(.inline)
-                    }
-                }
-                // Sheet content is presented in its own modal container above the checkout view,
-                // so the root-level ActivityIndicatorModifier doesn't reach it. Re-apply here so
-                // `viewModel.isLoading` (driven by the widget's loadingDelegate) shows the custom
-                // loader on top of the sheet while the 3DS challenge is in flight.
-                .modifier(ActivityIndicatorModifier(isLoading: viewModel.isLoading))
+            .sheet(isPresented: $viewModel.showStandalone3dsWebView, onDismiss: {
+                viewModel.standalone3dsSheetDidDismiss()
+            }, content: {
+                Standalone3DSCheckoutSheet(viewModel: viewModel)
             })
             .onAppear {
                 loadProfileData()

@@ -135,6 +135,15 @@ class EnhancedCheckoutVM: ObservableObject {
     @Published var showStandalone3dsWebView = false
     @Published var showMastercardWebView = false
 
+    // Standalone 3DS sheet state
+    @Published private(set) var standalone3dsPhase: Standalone3DSPhase = .preparing
+    /// Set once `verifying` has taken longer than `standalone3dsSlowAfter`.
+    @Published private(set) var standalone3dsIsSlow = false
+    /// Whether a challenge page was announced for the current attempt (keeps the sheet expanded while finalizing).
+    @Published private(set) var standalone3dsChallengeMounted = false
+    /// Suppresses the SDK's built-in overlay — the sheet's phase overlay is the only loader.
+    let standalone3dsLoadingDelegate = SilentWidgetLoadingDelegate()
+
     var alertTitle = ""
     var alertMessage = ""
     var viewState: ViewState?
@@ -232,7 +241,15 @@ class EnhancedCheckoutVM: ObservableObject {
 
     // MARK: - Private Properties
     private var vaultToken = ""
-    private(set) var token3DS = ""
+    @Published private(set) var token3DS = ""
+    /// Incremented per standalone 3DS attempt so late responses from a cancelled attempt are ignored.
+    private var standalone3dsAttempt = 0
+    /// Charge 3DS id to capture once the sheet has been dismissed after a successful authentication.
+    private var pendingStandalone3dsCaptureId: String?
+    private var standalone3dsSlowTask: Task<Void, Never>?
+    private var standalone3dsAutoDismissTask: Task<Void, Never>?
+    private let standalone3dsSlowAfter: Duration = .seconds(8)
+    private let standalone3dsAutoDismissAfter: Duration = .seconds(2.5)
 
     // MARK: - Gateway IDs
     let mpgsGatewayId = ProjectEnvironment.shared.getMPGSGatewayId() ?? ""
@@ -844,7 +861,19 @@ extension EnhancedCheckoutVM {
         }
     }
 
+    /// Opens the 3DS sheet in `preparing` and creates a new standalone 3DS token (tokens are single-use).
     private func attemptStandalone3dsTokenCreation() {
+        standalone3dsAttempt += 1
+        let attempt = standalone3dsAttempt
+        isLoading = false
+        viewState?.setState(.none)
+        token3DS = ""
+        pendingStandalone3dsCaptureId = nil
+        standalone3dsAutoDismissTask?.cancel()
+        standalone3dsChallengeMounted = false
+        setStandalone3dsPhase(.preparing)
+        showStandalone3dsWebView = true
+
         Task {
             let request = DataStandalone3ds.Standalone3DSReq(
                 amount: cartManager.stringTotal,
@@ -873,12 +902,16 @@ extension EnhancedCheckoutVM {
             )
             do {
                 let response = try await standalone3dsService.createStandalone3DSToken(request: request, apiAccessToken: apiAccessToken)
-                self.isLoading = false
-                self.viewState?.setState(.none)
-                self.token3DS = response ?? ""
-                self.showStandalone3dsWebView = true
+                guard attempt == standalone3dsAttempt else { return }
+                guard let response, !response.isEmpty else {
+                    setStandalone3dsPhase(.failed(message: "Error creating standalone 3DS token!"))
+                    return
+                }
+                token3DS = response
+                setStandalone3dsPhase(.verifying)
             } catch {
-                showResultOverlay(success: false, message: "Error creating standalone 3DS token!")
+                guard attempt == standalone3dsAttempt else { return }
+                setStandalone3dsPhase(.failed(message: "Error creating standalone 3DS token!"))
             }
         }
     }
@@ -922,27 +955,107 @@ extension EnhancedCheckoutVM {
         }
     }
 
-    /// Handles the outcome of standlone  3DS WebView check
+    /// Handles the outcome of standalone 3DS WebView check. Intermediate phases are driven by
+    /// `handleStandalone3dsProgress(_:)`; only the final events are handled here.
     /// Note: This method is @MainActor, so it will execute on main thread even if called from non-isolated context
     func handleStandalone3dsEvent(_ event: Standalone3DSResult) {
         Task {
+            guard !standalone3dsPhase.isTerminal else { return }
             switch event.event {
             case .chargeAuthSuccess:
-                self.showStandalone3dsWebView = false
-                self.captureChargeForStandalone(id3ds: event.charge3dsId)
+                pendingStandalone3dsCaptureId = event.charge3dsId
+                setStandalone3dsPhase(.success)
+                standalone3dsAutoDismissTask = Task { [weak self, standalone3dsAutoDismissAfter] in
+                    try? await Task.sleep(for: standalone3dsAutoDismissAfter)
+                    guard !Task.isCancelled else { return }
+                    self?.showStandalone3dsWebView = false
+                }
             case .chargeAuthReject:
-                self.showStandalone3dsWebView = false
-                self.showResultOverlay(success: false, message: "Standalone 3DS auth rejected!")
-            case .chargeAuthChallenge:
-                break
-            case .chargeAuthDecoupled:
-                break
-            case .chargeAuthInfo:
-                break
+                setStandalone3dsPhase(.failed(message: "Your bank declined the authentication for this payment.", declined: true))
             case .chargeError:
-                self.showStandalone3dsWebView = false
-                self.showResultOverlay(success: false, message: "Standalone 3DS auth error!")
+                setStandalone3dsPhase(.failed(message: "An unexpected error interrupted the authentication."))
+            case .chargeAuthChallenge, .chargeAuthDecoupled, .chargeAuthInfo:
+                break
             }
+        }
+    }
+
+    /// Drives the sheet's phase from the widget's progress callback.
+    func handleStandalone3dsProgress(_ progress: Standalone3DSProgress) {
+        Task {
+            guard showStandalone3dsWebView, !standalone3dsPhase.isTerminal else { return }
+            switch progress {
+            case .challengeStarted:
+                standalone3dsChallengeMounted = true
+                setStandalone3dsPhase(.challengeLoading)
+            case .challengeLoaded:
+                if standalone3dsPhase == .challengeLoading {
+                    setStandalone3dsPhase(.challenge)
+                }
+            case .challengeCompleted:
+                switch standalone3dsPhase {
+                case .challengeLoading, .challenge, .decoupled:
+                    setStandalone3dsPhase(.finalizing)
+                default:
+                    break
+                }
+            case let .decoupled(_, description):
+                setStandalone3dsPhase(.decoupled(description: description))
+            }
+        }
+    }
+
+    func handleStandalone3dsFailure(_ error: Standalone3DSError) {
+        Task {
+            guard !standalone3dsPhase.isTerminal else { return }
+            setStandalone3dsPhase(.failed(message: error.customMessage))
+        }
+    }
+
+    /// "Try again": drops the used token and creates a new 3DS token/charge.
+    func retryStandalone3ds() {
+        attemptStandalone3dsTokenCreation()
+    }
+
+    /// Close button. After a successful authentication this just dismisses early — the capture still runs.
+    func closeStandalone3ds() {
+        if standalone3dsPhase != .success {
+            pendingStandalone3dsCaptureId = nil
+        }
+        showStandalone3dsWebView = false
+    }
+
+    /// Sheet dismissed (close button, swipe or auto-dismiss): tears the widget down, then captures if verified.
+    func standalone3dsSheetDidDismiss() {
+        standalone3dsAttempt += 1
+        standalone3dsSlowTask?.cancel()
+        standalone3dsAutoDismissTask?.cancel()
+        token3DS = ""
+        standalone3dsChallengeMounted = false
+        standalone3dsIsSlow = false
+        standalone3dsPhase = .preparing
+        viewState?.setState(.none)
+
+        if let id3ds = pendingStandalone3dsCaptureId {
+            pendingStandalone3dsCaptureId = nil
+            captureChargeForStandalone(id3ds: id3ds)
+        }
+    }
+
+    private func setStandalone3dsPhase(_ phase: Standalone3DSPhase) {
+        standalone3dsPhase = phase
+        standalone3dsSlowTask?.cancel()
+        standalone3dsIsSlow = false
+        if phase == .verifying {
+            standalone3dsSlowTask = Task { [weak self, standalone3dsSlowAfter] in
+                try? await Task.sleep(for: standalone3dsSlowAfter)
+                guard !Task.isCancelled else { return }
+                self?.standalone3dsIsSlow = true
+            }
+        }
+        if phase.isTerminal {
+            // Tokens are single-use: tear the widget down once the authentication has ended.
+            token3DS = ""
         }
     }
 }
