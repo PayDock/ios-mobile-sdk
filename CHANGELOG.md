@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [4.9.0] - 2026-09-30
 
 ### Added
 - `Standalone3DSWidget` gains an optional `onProgress: ((Standalone3DSProgress) -> Void)?` init parameter that
@@ -10,6 +10,8 @@
 - `Standalone3DSResult` exposes optional `status: String?` (raw authentication status reported by the web SDK) and
   `resultDescription: String?` (the web SDK's `result.description`, typically only on frictionless / first-step
   results), for parity with the web `Canvas3ds` event payloads. Additive — no migration needed.
+- See the updated [Standalone 3DS guide](https://github.com/PayDock/mobile-sdk-doc/blob/main/widgets/standalone3ds.md#ios)
+  for `onProgress`, the new loading behaviour and a recommended integration pattern.
 
 ### Changed
 - Updated Client-SDK to `v1.147.0` — faster standalone 3DS authentication
@@ -22,6 +24,11 @@
   when the error carries no charge 3DS id, the last id seen in the session (or `""`) is used.
 - `Standalone3DSWidget` now delivers `chargeAuthInfo` (whose payload has no charge 3DS id) instead of failing with
   `.mappingFailed`, and ignores unknown web events instead of failing the flow.
+
+## [4.8.0] - 2026-09-30
+
+### Changed
+- Updated Client-SDK to `v1.145.0`
 
 ## [4.7.0] - 2026-09-23
 
