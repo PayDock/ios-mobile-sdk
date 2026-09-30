@@ -26,6 +26,7 @@
 		283825892CBFDC42005BE050 /* PayPalVaultExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283825882CBFDC32005BE050 /* PayPalVaultExampleView.swift */; };
 		28386A902E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28386A8F2E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift */; };
 		28386A922E9DB22C00D941DC /* CheckoutResultOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28386A912E9DB22C00D941DC /* CheckoutResultOverlay.swift */; };
+		3D5A1E012F10000000C0FFEE /* Standalone3DSCheckoutSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5A1E022F10000000C0FFEE /* Standalone3DSCheckoutSheet.swift */; };
 		2838F0472ACEF584006B23E2 /* ApplePayExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2838F0462ACEF584006B23E2 /* ApplePayExampleVM.swift */; };
 		28552E6E2CCBB073004C93CA /* PayPalVaultExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28552E6D2CCBB068004C93CA /* PayPalVaultExampleVM.swift */; };
 		285C14342E95D7A8007ECC80 /* GiftCardEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 285C13F62E95D7A8007ECC80 /* GiftCardEntryView.swift */; };
@@ -209,6 +210,7 @@
 		283825882CBFDC32005BE050 /* PayPalVaultExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultExampleView.swift; sourceTree = "<group>"; };
 		28386A8F2E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentAndReviewStepView.swift; sourceTree = "<group>"; };
 		28386A912E9DB22C00D941DC /* CheckoutResultOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutResultOverlay.swift; sourceTree = "<group>"; };
+		3D5A1E022F10000000C0FFEE /* Standalone3DSCheckoutSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Standalone3DSCheckoutSheet.swift; sourceTree = "<group>"; };
 		2838F0462ACEF584006B23E2 /* ApplePayExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayExampleVM.swift; sourceTree = "<group>"; };
 		28552E6D2CCBB068004C93CA /* PayPalVaultExampleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayPalVaultExampleVM.swift; sourceTree = "<group>"; };
 		285C13F32E95D7A8007ECC80 /* CartItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemRowView.swift; sourceTree = "<group>"; };
@@ -559,6 +561,7 @@
 				285C141D2E95D7A8007ECC80 /* EnhancedCheckoutVM.swift */,
 				28386A8F2E9D9EB300D941DC /* CheckoutPaymentAndReviewStepView.swift */,
 				28386A912E9DB22C00D941DC /* CheckoutResultOverlay.swift */,
+				3D5A1E022F10000000C0FFEE /* Standalone3DSCheckoutSheet.swift */,
 			);
 			path = Checkout;
 			sourceTree = "<group>";
@@ -1240,6 +1243,7 @@
 				28552E6E2CCBB073004C93CA /* PayPalVaultExampleVM.swift in Sources */,
 				28E34C682DD4D7D800A356A0 /* ColesPayExampleVM.swift in Sources */,
 				28386A922E9DB22C00D941DC /* CheckoutResultOverlay.swift in Sources */,
+				3D5A1E012F10000000C0FFEE /* Standalone3DSCheckoutSheet.swift in Sources */,
 				28E34C692DD4D7D800A356A0 /* ColesPayExampleView.swift in Sources */,
 				2838F0472ACEF584006B23E2 /* ApplePayExampleVM.swift in Sources */,
 				28D8BA632E00706900EDD422 /* ResetConfirmationModifier.swift in Sources */,

@@ -2,8 +2,26 @@
 
 ## [Unreleased]
 
+### Added
+- `Standalone3DSWidget` gains an optional `onProgress: ((Standalone3DSProgress) -> Void)?` init parameter that
+  reports intermediate progress of the authentication: `challengeStarted`, `challengeLoaded` (with a
+  `ChallengeLoadedReason`), `challengeCompleted` (with a `ChallengeCompletedSource`) and `decoupled` (with the
+  issuer's shopper-facing `description`). `completion` is unchanged and keeps receiving the same events as before.
+- `Standalone3DSResult` exposes optional `status: String?` (raw authentication status reported by the web SDK) and
+  `resultDescription: String?` (the web SDK's `result.description`, typically only on frictionless / first-step
+  results), for parity with the web `Canvas3ds` event payloads. Additive — no migration needed.
+
 ### Changed
-- Updated Client-SDK to `v1.145.0` (staging `v1.145.0-beta`)
+- Updated Client-SDK to `v1.147.0` — faster standalone 3DS authentication
+- `Standalone3DSWidget` loading now covers the whole challenge: the built-in overlay (or `loadingDidStart`/`Finish` on
+  your `loadingDelegate` — you own the UI) runs from appearance until the bank's challenge page has loaded, and again
+  while the result is confirmed. Decoupled ends it; `chargeAuthInfo` leaves it unchanged. Calls are always balanced.
+
+### Fixed
+- `Standalone3DSWidget` now delivers web `error` events as `.chargeError` instead of failing with `.mappingFailed`;
+  when the error carries no charge 3DS id, the last id seen in the session (or `""`) is used.
+- `Standalone3DSWidget` now delivers `chargeAuthInfo` (whose payload has no charge 3DS id) instead of failing with
+  `.mappingFailed`, and ignores unknown web events instead of failing the flow.
 
 ## [4.7.0] - 2026-09-23
 

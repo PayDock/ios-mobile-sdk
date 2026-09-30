@@ -123,6 +123,305 @@ class Standalone3DSTests: XCTestCase {
         }
     }
 
+    // MARK: - Error event
+
+    func testUserContentController_mapsErrorEventToChargeError() {
+        coordinator.handleMessage(["event": "error", "charge3dsId": "chargeId"])
+
+        if case .success(let result) = receivedResult {
+            XCTAssertEqual(result.event, .chargeError)
+            XCTAssertEqual(result.charge3dsId, "chargeId")
+        } else {
+            XCTFail("Expected chargeError result")
+        }
+    }
+
+    func testUserContentController_errorWithoutId_usesLastSeenChargeId() {
+        coordinator.handleMessage(["event": "chargeAuthChallenge", "charge3dsId": "chargeId", "status": "pending"])
+        coordinator.handleMessage(["event": "error"])
+
+        if case .success(let result) = receivedResult {
+            XCTAssertEqual(result.event, .chargeError)
+            XCTAssertEqual(result.charge3dsId, "chargeId")
+        } else {
+            XCTFail("Expected chargeError result")
+        }
+    }
+
+    func testUserContentController_errorWithoutAnyId_usesEmptyChargeId() {
+        coordinator.handleMessage(["event": "error"])
+
+        if case .success(let result) = receivedResult {
+            XCTAssertEqual(result.event, .chargeError)
+            XCTAssertEqual(result.charge3dsId, "")
+        } else {
+            XCTFail("Expected chargeError result")
+        }
+    }
+
+    func testUserContentController_infoWithoutId_isDeliveredNotMappingFailure() {
+        coordinator.handleMessage(["event": "chargeAuthInfo"])
+
+        if case .success(let result) = receivedResult {
+            XCTAssertEqual(result.event, .chargeAuthInfo)
+            XCTAssertEqual(result.charge3dsId, "")
+        } else {
+            XCTFail("Expected chargeAuthInfo result")
+        }
+    }
+
+    func testUserContentController_ignoresUnknownEvent() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthSomethingNew", "charge3dsId": "chargeId"])
+
+        XCTAssertTrue(recorder.results.isEmpty)
+        XCTAssertTrue(recorder.progress.isEmpty)
+        XCTAssertTrue(recorder.coordinator.isLoading)
+    }
+
+    // MARK: - Status / resultDescription
+
+    func testResult_successCarriesStatusAndDescription() {
+        coordinator.handleMessage([
+            "event": "chargeAuthSuccess", "charge3dsId": "chargeId", "status": "success", "description": "frictionless"
+        ])
+
+        if case .success(let result) = receivedResult {
+            XCTAssertEqual(result.event, .chargeAuthSuccess)
+            XCTAssertEqual(result.charge3dsId, "chargeId")
+            XCTAssertEqual(result.status, "success")
+            XCTAssertEqual(result.resultDescription, "frictionless")
+        } else {
+            XCTFail("Expected success result")
+        }
+    }
+
+    func testResult_challengeOutcomeCarriesStatusWithoutDescription() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallenge", "charge3dsId": "chargeId", "status": "pending"])
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallengeLoaded", "charge3dsId": "chargeId", "reason": "load"])
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallengeCompleted", "charge3dsId": "chargeId", "source": "poll"])
+        recorder.coordinator.handleMessage(["event": "chargeAuthReject", "charge3dsId": "chargeId", "status": "rejected"])
+
+        let results = recorder.results.compactMap { try? $0.get() }
+        XCTAssertEqual(results.map(\.event), [.chargeAuthChallenge, .chargeAuthReject])
+        XCTAssertEqual(results.map(\.status), ["pending", "rejected"])
+        XCTAssertEqual(results.map(\.resultDescription), [nil, nil])
+        XCTAssertEqual(results.map(\.charge3dsId), ["chargeId", "chargeId"])
+    }
+
+    func testResult_missingOrEmptyStatusAndDescriptionAreNil() {
+        let bodies: [[String: Any]] = [
+            ["event": "chargeAuthSuccess", "charge3dsId": "chargeId"],
+            ["event": "chargeAuthSuccess", "charge3dsId": "chargeId", "status": "", "description": ""],
+            ["event": "chargeAuthSuccess", "charge3dsId": "chargeId", "status": 1, "description": NSNull()]
+        ]
+        for body in bodies {
+            receivedResult = nil
+            coordinator.handleMessage(body)
+
+            guard case .success(let result) = receivedResult else {
+                XCTFail("Expected success result")
+                continue
+            }
+            XCTAssertEqual(result.event, .chargeAuthSuccess)
+            XCTAssertEqual(result.charge3dsId, "chargeId")
+            XCTAssertNil(result.status)
+            XCTAssertNil(result.resultDescription)
+        }
+    }
+
+    func testResult_errorAndInfoCarryStatusAndKeepExistingFields() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthInfo", "status": "pending", "description": "frictionless"])
+        recorder.coordinator.handleMessage(["event": "error", "charge3dsId": "chargeId", "status": "error"])
+
+        let results = recorder.results.compactMap { try? $0.get() }
+        XCTAssertEqual(results.map(\.event), [.chargeAuthInfo, .chargeError])
+        XCTAssertEqual(results.map(\.charge3dsId), ["", "chargeId"])
+        XCTAssertEqual(results.map(\.status), ["pending", "error"])
+        XCTAssertEqual(results.map(\.resultDescription), ["frictionless", nil])
+    }
+
+    func testResult_decoupledProgressDescriptionUnchanged() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage([
+            "event": "chargeAuthDecoupled", "charge3dsId": "chargeId", "status": "pending", "description": "Approve in app"
+        ])
+
+        XCTAssertEqual(recorder.progress, [.decoupled(charge3dsId: "chargeId", description: "Approve in app")])
+        let result = try? recorder.results.first?.get()
+        XCTAssertEqual(result?.status, "pending")
+        XCTAssertEqual(result?.resultDescription, "Approve in app")
+    }
+
+    // MARK: - Progress
+
+    func testProgress_challengeStarted() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallenge", "charge3dsId": "chargeId", "status": "pending"])
+
+        XCTAssertEqual(recorder.progress, [.challengeStarted(charge3dsId: "chargeId")])
+        XCTAssertEqual(recorder.events, [.chargeAuthChallenge])
+    }
+
+    func testProgress_challengeLoadedReasons() {
+        let cases: [(String?, Standalone3DSProgress.ChallengeLoadedReason)] = [
+            ("load", .load), ("timeout", .timeout), ("somethingElse", .unknown), (nil, .unknown)
+        ]
+        for (raw, expected) in cases {
+            let recorder = makeRecordingCoordinator()
+            var body: [String: Any] = ["event": "chargeAuthChallengeLoaded", "charge3dsId": "chargeId"]
+            body["reason"] = raw
+
+            recorder.coordinator.handleMessage(body)
+
+            XCTAssertEqual(recorder.progress, [.challengeLoaded(charge3dsId: "chargeId", reason: expected)])
+            XCTAssertTrue(recorder.results.isEmpty, "chargeAuthChallengeLoaded must not reach completion")
+        }
+    }
+
+    func testProgress_challengeCompletedSources() {
+        let cases: [(String?, Standalone3DSProgress.ChallengeCompletedSource)] = [
+            ("poll", .poll), ("callback", .callback), ("somethingElse", .unknown), (nil, .unknown)
+        ]
+        for (raw, expected) in cases {
+            let recorder = makeRecordingCoordinator()
+            var body: [String: Any] = ["event": "chargeAuthChallengeCompleted"]
+            body["source"] = raw
+
+            recorder.coordinator.handleMessage(body)
+
+            XCTAssertEqual(recorder.progress, [.challengeCompleted(charge3dsId: nil, source: expected)])
+            XCTAssertTrue(recorder.results.isEmpty, "chargeAuthChallengeCompleted must not reach completion")
+        }
+    }
+
+    func testProgress_decoupledCarriesDescription() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage([
+            "event": "chargeAuthDecoupled", "charge3dsId": "chargeId", "status": "pending", "description": "Approve in app"
+        ])
+        recorder.coordinator.handleMessage(["event": "chargeAuthDecoupled", "charge3dsId": "chargeId"])
+
+        XCTAssertEqual(recorder.progress, [
+            .decoupled(charge3dsId: "chargeId", description: "Approve in app"),
+            .decoupled(charge3dsId: "chargeId", description: nil)
+        ])
+        XCTAssertEqual(recorder.events, [.chargeAuthDecoupled, .chargeAuthDecoupled])
+    }
+
+    func testProgress_notEmittedForFinalEvents() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthInfo"])
+        recorder.coordinator.handleMessage(["event": "chargeAuthSuccess", "charge3dsId": "chargeId"])
+
+        XCTAssertTrue(recorder.progress.isEmpty)
+        XCTAssertEqual(recorder.events, [.chargeAuthInfo, .chargeAuthSuccess])
+    }
+
+    // MARK: - Loading sequencing
+
+    func testLoading_frictionless() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthInfo"])
+        XCTAssertEqual(recorder.loading.calls, [.start], "chargeAuthInfo must not change loading state")
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthSuccess", "charge3dsId": "chargeId"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish])
+    }
+
+    func testLoading_challenge() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallenge", "charge3dsId": "chargeId"])
+        XCTAssertEqual(recorder.loading.calls, [.start], "Loading stays up until the challenge page has loaded")
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallengeLoaded", "charge3dsId": "chargeId", "reason": "load"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish])
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallengeCompleted", "charge3dsId": "chargeId", "source": "poll"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish, .start])
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthReject", "charge3dsId": "chargeId"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish, .start, .finish])
+        XCTAssertEqual(recorder.events, [.chargeAuthChallenge, .chargeAuthReject])
+    }
+
+    func testLoading_decoupled() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthDecoupled", "charge3dsId": "chargeId"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish])
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallengeCompleted", "charge3dsId": "chargeId", "source": "callback"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish, .start])
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthSuccess", "charge3dsId": "chargeId"])
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish, .start, .finish])
+    }
+
+    func testLoading_errorAfterChallengeFinishesOnce() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallenge", "charge3dsId": "chargeId"])
+        recorder.coordinator.handleMessage(["event": "chargeAuthChallengeLoaded", "charge3dsId": "chargeId", "reason": "timeout"])
+        recorder.coordinator.handleMessage(["event": "error"])
+        recorder.coordinator.handleMessage(["event": "error"])
+
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish], "Start/finish must stay balanced")
+    }
+
+    func testLoading_mappingFailureFinishes() {
+        let recorder = makeRecordingCoordinator()
+
+        recorder.coordinator.handleMessage(["invalid": "data"])
+
+        XCTAssertEqual(recorder.loading.calls, [.start, .finish])
+        XCTAssertFalse(recorder.coordinator.isLoading)
+    }
+
+    // MARK: - Helpers
+
+    enum LoadingCall { case start, finish }
+
+    final class LoadingRecorder: WidgetLoadingDelegate {
+        private(set) var calls: [LoadingCall] = []
+        func loadingDidStart() { calls.append(.start) }
+        func loadingDidFinish() { calls.append(.finish) }
+    }
+
+    @MainActor
+    final class Recorder {
+        let loading = LoadingRecorder()
+        var results: [Result<Standalone3DSResult, Standalone3DSError>] = []
+        var progress: [Standalone3DSProgress] = []
+        var coordinator: Standalone3DSWidget.Coordinator!
+
+        var events: [Standalone3DSResult.EventType] {
+            results.compactMap { try? $0.get().event }
+        }
+    }
+
+    /// Coordinator wired to a recording loading delegate, already loading as it is after `makeUIView`.
+    func makeRecordingCoordinator() -> Recorder {
+        let recorder = Recorder()
+        recorder.coordinator = Standalone3DSWidget.Coordinator(
+            completion: { [unowned recorder] in recorder.results.append($0) },
+            loadingDelegate: recorder.loading,
+            onProgress: { [unowned recorder] in recorder.progress.append($0) })
+        recorder.coordinator.notifyLoadingStart()
+        return recorder
+    }
+
     // Helper function to create a WKScriptMessage-like object
     func createMockScriptMessage(body: Any) -> WKScriptMessage {
         class MockScriptMessage: WKScriptMessage {
