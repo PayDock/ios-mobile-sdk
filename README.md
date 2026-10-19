@@ -48,7 +48,7 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 
 1.  **Environments:** The sample app supports three environments: `Staging`, `Sandbox` and `Production`. You'll need to provide values for each environment.
 2.  **Location:** Files are already created and are located in the `ExampleApp/Configs/` directory of the project.
-3.  **Structure:** The `*.xcconfig` file should contain key-value pairs for each configuration setting.
+3.  **Structure:** The `*.xcconfig` file should contain key-value pairs for each configuration setting. Keep the first line, `#include "Version.xcconfig"`: it provides the app version, and without it builds get an empty version.
 4.  **Required Fields:** The following fields are used in the `config.properties` file:
 
 *   **`ACCESS_TOKEN_API`:** The Paydock API access token for the specified environment (e.g., Sandbox, Staging, Production). This token is used by the sample app to make direct calls to the Paydock API for tasks like creating customers or managing transactions.
@@ -67,6 +67,8 @@ The files are `Staging.xcconfig`, `Sandbox.xcconfig`, and `Production.xcconfig`
 
 **Example `*.xcconfig`:**
 ```
+#include "Version.xcconfig"
+
 // Authentication
 ACCESS_TOKEN_API=your_api_access_token
 ACCESS_TOKEN_WIDGET=your_widget_access_token
