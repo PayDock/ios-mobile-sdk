@@ -10,7 +10,7 @@ The Paydock **iOS MobileSDK** — a Swift Package Manager package (product `Mobi
 
 ## Toolchain & setup
 
-- **swift-tools-version 5.7.1** (`Package.swift`); build with a current stable Xcode / Swift 5.7.1+ toolchain.
+- **swift-tools-version 5.9** (`Package.swift`), required by the `package` access the internal `PaydockTelemetry` target uses; build with Xcode 15 or later (Swift 5.9+). The language mode stays Swift 5. The nested per-target manifests stay at 5.7.1, except `PaydockTelemetry/Package.swift` (5.9).
 - Run `make setup` once after cloning — it invokes `scripts/ensure-validation.sh`, which installs the git `pre-commit` / `pre-push` hooks that enforce branch naming (see Conventions). `make status` shows hook state; `make clean-hooks` removes them.
 - `Gemfile` + `fastlane/` back CI release automation (GitLab CI, `.gitlab-ci.yml`); not needed for local dev.
 
@@ -21,11 +21,12 @@ swift build                                   # build all SPM targets
 swift test                                    # run all module + SDK tests
 swift test --filter DataChargesTests          # single module test bundle
 swift test --filter MobileSDKTests            # core SDK tests
+cd PaydockTelemetry && swift test             # the telemetry target on its own
 make validate-branch                          # check the current branch name
 ```
 
 - **SwiftLint** runs automatically as an SPM build-tool plugin (`SwiftLintBuildToolPlugin` from the `SwiftLintPlugins` package) on the `MobileSDK` and `MobileSDKTests` targets, so `swift build`/`swift test` lint as they compile. Config is `.swiftlint.yml`.
-- Test-bundle filter names match the target names in `Package.swift`: `CommonModelsTests`, `DataGatewaysTests`, `DataPaymentSourcesTests`, `DataChargesTests`, `DataCustomerTests`, `DataVaultTests`, `DataMPGS3dsTests`, `DataStandalone3dsTests`, `BinProcessingTests`, `MobileSDKTests`.
+- Test-bundle filter names match the target names in `Package.swift`: `CommonModelsTests`, `DataGatewaysTests`, `DataPaymentSourcesTests`, `DataChargesTests`, `DataCustomerTests`, `DataVaultTests`, `DataMPGS3dsTests`, `DataStandalone3dsTests`, `BinProcessingTests`, `PaydockTelemetryTests`, `MobileSDKTests`.
 
 ### Running the ExampleApp (sample app)
 
@@ -51,6 +52,7 @@ The package is a **multi-target SPM layout**: one core UI target plus several pe
 **Support targets:**
 - **`CommonModels`** — small shared Codable types reused by multiple Data\* modules.
 - **`BinProcessing`** — standalone target (no other package deps) for card-scheme detection from BIN ranges; ships an offline `Resources/JSON/card-schemes.json` and a refresh coordinator that `configureMobileSDK` starts at init (`BinDataRefreshCoordinator`, `CardSchemeDetector`).
+- **`PaydockTelemetry`** — internal telemetry target (path `PaydockTelemetry/Sources/PaydockTelemetry`, standalone manifest for `cd PaydockTelemetry && swift test`): the `Telemetry` facade, `TelemetryRuntime`, `NoOpTelemetry`, `TelemetryLevel`, `TelemetryEvent` and `TelemetryIntent`. A dependency of `MobileSDK`, never a product; every declaration uses `package` access, so nothing reaches the public interface. Dormant until activation (MD-33): nothing imports or binds it yet. Guarded by `PackageOnlyTests` (package access only) and `TelemetrySeamTests` in `MobileSDKTests` (SDK code refers only to the facade and `TelemetryEvent`).
 
 **Third-party SDK deps** wired into the core `MobileSDK` target (all pinned `exact` in `Package.swift`): `Afterpay` (afterpay/sdk-ios `5.9.0`), and `FraudProtection` / `PaymentButtons` / `PayPalWebPayments` (paypal/paypal-ios `2.0.1`). SwiftLint tooling comes from `SimplyDanny/SwiftLintPlugins` `0.59.1`.
 

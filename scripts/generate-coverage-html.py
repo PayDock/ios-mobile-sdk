@@ -318,7 +318,7 @@ def generate_html_report(coverage_data, output_dir):
             continue
             
         # Filter to only include our SDK target
-        if not any(name in target_name for name in ['MobileSDK', 'Sources']):
+        if not any(name in target_name for name in ['MobileSDK', 'Sources', 'PaydockTelemetry']):
             continue
         
         files = target.get('files', [])

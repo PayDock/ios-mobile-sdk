@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7.1
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -175,6 +175,18 @@ let package = Package(
             path: "BinProcessing/Tests/BinProcessingTests"
         ),
 
+        // Internal telemetry (dormant until activation, MD-33); not a product, its declarations use package access
+        .target(
+            name: "PaydockTelemetry",
+            dependencies: [],
+            path: "PaydockTelemetry/Sources/PaydockTelemetry"
+        ),
+        .testTarget(
+            name: "PaydockTelemetryTests",
+            dependencies: ["PaydockTelemetry"],
+            path: "PaydockTelemetry/Tests/PaydockTelemetryTests"
+        ),
+
         // Main SDK target
         .target(
             name: "MobileSDK",
@@ -188,6 +200,7 @@ let package = Package(
                 "DataMPGS3ds",
                 "DataStandalone3ds",
                 "BinProcessing",
+                "PaydockTelemetry",
                 .product(name: "Afterpay", package: "sdk-ios"),
                 .product(name: "NetworkingLib", package: "ios-core-networking"),
                 .product(name: "FraudProtection", package: "paypal-ios"),

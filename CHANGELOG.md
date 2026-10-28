@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- The package now declares `swift-tools-version: 5.9`, so resolving it needs Xcode 15 or later. No API or behaviour change.
+
 ## [4.9.0] - 2026-09-30
 
 ### Added
