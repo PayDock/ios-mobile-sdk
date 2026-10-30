@@ -2,8 +2,23 @@
 
 ## [Unreleased]
 
+### Added
+- `Standalone3DSError` exposes `charge3dsId`, `inBackground` and `failingHost` (host only, no path or query) for
+  `webViewFailed` errors raised by `Standalone3DSWidget`, so a failed session can be looked up in Paydock and its cause
+  told apart. They're read from the carried `NSError`'s `userInfo` (`Standalone3DSError.ContextKey`). Additive — the
+  error cases are unchanged, so existing `switch` statements keep compiling.
+
 ### Changed
 - The package now declares `swift-tools-version: 5.9`, so resolving it needs Xcode 15 or later. No API or behaviour change.
+- Client-SDK version to `v1.150.0` — the standalone 3DS result poll now times out hung requests and polls again as soon
+  as the app returns to the foreground or the network comes back.
+
+### Fixed
+- `Standalone3DSWidget` no longer waits forever on a blank page when iOS terminates the page's web content process
+  (typically to reclaim memory while the shopper is in their banking app). The flow ends with `webViewFailed`
+  carrying `WKError.webContentProcessTerminated`, and the page isn't reloaded (that would restart 3DS on the same token).
+- `Standalone3DSWidget` no longer waits forever when the Client SDK script fails to load (network error or HTTP error
+  response). The flow ends with `webViewFailed` in `Standalone3DSError.errorDomain` (`clientSdkLoadFailed`).
 
 ## [4.9.0] - 2026-09-30
 

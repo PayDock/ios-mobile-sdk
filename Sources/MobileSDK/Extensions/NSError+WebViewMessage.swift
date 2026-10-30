@@ -24,6 +24,10 @@ extension NSError {
     /// - Parameter fallback: Message when error is not a known URL error (e.g. "Zip WebView widget has failed").
     /// - Returns: Specific message for known codes, or "\(fallback): \(localizedDescription)" when detail exists.
     public func webViewFailureMessage(fallback: String) -> String {
+        // WKError.webContentProcessTerminated: iOS stopped the page's process, typically to reclaim memory in the background
+        if domain == "WKErrorDomain" && code == 2 {
+            return "The page stopped unexpectedly. Please try again."
+        }
         if domain == NSURLErrorDomain {
             switch code {
             case NSURLErrorTimedOut:
