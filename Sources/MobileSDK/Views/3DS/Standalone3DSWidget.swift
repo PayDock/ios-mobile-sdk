@@ -13,6 +13,8 @@ private enum Standalone3DSWebEvent {
     static let challengeLoaded = "chargeAuthChallengeLoaded"
     static let challengeCompleted = "chargeAuthChallengeCompleted"
     static let error = "error"
+    /// Posted by the page itself (not the web SDK) when the Client SDK script fails to load.
+    static let clientSdkLoadFailed = "clientSdkLoadFailed"
 }
 
 /// Optional informational fields carried by a final web event.
@@ -114,14 +116,20 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         guard let webView = view.subviews.first(where: { $0 is WKWebView }) as? WKWebView else {
             return
         }
-        if !context.coordinator.isLoaded {
+        // Once the session has ended (e.g. the page's process was terminated) the page must not be loaded again:
+        // that would restart the 3DS flow on the same token.
+        if !context.coordinator.isLoaded && !context.coordinator.hasEnded {
             let html = Standalone3DSWidget.html(config.token)
             webView.loadHTMLString(html, baseURL: URL(string: "https://paydock.com"))
         }
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(completion: completion, loadingDelegate: loadingDelegate, onProgress: onProgress)
+        .init(completion: completion,
+              loadingDelegate: loadingDelegate,
+              onProgress: onProgress,
+              charge3dsId: base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self)?.resolvedCharge3dsId,
+              clientSdkHost: URL(string: Constants.clientSdkUrlString)?.host)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
@@ -134,13 +142,28 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         private(set) var isLoading = false
         /// Last non-empty charge 3DS id received, used when an event arrives without one (e.g. `error`).
         private var lastCharge3dsId: String?
+        /// Charge 3DS id read from the token, used to label failures that happen before any event.
+        private let tokenCharge3dsId: String?
+        /// Host of the Client SDK script, reported when it fails to load.
+        private let clientSdkHost: String?
+        /// Test seam for the app's background state; `nil` reads `UIApplication`.
+        private let isAppInBackground: (() -> Bool)?
+        /// Set once the page can no longer progress (its process was terminated or the Client SDK script failed):
+        /// the failure is reported once and the page is never loaded again.
+        private(set) var hasEnded = false
 
         init(completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void,
              loadingDelegate: WidgetLoadingDelegate? = nil,
-             onProgress: ((Standalone3DSProgress) -> Void)? = nil) {
+             onProgress: ((Standalone3DSProgress) -> Void)? = nil,
+             charge3dsId: String? = nil,
+             clientSdkHost: String? = nil,
+             isAppInBackground: (() -> Bool)? = nil) {
             self.completion = completion
             self.loadingDelegate = loadingDelegate
             self.onProgress = onProgress
+            self.tokenCharge3dsId = charge3dsId
+            self.clientSdkHost = clientSdkHost
+            self.isAppInBackground = isAppInBackground
         }
 
         /// Notify whichever owner is driving the loading UI that a load just started.
@@ -200,6 +223,14 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                 onProgress?(.challengeCompleted(charge3dsId: charge3dsId, source: source))
             case Standalone3DSWebEvent.error:
                 handleEvent(.chargeError, charge3dsId: charge3dsId, details: details)
+            case Standalone3DSWebEvent.clientSdkLoadFailed:
+                var userInfo: [String: Any] = [
+                    NSLocalizedDescriptionKey: "Failed to load the payment page. Please try again later."
+                ]
+                userInfo[Standalone3DSError.ContextKey.failingHost] = clientSdkHost
+                endSession(with: NSError(domain: Standalone3DSError.errorDomain,
+                                         code: Standalone3DSError.ErrorCode.clientSdkLoadFailed.rawValue,
+                                         userInfo: userInfo))
             default:
                 // Unknown events (e.g. from a newer web SDK) are ignored so they never fail the flow.
                 guard let event = Standalone3DSResult.EventType(rawValue: eventRaw) else { return }
@@ -260,7 +291,40 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
             notifyLoadingFinish()
-            completion(.failure(.webViewFailed(error: nsError)))
+            completion(.failure(.webViewFailed(error: withContext(nsError))))
+        }
+
+        /**
+         iOS terminated the page's web content process — typically to reclaim memory while the app was in the
+         background (e.g. the shopper approving in their banking app). The page is blank from then on and no event
+         will ever arrive, so the session is ended with `webViewFailed` (`WKError.webContentProcessTerminated`)
+         instead of waiting forever. The page is not reloaded: that would restart 3DS on the same token.
+         **/
+        public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            endSession(with: NSError(domain: WKError.errorDomain,
+                                     code: WKError.Code.webContentProcessTerminated.rawValue))
+        }
+
+        /// Reports a failure the page can't recover from, once, and stops the page from being loaded again.
+        private func endSession(with error: NSError) {
+            guard !hasEnded else { return }
+            hasEnded = true
+            notifyLoadingFinish()
+            completion(.failure(.webViewFailed(error: withContext(error))))
+        }
+
+        /// Adds the session context (charge 3DS id, background state) to a WebView failure, keeping its domain, code
+        /// and existing `userInfo`.
+        private func withContext(_ error: NSError) -> NSError {
+            var userInfo = error.userInfo
+            userInfo[Standalone3DSError.ContextKey.charge3dsId] = lastCharge3dsId ?? tokenCharge3dsId
+            userInfo[Standalone3DSError.ContextKey.inBackground] = appInBackground()
+            return NSError(domain: error.domain, code: error.code, userInfo: userInfo)
+        }
+
+        private func appInBackground() -> Bool {
+            if let isAppInBackground { return isAppInBackground() }
+            return UIApplication.shared.applicationState == .background
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -280,7 +344,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
             notifyLoadingFinish()
-            completion(.failure(.webViewFailed(error: nsError)))
+            completion(.failure(.webViewFailed(error: withContext(nsError))))
         }
 
         public func webView(_ webView: WKWebView,
@@ -341,7 +405,18 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             </head>
             <body>
                 <div id="widget"></div>
-                <script src="\(clientSdkUrl)"></script>
+                <script>
+                    // The page can't progress without the Client SDK script: report a failed load (network error or
+                    // HTTP error response) instead of leaving the flow waiting with no event.
+                    function onClientSdkLoadFailed() {
+                        try {
+                            window.webkit.messageHandlers.PayDockMobileSDK.postMessage({ event: "clientSdkLoadFailed" });
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                </script>
+                <script src="\(clientSdkUrl)" onerror="onClientSdkLoadFailed()"></script>
                 <script>
                     var meta = document.createElement("meta");
                     meta.name = "viewport";

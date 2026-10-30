@@ -1,0 +1,7 @@
+// Single source of truth for the release version (SDK + ExampleApp).
+//
+// Change VERSION_NAME here when preparing a release (deploy/vX.Y.Z). Every ExampleApp build
+// configuration sets MARKETING_VERSION = $(VERSION_NAME), so do not edit the "Version" field in
+// Xcode's General tab: that writes a literal MARKETING_VERSION and bypasses this file.
+// fastlane's `verify_release` lane fails the pipeline if the two disagree.
+VERSION_NAME = 4.9.1

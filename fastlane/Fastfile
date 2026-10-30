@@ -1432,13 +1432,116 @@ end
 
 # --- Release Lanes ---
 
+desc "Merge request gate for release branches (deploy/vX.Y.Z and hotfix/vX.Y.Z)"
+lane :verify_release do |options|
+    # Runs on every merge request into `release` and every merge request from a deploy/ or hotfix/ branch
+    # (see `verify_release` in .gitlab-ci.yml). Fails, and so blocks the merge, unless:
+    #   0. A deploy/ or hotfix/ branch targets `release` (they never merge into `main`; after the release,
+    #      `release` itself is merged into `main`).
+    #   1. The source branch is deploy/vX.Y.Z or hotfix/vX.Y.Z.
+    #   2. VERSION_NAME in ExampleApp/ExampleApp/Configs/Version.xcconfig equals X.Y.Z, every ExampleApp build
+    #      configuration resolves MARKETING_VERSION to it, and it is higher than the latest release.
+    #   3. CHANGELOG.md has a "## [X.Y.Z]" entry.
+    #   4. hotfix/ only: X.Y.Z is a patch bump of the latest release, and the branch was cut from `release`
+    #      (it contains no unreleased commits from `main`). A hotfix for a previous release (e.g. 4.8.1 when
+    #      4.9.0 is out) never merges into `release`: it's released from its own branch (`hotfix_release` job).
+    #
+    # Options (all default to the GitLab merge request variables):
+    #   source_branch, target_branch: branch names
+    #   head: commit to check (default HEAD)
+    source_branch = options[:source_branch] ||
+        ENV["CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"] ||
+        sh("git rev-parse --abbrev-ref HEAD", log: false).strip
+    target_branch = options[:target_branch] || ENV["CI_MERGE_REQUEST_TARGET_BRANCH_NAME"]
+    head = options[:head] || "HEAD"
+
+    # Checked first: the release checks below give misleading errors for an MR into main
+    # (e.g. "already released" once the version is tagged).
+    if source_branch.match?(%r{\A(deploy|hotfix)/}) && target_branch && target_branch != "release"
+        UI.user_error!("#{source_branch} can only be merged into release, not #{target_branch}. After the release, bring its changes to main by merging release into main.")
+    end
+
+    branch_match = source_branch.match(%r{\A(deploy|hotfix)/v(\d+\.\d+\.\d+)\z})
+    unless branch_match
+        if target_branch == "release"
+            UI.user_error!("Only deploy/vX.Y.Z or hotfix/vX.Y.Z branches can be merged into release (got '#{source_branch}')")
+        end
+        UI.user_error!("Branch '#{source_branch}' must be named deploy/vX.Y.Z or hotfix/vX.Y.Z")
+    end
+    kind, branch_version = branch_match[1], branch_match[2]
+
+    version = read_version_name_xcconfig
+    if branch_version != version
+        UI.user_error!("Version mismatch: branch '#{source_branch}' is for #{branch_version} but Version.xcconfig has VERSION_NAME = #{version}. Update VERSION_NAME (or rename the branch).")
+    end
+    UI.success("✅ VERSION_NAME (#{version}) matches branch #{source_branch}")
+    ensure_example_app_versions_match!(version)
+
+    tags = release_remote_tags
+    latest = release_latest_version(tags)
+    ensure_hotfix_for_latest_release!(version, latest) if kind == "hotfix"
+    ensure_release_version_is_new!(version, tags, latest, "bump VERSION_NAME in Version.xcconfig")
+    ensure_changelog_entry!(version)
+
+    if kind == "hotfix"
+        ensure_hotfix_is_patch_bump!(version, latest)
+        ensure_hotfix_cut_from_release!(head)
+    end
+
+    version
+end
+
+desc "Release pipeline pre-flight: version not released yet, and every release token present and valid"
+lane :release_preflight do
+    # First job of the release pipeline (push to `release`), before the tag is created. The tag is the release
+    # for Swift Package Manager users, so nothing may be left to chance after this.
+    # Also run by the manual `hotfix_release` job on a hotfix/ branch, to release a hotfix for a previous release;
+    # there the version is checked against its own release line (4.8.1 against 4.8.0, not 4.9.0).
+    # A new pipeline on an already-tagged commit is a re-run and is allowed through.
+    version = read_version_name_xcconfig
+    ensure_example_app_versions_match!(version)
+
+    tags = release_remote_tags
+    tag = tags[version] || tags["v#{version}"]
+    head_commit = sh("git rev-parse HEAD", log: false).strip
+    hotfix_branch = ENV["CI_COMMIT_BRANCH"].to_s.start_with?("hotfix/") ? ENV["CI_COMMIT_BRANCH"] : nil
+    if tag && tag[:commit] == head_commit
+        UI.important("Tag #{tag[:name]} already points at HEAD (#{head_commit[0, 8]}); treating this pipeline as a re-run")
+    elsif hotfix_branch
+        ensure_previous_release_hotfix!(hotfix_branch, version, tags, "HEAD", "bump VERSION_NAME in Version.xcconfig")
+    else
+        ensure_release_version_is_new!(version, tags, release_latest_version(tags), "bump VERSION_NAME in Version.xcconfig")
+    end
+    ensure_changelog_entry!(version)
+
+    ensure_env_present!(%w[GITLAB_TOKEN GITHUB_TOKEN])
+    ensure_gitlab_token_valid!
+    ensure_github_token_can_push!("PayDock/ios-mobile-sdk")
+
+    UI.success("✅ Pre-flight passed for #{version}")
+    remind_to_hotfix_latest_release(version, tags) if hotfix_branch
+    version
+end
+
 desc "Creates and pushes a tag on GitLab"
 lane :tag_release do
     # This lane automates the process of creating and pushing a tag to the GitLab repository.
     # It extracts the version number from the unified helper function.
 
     # Get the version name using the unified helper function
-    version_tag = get_version_tag()
+    version_tag = release_version
+
+    # Fail before tagging if this version was already tagged on a different commit. If the tag already
+    # points at HEAD this job is being retried, so there is nothing left to tag.
+    tag = release_remote_tags.values_at(version_tag, "v#{version_tag}").compact.first
+    if tag
+        head_commit = sh("git rev-parse HEAD", log: false).strip
+        if tag[:commit] != head_commit
+            UI.user_error!("Tag #{tag[:name]} already exists on origin (commit #{tag[:commit][0, 8]}), not on this release commit. Version #{version_tag} has already been released: ship the fix as the next patch version.")
+        end
+        UI.important("Tag #{tag[:name]} already exists on HEAD; skipping creation and push")
+        next
+    end
 
     # Configure Git user (if needed).
     sh("git config --global user.email \"john.costello@paydock.com\"") # Sets the Git user email.
@@ -1480,7 +1583,7 @@ lane :create_gitlab_release do |options|
     # It is designed to be triggered when a new tag is pushed to the 'release' branch.
 
     # Get the version tag using the unified helper function
-    version_tag = get_version_tag(options)
+    version_tag = release_version(options)
 
     # Ensure a version tag is available; otherwise, raise an error.
     if version_tag == "unknown"
@@ -1577,7 +1680,7 @@ lane :create_github_release do |options|
     # It extracts the version name from the Git tag, authenticates with GitHub, and creates a new release.
 
     # Get the version tag using the unified helper function
-    version_tag = get_version_tag(options)
+    version_tag = release_version(options)
 
     fastlane_require 'octokit' # Loads the Octokit library for interacting with the GitHub API.
 
@@ -1598,7 +1701,7 @@ lane :create_github_release do |options|
     begin
         client.ref(repo, "tags/#{version_tag}")
     rescue Octokit::NotFound
-        UI.user_error!("Tag #{version_tag} does not exist on github.com/#{repo}. Push the `release` branch and the tag to GitHub first, then retry this job.")
+        UI.user_error!("Tag #{version_tag} does not exist on github.com/#{repo}. Push the `#{ENV['CI_COMMIT_BRANCH'] || 'release'}` branch and tag #{version_tag} to GitHub first, then retry this job.")
     end
 
     # Idempotency: a re-run must not fail if the release is already there.
@@ -1615,14 +1718,20 @@ lane :create_github_release do |options|
         **Full Changelog:** [View on GitLab]( https://github.com/PayDock/ios-mobile-sdk/commits/#{version_tag})
     RELEASE
 
+    # Only the highest version is "latest": a hotfix for a previous release (4.8.1 after 4.9.0) must not
+    # replace the newest SDK on the GitHub releases page.
+    latest = release_latest_version(release_remote_tags)
+    is_latest = latest.nil? || Gem::Version.new(version_tag) >= latest
+
     release = client.create_release(repo, "#{version_tag}", { # Creates the release on GitHub.
       tag_name: "#{version_tag}", # Sets the tag name.
       name: release_name, # Sets the release name.
       body: release_body, # Sets the release body.
       is_generate_release_notes: false, # Disables automatic generation of release notes.
-      make_latest: 'true' # Marks the release as the latest.
+      make_latest: is_latest.to_s
     })
     # The 'client.create_release' method is used to create the release.
+    remind_to_hotfix_latest_release(version_tag, release_remote_tags) unless is_latest
 end
 
 # Gets the version tag using multiple fallback strategies.
@@ -1639,6 +1748,284 @@ end
 #
 # @param options [Hash] Lane options that may contain a :version key
 # @return [String] The version tag (without 'v' prefix), or "unknown" if none found
+def read_version_name_xcconfig
+    # Reads VERSION_NAME from the single version source shared by every ExampleApp configuration.
+    #
+    # @return [String] The version, e.g. "4.9.0"
+    xcconfig_path = File.expand_path("../ExampleApp/ExampleApp/Configs/Version.xcconfig", __dir__)
+    line = File.readlines(xcconfig_path).find { |l| l.match?(/\A\s*VERSION_NAME\s*=/) }
+    UI.user_error!("VERSION_NAME not found in #{xcconfig_path}") unless line
+    version = line.split("=", 2).last.strip
+    UI.user_error!("VERSION_NAME '#{version}' in Version.xcconfig is not X.Y.Z") unless version.match?(/\A\d+\.\d+\.\d+\z/)
+    version
+end
+
+# The version a release lane works on: the `version` option if given, otherwise VERSION_NAME in
+# Version.xcconfig. No fallbacks, so a lane can never act on a stale or "unknown" version.
+def release_version(options = {})
+    version = options[:version].to_s.sub(/\Av/, "")
+    version.empty? ? read_version_name_xcconfig : version
+end
+
+# --- Release check helpers (used by verify_release, release_preflight and tag_release) ---
+
+# Lists the release tags on origin (X.Y.Z or vX.Y.Z).
+#
+# @return [Hash{String => Hash}] tag name => { name:, version:, commit: } (commit the tag points at)
+def release_remote_tags
+    refs = {}
+    sh("git ls-remote --tags origin", log: false).each_line do |line|
+        sha, ref = line.strip.split("\t", 2)
+        refs[ref] = sha if ref
+    end
+    tags = {}
+    refs.each_key do |ref|
+        match = ref.match(%r{\Arefs/tags/(v?(\d+\.\d+\.\d+))\z})
+        next unless match
+        # Annotated tags are listed twice; the peeled "^{}" entry is the commit they point at.
+        tags[match[1]] = { name: match[1], version: match[2], commit: refs["#{ref}^{}"] || refs[ref] }
+    end
+    tags
+end
+
+# @return [Gem::Version, nil] The highest released version, or nil if nothing has been released
+def release_latest_version(tags)
+    tags.values.map { |tag| Gem::Version.new(tag[:version]) }.max
+end
+
+# Fails unless `version` is unreleased and higher than the latest release.
+def ensure_release_version_is_new!(version, tags, latest, how_to_fix)
+    tag = tags[version] || tags["v#{version}"]
+    if tag
+        UI.user_error!("Version #{version} has already been released (tag #{tag[:name]} on commit #{tag[:commit][0, 8]}): #{how_to_fix}.")
+    end
+    if latest && Gem::Version.new(version) <= latest
+        UI.user_error!("Version #{version} must be higher than the latest release (#{latest}): #{how_to_fix}.")
+    end
+    UI.success("✅ #{version} is unreleased and higher than the latest release (#{latest || 'none'})")
+end
+
+# Fails unless CHANGELOG.md has a "## [X.Y.Z]" entry, so release notes are never empty.
+def ensure_changelog_entry!(version)
+    changelog_path = File.expand_path("../CHANGELOG.md", __dir__)
+    content = File.exist?(changelog_path) ? File.read(changelog_path) : ""
+    unless content.match?(/^##\s+\[#{Regexp.escape(version)}\]/)
+        UI.user_error!("CHANGELOG.md has no '## [#{version}]' entry. Add the release notes for #{version}.")
+    end
+    UI.success("✅ CHANGELOG.md has an entry for #{version}")
+end
+
+# Hotfixes only patch the latest release: same major.minor, higher patch (e.g. 5.7.0 -> 5.7.1).
+def ensure_hotfix_is_patch_bump!(version, latest)
+    UI.user_error!("There is no previous release to hotfix; use a deploy/ branch") unless latest
+    major, minor, = version.split(".").map(&:to_i)
+    latest_major, latest_minor, = latest.segments
+    unless major == latest_major && minor == latest_minor
+        UI.user_error!("A hotfix must be a patch bump of the latest release (#{latest}), e.g. #{latest_major}.#{latest_minor}.#{latest.segments[2] + 1}. Use a deploy/ branch for #{version}.")
+    end
+    UI.success("✅ #{version} is a patch bump of #{latest}")
+end
+
+# A hotfix branch may only contain commits already on `release`, plus its own fix: the commit it shares
+# with `main` must already be on `release`. Branching from `main` would ship unreleased work.
+def ensure_hotfix_cut_from_release!(head)
+    if ENV["CI"]
+        sh("git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main +refs/heads/release:refs/remotes/origin/release", log: false)
+    end
+    shared_with_main = sh("git merge-base #{head} origin/main", log: false).strip
+    unless system("git", "merge-base", "--is-ancestor", shared_with_main, "origin/release")
+        UI.user_error!("This hotfix branch contains unreleased commits from main (it shares #{shared_with_main[0, 8]} with main, which isn't on release). Cut hotfix/ branches from release and add only the fix.")
+    end
+    UI.success("✅ Hotfix branch was cut from release (no unreleased main commits)")
+end
+
+# --- Hotfixes for the latest release vs a previous release ---
+# A hotfix for the latest release (4.9.1 when 4.9.0 is out) merges into `release`. A hotfix for a previous
+# release (4.8.1 when 4.9.0 is out) is cut from that release's tag and released from its own branch.
+
+# @return [Symbol] :latest (same major.minor as the latest release), :previous (an older major.minor) or
+#   :new (a higher major.minor, or nothing released yet: not a hotfix)
+def hotfix_target(version, latest)
+    return :new unless latest
+    line = Gem::Version.new(version).segments[0, 2]
+    latest_line = latest.segments[0, 2]
+    return :latest if line == latest_line
+    (line <=> latest_line) < 0 ? :previous : :new
+end
+
+# @return [Gem::Version, nil] The highest released version on the same major.minor as `version`
+def release_latest_on_line(tags, version)
+    line = Gem::Version.new(version).segments[0, 2]
+    tags.values.map { |tag| Gem::Version.new(tag[:version]) }.select { |v| v.segments[0, 2] == line }.max
+end
+
+# Merge request into `release`: fails with what to do instead unless `version` hotfixes the latest release.
+def ensure_hotfix_for_latest_release!(version, latest)
+    case hotfix_target(version, latest)
+    when :previous
+        UI.user_error!("#{version} is a hotfix for a previous release (the latest release is #{latest}). Don't merge it into release: release it from this branch's pipeline by running the manual hotfix_release job.")
+    when :new
+        UI.user_error!("#{version} isn't a hotfix of any release (the latest release is #{latest || 'none'}). Use a deploy/v#{version} branch.")
+    end
+end
+
+# Manual release from a hotfix/ branch: fails with what to do instead unless the branch hotfixes a previous
+# release, is the next version on that release's line, and was cut from that line's latest tag.
+def ensure_previous_release_hotfix!(branch, version, tags, head, how_to_fix)
+    branch_version = branch[%r{\Ahotfix/v(\d+\.\d+\.\d+)\z}, 1]
+    UI.user_error!("Branch '#{branch}' must be named hotfix/vX.Y.Z") unless branch_version
+    if branch_version != version
+        UI.user_error!("Version mismatch: branch '#{branch}' is for #{branch_version} but the project version is #{version}: #{how_to_fix} (or rename the branch).")
+    end
+
+    latest = release_latest_version(tags)
+    case hotfix_target(version, latest)
+    when :latest
+        UI.user_error!("#{version} is a hotfix for the latest release (#{latest}). Don't run hotfix_release: open a merge request from #{branch} into release; merging it runs the release pipeline.")
+    when :new
+        UI.user_error!("#{version} isn't a hotfix of any release (the latest release is #{latest || 'none'}). Use a deploy/v#{version} branch.")
+    end
+
+    line_latest = release_latest_on_line(tags, version)
+    unless line_latest
+        UI.user_error!("Nothing has been released on the #{version.split('.')[0, 2].join('.')} line, so there's no release to hotfix.")
+    end
+    ensure_release_version_is_new!(version, tags, line_latest, how_to_fix)
+    ensure_hotfix_cut_from_tag!(head, tags, line_latest)
+    UI.success("✅ #{version} is a hotfix for the previous release #{line_latest} (latest release: #{latest})")
+end
+
+# The branch contains the line's latest release tag, and nothing released after it or unreleased from main.
+def ensure_hotfix_cut_from_tag!(head, tags, line_latest)
+    if ENV["CI"]
+        sh("git fetch --tags --force origin +refs/heads/main:refs/remotes/origin/main", log: false)
+    end
+    line_tag = tags.values.find { |tag| Gem::Version.new(tag[:version]) == line_latest }
+    unless system("git", "merge-base", "--is-ancestor", line_tag[:commit], head)
+        UI.user_error!("This branch doesn't contain #{line_tag[:name]}. Cut a hotfix for a previous release from that release's tag: git switch -c hotfix/vX.Y.Z #{line_tag[:name]}")
+    end
+    later = tags.values.select do |tag|
+        Gem::Version.new(tag[:version]) > line_latest && system("git", "merge-base", "--is-ancestor", tag[:commit], head)
+    end
+    unless later.empty?
+        UI.user_error!("This branch contains #{later.map { |tag| tag[:name] }.sort.join(', ')}, released after #{line_tag[:name]}. Cut it from #{line_tag[:name]} and add only the fix.")
+    end
+    shared_with_main = sh("git merge-base #{head} origin/main", log: false).strip
+    unless system("git", "merge-base", "--is-ancestor", shared_with_main, line_tag[:commit])
+        UI.user_error!("This branch contains unreleased commits from main (it shares #{shared_with_main[0, 8]} with main, which isn't in #{line_tag[:name]}). Cut it from #{line_tag[:name]} and add only the fix.")
+    end
+    UI.success("✅ Branch was cut from #{line_tag[:name]}")
+end
+
+# Printed when a hotfix for a previous release is released.
+def remind_to_hotfix_latest_release(version, tags)
+    latest = release_latest_version(tags)
+    return unless latest && hotfix_target(version, latest) == :previous
+    next_version = "#{latest.segments[0]}.#{latest.segments[1]}.#{latest.segments[2] + 1}"
+    UI.important("Reminder: ship this fix on the latest release too (hotfix/v#{next_version} into release), unless #{latest} isn't affected.")
+end
+
+def ensure_env_present!(names)
+    missing = names.select { |name| ENV[name].to_s.strip.empty? }
+    UI.user_error!("Missing CI/CD variables: #{missing.join(', ')}") unless missing.empty?
+    UI.success("✅ All release variables are set")
+end
+
+# GET with retries. Transient failures (timeouts, connection/DNS errors, HTTP 429 and 5xx) are retried 3 times
+# with a short back-off, so a network blip doesn't fail a release. Uses Net::HTTP so tokens never reach the job log.
+#
+# @return [Array(Integer, String, Hash)] HTTP status (0 if the host couldn't be reached), body, and response
+#   headers (lower-case names)
+def release_http_get(url, headers = {})
+    require 'net/http'
+    uri = URI(url)
+    code, body, response_headers = 0, "", {}
+    3.times do |attempt|
+        sleep(2 * attempt) if attempt > 0
+        begin
+            request = Net::HTTP::Get.new(uri)
+            headers.each { |key, value| request[key] = value }
+            response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 15, read_timeout: 30) do |http|
+                http.request(request)
+            end
+            code, body = response.code.to_i, response.body.to_s
+            response_headers = response.each_header.to_h
+            return [code, body, response_headers] unless code == 429 || code >= 500
+        rescue StandardError => e
+            code, body, response_headers = 0, "#{e.class}: #{e.message}", {}
+        end
+        UI.message("#{uri.host} didn't respond properly (#{code == 0 ? body : "HTTP #{code}"}); retrying...") if attempt < 2
+    end
+    [code, body, response_headers]
+end
+
+# GITLAB_TOKEN pushes the release tag and creates the GitLab release, so it needs the api and write_repository
+# scopes, must be active and must not be expired. Works for personal, project and group access tokens.
+def ensure_gitlab_token_valid!
+    unless ENV["CI_API_V4_URL"] && ENV["CI_PROJECT_ID"]
+        UI.important("Not in GitLab CI; skipping the GITLAB_TOKEN check")
+        return
+    end
+    auth = { "PRIVATE-TOKEN" => ENV["GITLAB_TOKEN"] }
+    code, body = release_http_get("#{ENV['CI_API_V4_URL']}/personal_access_tokens/self", auth)
+    UI.user_error!("Couldn't reach GitLab to check GITLAB_TOKEN (#{body}); retry this job") if code == 0
+    UI.user_error!("GITLAB_TOKEN was rejected by GitLab (HTTP #{code}): it's missing, revoked or expired") if code == 401
+    if code == 200
+        token = JSON.parse(body) rescue {}
+        missing = %w[api write_repository] - Array(token["scopes"])
+        UI.user_error!("GITLAB_TOKEN is not active (revoked or expired)") unless token["active"] == true && token["revoked"] != true
+        UI.user_error!("GITLAB_TOKEN is missing the #{missing.join(' and ')} scope(s), needed to push the tag and create the release") unless missing.empty?
+        require 'date'
+        if token["expires_at"] && Date.parse(token["expires_at"]) <= Date.today + 14
+            UI.important("GITLAB_TOKEN expires on #{token['expires_at']}; renew it soon")
+        end
+    else
+        # Not a token type that endpoint describes; at least make sure it can see this project.
+        code, = release_http_get("#{ENV['CI_API_V4_URL']}/projects/#{ENV['CI_PROJECT_ID']}", auth)
+        UI.user_error!("GITLAB_TOKEN can't access this project (HTTP #{code})") unless code == 200
+        UI.important("Couldn't read GITLAB_TOKEN's scopes; it can access the project, but check it has api and write_repository")
+    end
+    UI.success("✅ GITLAB_TOKEN is valid")
+end
+
+# GITHUB_TOKEN creates the GitHub release (and, on Android, publishes GitHub Packages). Classic tokens report their
+# scopes, so those are checked exactly. Fine-grained tokens don't, so for them only repository access can be checked.
+def ensure_github_token_can_push!(repo, extra_scopes: [])
+    code, body, headers = release_http_get("https://api.github.com/repos/#{repo}", "Authorization" => "Bearer #{ENV['GITHUB_TOKEN']}", "Accept" => "application/vnd.github+json")
+    UI.user_error!("Couldn't reach GitHub to check GITHUB_TOKEN (#{body}); retry this job") if code == 0
+    UI.user_error!("GITHUB_TOKEN was rejected by GitHub (HTTP 401): it's missing, revoked or expired") if code == 401
+    UI.user_error!("GITHUB_TOKEN can't see #{repo} (HTTP #{code})") unless code == 200
+    if headers.key?("x-oauth-scopes")
+        scopes = headers["x-oauth-scopes"].split(",").map(&:strip)
+        missing = []
+        missing << "repo (or public_repo)" unless (scopes & %w[repo public_repo]).any?
+        missing.concat(extra_scopes - scopes)
+        UI.user_error!("GITHUB_TOKEN is missing the #{missing.join(' and ')} scope(s) for #{repo}") unless missing.empty?
+        can_push = JSON.parse(body).dig("permissions", "push") rescue false
+        UI.user_error!("GITHUB_TOKEN's account has no write access to #{repo}") unless can_push
+        UI.success("✅ GITHUB_TOKEN can create releases on #{repo}")
+    else
+        UI.success("✅ GITHUB_TOKEN can access #{repo}")
+        UI.important("GITHUB_TOKEN is a fine-grained token, so its write permission can't be checked in advance; it needs Contents: read and write#{extra_scopes.empty? ? '' : ' and Packages: write'} on #{repo}")
+    end
+end
+
+# Every ExampleApp build configuration must resolve MARKETING_VERSION to VERSION_NAME. A version typed into
+# Xcode's General tab writes a literal MARKETING_VERSION, and the tag and the TestFlight builds would disagree.
+def ensure_example_app_versions_match!(version)
+    xcodeproj_path = File.expand_path("../ExampleApp/ExampleApp.xcodeproj", __dir__)
+    target = Xcodeproj::Project.open(xcodeproj_path).targets.find { |t| t.name == "ExampleApp" }
+    UI.user_error!("ExampleApp target not found in #{xcodeproj_path}") unless target
+    mismatches = target.build_configurations.map(&:name).sort.map do |configuration|
+        resolved = get_version_number(xcodeproj: xcodeproj_path, target: "ExampleApp", configuration: configuration)
+        "#{configuration}: #{resolved}" if resolved != version
+    end.compact
+    unless mismatches.empty?
+        UI.user_error!("MARKETING_VERSION doesn't match VERSION_NAME=#{version} in Version.xcconfig for: #{mismatches.join(', ')}. Set MARKETING_VERSION = $(VERSION_NAME) for those configurations.")
+    end
+    UI.success("✅ All ExampleApp configurations resolve to VERSION_NAME #{version}")
+end
+
 def get_version_tag(options = {})
     begin
         # 1. Check if version was passed as a lane option

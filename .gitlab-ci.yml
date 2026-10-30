@@ -7,6 +7,7 @@ stages:
   - test # Stage for running unit and integration tests.
   - build # Stage for building the iOS application.
   - deploy # Stage for deploying builds to Firebase and TestFlight.
+  - release_gate # Manual start of a release from a hotfix/ branch (hotfix for a previous release).
   - tag # Stage for tagging a release.
   - gitlab_release # Stage for creating a release in GitLab.
   - github_release # Stage for creating a release in GitHub.
@@ -82,6 +83,62 @@ runLint:
       - "$CODE_CLIMATE_REPORT_PATH"
     reports:
       codequality: "$CODE_CLIMATE_REPORT_PATH"
+
+# verify_release:
+# Merge request gate (seconds, no build). Runs on every MR into `release` and every MR from a deploy/ or hotfix/
+# branch, and blocks the merge (with "Pipelines must succeed") unless: a deploy/ or hotfix/ branch targets `release`
+# (never `main`), the branch is deploy/vX.Y.Z or hotfix/vX.Y.Z, VERSION_NAME in ExampleApp/ExampleApp/Configs/Version.xcconfig matches it, every ExampleApp
+# configuration resolves MARKETING_VERSION to it, it is higher than the latest release, CHANGELOG.md has the
+# entry, and (hotfix only) it is a patch bump cut from `release`. GIT_DEPTH 0 so the hotfix check can compare
+# with main.
+verify_release:
+  extends:
+    - .macos_saas_runners
+    - .setup_bundler
+  stage: quality
+  variables:
+    GIT_DEPTH: "0"
+  script:
+    - bundle exec fastlane verify_release
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\//)'
+      when: on_success
+
+# release_preflight:
+# First check of the release pipeline (seconds). Stops the release before the tag is created if the version was
+# already released, the CHANGELOG entry is missing, the ExampleApp configurations disagree, or a release token is
+# missing or invalid. The tag is the Swift Package Manager release, so it is the point of no return.
+release_preflight:
+  extends:
+    - .macos_saas_runners
+    - .setup_bundler
+  stage: quality
+  script:
+    - bundle exec fastlane release_preflight
+  rules:
+    - if: $CI_COMMIT_BRANCH == "release"
+      when: on_success
+
+# hotfix_release:
+# Releases a hotfix for a previous release (e.g. hotfix/v4.8.1 cut from tag 4.8.0 while 4.9.0 is the latest) from
+# its own branch; that branch never merges into `release`. Press Run once the tests have passed: it runs the
+# release pre-flight (version checked against its own release line), then the tag and release jobs run on their
+# own, and the GitHub release isn't marked latest. As for every release, push the branch and tag to GitHub for
+# create_github_release. Run on a hotfix for the latest release, it fails and says to open a merge request into
+# `release` instead. hotfix/* must be protected branches so the release variables are available.
+hotfix_release:
+  extends:
+    - .macos_saas_runners
+    - .setup_bundler
+  stage: release_gate
+  variables:
+    GIT_DEPTH: "0" # The pre-flight checks the branch was cut from the right release tag.
+  script:
+    - bundle exec fastlane release_preflight
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /^hotfix\//
+      when: manual
+      allow_failure: false # Later stages (tag and releases) wait for it.
 
 run_ExampleApp_tests:
   extends:
@@ -265,7 +322,7 @@ prepareSandbox:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
     # Automatically run on merge requests from "deploy/*" branches targeting "release"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^deploy\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
       allow_failure: false
   allow_failure: true
@@ -379,7 +436,7 @@ buildSandboxTestflight:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: manual
     # Automatically run on merge requests from "deploy/*" branches targeting "release"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^deploy\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
       allow_failure: false
     # Manual trigger for other merge requests
@@ -490,7 +547,7 @@ deploySandboxTestflight:
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: manual
     # Automatically run on merge requests from "deploy/*" branches targeting "release"
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^deploy\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
       allow_failure: false
     # Allow manual trigger from other merge requests
@@ -510,6 +567,8 @@ tag_release:
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
       when: on_success
+    - if: $CI_COMMIT_BRANCH =~ /^hotfix\// # Hotfix for a previous release, after the manual hotfix_release job.
+      when: on_success
 
 # create_gitlab_release:
 # This job creates a release in GitLab.
@@ -526,6 +585,8 @@ create_gitlab_release:
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
       when: on_success
+    - if: $CI_COMMIT_BRANCH =~ /^hotfix\// # Hotfix for a previous release, after the manual hotfix_release job.
+      when: on_success
 
 # create_github_release:
 # This job creates a release in GitHub.
@@ -541,4 +602,6 @@ create_github_release:
     - bundle exec fastlane create_github_release
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
+      when: on_success
+    - if: $CI_COMMIT_BRANCH =~ /^hotfix\// # Hotfix for a previous release, after the manual hotfix_release job.
       when: on_success

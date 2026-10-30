@@ -16,7 +16,7 @@ help:
 	@echo "  make help             - Show this help message"
 	@echo ""
 	@echo "Branch naming conventions:"
-	@echo "  bug/SDK-####-* or bug/PAYRAC-####-*, task/SDK-####-*, feature/SDK-####-*, spike/SDK-####-*, release/*"
+	@echo "  bug/SDK-####-* or bug/PAYRAC-####-*, task/SDK-####-*, feature/SDK-####-*, spike/SDK-####-*, deploy/vX.Y.Z, hotfix/vX.Y.Z"
 	@echo ""
 	@echo "Note: Branch validation is automatically enforced on commit/push."
 	@echo "      No manual setup required - hooks are installed automatically."

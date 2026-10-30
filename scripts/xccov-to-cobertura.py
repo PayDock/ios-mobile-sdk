@@ -63,7 +63,7 @@ def create_cobertura_xml(coverage_data, source_root=None):
             continue
             
         # Filter to only include our SDK target
-        if not any(name in target_name for name in ['MobileSDK', 'Sources']):
+        if not any(name in target_name for name in ['MobileSDK', 'Sources', 'PaydockTelemetry']):
             continue
         
         # Create package for this target

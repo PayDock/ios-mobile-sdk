@@ -10,7 +10,7 @@ The Paydock **iOS MobileSDK** — a Swift Package Manager package (product `Mobi
 
 ## Toolchain & setup
 
-- **swift-tools-version 5.7.1** (`Package.swift`); build with a current stable Xcode / Swift 5.7.1+ toolchain.
+- **swift-tools-version 5.9** (`Package.swift`), required by the `package` access the internal `PaydockTelemetry` target uses; build with Xcode 15 or later (Swift 5.9+). The language mode stays Swift 5. The nested per-target manifests stay at 5.7.1, except `PaydockTelemetry/Package.swift` (5.9).
 - Run `make setup` once after cloning — it invokes `scripts/ensure-validation.sh`, which installs the git `pre-commit` / `pre-push` hooks that enforce branch naming (see Conventions). `make status` shows hook state; `make clean-hooks` removes them.
 - `Gemfile` + `fastlane/` back CI release automation (GitLab CI, `.gitlab-ci.yml`); not needed for local dev.
 
@@ -21,11 +21,12 @@ swift build                                   # build all SPM targets
 swift test                                    # run all module + SDK tests
 swift test --filter DataChargesTests          # single module test bundle
 swift test --filter MobileSDKTests            # core SDK tests
+cd PaydockTelemetry && swift test             # the telemetry target on its own
 make validate-branch                          # check the current branch name
 ```
 
 - **SwiftLint** runs automatically as an SPM build-tool plugin (`SwiftLintBuildToolPlugin` from the `SwiftLintPlugins` package) on the `MobileSDK` and `MobileSDKTests` targets, so `swift build`/`swift test` lint as they compile. Config is `.swiftlint.yml`.
-- Test-bundle filter names match the target names in `Package.swift`: `CommonModelsTests`, `DataGatewaysTests`, `DataPaymentSourcesTests`, `DataChargesTests`, `DataCustomerTests`, `DataVaultTests`, `DataMPGS3dsTests`, `DataStandalone3dsTests`, `BinProcessingTests`, `MobileSDKTests`.
+- Test-bundle filter names match the target names in `Package.swift`: `CommonModelsTests`, `DataGatewaysTests`, `DataPaymentSourcesTests`, `DataChargesTests`, `DataCustomerTests`, `DataVaultTests`, `DataMPGS3dsTests`, `DataStandalone3dsTests`, `BinProcessingTests`, `PaydockTelemetryTests`, `MobileSDKTests`.
 
 ### Running the ExampleApp (sample app)
 
@@ -51,14 +52,16 @@ The package is a **multi-target SPM layout**: one core UI target plus several pe
 **Support targets:**
 - **`CommonModels`** — small shared Codable types reused by multiple Data\* modules.
 - **`BinProcessing`** — standalone target (no other package deps) for card-scheme detection from BIN ranges; ships an offline `Resources/JSON/card-schemes.json` and a refresh coordinator that `configureMobileSDK` starts at init (`BinDataRefreshCoordinator`, `CardSchemeDetector`).
+- **`PaydockTelemetry`** — internal telemetry target (path `PaydockTelemetry/Sources/PaydockTelemetry`, standalone manifest for `cd PaydockTelemetry && swift test`): the `Telemetry` facade, `TelemetryRuntime`, `NoOpTelemetry`, `TelemetryLevel`, `TelemetryEvent` and `TelemetryIntent`. A dependency of `MobileSDK`, never a product; every declaration uses `package` access, so nothing reaches the public interface. Dormant until activation (MD-33): nothing imports or binds it yet. Guarded by `PackageOnlyTests` (package access only) and `TelemetrySeamTests` in `MobileSDKTests` (SDK code refers only to the facade and `TelemetryEvent`).
 
 **Third-party SDK deps** wired into the core `MobileSDK` target (all pinned `exact` in `Package.swift`): `Afterpay` (afterpay/sdk-ios `5.9.0`), and `FraudProtection` / `PaymentButtons` / `PayPalWebPayments` (paypal/paypal-ios `2.0.1`). SwiftLint tooling comes from `SimplyDanny/SwiftLintPlugins` `0.59.1`.
 
 ## Conventions & gotchas
 
 - **NetworkingLib source (important):** `NetworkingLib` is provided by the standalone **`ios-core-networking`** package (every target depends on `.product(name: "NetworkingLib", package: "ios-core-networking")`). On this branch the dependency is a **local path override** — `Package.swift` currently declares `.package(path: "…/ios-core-networking")` with a `TODO` to revert to the remote pin `https://github.com/PayDock/ios-core-networking` `exact: "1.3.0"` once 1.3.0 is published. Because it resolves locally, `ios-core-networking` no longer appears in `Package.resolved` (which now lists only `paypal-ios` 2.0.1, `sdk-ios` 5.9.0, and `swiftlintplugins` 0.59.1); anyone building this branch must have the local `ios-core-networking` checkout available (the pinned path is developer-specific) or switch back to the commented-out remote 1.3.0 pin. The `mobile-lib-networking-android` KMP repo *also* publishes an iOS binary via its own `Package.swift`, but **that KMP iOS target is not currently used** — this repo uses only the standalone `ios-core-networking` package.
-- **Branch naming is hook-enforced.** `scripts/validate-branch-name.sh` allows prefixes `bug/`, `task/`, `feature/`, `spike/`, `deploy/`; the first four **require** a Jira ticket, i.e. `bug|task|feature|spike/SDK-####-description`, while `deploy/*` (and `main`) are free-form. Note a doc mismatch: the `Makefile` help text mentions `release/*`, but the enforced script actually uses `deploy/*` — follow the script.
-- **ExampleApp needs xcconfig per environment.** The app injects `ExampleApp/ExampleApp/Configs/<Env>.xcconfig` at build time; running a scheme without its config filled fails with missing-variable errors. Never commit real tokens.
+- **Branch naming is hook-enforced.** `scripts/validate-branch-name.sh` allows prefixes `bug/`, `task/`, `feature/`, `spike/`, `deploy/`, `hotfix/`; the first four **require** a Jira ticket, i.e. `bug|task|feature|spike/SDK-####-description`, while `deploy/` and `hotfix/` must be `deploy/v<major>.<minor>.<patch>` / `hotfix/v<major>.<minor>.<patch>` (`main` and `release` are exempt).
+- **Releasing** — The version lives in `ExampleApp/ExampleApp/Configs/Version.xcconfig` (`VERSION_NAME`). Only `deploy/vX.Y.Z` (from `main`) and `hotfix/vX.Y.Z` (from `release`) merge into `release`; the `verify_release` MR job checks the branch, version, CHANGELOG and hotfix base, and the release pipeline runs `release_preflight` → lint/tests/build → tag (the Swift Package Manager release) → GitLab/GitHub releases. A hotfix for a previous release (e.g. `hotfix/v4.8.1` cut from tag `4.8.0` while 4.9.x is out) never merges into `release`: it's released from its own branch by running the manual `hotfix_release` job, its GitHub release isn't marked latest, and the fix must also ship as a hotfix of the latest release.
+- **ExampleApp needs xcconfig per environment.** The app injects `ExampleApp/ExampleApp/Configs/<Env>.xcconfig` at build time; running a scheme without its config filled fails with missing-variable errors. Each file starts with `#include "Version.xcconfig"` (the app version, `VERSION_NAME`); keep that line when filling in tokens, or `MARKETING_VERSION` resolves to an empty string. Never commit real tokens.
 - **SwiftLint** (`.swiftlint.yml`): `todo` and `inclusive_language` rules disabled; `line_length` warns at 140; identifier length 2–45 (warn); relaxed `cyclomatic_complexity` (25/30), `file_length` (600/1000), `type_body_length`, `function_parameter_count` (10/15). Runs via the build-tool plugin, so lint violations surface during normal builds.
 - **Networking / SSL:** the SDK relies on the system trust store for TLS (WebView-driven flows note "default system SSL certificate validation for PCI DSS compliance"); it does not add custom certificate pinning in this layer.
 - **Widget error model (recent):** every widget error type conforms to the `WidgetError` protocol (`Sources/MobileSDK/Models/Errors/WidgetError.swift`) exposing a stable, machine-readable `code`, the user-facing `customMessage`, and a technical `debugDescription`. A failed response mapping now surfaces as a `*_RESPONSE_DECODE` code (via `RequestError.decode`, whose extension in `Sources/MobileSDK/Extensions/RequestError+Extensions.swift` maps it and, when a `DecodingFailureContext` is present, names the failing key/path) instead of an indistinguishable "unknown error". This relies on `ios-core-networking` 1.3.0, where `RequestError.decode` carries a `DecodingFailureContext` associated value. Full reference: `docs/error-codes.md`.

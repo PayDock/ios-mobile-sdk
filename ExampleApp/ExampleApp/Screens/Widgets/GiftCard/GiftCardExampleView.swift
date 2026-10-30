@@ -28,9 +28,6 @@ struct GiftCardExampleView: View {
                 GiftCardWidget(
                     config: viewModel.getConfig(),
                     appearance: viewModel.getAppearance(isDarkMode: colorScheme == .dark),
-                    // Only attach when the custom button is in use (showSubmitButton = false),
-                    // so the internal button keeps its own native spinner otherwise.
-                    loadingDelegate: viewModel.getConfig().showSubmitButton ? nil : viewModel,
                     eventDelegate: viewModel,
                     submitTrigger: $submitTrigger,
                     onFormValidityChange: { isFormValid = $0 },
@@ -44,30 +41,12 @@ struct GiftCardExampleView: View {
                     })
 
                 if !viewModel.getConfig().showSubmitButton {
-                    let isSubmitDisabled = viewModel.isSubmitting ||
-                        (!viewModel.getConfig().activePrimaryButton && !isFormValid)
-                    Button(action: {
+                    Button("Add Gift Card (custom button)") {
                         submitTrigger = true
-                    }, label: {
-                        HStack(spacing: 6) {
-                            if viewModel.isSubmitting {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            } else {
-                                Text("Add Gift Card (custom button)")
-                                    .font(.system(size: 14, weight: .semibold))
-                            }
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(Color.defaultPrimary)
-                        .cornerRadius(8)
-                        .opacity(isSubmitDisabled ? 0.5 : 1.0)
-                    })
-                    .accessibilityIdentifier("Add Gift Card Custom Button")
-                    .disabled(isSubmitDisabled)
-                    .padding(.all, 16)
+                    }
+                    .disabled(!viewModel.getConfig().activePrimaryButton && !isFormValid)
+                    .buttonStyle(.borderedProminent)
+                    .padding()
                 }
             }
             .alert(viewModel.alertTitle, isPresented: $viewModel.showAlert, actions: {}, message: {
