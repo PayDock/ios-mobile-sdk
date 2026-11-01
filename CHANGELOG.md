@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [4.9.1] - 2026-10-30
 
 ### Added
 - `Standalone3DSError` exposes `charge3dsId`, `inBackground` and `failingHost` (host only, no path or query) for
