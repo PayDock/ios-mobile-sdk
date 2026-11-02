@@ -30,6 +30,7 @@ public class MobileSDK {
         self.config = config
         // Once we have setup our config, we are able to setup our networking based on the environment
         setupNetworkLayer()
+        TelemetryBinding.bindTelemetry(environment: config.environment)
         BinProcessing.startBinDataRefreshCoordinator()
         BinProcessing.triggerBinDataRefreshAtSDKInit()
     }

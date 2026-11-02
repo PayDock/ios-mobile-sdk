@@ -222,7 +222,8 @@ let package = Package(
             name: "MobileSDKTests",
             dependencies: [
                 "MobileSDK",
-                "BinProcessing"
+                "BinProcessing",
+                "PaydockTelemetry"
             ],
             path: "Tests",
             resources: [
