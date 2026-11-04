@@ -58,7 +58,6 @@ final class SerialTelemetryDispatcherTests: XCTestCase {
 
         let started = Date()
         XCTAssertFalse(dispatcher.post { log.append(2) })
-        XCTAssertFalse(dispatcher.postDelayed(milliseconds: 1) { log.append(3) })
         XCTAssertLessThan(Date().timeIntervalSince(started), 0.1)
 
         gate.signal()
@@ -86,6 +85,27 @@ final class SerialTelemetryDispatcherTests: XCTestCase {
         wait(for: [ran], timeout: 2)
         XCTAssertGreaterThanOrEqual(Date().timeIntervalSince(started), 0.09)
         XCTAssertEqual(log.values, [1])
+    }
+
+    /// A full dispatcher still runs a delayed task: the flush timer must never be dropped.
+    func testPostDelayed_WhenFull_IsAccepted_AndRunsOnceTheQueueDrains() {
+        let dispatcher = SerialTelemetryDispatcher(capacity: 1)
+        let gate = DispatchSemaphore(value: 0)
+        let log = Log()
+        defer { gate.signal() }
+
+        XCTAssertTrue(dispatcher.post { gate.wait() })
+        XCTAssertFalse(dispatcher.post { log.append(1) })
+
+        let ran = expectation(description: "delayed task ran")
+        XCTAssertTrue(dispatcher.postDelayed(milliseconds: 10) {
+            log.append(2)
+            ran.fulfill()
+        })
+
+        gate.signal()
+        wait(for: [ran], timeout: 2)
+        XCTAssertEqual(log.values, [2])
     }
 }
 #endif
