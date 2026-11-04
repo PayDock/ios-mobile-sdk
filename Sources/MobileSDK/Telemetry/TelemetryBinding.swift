@@ -94,7 +94,15 @@ func selectTelemetry(
     guard isActive, let credentials else {
         return TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry())
     }
-    let active = ActiveTelemetry(credentials: credentials, level: level)
+    let active = ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: PlaceholderDeviceContextProvider())
     return TelemetrySelection(telemetry: active, runtime: active)
+}
+
+/// Until the device context lands: a fixed, empty context. The ports are no-ops, so nothing is sent.
+private struct PlaceholderDeviceContextProvider: DeviceContextProvider {
+    func current() -> ResourceAttributes {
+        ResourceAttributes(serviceVersion: "", deploymentEnvironmentName: "", osVersion: "", deviceModelIdentifier: "",
+                           appInstallationId: "", appId: "", appVersion: "", appDebuggable: true)
+    }
 }
 #endif
