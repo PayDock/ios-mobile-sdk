@@ -73,6 +73,18 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         )
     }
 
+    /// Production wiring: Apple platform, user defaults, the real queue, no-op ports.
+    package static func create(credentials: TelemetryCredentials, level: TelemetryLevel, sdkVersion: String,
+                               environmentName: String) -> ActiveTelemetry {
+        let provider = DefaultDeviceContextProvider(
+            platform: ApplePlatformInfo(),
+            installationIds: InstallationIdStore(store: UserDefaultsKeyValueStore(), idGenerator: RandomIdGenerator()),
+            sdkVersion: sdkVersion,
+            environmentName: environmentName
+        )
+        return ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: provider)
+    }
+
     package func report(_ event: TelemetryEvent) {
         dispatcher.post { [self] in dispatch(.reported(event)) }
     }
