@@ -27,7 +27,11 @@ enum TelemetryBinding {
             credentialsProvider: EnvironmentCredentialsProvider(environment: env),
             sdkEnvironment: environment,
             level: TelemetryLevel.parse(env[EnvironmentCredentialsProvider.levelKey]),
-            hostBundleIdentifier: Bundle.main.bundleIdentifier
+            hostBundleIdentifier: Bundle.main.bundleIdentifier,
+            createActive: {
+                ActiveTelemetry.create(credentials: $0, level: $1, sdkVersion: SDKVersion.current,
+                                       environmentName: environment.rawValue)
+            }
         )
         #else
         let selection = TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry())
@@ -78,11 +82,13 @@ struct EnvironmentCredentialsProvider: TelemetryCredentialsProvider {
 }
 
 /// The decision with every input injectable: one `ActiveTelemetry` as both handles when active, else `NoOpTelemetry()`.
+/// `createActive` is called only when the decision passes, so nothing is created or written while inactive.
 func selectTelemetry(
     credentialsProvider: any TelemetryCredentialsProvider,
     sdkEnvironment: SDKEnvironment,
     level: TelemetryLevel,
-    hostBundleIdentifier: String?
+    hostBundleIdentifier: String?,
+    createActive: (TelemetryCredentials, TelemetryLevel) -> ActiveTelemetry
 ) -> TelemetrySelection {
     let credentials = credentialsProvider.credentials()
     let isActive = TelemetryActivation.isActive(
@@ -94,15 +100,7 @@ func selectTelemetry(
     guard isActive, let credentials else {
         return TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry())
     }
-    let active = ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: PlaceholderDeviceContextProvider())
+    let active = createActive(credentials, level)
     return TelemetrySelection(telemetry: active, runtime: active)
-}
-
-/// Until the device context lands: a fixed, empty context. The ports are no-ops, so nothing is sent.
-private struct PlaceholderDeviceContextProvider: DeviceContextProvider {
-    func current() -> ResourceAttributes {
-        ResourceAttributes(serviceVersion: "", deploymentEnvironmentName: "", osVersion: "", deviceModelIdentifier: "",
-                           appInstallationId: "", appId: "", appVersion: "", appDebuggable: true)
-    }
 }
 #endif

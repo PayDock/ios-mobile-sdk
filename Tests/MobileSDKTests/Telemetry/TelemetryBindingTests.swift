@@ -22,6 +22,13 @@ final class TelemetryBindingTests: XCTestCase {
         EnvironmentCredentialsProvider.authorizationKey: authorization
     ]
 
+    private var factory = CountingActiveFactory()
+
+    override func setUp() {
+        super.setUp()
+        factory = CountingActiveFactory()
+    }
+
     override func tearDown() {
         TelemetryBinding.bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
         super.tearDown()
@@ -57,33 +64,58 @@ final class TelemetryBindingTests: XCTestCase {
 
     // MARK: - selectTelemetry
 
-    func testSelect_WithoutCredentials_GivesNoOp() {
+    func testSelect_WithoutCredentials_GivesNoOp_AndCreatesNothing() {
         assertNoOp(select(provider: StubCredentialsProvider(value: nil)))
+        XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_ProductionOrStaging_GivesNoOp() {
+    func testSelect_ProductionOrStaging_GivesNoOp_AndCreatesNothing() {
         assertNoOp(select(environment: .production))
         assertNoOp(select(environment: .staging))
+        XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_LevelOff_GivesNoOp() {
+    func testSelect_LevelOff_GivesNoOp_AndCreatesNothing() {
         assertNoOp(select(level: .off))
+        XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_NilOrMerchantHost_GivesNoOp() {
+    func testSelect_NilOrMerchantHost_GivesNoOp_AndCreatesNothing() {
         assertNoOp(select(host: nil))
         assertNoOp(select(host: Self.merchantHost))
+        XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_EveryConditionHolds_GivesOneActiveTelemetryAsBothHandles() throws {
+    func testSelect_EveryConditionHolds_CreatesOnce_AndGivesThatActiveTelemetryAsBothHandles() throws {
         let selection = select()
 
+        XCTAssertEqual(factory.callCount, 1)
+        let created = try XCTUnwrap(factory.created)
         let telemetry = try XCTUnwrap(selection.telemetry as? ActiveTelemetry)
         let runtime = try XCTUnwrap(selection.runtime as? ActiveTelemetry)
+        XCTAssertTrue(telemetry === created)
         XCTAssertTrue(telemetry === runtime)
         XCTAssertTrue(telemetry.isActive)
         XCTAssertEqual(telemetry.credentials, TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization))
         XCTAssertEqual(telemetry.level, .all)
+    }
+
+    func testSelect_PassesTheCredentialsAndLevelToTheFactory() {
+        select(level: .errors)
+
+        XCTAssertEqual(factory.arguments.map(\.credentials),
+                       [TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization)])
+        XCTAssertEqual(factory.arguments.map(\.level), [.errors])
+    }
+
+    func testSelect_ActiveThenBound_ReadsTheDeviceContextOnStart() throws {
+        let selection = select()
+
+        TelemetryBinding.bind(selection)
+
+        let telemetry = try XCTUnwrap(selection.telemetry as? ActiveTelemetry)
+        XCTAssertEqual(factory.provider.callCount, 1)
+        XCTAssertEqual(telemetry.resourceAttributes, FakeDeviceContextProvider.attributes)
     }
 
     // MARK: - bind
@@ -122,6 +154,7 @@ final class TelemetryBindingTests: XCTestCase {
 
     // MARK: - Helpers
 
+    @discardableResult
     private func select(
         provider: any TelemetryCredentialsProvider = StubCredentialsProvider(
             value: TelemetryCredentials(endpoint: TelemetryBindingTests.endpoint, authorization: TelemetryBindingTests.authorization)
@@ -134,7 +167,8 @@ final class TelemetryBindingTests: XCTestCase {
             credentialsProvider: provider,
             sdkEnvironment: environment,
             level: level,
-            hostBundleIdentifier: host
+            hostBundleIdentifier: host,
+            createActive: factory.make
         )
     }
 
@@ -159,6 +193,59 @@ private final class FakeTelemetry: Telemetry {
     }
 
     func report(_ event: TelemetryEvent) {}
+}
+
+/// Builds `ActiveTelemetry` with an inline dispatcher and a fixed device context, and counts its calls.
+private final class CountingActiveFactory {
+    let provider = FakeDeviceContextProvider()
+    private(set) var arguments: [(credentials: TelemetryCredentials, level: TelemetryLevel)] = []
+    private(set) var created: ActiveTelemetry?
+
+    var callCount: Int { arguments.count }
+
+    func make(credentials: TelemetryCredentials, level: TelemetryLevel) -> ActiveTelemetry {
+        arguments.append((credentials, level))
+        let telemetry = ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: provider,
+                                        dispatcher: ImmediateDispatcher())
+        created = telemetry
+        return telemetry
+    }
+}
+
+/// Runs every task inline; delayed tasks are dropped.
+private struct ImmediateDispatcher: TelemetryDispatcher {
+    func post(_ task: @escaping @Sendable () -> Void) -> Bool {
+        task()
+        return true
+    }
+
+    func postDelayed(milliseconds: Int64, _ task: @escaping @Sendable () -> Void) -> Bool {
+        true
+    }
+}
+
+/// A fixed, synthetic device context that counts how often it is read.
+private final class FakeDeviceContextProvider: DeviceContextProvider, @unchecked Sendable {
+    static let attributes = ResourceAttributes(
+        serviceVersion: "0.0.0-test",
+        deploymentEnvironmentName: "sandbox",
+        osVersion: "17.0",
+        deviceModelIdentifier: "iPhone15,2",
+        appInstallationId: "00000000-0000-4000-8000-000000000001",
+        appId: "com.paydock.sample",
+        appVersion: "1.0.0",
+        appDebuggable: true
+    )
+
+    private let lock = NSLock()
+    private var calls = 0
+
+    var callCount: Int { lock.withLock { calls } }
+
+    func current() -> ResourceAttributes {
+        lock.withLock { calls += 1 }
+        return Self.attributes
+    }
 }
 
 private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
