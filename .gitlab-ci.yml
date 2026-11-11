@@ -350,10 +350,12 @@ buildStagingFirebase:
     # Manual on release branch commits
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: manual
-    # Automatically runs on merge request change
+    # Automatically runs on merge request change. Non-blocking: it needs the ad-hoc signing certificate (fastlane
+    # match), which only distributes the sample app and plays no part in the SDK build or its tests. Make it blocking
+    # again once the certificate is renewed.
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: on_success
-      allow_failure: false
+      allow_failure: true
   allow_failure: true
 
 buildStagingTestflight:
@@ -438,7 +440,8 @@ buildSandboxTestflight:
     # Automatically run on merge requests from "deploy/*" branches targeting "release"
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
-      allow_failure: false
+      # Non-blocking while the Apple signing certificates / account access can't be renewed (see buildStagingFirebase).
+      allow_failure: true
     # Manual trigger for other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
@@ -549,7 +552,8 @@ deploySandboxTestflight:
     # Automatically run on merge requests from "deploy/*" branches targeting "release"
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\// && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"'
       when: on_success
-      allow_failure: false
+      # Non-blocking while the Apple signing certificates / account access can't be renewed (see buildStagingFirebase).
+      allow_failure: true
     # Allow manual trigger from other merge requests
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
