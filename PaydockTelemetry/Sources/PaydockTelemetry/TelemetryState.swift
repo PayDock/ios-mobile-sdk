@@ -14,6 +14,7 @@ package struct TelemetryState: Sendable, Equatable {
     /// UTC epoch milliseconds.
     package var lastExport: Int64?
     package var flushScheduled: Bool = false
+    /// The last sequence used in this session, `0` at the start; the first record is `<sessionId>-1` (R_09).
     package var nextSequence: Int64 = 0
     /// Fingerprint → the record held in its collapse window.
     package var collapsing: [String: PendingRecord] = [:]

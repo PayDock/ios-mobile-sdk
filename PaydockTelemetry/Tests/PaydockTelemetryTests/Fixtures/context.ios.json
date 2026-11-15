@@ -1,0 +1,16 @@
+{
+  "service.name": "paydock-mobile-sdk",
+  "service.namespace": "paydock",
+  "service.version": "4.9.1",
+  "paydock.sdk.platform": "ios",
+  "paydock.telemetry.spec_version": 1,
+  "deployment.environment.name": "sandbox",
+  "os.name": "iOS",
+  "os.version": "18.1",
+  "device.manufacturer": "Apple",
+  "device.model.identifier": "iPhone15,2",
+  "app.installation.id": "c81d4e2a-5f3b-4a90-b6e7-19d2f0a8c435",
+  "paydock.app.id": "com.merchant.shop",
+  "paydock.app.version": "3.2.0",
+  "paydock.app.debuggable": true
+}

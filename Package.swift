@@ -184,7 +184,8 @@ let package = Package(
         .testTarget(
             name: "PaydockTelemetryTests",
             dependencies: ["PaydockTelemetry"],
-            path: "PaydockTelemetry/Tests/PaydockTelemetryTests"
+            path: "PaydockTelemetry/Tests/PaydockTelemetryTests",
+            resources: [.copy("Fixtures")]
         ),
 
         // Main SDK target

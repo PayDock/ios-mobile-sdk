@@ -1,0 +1,26 @@
+{
+  "time": "2026-11-05T04:14:07.512Z",
+  "builtTime": "2026-11-05T04:14:07.512Z",
+  "sentTime": "2026-11-05T04:14:12.512Z",
+  "sessionId": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68",
+  "sequence": 7,
+  "connection": "cell",
+  "event": {
+    "type": "NetworkFailure",
+    "method": "POST",
+    "urlTemplate": "/v1/payment_sources/tokens",
+    "serverAddress": "api-sandbox.paydock.com",
+    "failure": {
+      "kind": "timeout",
+      "error": {
+        "type": "Foundation.URLError",
+        "frames": [
+          "NetworkingLib NetworkService.request(_:) + 280",
+          "MobileSDK GiftCardService.tokenise(_:) + 96"
+        ]
+      }
+    },
+    "attempt": 2,
+    "widget": "GiftCardWidget"
+  }
+}

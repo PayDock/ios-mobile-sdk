@@ -52,7 +52,7 @@ final class TelemetryReducerTests: XCTestCase {
         }
     }
 
-    func testLevelErrors_KeepsEveryKindToday() {
+    func testLevelErrors_KeepsEveryErrorKind() {
         var state = initial
         state.level = .errors
 
@@ -65,8 +65,21 @@ final class TelemetryReducerTests: XCTestCase {
         }
     }
 
+    func testLevelErrors_DropsWidgetOpenedAndDropped_WithoutStateChange() {
+        var state = initial
+        state.level = .errors
+
+        for event in nonErrorKinds() {
+            XCTAssertFalse(Reducer.isError(event))
+            let result = Reducer.reduce(state, .reported(event), now: Self.start)
+
+            XCTAssertEqual(result.state, state)
+            XCTAssertEqual(result.effects, [.drop(.levelFiltered)])
+        }
+    }
+
     func testLevelAll_KeepsEveryKind() {
-        for event in everyKind() {
+        for event in everyKind() + nonErrorKinds() {
             let result = Reducer.reduce(initial, .reported(event), now: Self.start)
 
             XCTAssertEqual(result.state.persisted, 1)
@@ -95,7 +108,7 @@ final class TelemetryReducerTests: XCTestCase {
 
     func testCrash_IsNeverHeld() {
         let event = TelemetryFixtures.crash()
-        let record = PendingRecord(id: "session-0", sessionId: "session", event: event, firstSeenAt: Self.start)
+        let record = PendingRecord(id: "session-1", sessionId: "session", event: event, firstSeenAt: Self.start)
 
         let first = Reducer.reduce(initial, .reported(event), now: Self.start)
 
@@ -106,7 +119,7 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertTrue(first.state.flushScheduled)
 
         let second = Reducer.reduce(first.state, .reported(event), now: Self.start + 1)
-        let secondRecord = PendingRecord(id: "session-1", sessionId: "session", event: event, firstSeenAt: Self.start + 1)
+        let secondRecord = PendingRecord(id: "session-2", sessionId: "session", event: event, firstSeenAt: Self.start + 1)
 
         XCTAssertEqual(second.effects, [.persist(secondRecord), .enqueue(secondRecord)])
         XCTAssertEqual(second.state.queued, 2)
@@ -116,7 +129,7 @@ final class TelemetryReducerTests: XCTestCase {
 
     func testError_IsHeld_PersistedOnFirstSight_AndSchedulesAFlush() {
         let event = TelemetryFixtures.sdkError()
-        let record = PendingRecord(id: "session-0", sessionId: "session", event: event, firstSeenAt: Self.start)
+        let record = PendingRecord(id: "session-1", sessionId: "session", event: event, firstSeenAt: Self.start)
 
         let result = Reducer.reduce(initial, .reported(event), now: Self.start)
 
@@ -150,7 +163,7 @@ final class TelemetryReducerTests: XCTestCase {
 
         let result = Reducer.reduce(counted, .reported(event), now: Self.start + Self.window)
 
-        let fresh = PendingRecord(id: "session-2", sessionId: "session", event: event, firstSeenAt: Self.start + Self.window)
+        let fresh = PendingRecord(id: "session-3", sessionId: "session", event: event, firstSeenAt: Self.start + Self.window)
         XCTAssertEqual(result.effects, [.enqueue(released), .persist(released), .persist(fresh)])
         XCTAssertEqual(result.state.collapsing, [key: fresh])
         XCTAssertEqual(result.state.queued, 1)
@@ -160,7 +173,7 @@ final class TelemetryReducerTests: XCTestCase {
     func testReleasedRecordSeenOnce_IsEnqueuedWithoutPersistingAgain() {
         let event = TelemetryFixtures.sdkError()
         let held = Reducer.reduce(initial, .reported(event), now: Self.start)
-        let record = PendingRecord(id: "session-0", sessionId: "session", event: event, firstSeenAt: Self.start)
+        let record = PendingRecord(id: "session-1", sessionId: "session", event: event, firstSeenAt: Self.start)
 
         let result = Reducer.reduce(held.state, .flush, now: Self.start + Self.window)
 
@@ -185,8 +198,25 @@ final class TelemetryReducerTests: XCTestCase {
     // MARK: - Fingerprint
 
     func testFingerprint_Crash() {
-        XCTAssertEqual(Reducer.fingerprint(TelemetryFixtures.crash()), "paydock.crash|NSException|")
-        XCTAssertEqual(Reducer.fingerprint(.crash(error: nil, source: .metricKit)), "paydock.crash||")
+        XCTAssertEqual(Reducer.fingerprint(TelemetryFixtures.crash()), "paydock.crash|NSInvalidArgumentException|")
+        XCTAssertEqual(Reducer.fingerprint(.crash(error: nil, source: .metricKit, kind: .osKill, inSdk: false)), "paydock.crash||")
+    }
+
+    func testFingerprint_ErrorWithoutAType_ReadsAsEmpty() {
+        let hang = TelemetryEvent.crash(error: TelemetryEvent.ErrorInfo(type: nil, frames: ["MobileSDK 0x0000000104a3c1f0"]),
+                                        source: .metricKit, kind: .hang, inSdk: true)
+
+        XCTAssertEqual(Reducer.fingerprint(hang), "paydock.crash||MobileSDK 0x0000000104a3c1f0")
+    }
+
+    func testFingerprint_WidgetOpenedAndDropped() {
+        XCTAssertEqual(Reducer.fingerprint(.widgetOpened(widget: "CardDetailsWidget")), "paydock.widget.opened|CardDetailsWidget")
+        let reasons: [(TelemetryEvent.DroppedReason, String)] = [
+            (.rateLimit, "rate_limit"), (.storeFull, "store_full"), (.tooOld, "too_old"), (.rejected, "rejected")
+        ]
+        for (reason, name) in reasons {
+            XCTAssertEqual(Reducer.fingerprint(.dropped(reason: reason, count: 5)), "paydock.telemetry.dropped|\(name)")
+        }
     }
 
     func testFingerprint_TopPaydockFrame_IsTheFirstFrameNamingAModuleAsAWholeWord() {
@@ -274,8 +304,8 @@ final class TelemetryReducerTests: XCTestCase {
         state = Reducer.reduce(state, .reported(TelemetryFixtures.sdkError("Sample.B")), now: Self.start).state
         state = Reducer.reduce(state, .reported(TelemetryFixtures.sdkError("Sample.A")), now: Self.start).state
         state = Reducer.reduce(state, .reported(TelemetryFixtures.sdkError("Sample.C")), now: Self.start + 10).state
-        let recordB = record(0, TelemetryFixtures.sdkError("Sample.B"), at: Self.start)
-        let recordA = record(1, TelemetryFixtures.sdkError("Sample.A"), at: Self.start)
+        let recordB = record(1, TelemetryFixtures.sdkError("Sample.B"), at: Self.start)
+        let recordA = record(2, TelemetryFixtures.sdkError("Sample.A"), at: Self.start)
 
         let result = Reducer.reduce(state, .flush, now: Self.start + Self.window)
 
@@ -332,7 +362,7 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(state.queued, 19)
 
         let result = Reducer.reduce(state, .reported(TelemetryFixtures.crash()), now: Self.start + 100)
-        let record = PendingRecord(id: "session-19", sessionId: "session", event: TelemetryFixtures.crash(), firstSeenAt: Self.start + 100)
+        let record = PendingRecord(id: "session-20", sessionId: "session", event: TelemetryFixtures.crash(), firstSeenAt: Self.start + 100)
 
         XCTAssertEqual(result.effects, [.persist(record), .enqueue(record), Self.export])
         XCTAssertEqual(result.state.queued, 0)
@@ -357,8 +387,8 @@ final class TelemetryReducerTests: XCTestCase {
         state = Reducer.reduce(state, .reported(TelemetryFixtures.sdkError("Sample.B")), now: Self.start).state
         state = Reducer.reduce(state, .reported(TelemetryFixtures.sdkError("Sample.A")), now: Self.start).state
         state = Reducer.reduce(state, .reported(TelemetryFixtures.crash()), now: Self.start).state
-        let recordB = record(0, TelemetryFixtures.sdkError("Sample.B"), at: Self.start)
-        let recordA = record(1, TelemetryFixtures.sdkError("Sample.A"), at: Self.start)
+        let recordB = record(1, TelemetryFixtures.sdkError("Sample.B"), at: Self.start)
+        let recordA = record(2, TelemetryFixtures.sdkError("Sample.A"), at: Self.start)
 
         let result = Reducer.reduce(state, .appBackgrounded, now: Self.start + 1)
 
@@ -378,7 +408,7 @@ final class TelemetryReducerTests: XCTestCase {
 
     // MARK: - Identity
 
-    func testRecordIds_FollowTheSessionAndTheSequence() {
+    func testRecordIds_FollowTheSessionAndTheSequence_FromOne() {
         var state = TelemetryState(level: .all, enabled: true, sessionId: "abc")
         var ids: [String] = []
         for index in 0..<3 {
@@ -390,7 +420,7 @@ final class TelemetryReducerTests: XCTestCase {
             state = result.state
         }
 
-        XCTAssertEqual(ids, ["abc-0", "abc-1", "abc-2"])
+        XCTAssertEqual(ids, ["abc-1", "abc-2", "abc-3"])
         XCTAssertEqual(state.nextSequence, 3)
     }
 
@@ -404,7 +434,8 @@ final class TelemetryReducerTests: XCTestCase {
     // MARK: - Purity
 
     func testReduce_IsPure() {
-        let inputs: [TelemetryIntent] = everyKind().map { .reported($0) } + [.flush, .appBackgrounded, .levelChanged(.errors)]
+        let inputs: [TelemetryIntent] = (everyKind() + nonErrorKinds()).map { .reported($0) }
+            + [.flush, .appBackgrounded, .levelChanged(.errors)]
         var state = initial
         for (index, intent) in inputs.enumerated() {
             let now = Self.start + Int64(index) * Self.window
@@ -430,5 +461,9 @@ final class TelemetryReducerTests: XCTestCase {
             TelemetryFixtures.sdkError(),
             TelemetryFixtures.networkFailure()
         ]
+    }
+
+    private func nonErrorKinds() -> [TelemetryEvent] {
+        [.widgetOpened(widget: "CardDetailsWidget"), .dropped(reason: .tooOld, count: 4)]
     }
 }

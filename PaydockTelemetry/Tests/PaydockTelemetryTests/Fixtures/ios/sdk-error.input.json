@@ -1,0 +1,24 @@
+{
+  "time": "2026-11-05T04:14:07.512Z",
+  "builtTime": "2026-11-05T04:14:07.512Z",
+  "sentTime": "2026-11-05T04:14:12.512Z",
+  "sessionId": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68",
+  "sequence": 5,
+  "connection": "wifi",
+  "event": {
+    "type": "SdkError",
+    "code": "CARD_TOKENISE_ERROR",
+    "widget": "CardDetailsWidget",
+    "inSdk": true,
+    "error": {
+      "type": "MobileSDK.CardDetailsError",
+      "frames": [
+        "MobileSDK CardDetailsViewModel.handleTokenResult(_:) + 340",
+        "MobileSDK closure #1 in CardDetailsViewModel.tokeniseCard() + 196"
+      ],
+      "cause": {
+        "type": "NetworkingLib.ErrorRes"
+      }
+    }
+  }
+}

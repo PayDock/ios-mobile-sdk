@@ -33,23 +33,30 @@ package enum TelemetryReducer {
     }
 
     /// `"<name>|<exceptionType>|<topPaydockFrame>"`; a network failure appends `"|<method>|<urlTemplate>|<failure>"`.
+    /// A widget opened is `"paydock.widget.opened|<widget>"`, a dropped notice `"paydock.telemetry.dropped|<reason>"`.
     package static func fingerprint(_ event: TelemetryEvent) -> String {
         switch event {
-        case let .crash(error, _, _, _):
+        case let .crash(error, _, _, _, _, _, _):
             return key("paydock.crash", error)
-        case let .uncaughtException(error, _, _), let .sdkError(error, _, _):
+        case let .uncaughtException(error, _, _), let .sdkError(error, _, _, _):
             return key("paydock.error", error)
         case let .networkFailure(method, urlTemplate, _, failure, _, _, _):
             let base = key("paydock.network.failure", failureError(failure))
-            return "\(base)|\(methodName(method))|\(urlTemplate)|\(failureName(failure))"
+            return "\(base)|\(method.rawValue)|\(urlTemplate)|\(failureName(failure))"
+        case let .widgetOpened(widget):
+            return "paydock.widget.opened|\(widget)"
+        case let .dropped(reason, _):
+            return "paydock.telemetry.dropped|\(reason.rawValue)"
         }
     }
 
-    /// True for all four kinds today.
+    /// True for the four error kinds; a widget opened and a dropped notice are not errors, so level `errors` drops them.
     package static func isError(_ event: TelemetryEvent) -> Bool {
         switch event {
         case .crash, .uncaughtException, .sdkError, .networkFailure:
             return true
+        case .widgetOpened, .dropped:
+            return false
         }
     }
 
@@ -69,9 +76,9 @@ package enum TelemetryReducer {
 
         var next = state
         var effects: [TelemetryEffect] = []
+        next.nextSequence += 1
         let record = PendingRecord(id: "\(next.sessionId)-\(next.nextSequence)", sessionId: next.sessionId, event: event,
                                    firstSeenAt: now)
-        next.nextSequence += 1
 
         if case .crash = event {
             effects += [.persist(record), .enqueue(record)]
@@ -176,30 +183,9 @@ package enum TelemetryReducer {
         case let .httpStatus(code):
             return "http_\(code)"
         case let .transport(kind, _):
-            return "transport_\(kindName(kind))"
+            return "transport_\(kind.rawValue)"
         case .decode:
             return "decode"
-        }
-    }
-
-    private static func kindName(_ kind: TelemetryEvent.TransportKind) -> String {
-        switch kind {
-        case .timeout: return "timeout"
-        case .connection: return "connection"
-        case .tls: return "tls"
-        case .unknown: return "unknown"
-        }
-    }
-
-    private static func methodName(_ method: TelemetryEvent.HTTPMethod) -> String {
-        switch method {
-        case .get: return "GET"
-        case .post: return "POST"
-        case .put: return "PUT"
-        case .patch: return "PATCH"
-        case .delete: return "DELETE"
-        case .head: return "HEAD"
-        case .options: return "OPTIONS"
         }
     }
 

@@ -17,7 +17,8 @@ final class ErrorInfoTests: XCTestCase {
         static let underlyingDescription = "SENTINEL_UNDERLYING_DESCRIPTION"
         static let localizedDescription = "SENTINEL_LOCALIZED_DESCRIPTION"
 
-        static let all = [name, reason, userInfoValue, underlyingDescription, localizedDescription]
+        /// The name is the exception's type (spec § 5.3), so it is the one sentinel an `ErrorInfo` may carry.
+        static let all = [reason, userInfoValue, underlyingDescription, localizedDescription]
     }
 
     private struct SentinelLocalizedError: LocalizedError {
@@ -31,7 +32,7 @@ final class ErrorInfoTests: XCTestCase {
 
     private struct PlainError: Error {}
 
-    func testFromException_CarriesTypeAndCause_AndNoMessageText() {
+    func testFromException_TypeIsItsName_CarriesCause_AndNoMessageText() {
         let underlying = NSError(
             domain: "SampleDomain",
             code: 1,
@@ -45,7 +46,7 @@ final class ErrorInfoTests: XCTestCase {
 
         let info = TelemetryEvent.ErrorInfo.from(exception)
 
-        XCTAssertEqual(info.type, "NSException")
+        XCTAssertEqual(info.type, Sentinel.name)
         XCTAssertEqual(info.causeTypes, ["NSError"])
         assertNoSentinel(in: info)
     }
@@ -54,7 +55,7 @@ final class ErrorInfoTests: XCTestCase {
         let info = TelemetryEvent.ErrorInfo.from(SentinelLocalizedError())
 
         XCTAssertEqual(info.type, String(reflecting: SentinelLocalizedError.self))
-        XCTAssertTrue(info.type.hasPrefix("PaydockTelemetryTests."), info.type)
+        XCTAssertTrue(info.type?.hasPrefix("PaydockTelemetryTests.") == true, info.type ?? "nil")
         XCTAssertTrue(info.causeTypes.isEmpty)
         assertNoSentinel(in: info)
     }
@@ -65,13 +66,28 @@ final class ErrorInfoTests: XCTestCase {
         let info = TelemetryEvent.ErrorInfo.from(PlainError(), frames: frames)
 
         XCTAssertEqual(info.frames.count, TelemetryEvent.ErrorInfo.maxFrames)
-        XCTAssertEqual(info.frames, Array(frames.prefix(TelemetryEvent.ErrorInfo.maxFrames)))
+        XCTAssertEqual(Set(info.frames), ["Sample 0x0000000100000000"])
     }
 
-    func testFrames_AreKeptAsGivenBelowTheCap() {
-        let frames = ["0 Sample 0x0000000100000000", "1 Sample 0x0000000100000010"]
+    func testFrames_ComeBackSanitised() {
+        let frames = [
+            "3   MobileSDK      0x0000000104a3c1f0 $s9MobileSDK3fooyyF + 340",
+            "4   MobileSDK      0x0000000104a3c1f0 MobileSDK + 1234",
+            "MobileSDK 0x0000000104a3c1f0"
+        ]
 
-        XCTAssertEqual(TelemetryEvent.ErrorInfo.from(PlainError(), frames: frames).frames, frames)
+        XCTAssertEqual(
+            TelemetryEvent.ErrorInfo.from(PlainError(), frames: frames).frames,
+            ["MobileSDK $s9MobileSDK3fooyyF + 340", "MobileSDK 0x0000000104a3c1f0", "MobileSDK 0x0000000104a3c1f0"]
+        )
+    }
+
+    func testFromException_FramesAreSanitisedCallStackSymbols() {
+        let exception = NSException(name: .invalidArgumentException, reason: Sentinel.reason)
+
+        let info = TelemetryEvent.ErrorInfo.from(exception)
+
+        XCTAssertEqual(info.frames, exception.callStackSymbols.prefix(TelemetryEvent.ErrorInfo.maxFrames).map(StackFrame.sanitise))
     }
 
     func testSelfReferencingCauseChain_TerminatesAtMaxCauses() {
@@ -90,6 +106,27 @@ final class ErrorInfoTests: XCTestCase {
         let cause = try XCTUnwrap(info.cause)
         XCTAssertTrue(cause.frames.isEmpty)
         XCTAssertEqual(info.frames.count, 1)
+    }
+
+    func testFromException_WithAStandardName_GivesTheName() {
+        let exception = NSException(name: .invalidArgumentException, reason: Sentinel.reason)
+
+        XCTAssertEqual(TelemetryEvent.ErrorInfo.from(exception).type, "NSInvalidArgumentException")
+    }
+
+    func testCauseTypes_SkipANilType() {
+        let innermost = TelemetryEvent.ErrorInfo(type: "Sample.Inner", frames: [])
+        let middle = TelemetryEvent.ErrorInfo(type: nil, frames: [], cause: innermost)
+        let info = TelemetryEvent.ErrorInfo(type: "Sample.Outer", frames: [], cause: middle)
+
+        XCTAssertEqual(info.causeTypes, ["Sample.Inner"])
+    }
+
+    func testType_MayBeNil_ForFramesWithoutAnException() {
+        let info = TelemetryEvent.ErrorInfo(type: nil, frames: ["MobileSDK 0x0000000104a3c1f0"])
+
+        XCTAssertNil(info.type)
+        XCTAssertEqual(info.frames, ["MobileSDK 0x0000000104a3c1f0"])
     }
 
     private func assertNoSentinel(in info: TelemetryEvent.ErrorInfo, file: StaticString = #filePath, line: UInt = #line) {

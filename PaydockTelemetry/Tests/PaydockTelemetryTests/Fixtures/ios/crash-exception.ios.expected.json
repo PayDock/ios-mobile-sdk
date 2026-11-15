@@ -1,0 +1,179 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "paydock-mobile-sdk"
+            }
+          },
+          {
+            "key": "service.namespace",
+            "value": {
+              "stringValue": "paydock"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "4.9.1"
+            }
+          },
+          {
+            "key": "paydock.sdk.platform",
+            "value": {
+              "stringValue": "ios"
+            }
+          },
+          {
+            "key": "paydock.telemetry.spec_version",
+            "value": {
+              "intValue": "1"
+            }
+          },
+          {
+            "key": "deployment.environment.name",
+            "value": {
+              "stringValue": "sandbox"
+            }
+          },
+          {
+            "key": "os.name",
+            "value": {
+              "stringValue": "iOS"
+            }
+          },
+          {
+            "key": "os.version",
+            "value": {
+              "stringValue": "18.1"
+            }
+          },
+          {
+            "key": "device.manufacturer",
+            "value": {
+              "stringValue": "Apple"
+            }
+          },
+          {
+            "key": "device.model.identifier",
+            "value": {
+              "stringValue": "iPhone15,2"
+            }
+          },
+          {
+            "key": "app.installation.id",
+            "value": {
+              "stringValue": "c81d4e2a-5f3b-4a90-b6e7-19d2f0a8c435"
+            }
+          },
+          {
+            "key": "paydock.app.id",
+            "value": {
+              "stringValue": "com.merchant.shop"
+            }
+          },
+          {
+            "key": "paydock.app.version",
+            "value": {
+              "stringValue": "3.2.0"
+            }
+          },
+          {
+            "key": "paydock.app.debuggable",
+            "value": {
+              "boolValue": true
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "scope": {
+            "name": "paydock.telemetry"
+          },
+          "logRecords": [
+            {
+              "timeUnixNano": "1793852047512000000",
+              "severityNumber": 21,
+              "severityText": "FATAL",
+              "body": {
+                "stringValue": "paydock.crash · exception · NSInvalidArgumentException"
+              },
+              "attributes": [
+                {
+                  "key": "event.name",
+                  "value": {
+                    "stringValue": "paydock.crash"
+                  }
+                },
+                {
+                  "key": "session.id",
+                  "value": {
+                    "stringValue": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68"
+                  }
+                },
+                {
+                  "key": "log.record.uid",
+                  "value": {
+                    "stringValue": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68-3"
+                  }
+                },
+                {
+                  "key": "network.connection.type",
+                  "value": {
+                    "stringValue": "wifi"
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "NSInvalidArgumentException"
+                  }
+                },
+                {
+                  "key": "exception.stacktrace",
+                  "value": {
+                    "stringValue": "NSInvalidArgumentException\n\tat CoreFoundation __exceptionPreprocess + 164\n\tat libobjc.A.dylib objc_exception_throw + 60\n\tat MobileSDK CardDetailsViewModel.tokeniseCard() + 212"
+                  }
+                },
+                {
+                  "key": "paydock.exception.in_sdk",
+                  "value": {
+                    "boolValue": true
+                  }
+                },
+                {
+                  "key": "paydock.crash.kind",
+                  "value": {
+                    "stringValue": "exception"
+                  }
+                },
+                {
+                  "key": "paydock.crash.source",
+                  "value": {
+                    "stringValue": "nsexception"
+                  }
+                },
+                {
+                  "key": "paydock.crash.reason",
+                  "value": {
+                    "stringValue": "NSInvalidArgumentException"
+                  }
+                },
+                {
+                  "key": "thread.name",
+                  "value": {
+                    "stringValue": "main"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

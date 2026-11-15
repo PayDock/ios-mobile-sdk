@@ -1,0 +1,23 @@
+{
+  "time": "2026-11-04T22:10:03.000Z",
+  "builtTime": "2026-11-05T04:14:07.512Z",
+  "sentTime": "2026-11-05T04:14:12.512Z",
+  "sessionId": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68",
+  "sequence": 1,
+  "connection": "wifi",
+  "event": {
+    "type": "Crash",
+    "kind": "signal",
+    "source": "metrickit",
+    "reason": "SIGSEGV",
+    "inSdk": true,
+    "error": {
+      "type": "EXC_BAD_ACCESS",
+      "frames": [
+        "MobileSDK 0x0000000104a3c1f0",
+        "MobileSDK 0x0000000104a39b84",
+        "UIKitCore 0x00000001a6f2d6a8"
+      ]
+    }
+  }
+}

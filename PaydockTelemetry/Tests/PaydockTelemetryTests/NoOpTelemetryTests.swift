@@ -19,7 +19,7 @@ final class NoOpTelemetryTests: XCTestCase {
     func testReport_AcceptsOneEventOfEachKind_AndReturns() {
         let telemetry = NoOpTelemetry()
         let events: [TelemetryEvent] = [
-            .crash(error: info, source: .nsException, crashReason: "NSInvalidArgumentException"),
+            .crash(error: info, source: .nsException, kind: .exception, inSdk: true, crashReason: "NSInvalidArgumentException"),
             .uncaughtException(error: info),
             .sdkError(error: info, errorCode: "SAMPLE_CODE"),
             .networkFailure(
@@ -27,7 +27,9 @@ final class NoOpTelemetryTests: XCTestCase {
                 urlTemplate: "/v1/sample/{id}",
                 serverAddress: "api-sandbox.paydock.com",
                 failure: .httpStatus(code: 500)
-            )
+            ),
+            .widgetOpened(widget: "SampleWidget"),
+            .dropped(reason: .rateLimit, count: 3)
         ]
 
         for event in events {

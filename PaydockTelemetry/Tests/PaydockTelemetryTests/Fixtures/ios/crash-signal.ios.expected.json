@@ -1,0 +1,179 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "paydock-mobile-sdk"
+            }
+          },
+          {
+            "key": "service.namespace",
+            "value": {
+              "stringValue": "paydock"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "4.9.1"
+            }
+          },
+          {
+            "key": "paydock.sdk.platform",
+            "value": {
+              "stringValue": "ios"
+            }
+          },
+          {
+            "key": "paydock.telemetry.spec_version",
+            "value": {
+              "intValue": "1"
+            }
+          },
+          {
+            "key": "deployment.environment.name",
+            "value": {
+              "stringValue": "sandbox"
+            }
+          },
+          {
+            "key": "os.name",
+            "value": {
+              "stringValue": "iOS"
+            }
+          },
+          {
+            "key": "os.version",
+            "value": {
+              "stringValue": "18.1"
+            }
+          },
+          {
+            "key": "device.manufacturer",
+            "value": {
+              "stringValue": "Apple"
+            }
+          },
+          {
+            "key": "device.model.identifier",
+            "value": {
+              "stringValue": "iPhone15,2"
+            }
+          },
+          {
+            "key": "app.installation.id",
+            "value": {
+              "stringValue": "c81d4e2a-5f3b-4a90-b6e7-19d2f0a8c435"
+            }
+          },
+          {
+            "key": "paydock.app.id",
+            "value": {
+              "stringValue": "com.merchant.shop"
+            }
+          },
+          {
+            "key": "paydock.app.version",
+            "value": {
+              "stringValue": "3.2.0"
+            }
+          },
+          {
+            "key": "paydock.app.debuggable",
+            "value": {
+              "boolValue": true
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "scope": {
+            "name": "paydock.telemetry"
+          },
+          "logRecords": [
+            {
+              "timeUnixNano": "1793852052512000000",
+              "severityNumber": 21,
+              "severityText": "FATAL",
+              "body": {
+                "stringValue": "paydock.crash · signal · SIGSEGV"
+              },
+              "attributes": [
+                {
+                  "key": "event.name",
+                  "value": {
+                    "stringValue": "paydock.crash"
+                  }
+                },
+                {
+                  "key": "session.id",
+                  "value": {
+                    "stringValue": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68"
+                  }
+                },
+                {
+                  "key": "log.record.uid",
+                  "value": {
+                    "stringValue": "7e41d9c2-8b05-4f6a-a3d1-0c9e2b7f5a68-1"
+                  }
+                },
+                {
+                  "key": "network.connection.type",
+                  "value": {
+                    "stringValue": "wifi"
+                  }
+                },
+                {
+                  "key": "paydock.occurred_at",
+                  "value": {
+                    "stringValue": "2026-11-04T22:10:03.000Z"
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "EXC_BAD_ACCESS"
+                  }
+                },
+                {
+                  "key": "exception.stacktrace",
+                  "value": {
+                    "stringValue": "EXC_BAD_ACCESS\n\tat MobileSDK 0x0000000104a3c1f0\n\tat MobileSDK 0x0000000104a39b84\n\tat UIKitCore 0x00000001a6f2d6a8"
+                  }
+                },
+                {
+                  "key": "paydock.exception.in_sdk",
+                  "value": {
+                    "boolValue": true
+                  }
+                },
+                {
+                  "key": "paydock.crash.kind",
+                  "value": {
+                    "stringValue": "signal"
+                  }
+                },
+                {
+                  "key": "paydock.crash.source",
+                  "value": {
+                    "stringValue": "metrickit"
+                  }
+                },
+                {
+                  "key": "paydock.crash.reason",
+                  "value": {
+                    "stringValue": "SIGSEGV"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

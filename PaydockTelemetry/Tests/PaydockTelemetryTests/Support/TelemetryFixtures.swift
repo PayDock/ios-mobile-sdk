@@ -19,8 +19,9 @@ enum TelemetryFixtures {
         .sdkError(error: info(type, frames: frames), errorCode: "SAMPLE_CODE")
     }
 
-    static func crash(_ type: String = "NSException", frames: [String] = []) -> TelemetryEvent {
-        .crash(error: info(type, frames: frames), source: .nsException, crashReason: "NSInvalidArgumentException")
+    static func crash(_ type: String = "NSInvalidArgumentException", frames: [String] = []) -> TelemetryEvent {
+        .crash(error: info(type, frames: frames), source: .nsException, kind: .exception, inSdk: true,
+               crashReason: "NSInvalidArgumentException")
     }
 
     static func networkFailure(

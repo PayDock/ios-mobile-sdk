@@ -24,7 +24,8 @@ let package = Package(
         .testTarget(
             name: "PaydockTelemetryTests",
             dependencies: ["PaydockTelemetry"],
-            path: "Tests/PaydockTelemetryTests"
+            path: "Tests/PaydockTelemetryTests",
+            resources: [.copy("Fixtures")]
         )
     ]
 )

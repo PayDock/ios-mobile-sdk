@@ -20,7 +20,7 @@ final class TelemetryContractTests: XCTestCase {
         XCTAssertFalse(rawErrorPaths(in: ("probe", NSError(domain: "SampleDomain", code: 1)), path: "probe").isEmpty)
 
         let events = Self.everyEvent()
-        XCTAssertEqual(Set(events.map(Self.kind)).count, 4)
+        XCTAssertEqual(Set(events.map(Self.kind)).count, 6)
         XCTAssertEqual(Set(Self.everyNetworkError().map(Self.kind)).count, 3)
 
         for event in events {
@@ -91,12 +91,15 @@ final class TelemetryContractTests: XCTestCase {
             NSError(domain: "SampleDomain", code: 2, userInfo: [NSUnderlyingErrorKey: underlying]),
             frames: ["0 Sample 0x0000000100000000"]
         )
-        let apiError = TelemetryEvent.APIError(status: "400", code: "sample_code", summaryCode: "sample", gatewayCodes: ["G1"])
+        let apiError = TelemetryEvent.APIError(status: 400, code: "sample_code", summaryCode: "sample", gatewayCodes: ["G1"])
 
         let fixed: [TelemetryEvent] = [
-            .crash(error: .from(exception), source: .nsException, crashReason: "NSInvalidArgumentException", threadName: "main"),
+            .crash(error: .from(exception), source: .nsException, kind: .exception, inSdk: true,
+                   crashReason: "NSInvalidArgumentException", threadName: "main", occurredAt: 1_700_000_000_000),
             .uncaughtException(error: info, threadName: "worker", widget: "SampleWidget"),
-            .sdkError(error: info, errorCode: "SAMPLE_CODE", widget: "SampleWidget")
+            .sdkError(error: info, errorCode: "SAMPLE_CODE", widget: "SampleWidget", apiError: apiError),
+            .widgetOpened(widget: "SampleWidget"),
+            .dropped(reason: .storeFull, count: 2)
         ]
         let failures: [TelemetryEvent] = everyNetworkError().map { failure in
             .networkFailure(
@@ -119,6 +122,8 @@ final class TelemetryContractTests: XCTestCase {
         case .uncaughtException: return "uncaughtException"
         case .sdkError: return "sdkError"
         case .networkFailure: return "networkFailure"
+        case .widgetOpened: return "widgetOpened"
+        case .dropped: return "dropped"
         }
     }
 
