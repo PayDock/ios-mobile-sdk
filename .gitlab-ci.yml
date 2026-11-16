@@ -119,6 +119,31 @@ release_preflight:
     - if: $CI_COMMIT_BRANCH == "release"
       when: on_success
 
+# check_client_sdk_aliases:
+# Release gate (seconds, no build, Linux). Without a pin, widgets load the supported Client SDK line's stable alias in
+# production and sandbox (Constants.clientSdkSupportedLine); staging's candidate alias is internal and not gated.
+# Fails unless the stable alias serves a JavaScript script and a version
+# record naming a release of the line, so a release never ships before the client SDK pipeline has promoted the
+# line to stable. The self-test (stubbed curl,
+# no network) runs first. Runs on every MR into `release` or from a deploy/ or hotfix/ branch, and on `release` and
+# hotfix/ branches, where the tag and release stages wait for the quality stage.
+check_client_sdk_aliases:
+  stage: quality
+  image: alpine:latest
+  needs: [] # Independent of the other jobs: start straight away.
+  before_script:
+    - apk add --no-cache bash curl
+  script:
+    - bash scripts/check-client-sdk-aliases-test.sh
+    - bash scripts/check-client-sdk-aliases.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(deploy|hotfix)\//)'
+      when: on_success
+    - if: $CI_COMMIT_BRANCH == "release"
+      when: on_success
+    - if: $CI_COMMIT_BRANCH =~ /^hotfix\//
+      when: on_success
+
 # hotfix_release:
 # Releases a hotfix for a previous release (e.g. hotfix/v4.8.1 cut from tag 4.8.0 while 4.9.0 is the latest) from
 # its own branch; that branch never merges into `release`. Press Run once the tests have passed: it runs the

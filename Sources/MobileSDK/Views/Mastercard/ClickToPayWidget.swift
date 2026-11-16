@@ -108,20 +108,37 @@ public struct ClickToPayWidget: UIViewRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(completion: completion)
+        .init(completion: completion, clientSdkHost: URL(string: Constants.clientSdkUrlString)?.host)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
         private let completion: (Result<ClickToPayResult, ClickToPayError>) -> Void
         var isLoaded = false
         var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
+        private let clientSdkHost: String?
+        private var clientSdkLoadFailureReported = false
 
-        init(completion: @escaping (Result<ClickToPayResult, ClickToPayError>) -> Void) {
+        init(completion: @escaping (Result<ClickToPayResult, ClickToPayError>) -> Void,
+             clientSdkHost: String? = nil) {
             self.completion = completion
+            self.clientSdkHost = clientSdkHost
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard let data = message.body as? [String: Any],
+            handleMessage(message.body)
+        }
+
+        /// Maps a message posted by the page to `completion`. The page's `clientSdkLoadFailed` report ends the widget
+        /// with `webViewFailed`, at most once.
+        func handleMessage(_ body: Any) {
+            if ClientSdkPage.isLoadFailed(body) {
+                guard !clientSdkLoadFailureReported else { return }
+                clientSdkLoadFailureReported = true
+                activityIndicator?.stopAnimating()
+                completion(.failure(.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))))
+                return
+            }
+            guard let data = body as? [String: Any],
                   let eventRaw = data["event"] as? String,
                   let event = ClickToPayResult.EventType(rawValue: eventRaw) else {
                 completion(.success(ClickToPayResult(event: .checkoutError, mastercardToken: "")))
@@ -153,6 +170,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
             activityIndicator?.stopAnimating()
+            ClientSdkVersionReader.read(webView)
         }
 
         /**
@@ -218,6 +236,34 @@ public struct ClickToPayWidget: UIViewRepresentable {
             }
         }()
 
+        let inlineScript = """
+                const serviceId = "\(serviceId)";
+                const accessToken = "\(accessToken)";
+                const meta = \(jsonString)
+                var src = new \(clientSdkType).ClickToPay(
+                        "#checkoutIframe",
+                        serviceId,
+                        accessToken,
+                        meta,
+                        {}
+                    );
+                src.setEnv('\(clientSdkEnvironment)');
+                const watchEvent = (event) => {
+                    src.on(event, function (data) {
+                        if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
+                            window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
+                                event,
+                                data: data
+                            });
+                        }
+                    });
+                };
+                watchEvent("checkoutReady");
+                watchEvent("checkoutCompleted");
+                watchEvent("checkoutError");
+                src.load();
+        """
+
         return """
         <!DOCTYPE html>
         <html lang="en">
@@ -260,34 +306,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
         </head>
         <body>
             <div id="checkoutIframe"></div>
-            <script src="\(clientSdkUrl)"></script>
-            <script>
-                const serviceId = "\(serviceId)";
-                const accessToken = "\(accessToken)";
-                const meta = \(jsonString)
-                var src = new \(clientSdkType).ClickToPay(
-                        "#checkoutIframe",
-                        serviceId,
-                        accessToken,
-                        meta,
-                        {}
-                    );
-                src.setEnv('\(clientSdkEnvironment)');
-                const watchEvent = (event) => {
-                    src.on(event, function (data) {
-                        if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
-                            window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
-                                event,
-                                data: data
-                            });
-                        }
-                    });
-                };
-                watchEvent("checkoutReady");
-                watchEvent("checkoutCompleted");
-                watchEvent("checkoutError");
-                src.load();
-            </script>
+            \(ClientSdkPage.scripts(clientSdkUrl: clientSdkUrl, inlineScript: inlineScript))
         </body>
         </html>
         """

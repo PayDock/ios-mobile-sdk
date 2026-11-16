@@ -1,5 +1,31 @@
 # Changelog
 
+## [4.10.0] - Unreleased
+
+### Added
+- `MobileSDKConfig(environment:theme:enableTestMode:clientSdkVersion:) throws`: optionally pin the exact Client SDK
+  release every web widget loads, in every environment (e.g. `"v1.150.1"`). It must be a plain release (`vX.Y.Z`, no
+  `-beta` or other suffix) of the Client SDK line this Mobile SDK supports (`v1.150`); otherwise it throws
+  `MobileSDKConfigError.clientSdkVersionOutsideSupportedLine` (code `CONFIG_CLIENT_SDK_VERSION_OUTSIDE_SUPPORTED_LINE`),
+  whose message names the supported line. The existing initialiser and `configureMobileSDK(config:)` are unchanged
+  and don't throw.
+- `MobileSDK.shared.loadedClientSdkVersion`: the Client SDK version the most recent widget page reported after loading
+  (e.g. `"v1.150.2"`), also printed in debug builds. `nil` until a page has reported one, e.g. with a Client SDK
+  release that does not report its version.
+
+### Changed
+- The Mobile SDK no longer compiles an exact Client SDK version in. It supports the Client SDK line `v1.150` and,
+  without a pin, loads that line's **stable** alias in production and sandbox and its **candidate** alias in staging,
+  so patch releases of the line reach your app without a Mobile SDK update, and sandbox runs exactly what production
+  runs.
+- `ClickToPayWidget` and `MPGS3DSWidget` end with `webViewFailed` when the Client SDK script fails to load or loads
+  without providing the Client SDK (e.g. the address answers with a page that is not a script), instead of waiting.
+  `Standalone3DSWidget` already did for a failed load and now also does when the Client SDK is missing.
+
+### Release
+- A release requires the supported line's aliases: the release pipeline's `check_client_sdk_aliases` job refuses it
+  until a `v1.150` release has been promoted to the stable alias.
+
 ## [4.9.1] - 2026-10-30
 
 ### Added

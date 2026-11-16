@@ -14,6 +14,17 @@ public class MobileSDK {
     public static let shared = MobileSDK()
     private(set) var config: MobileSDKConfig?
     private let fontRegistration: FontRegistration
+    private let loadedClientSdkVersionLock = NSLock()
+    private var _loadedClientSdkVersion: String?
+
+    /// The Client SDK version the most recent widget page reported after loading (e.g. `"v1.150.2"`). Widgets load an
+    /// alias of the supported line unless pinned, so this names the release that actually ran. `nil` until a widget
+    /// page has reported a version, e.g. when the loaded release does not report one.
+    public var loadedClientSdkVersion: String? {
+        loadedClientSdkVersionLock.lock()
+        defer { loadedClientSdkVersionLock.unlock() }
+        return _loadedClientSdkVersion
+    }
 
     // MARK: - Initialisation
 
@@ -37,6 +48,17 @@ public class MobileSDK {
 
     private func setupNetworkLayer() {
         NetworkingLib.shared.host = Constants.baseURL
+    }
+
+    /// Keeps a reported Client SDK version and logs it in debug builds. `nil` leaves the last kept value unchanged.
+    func recordLoadedClientSdkVersion(_ version: String?) {
+        guard let version else { return }
+        loadedClientSdkVersionLock.lock()
+        _loadedClientSdkVersion = version
+        loadedClientSdkVersionLock.unlock()
+        #if DEBUG
+        print("[MobileSDK] Client SDK version loaded: \(version)")
+        #endif
     }
 }
 

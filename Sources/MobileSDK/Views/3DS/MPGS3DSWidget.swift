@@ -97,20 +97,37 @@ public struct MPGS3DSWidget: UIViewRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        .init(completion: completion)
+        .init(completion: completion, clientSdkHost: URL(string: Constants.clientSdkUrlString)?.host)
     }
 
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         private let completion: (Result<MPGS3dsResult, MPGS3dsError>) -> Void
         var isLoaded = false
         var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
+        private let clientSdkHost: String?
+        private var clientSdkLoadFailureReported = false
 
-        init(completion: @escaping (Result<MPGS3dsResult, MPGS3dsError>) -> Void) {
+        init(completion: @escaping (Result<MPGS3dsResult, MPGS3dsError>) -> Void,
+             clientSdkHost: String? = nil) {
             self.completion = completion
+            self.clientSdkHost = clientSdkHost
         }
 
         public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard let data = message.body as? [String: Any],
+            handleMessage(message.body)
+        }
+
+        /// Maps a message posted by the page to `completion`. The page's `clientSdkLoadFailed` report ends the widget
+        /// with `webViewFailed`, at most once.
+        func handleMessage(_ body: Any) {
+            if ClientSdkPage.isLoadFailed(body) {
+                guard !clientSdkLoadFailureReported else { return }
+                clientSdkLoadFailureReported = true
+                activityIndicator?.stopAnimating()
+                completion(.failure(.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))))
+                return
+            }
+            guard let data = body as? [String: Any],
                   let eventRaw = data["event"] as? String,
                   let event = MPGS3dsResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
@@ -127,6 +144,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
             activityIndicator?.stopAnimating()
+            ClientSdkVersionReader.read(webView)
         }
 
         /**
@@ -181,6 +199,39 @@ public struct MPGS3DSWidget: UIViewRepresentable {
         let clientSdkUrl = Constants.clientSdkUrlString
         let clientSdkEnvironment = Constants.clientSdkEnvironment
         let clientSdkType = Constants.clientSdkType
+        let inlineScript = """
+                    var meta = document.createElement("meta");
+                    meta.name = "viewport";
+                    meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+                    var head = document.getElementsByTagName("head")[0];
+                    head.appendChild(meta);
+
+                    const token = "\(token)";
+                    var canvas3ds = new \(clientSdkType).Canvas3ds("#widget", token);
+                    canvas3ds.setEnv('\(clientSdkEnvironment)');
+
+                    const watchEvent = (event) => {
+                        canvas3ds.on(event, function (data) {
+                            if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
+                                window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
+                                    event,
+                                    charge3dsId: data.charge_3ds_id,
+                                    status: data.status,
+                                });
+                            }
+                        });
+                    };
+
+                    watchEvent("chargeAuthSuccess");
+                    watchEvent("chargeAuthReject");
+                    watchEvent("chargeAuthCancelled");
+                    watchEvent("additionalDataCollectSuccess");
+                    watchEvent("additionalDataCollectReject");
+                    watchEvent("chargeAuth");
+                    watchEvent("error");
+
+                    canvas3ds.load();
+        """
         return """
         <!DOCTYPE html>
         <html lang="en">
@@ -218,40 +269,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             </head>
             <body>
                 <div id="widget"></div>
-                <script src="\(clientSdkUrl)"></script>
-                <script>
-                    var meta = document.createElement("meta");
-                    meta.name = "viewport";
-                    meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-                    var head = document.getElementsByTagName("head")[0];
-                    head.appendChild(meta);
-
-                    const token = "\(token)";
-                    var canvas3ds = new \(clientSdkType).Canvas3ds("#widget", token);
-                    canvas3ds.setEnv('\(clientSdkEnvironment)');
-
-                    const watchEvent = (event) => {
-                        canvas3ds.on(event, function (data) {
-                            if (typeof window.webkit.messageHandlers.PayDockMobileSDK !== "undefined") {
-                                window.webkit.messageHandlers.PayDockMobileSDK.postMessage({
-                                    event,
-                                    charge3dsId: data.charge_3ds_id,
-                                    status: data.status,
-                                });
-                            }
-                        });
-                    };
-
-                    watchEvent("chargeAuthSuccess");
-                    watchEvent("chargeAuthReject");
-                    watchEvent("chargeAuthCancelled");
-                    watchEvent("additionalDataCollectSuccess");
-                    watchEvent("additionalDataCollectReject");
-                    watchEvent("chargeAuth");
-                    watchEvent("error");
-
-                    canvas3ds.load();
-                </script>
+                \(ClientSdkPage.scripts(clientSdkUrl: clientSdkUrl, inlineScript: inlineScript))
             </body>
         </html>
         """

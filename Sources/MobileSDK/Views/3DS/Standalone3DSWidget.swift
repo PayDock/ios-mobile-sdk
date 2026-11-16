@@ -13,8 +13,9 @@ private enum Standalone3DSWebEvent {
     static let challengeLoaded = "chargeAuthChallengeLoaded"
     static let challengeCompleted = "chargeAuthChallengeCompleted"
     static let error = "error"
-    /// Posted by the page itself (not the web SDK) when the Client SDK script fails to load.
-    static let clientSdkLoadFailed = "clientSdkLoadFailed"
+    /// Posted by the page itself (not the web SDK) when the Client SDK script fails to load, or loads without
+    /// providing the Client SDK global.
+    static let clientSdkLoadFailed = ClientSdkPage.loadFailedEvent
 }
 
 /// Optional informational fields carried by a final web event.
@@ -281,6 +282,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            ClientSdkVersionReader.read(webView)
         }
 
         /**
@@ -368,56 +370,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         let clientSdkUrl = Constants.clientSdkUrlString
         let clientSdkEnvironment = Constants.clientSdkEnvironment
         let clientSdkType = Constants.clientSdkType
-        return """
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <meta charset="UTF-8" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-                />
-                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-                <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-                <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-                <link rel="manifest" href="/site.webmanifest" />
-                <title>3DS</title>
-                <style>
-                    iframe {
-                        border: 0;
-                        width: 100%;
-                        height: 80vh;
-                    }
-                    #loader {
-                        display: flex;
-                        position: fixed;
-                        width: 100%;
-                        height: 80vh;
-                        top: 0;
-                        left: 0;
-                        background: white;
-                        align-items: center;
-                        justify-content: center;
-                        color: black;
-                        font-size: 40px;
-                    }
-                </style>
-            </head>
-            <body>
-                <div id="widget"></div>
-                <script>
-                    // The page can't progress without the Client SDK script: report a failed load (network error or
-                    // HTTP error response) instead of leaving the flow waiting with no event.
-                    function onClientSdkLoadFailed() {
-                        try {
-                            window.webkit.messageHandlers.PayDockMobileSDK.postMessage({ event: "clientSdkLoadFailed" });
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    }
-                </script>
-                <script src="\(clientSdkUrl)" onerror="onClientSdkLoadFailed()"></script>
-                <script>
+        let inlineScript = """
                     var meta = document.createElement("meta");
                     meta.name = "viewport";
                     meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
@@ -466,7 +419,45 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                     watchEvent("error");
 
                     canvas3ds.load();
-                </script>
+        """
+        return """
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+                />
+                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+                <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+                <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+                <link rel="manifest" href="/site.webmanifest" />
+                <title>3DS</title>
+                <style>
+                    iframe {
+                        border: 0;
+                        width: 100%;
+                        height: 80vh;
+                    }
+                    #loader {
+                        display: flex;
+                        position: fixed;
+                        width: 100%;
+                        height: 80vh;
+                        top: 0;
+                        left: 0;
+                        background: white;
+                        align-items: center;
+                        justify-content: center;
+                        color: black;
+                        font-size: 40px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div id="widget"></div>
+                \(ClientSdkPage.scripts(clientSdkUrl: clientSdkUrl, inlineScript: inlineScript))
             </body>
         </html>
         """

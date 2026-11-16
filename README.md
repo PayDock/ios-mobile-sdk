@@ -22,6 +22,44 @@ and tokenise card details.
 4. [Add](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/installation.md#step-2-add-sdk-dependency) the SDK dependency to your app.
 5. Use the following guide to [initialize](https://github.com/PayDock/mobile-sdk-doc/blob/main/setup/initialise.md#initialize-the-ios-sdk) your SDK.
 
+## Client SDK version
+
+The web-based widgets (Click to Pay, MPGS 3DS, standalone 3DS) run Paydock's Client SDK inside a `WKWebView`. This
+release supports the Client SDK line `v1.150` and, by default, loads:
+
+| Environment | Client SDK address |
+|---|---|
+| `.production`, `.sandbox` | the line's **stable** alias, `https://widget.paydock.com/sdk/v1.150.stable/widget.umd.min.js` |
+| `.staging` | the line's **candidate** alias, `https://widget.paydock.com/sdk/v1.150.candidate/widget.umd.min.js` |
+
+Paydock promotes patch releases of the line to the candidate alias first and to the stable alias afterwards, so they
+reach your app without a Mobile SDK update. Sandbox loads the same alias as production, so what you test in sandbox is
+what runs in production; staging, Paydock's internal pre-production environment, sees a release before it is promoted.
+
+If your own controls require a fixed script, pin an exact release of the supported line. The pin applies in every
+environment:
+
+```swift
+let config = try MobileSDKConfig(environment: .production,
+                                 clientSdkVersion: "v1.150.1") // a plain vX.Y.Z release of the supported line
+MobileSDK.shared.configureMobileSDK(config: config)
+```
+
+A pin outside the supported line, or with a suffix such as `-beta`, throws
+`MobileSDKConfigError.clientSdkVersionOutsideSupportedLine`, e.g. `clientSdkVersion v1.151.0 is outside supported line
+v1.150`. The initialiser without `clientSdkVersion` is unchanged and doesn't throw.
+
+After a widget page loads, `MobileSDK.shared.loadedClientSdkVersion` returns the Client SDK version that page reported
+(e.g. `v1.150.2`), and debug builds print it. It is `nil` until a page has reported one.
+
+If the Client SDK script fails to load, or loads without providing the Client SDK, the widget ends with
+`webViewFailed`.
+
+**Release order.** A Mobile SDK release that supports a new line ships only after that line's stable alias exists: promote a
+release of the line to the stable alias in the client SDK pipeline. The release pipeline's `check_client_sdk_aliases`
+job (`scripts/check-client-sdk-aliases.sh`) refuses the release until the stable alias serves a script and a version
+record of the line.
+
 # Getting Started (Sample App)
 
 This repository includes a sample application (`ExampleApp/`) that demonstrates how to integrate and use the Paydock Mobile SDK.

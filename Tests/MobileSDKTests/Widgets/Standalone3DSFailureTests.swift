@@ -96,7 +96,8 @@ final class Standalone3DSFailureTests: XCTestCase {
 
         XCTAssertTrue(html.contains("onerror=\"onClientSdkLoadFailed()\""))
         XCTAssertTrue(html.contains("event: \"clientSdkLoadFailed\""))
-        XCTAssertTrue(html.contains("/sdk/v1.150.0/widget.umd.min.js"))
+        XCTAssertTrue(html.contains("/sdk/v1.150.stable/widget.umd.min.js"))
+        XCTAssertTrue(html.contains("if (typeof window.paydock === \"undefined\")"))
     }
 
     // MARK: - Navigation failures
