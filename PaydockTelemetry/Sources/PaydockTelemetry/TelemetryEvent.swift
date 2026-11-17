@@ -13,9 +13,10 @@ package enum TelemetryEvent: Sendable, Equatable {
     /// The process died: an uncaught Objective-C exception seen by the chained handler (`.nsException`),
     /// or a crash diagnostic MetricKit delivers on a later launch (`.metricKit`).
     /// `crashReason` is the exception name or the signal (spec § 5.3), never `NSException.reason`.
-    /// `inSdk`: the capture slice decides (I8); `occurredAt`: UTC epoch ms from the OS report, nil when the event has no
-    /// time of its own (an in-process exception, a hang without one).
-    case crash(error: ErrorInfo?, source: CrashSource, kind: CrashKind, inSdk: Bool, crashReason: String? = nil,
+    /// `inSdk`: the frame classifier's answer (spec § 7.2), nil when it cannot tell (no record attribute then);
+    /// `occurredAt`: UTC epoch ms from the OS report, nil when the event has no time of its own (an in-process
+    /// exception, a hang without one).
+    case crash(error: ErrorInfo?, source: CrashSource, kind: CrashKind, inSdk: Bool?, crashReason: String? = nil,
                threadName: String? = nil, occurredAt: Int64? = nil)
 
     /// An error that escaped SDK-owned code (a `Task` or an async entry point) while the process kept running —
@@ -86,11 +87,11 @@ package enum TelemetryEvent: Sendable, Equatable {
         }
 
         /// An Objective-C exception. Type: the exception's name (`exception.name.rawValue`, spec § 5.3), never its
-        /// class, reason or user info. Frames: `callStackSymbols` through `StackFrame.sanitise`.
-        package static func from(_ exception: NSException) -> ErrorInfo {
+        /// class, reason or user info. Frames: as given, already described by `StackFrame.describe` (R_08).
+        package static func from(_ exception: NSException, frames: [String]) -> ErrorInfo {
             ErrorInfo(
                 type: exception.name.rawValue,
-                frames: exception.callStackSymbols.prefix(maxFrames).map(StackFrame.sanitise),
+                frames: Array(frames.prefix(maxFrames)),
                 cause: causeInfo(of: exception.userInfo?[NSUnderlyingErrorKey], depth: 0)
             )
         }

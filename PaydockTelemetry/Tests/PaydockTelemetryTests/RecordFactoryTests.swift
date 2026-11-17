@@ -83,6 +83,26 @@ final class RecordFactoryTests: XCTestCase {
         XCTAssertEqual(result.value("paydock.crash.kind"), .string("os_kill"))
     }
 
+    func testCrash_WithInSdkNil_HasNoInSdk() {
+        let error = TelemetryEvent.ErrorInfo(type: "NSInvalidArgumentException", frames: ["ExampleApp 0x1b5058"])
+
+        let result = record(.crash(error: error, source: .nsException, kind: .exception, inSdk: nil,
+                                   crashReason: "NSInvalidArgumentException"))
+
+        XCTAssertNil(result.value("paydock.exception.in_sdk"))
+        XCTAssertFalse(result.attributes.map(\.key).contains("paydock.exception.in_sdk"))
+        XCTAssertEqual(result.value("exception.type"), .string("NSInvalidArgumentException"))
+        XCTAssertEqual(result.value("paydock.crash.kind"), .string("exception"))
+    }
+
+    func testCrash_WritesInSdkTrueAndFalse() {
+        for inSdk in [true, false] {
+            let result = record(.crash(error: nil, source: .metricKit, kind: .signal, inSdk: inSdk, crashReason: "SIGSEGV"))
+
+            XCTAssertEqual(result.value("paydock.exception.in_sdk"), .bool(inSdk))
+        }
+    }
+
     func testHangWithoutType_HasNoExceptionType_ButAStack() {
         let error = TelemetryEvent.ErrorInfo(type: nil, frames: ["MobileSDK 0x0000000104a3c1f0"])
 

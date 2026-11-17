@@ -17,7 +17,7 @@
       "frames": [
         "CoreFoundation __exceptionPreprocess + 164",
         "libobjc.A.dylib objc_exception_throw + 60",
-        "MobileSDK CardDetailsViewModel.tokeniseCard() + 212"
+        "ExampleApp 0x1b5058"
       ]
     }
   }

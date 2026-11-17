@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "timeStampBegin": "2026-11-04 22:00:00",
+  "timeStampEnd": "2026-11-04 22:10:03",
+  "crashDiagnostics": [
+    {
+      "version": "1.0.0",
+      "callStackTree": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": false,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "5D1C7F2A-0B3E-3C4D-8E9F-1A2B3C4D5E6F",
+                "binaryName": "libsystem_kernel.dylib",
+                "offsetIntoBinaryTextSegment": 4528,
+                "address": 7516197296,
+                "sampleCount": 1
+              }
+            ]
+          },
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "c95ed3c1-f639-3822-bc5c-b2d03afdd182",
+                "binaryName": "ExampleApp",
+                "offsetIntoBinaryTextSegment": 1790040,
+                "address": 4296757336,
+                "sampleCount": 1,
+                "subFrames": [
+                  {
+                    "binaryUUID": "c95ed3c1-f639-3822-bc5c-b2d03afdd182",
+                    "binaryName": "ExampleApp",
+                    "offsetIntoBinaryTextSegment": 1789192,
+                    "address": 4296756488,
+                    "sampleCount": 1,
+                    "subFrames": [
+                      {
+                        "binaryUUID": "3E0F5B7A-9C1D-3F2E-A4B5-C6D7E8F90A1B",
+                        "binaryName": "UIKitCore",
+                        "offsetIntoBinaryTextSegment": 5830464,
+                        "address": 7678838592,
+                        "sampleCount": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "diagnosticMetaData": {
+        "exceptionType": 1,
+        "exceptionCode": 0,
+        "signal": 11,
+        "terminationReason": "Namespace SIGNAL, Code 11 Segmentation fault: 11",
+        "virtualMemoryRegionInfo": "0 is not in any region.",
+        "appVersion": "1.0",
+        "appBuildVersion": "1",
+        "osVersion": "iPhone OS 26.4",
+        "deviceType": "iPhone15,2",
+        "platformArchitecture": "arm64"
+      }
+    }
+  ]
+}

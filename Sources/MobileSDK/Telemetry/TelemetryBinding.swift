@@ -33,18 +33,20 @@ enum TelemetryBinding {
                                        environmentName: environment.rawValue)
             }
         )
-        return bind(selection, sendTestRecord: env[EnvironmentCredentialsProvider.sendTestRecordKey]?.lowercased() == "true")
+        return bind(selection, sendTestRecord: env[EnvironmentCredentialsProvider.sendTestRecordKey]?.lowercased() == "true",
+                    raiseTestCrash: env[EnvironmentCredentialsProvider.testCrashKey]?.lowercased() == "true")
         #else
         return bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
         #endif
     }
 
     /// Makes `selection.telemetry` the facade, then calls `selection.runtime.start()` once if it is active, and after
-    /// it `selection.runtime.sendTestRecord()` when active and `sendTestRecord` is set (R_16). While an active facade
+    /// it `selection.runtime.sendTestRecord()` when active and `sendTestRecord` is set (R_16), then
+    /// `selection.runtime.raiseTestCrash()` when active and `raiseTestCrash` is set (R_13). While an active facade
     /// is bound, another active selection is ignored and the bound facade returned: one runtime owns the store's
     /// directory for the process, so a second `configureMobileSDK` never starts a second one sending the same files.
     @discardableResult
-    static func bind(_ selection: TelemetrySelection, sendTestRecord: Bool = false) -> any Telemetry {
+    static func bind(_ selection: TelemetrySelection, sendTestRecord: Bool = false, raiseTestCrash: Bool = false) -> any Telemetry {
         let kept: (any Telemetry)? = lock.withLock {
             if selection.telemetry.isActive, bound.isActive {
                 return bound
@@ -59,6 +61,9 @@ enum TelemetryBinding {
             selection.runtime.start()
             if sendTestRecord {
                 selection.runtime.sendTestRecord()
+            }
+            if raiseTestCrash {
+                selection.runtime.raiseTestCrash()
             }
         }
         return selection.telemetry
@@ -81,6 +86,9 @@ struct EnvironmentCredentialsProvider: TelemetryCredentialsProvider {
     static let levelKey = "PAYDOCK_TELEMETRY_LEVEL"
     /// `true` (any case) makes an active runtime store and send one test record right after start (R_16).
     static let sendTestRecordKey = "PAYDOCK_TELEMETRY_SEND_TEST_RECORD"
+    /// `true` (any case) makes an active runtime raise a test Objective-C exception from SDK code on the main thread
+    /// 3 s after start (R_13).
+    static let testCrashKey = "PAYDOCK_TELEMETRY_TEST_CRASH"
 
     let environment: [String: String]
 

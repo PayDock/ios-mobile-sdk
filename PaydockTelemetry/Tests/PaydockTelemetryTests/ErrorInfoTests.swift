@@ -44,7 +44,7 @@ final class ErrorInfoTests: XCTestCase {
             userInfo: ["sample": Sentinel.userInfoValue, NSUnderlyingErrorKey: underlying]
         )
 
-        let info = TelemetryEvent.ErrorInfo.from(exception)
+        let info = TelemetryEvent.ErrorInfo.from(exception, frames: ["ExampleApp 0x1b5058"])
 
         XCTAssertEqual(info.type, Sentinel.name)
         XCTAssertEqual(info.causeTypes, ["NSError"])
@@ -82,12 +82,19 @@ final class ErrorInfoTests: XCTestCase {
         )
     }
 
-    func testFromException_FramesAreSanitisedCallStackSymbols() {
+    func testFromException_TakesItsFramesAsGiven() {
         let exception = NSException(name: .invalidArgumentException, reason: Sentinel.reason)
+        let frames = ["CoreFoundation __exceptionPreprocess + 164", "ExampleApp 0x1b5058", "??? 0x10"]
 
-        let info = TelemetryEvent.ErrorInfo.from(exception)
+        XCTAssertEqual(TelemetryEvent.ErrorInfo.from(exception, frames: frames).frames, frames)
+    }
 
-        XCTAssertEqual(info.frames, exception.callStackSymbols.prefix(TelemetryEvent.ErrorInfo.maxFrames).map(StackFrame.sanitise))
+    func testFromException_FramesAreCappedAtMaxFrames() {
+        let exception = NSException(name: .invalidArgumentException, reason: Sentinel.reason)
+        let frames = (0..<100).map { "ExampleApp 0x\(String($0, radix: 16))" }
+
+        XCTAssertEqual(TelemetryEvent.ErrorInfo.from(exception, frames: frames).frames,
+                       Array(frames.prefix(TelemetryEvent.ErrorInfo.maxFrames)))
     }
 
     func testSelfReferencingCauseChain_TerminatesAtMaxCauses() {
@@ -111,7 +118,7 @@ final class ErrorInfoTests: XCTestCase {
     func testFromException_WithAStandardName_GivesTheName() {
         let exception = NSException(name: .invalidArgumentException, reason: Sentinel.reason)
 
-        XCTAssertEqual(TelemetryEvent.ErrorInfo.from(exception).type, "NSInvalidArgumentException")
+        XCTAssertEqual(TelemetryEvent.ErrorInfo.from(exception, frames: []).type, "NSInvalidArgumentException")
     }
 
     func testCauseTypes_SkipANilType() {

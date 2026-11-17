@@ -8,7 +8,8 @@ import Foundation
 import XCTest
 
 /// No new required-reason API category (D16): no boot time, file timestamp, file size, disk space or keyboard API,
-/// user defaults only behind `UserDefaultsKeyValueStore`, and `FileManager` only in `FileDurableStore`.
+/// user defaults only behind `UserDefaultsKeyValueStore`, and `FileManager` only in `FileDurableStore` and
+/// `FileStateStore`.
 final class RequiredReasonApiTests: XCTestCase {
 
     private static let forbidden = [
@@ -19,7 +20,7 @@ final class RequiredReasonApiTests: XCTestCase {
     private static let userDefaults = "UserDefaults"
     private static let userDefaultsFile = "UserDefaultsKeyValueStore.swift"
     private static let fileManager = "FileManager"
-    private static let fileManagerFile = "FileDurableStore.swift"
+    private static let fileManagerFiles: Set<String> = ["FileDurableStore.swift", "FileStateStore.swift"]
     private static let monotonicClock = "clock_gettime_nsec_np"
 
     func testSources_UseNoOtherRequiredReasonApi() throws {
@@ -47,20 +48,22 @@ final class RequiredReasonApiTests: XCTestCase {
         XCTAssertTrue(storeUsesIt, "\(Self.userDefaultsFile) not found or no longer uses UserDefaults")
     }
 
-    func testSources_UseFileManagerOnlyInTheFileStore() throws {
-        var storeUsesIt = false
+    func testSources_UseFileManagerOnlyInTheFileStores() throws {
+        var storesUsingIt: Set<String> = []
         for file in try SourceScan.sourceFiles() {
             let text = try String(contentsOf: file, encoding: .utf8)
             let findings = SourceScan.findings(in: text, file: file.lastPathComponent, names: [Self.fileManager])
-            if file.lastPathComponent == Self.fileManagerFile {
-                storeUsesIt = !findings.isEmpty
+            if Self.fileManagerFiles.contains(file.lastPathComponent) {
+                if !findings.isEmpty {
+                    storesUsingIt.insert(file.lastPathComponent)
+                }
             } else {
                 for finding in findings {
-                    XCTFail("\(finding.file):\(finding.line) uses FileManager outside \(Self.fileManagerFile)")
+                    XCTFail("\(finding.file):\(finding.line) uses FileManager outside \(Self.fileManagerFiles.sorted())")
                 }
             }
         }
-        XCTAssertTrue(storeUsesIt, "\(Self.fileManagerFile) not found or no longer uses FileManager")
+        XCTAssertEqual(storesUsingIt, Self.fileManagerFiles, "a file store was not found or no longer uses FileManager")
     }
 
     /// The monotonic clock is not on Apple's required-reason list, so it stays allowed.
@@ -71,6 +74,14 @@ final class RequiredReasonApiTests: XCTestCase {
             return !SourceScan.findings(in: text, file: file.lastPathComponent, names: [Self.monotonicClock]).isEmpty
         }
         XCTAssertEqual(uses.map(\.lastPathComponent), ["SystemMonotonicClock.swift"])
+    }
+
+    /// The frame classifier reads the loaded image through dyld and `dladdr`, which are not on Apple's list.
+    func testTheLoaderApis_AreAllowed() {
+        for line in ["dladdr(pointer, &info)", "_dyld_image_count()", "_dyld_get_image_header(index)",
+                     "getsectiondata(header, \"__TEXT\", \"__text\", &size)"] {
+            XCTAssertFalse(Self.forbidden.contains { SourceScan.matches($0, line) }, line)
+        }
     }
 
     func testCheck_FlagsWhatItMustFlag() {

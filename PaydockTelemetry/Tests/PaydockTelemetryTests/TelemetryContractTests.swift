@@ -94,7 +94,7 @@ final class TelemetryContractTests: XCTestCase {
         let apiError = TelemetryEvent.APIError(status: 400, code: "sample_code", summaryCode: "sample", gatewayCodes: ["G1"])
 
         let fixed: [TelemetryEvent] = [
-            .crash(error: .from(exception), source: .nsException, kind: .exception, inSdk: true,
+            .crash(error: .from(exception, frames: ["Sample 0x10"]), source: .nsException, kind: .exception, inSdk: true,
                    crashReason: "NSInvalidArgumentException", threadName: "main", occurredAt: 1_700_000_000_000),
             .uncaughtException(error: info, threadName: "worker", widget: "SampleWidget"),
             .sdkError(error: info, errorCode: "SAMPLE_CODE", widget: "SampleWidget", apiError: apiError),

@@ -136,7 +136,7 @@
                 {
                   "key": "exception.stacktrace",
                   "value": {
-                    "stringValue": "NSInvalidArgumentException\n\tat CoreFoundation __exceptionPreprocess + 164\n\tat libobjc.A.dylib objc_exception_throw + 60\n\tat MobileSDK CardDetailsViewModel.tokeniseCard() + 212"
+                    "stringValue": "NSInvalidArgumentException\n\tat CoreFoundation __exceptionPreprocess + 164\n\tat libobjc.A.dylib objc_exception_throw + 60\n\tat ExampleApp 0x1b5058"
                   }
                 },
                 {

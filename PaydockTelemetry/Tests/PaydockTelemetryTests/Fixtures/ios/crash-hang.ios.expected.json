@@ -130,7 +130,7 @@
                 {
                   "key": "exception.stacktrace",
                   "value": {
-                    "stringValue": "\tat MobileSDK 0x0000000104a41c08\n\tat UIKitCore 0x00000001a6f2d6a8"
+                    "stringValue": "\tat ExampleApp 0x1b4dd8\n\tat UIKitCore 0x58f740"
                   }
                 },
                 {

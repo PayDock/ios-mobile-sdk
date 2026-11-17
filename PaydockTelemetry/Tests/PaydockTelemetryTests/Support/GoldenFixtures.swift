@@ -223,7 +223,7 @@ enum GoldenFixtures {
             error: event.error.map(errorInfo),
             source: try required(TelemetryEvent.CrashSource(rawValue: event.source ?? ""), "crash source"),
             kind: try required(TelemetryEvent.CrashKind(rawValue: event.kind ?? ""), "crash kind"),
-            inSdk: try required(event.inSdk, "inSdk"),
+            inSdk: event.inSdk,
             crashReason: event.reason,
             threadName: event.thread,
             occurredAt: occurredAt

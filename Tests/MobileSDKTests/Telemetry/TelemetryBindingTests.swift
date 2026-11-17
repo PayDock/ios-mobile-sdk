@@ -65,6 +65,10 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(EnvironmentCredentialsProvider.sendTestRecordKey, "PAYDOCK_TELEMETRY_SEND_TEST_RECORD")
     }
 
+    func testEnvironmentProvider_TheTestCrashVariable() {
+        XCTAssertEqual(EnvironmentCredentialsProvider.testCrashKey, "PAYDOCK_TELEMETRY_TEST_CRASH")
+    }
+
     func testEnvironmentProvider_EitherVariableBlank_GivesNil() {
         for key in [EnvironmentCredentialsProvider.endpointKey, EnvironmentCredentialsProvider.authorizationKey] {
             for blank in ["", "   "] {
@@ -100,11 +104,13 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(factory.callCount, 0)
     }
 
-    /// R_15, MD-36 acceptance: inactive, bound and asked for a test record, nothing is created, written or registered.
+    /// R_15, MD-36 acceptance: inactive, bound and asked for a test record and a test crash, nothing is created,
+    /// written, registered, installed or subscribed: the process's uncaught-exception handler slot is unchanged.
     func testInactive_Bound_CreatesNoDirectory_AndRegistersNothing() throws {
+        let handlerBefore = Self.processHandlerAddress()
         for selection in [select(provider: StubCredentialsProvider(value: nil)), select(environment: .production),
                           select(level: .off), select(host: Self.merchantHost)] {
-            TelemetryBinding.bind(selection, sendTestRecord: true)
+            TelemetryBinding.bind(selection, sendTestRecord: true, raiseTestCrash: true)
             selection.telemetry.report(.widgetOpened(widget: "SampleWidget"))
         }
 
@@ -113,9 +119,12 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.path), [])
         XCTAssertEqual(factory.lifecycle.registerCount, 0)
         XCTAssertEqual(factory.connection.startCount, 0)
+        XCTAssertEqual(factory.diagnostics.startCount, 0)
+        XCTAssertFalse(factory.exceptionHandlers.isInstalled)
+        XCTAssertEqual(Self.processHandlerAddress(), handlerBefore)
     }
 
-    func testActive_Bound_RegistersTheLifecycleAndTheMonitorOnce() {
+    func testActive_Bound_RegistersTheLifecycleTheMonitorTheHandlerAndTheDiagnosticsOnce() {
         let selection = select()
 
         TelemetryBinding.bind(selection)
@@ -124,6 +133,9 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(factory.callCount, 1)
         XCTAssertEqual(factory.lifecycle.registerCount, 1)
         XCTAssertEqual(factory.connection.startCount, 1)
+        XCTAssertEqual(factory.diagnostics.startCount, 1)
+        XCTAssertTrue(factory.exceptionHandlers.isInstalled)
+        XCTAssertEqual(factory.slot.setCount, 1)
     }
 
     /// R_16: the test record goes to the store directory when active and asked for.
@@ -195,6 +207,44 @@ final class TelemetryBindingTests: XCTestCase {
         TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime), sendTestRecord: true)
 
         XCTAssertEqual(runtime.calls, ["start", "sendTestRecord"])
+    }
+
+    /// R_13: the test crash is raised once, after start and the test record, only when active and asked for.
+    func testBind_Active_WithTheTestCrash_RaisesItOnce_AfterStart() {
+        let runtime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime),
+                              sendTestRecord: true, raiseTestCrash: true)
+
+        XCTAssertEqual(runtime.calls, ["start", "sendTestRecord", "raiseTestCrash"])
+    }
+
+    func testBind_Active_WithoutTheTestCrash_NeverRaisesIt() {
+        let runtime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime),
+                              raiseTestCrash: false)
+
+        XCTAssertEqual(runtime.calls, ["start"])
+    }
+
+    func testBind_Inactive_WithTheTestCrash_NeverRaisesIt() {
+        let runtime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: false), runtime: runtime),
+                              raiseTestCrash: true)
+
+        XCTAssertEqual(runtime.calls, [])
+    }
+
+    func testBind_ActiveWhileActiveIsBound_NeverRaisesTheSecondsTestCrash() {
+        let secondRuntime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: CountingRuntime()))
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: secondRuntime),
+                              raiseTestCrash: true)
+
+        XCTAssertEqual(secondRuntime.calls, [])
     }
 
     func testBind_Active_WithoutTheTestRecord_NeverSendsIt() {
@@ -270,6 +320,11 @@ final class TelemetryBindingTests: XCTestCase {
         )
     }
 
+    /// The process's uncaught-exception handler, as an address; nil when there is none.
+    private static func processHandlerAddress() -> UnsafeRawPointer? {
+        NSGetUncaughtExceptionHandler().map { unsafeBitCast($0, to: UnsafeRawPointer.self) }
+    }
+
     private func assertNoOp(_ selection: TelemetrySelection, file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(selection.telemetry is NoOpTelemetry, file: file, line: line)
         XCTAssertTrue(selection.runtime is NoOpTelemetry, file: file, line: line)
@@ -294,11 +349,15 @@ private final class FakeTelemetry: Telemetry {
 }
 
 /// Builds `ActiveTelemetry` with an inline dispatcher, a fixed device context, a file store under the given
-/// application-support stand-in and recording lifecycle and monitor, and counts its calls.
+/// application-support stand-in, recording lifecycle, monitor and diagnostic source, and a handler chain on a slot of
+/// its own (never the process's), and counts its calls.
 private final class CountingActiveFactory {
     let provider = FakeDeviceContextProvider()
     let lifecycle = RecordingLifecycle()
     let connection = RecordingConnectionMonitor()
+    let diagnostics = CountingDiagnosticSource()
+    let slot = CountingHandlerSlot()
+    let exceptionHandlers: ExceptionHandlerChain
     private let applicationSupport: URL
     private(set) var arguments: [(credentials: TelemetryCredentials, level: TelemetryLevel)] = []
     private(set) var created: ActiveTelemetry?
@@ -307,6 +366,7 @@ private final class CountingActiveFactory {
 
     init(applicationSupport: URL) {
         self.applicationSupport = applicationSupport
+        exceptionHandlers = ExceptionHandlerChain(slot: slot, entryPoint: { _ in })
     }
 
     func make(credentials: TelemetryCredentials, level: TelemetryLevel) -> ActiveTelemetry {
@@ -318,7 +378,8 @@ private final class CountingActiveFactory {
             deviceContextProvider: provider,
             dispatcher: ImmediateDispatcher(),
             ports: ActiveTelemetry.Ports(store: FileDurableStore(directory: { directory }), lifecycle: lifecycle,
-                                         connection: connection)
+                                         connection: connection, diagnostics: diagnostics,
+                                         exceptionHandlers: exceptionHandlers)
         )
         created = telemetry
         return telemetry
@@ -387,6 +448,38 @@ private final class RecordingConnectionMonitor: ConnectionMonitor, @unchecked Se
     func current() -> NetworkConnectionType { .unknown }
 }
 
+/// Counts every start; never delivers.
+private final class CountingDiagnosticSource: DiagnosticSource, @unchecked Sendable {
+    private let lock = NSLock()
+    private var starts = 0
+
+    var startCount: Int { lock.withLock { starts } }
+
+    func start(deliver: @escaping @Sendable ([MetricKitDiagnostic]) -> Void) {
+        lock.withLock { starts += 1 }
+    }
+}
+
+/// A handler slot of its own that counts every set.
+private final class CountingHandlerSlot: ExceptionHandlerSlot, @unchecked Sendable {
+    private let lock = NSLock()
+    private var handler: (@convention(c) (NSException) -> Void)?
+    private var sets = 0
+
+    var setCount: Int { lock.withLock { sets } }
+
+    func get() -> (@convention(c) (NSException) -> Void)? {
+        lock.withLock { handler }
+    }
+
+    func set(_ handler: (@convention(c) (NSException) -> Void)?) {
+        lock.withLock {
+            sets += 1
+            self.handler = handler
+        }
+    }
+}
+
 /// Records every call, in order.
 private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
     private let lock = NSLock()
@@ -401,6 +494,10 @@ private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
 
     func sendTestRecord() {
         lock.withLock { log.append("sendTestRecord") }
+    }
+
+    func raiseTestCrash() {
+        lock.withLock { log.append("raiseTestCrash") }
     }
 }
 #endif

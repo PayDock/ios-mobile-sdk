@@ -142,7 +142,7 @@
                 {
                   "key": "exception.stacktrace",
                   "value": {
-                    "stringValue": "EXC_BAD_ACCESS\n\tat MobileSDK 0x0000000104a3c1f0\n\tat MobileSDK 0x0000000104a39b84\n\tat UIKitCore 0x00000001a6f2d6a8"
+                    "stringValue": "EXC_BAD_ACCESS\n\tat ExampleApp 0x1b5058\n\tat ExampleApp 0x1b4d08\n\tat UIKitCore 0x58f740"
                   }
                 },
                 {

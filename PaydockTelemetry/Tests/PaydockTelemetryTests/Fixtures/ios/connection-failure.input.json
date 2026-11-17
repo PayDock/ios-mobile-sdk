@@ -15,8 +15,8 @@
       "error": {
         "type": "Foundation.URLError",
         "frames": [
-          "NetworkingLib NetworkService.request(_:) + 280",
-          "MobileSDK GiftCardService.tokenise(_:) + 96"
+          "ExampleApp 0x2680c8",
+          "ExampleApp 0x1d7a40"
         ]
       }
     },

@@ -78,7 +78,8 @@ package enum RecordFactory {
     }
 
     /// The exception fields of a crash, an SDK error or an uncaught error.
-    private static func addException(_ error: TelemetryEvent.ErrorInfo?, inSdk: Bool, to fields: inout Fields) {
+    /// `paydock.exception.in_sdk` only when known: a crash the classifier cannot place has none.
+    private static func addException(_ error: TelemetryEvent.ErrorInfo?, inSdk: Bool?, to fields: inout Fields) {
         if let error {
             fields.put("exception.type", error.type)
             fields.put("exception.stacktrace", StackTraceFormatter.format(error))
@@ -138,8 +139,10 @@ package enum RecordFactory {
             }
         }
 
-        mutating func put(_ key: String, _ flag: Bool) {
-            values[key] = .bool(flag)
+        mutating func put(_ key: String, _ flag: Bool?) {
+            if let flag {
+                values[key] = .bool(flag)
+            }
         }
     }
 }

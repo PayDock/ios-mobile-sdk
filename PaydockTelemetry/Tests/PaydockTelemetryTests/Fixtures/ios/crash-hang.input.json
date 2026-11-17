@@ -13,8 +13,8 @@
     "error": {
       "type": null,
       "frames": [
-        "MobileSDK 0x0000000104a41c08",
-        "UIKitCore 0x00000001a6f2d6a8"
+        "ExampleApp 0x1b4dd8",
+        "UIKitCore 0x58f740"
       ]
     }
   }

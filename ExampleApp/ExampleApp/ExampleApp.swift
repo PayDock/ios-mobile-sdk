@@ -14,6 +14,9 @@ struct ExampleApp: App {
 
     init() {
         setupMobileSDK()
+        #if DEBUG
+        raiseTestCrashIfAsked()
+        #endif
     }
 
     var body: some Scene {
@@ -32,4 +35,17 @@ struct ExampleApp: App {
 
         MobileSDK.shared.configureMobileSDK(config: config)
     }
+
+    #if DEBUG
+    /// Debug builds only: `EXAMPLE_APP_TEST_CRASH=true` raises an exception from app code on the main thread 3 s after
+    /// launch, the app case of `scripts/check-crash-in-sdk.sh`. A non-nil reason: CoreFoundation crashes on a nil one.
+    private func raiseTestCrashIfAsked() {
+        guard ProcessInfo.processInfo.environment["EXAMPLE_APP_TEST_CRASH"] == "true" else {
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            NSException(name: NSExceptionName("ExampleAppTestCrash"), reason: "test", userInfo: nil).raise()
+        }
+    }
+    #endif
 }

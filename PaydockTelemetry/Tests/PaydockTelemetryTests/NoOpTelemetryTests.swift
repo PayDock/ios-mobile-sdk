@@ -58,6 +58,30 @@ final class NoOpTelemetryTests: XCTestCase {
         XCTAssertFalse(telemetry.isActive)
     }
 
+    /// R_13: nothing is scheduled, so nothing is raised once the active runtime's delay has passed.
+    func testRaiseTestCrash_DoesNothing() {
+        let telemetry = NoOpTelemetry()
+
+        telemetry.start()
+        telemetry.raiseTestCrash()
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: Double(TelemetryLimits.testCrashDelayMilliseconds) / 1_000 + 0.2))
+
+        XCTAssertFalse(telemetry.isActive)
+    }
+
+    /// R_03, R_15: inactive, no handler is installed: the process's uncaught-exception handler slot is unchanged.
+    func testInactive_InstallsNoExceptionHandler() {
+        let before = Self.handlerAddress()
+        let telemetry = NoOpTelemetry()
+
+        telemetry.start()
+        telemetry.report(TelemetryFixtures.crash())
+        telemetry.sendTestRecord()
+        telemetry.raiseTestCrash()
+
+        XCTAssertEqual(Self.handlerAddress(), before)
+    }
+
     /// R_15, MD-36 acceptance: the no-op leaves an application-support stand-in without a telemetry directory.
     func testInactive_CreatesNoTelemetryDirectory() throws {
         let applicationSupport = try TemporaryDirectory()
@@ -67,8 +91,14 @@ final class NoOpTelemetryTests: XCTestCase {
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
         telemetry.sendTestRecord()
+        telemetry.raiseTestCrash()
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: applicationSupport.child("paydock_telemetry").path))
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.url.path), [])
+    }
+
+    /// The process's uncaught-exception handler, as an address; nil when there is none.
+    private static func handlerAddress() -> UnsafeRawPointer? {
+        NSGetUncaughtExceptionHandler().map { unsafeBitCast($0, to: UnsafeRawPointer.self) }
     }
 }

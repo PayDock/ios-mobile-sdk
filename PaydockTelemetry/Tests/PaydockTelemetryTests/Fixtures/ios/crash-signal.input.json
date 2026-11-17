@@ -14,9 +14,9 @@
     "error": {
       "type": "EXC_BAD_ACCESS",
       "frames": [
-        "MobileSDK 0x0000000104a3c1f0",
-        "MobileSDK 0x0000000104a39b84",
-        "UIKitCore 0x00000001a6f2d6a8"
+        "ExampleApp 0x1b5058",
+        "ExampleApp 0x1b4d08",
+        "UIKitCore 0x58f740"
       ]
     }
   }

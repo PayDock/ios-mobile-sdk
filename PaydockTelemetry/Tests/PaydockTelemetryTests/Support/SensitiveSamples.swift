@@ -59,7 +59,7 @@ enum SensitiveSamples {
     /// One event of every variant, errors built with `ErrorInfo.from`.
     static func events() -> [TelemetryEvent] {
         let fromError = TelemetryEvent.ErrorInfo.from(error(), frames: rawFrames)
-        let fromException = TelemetryEvent.ErrorInfo.from(exception())
+        let fromException = TelemetryEvent.ErrorInfo.from(exception(), frames: rawFrames.map(StackFrame.sanitise))
         let apiError = TelemetryEvent.APIError(status: 400, code: "invalid_transaction_details",
                                                summaryCode: "invalid_transaction_details",
                                                gatewayCodes: ["INVALID_REQUEST:INVALID:sourceOfFunds.provided.card.securityCode"])

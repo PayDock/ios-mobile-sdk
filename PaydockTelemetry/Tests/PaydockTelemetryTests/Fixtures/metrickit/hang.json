@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "timeStampBegin": "2026-11-04 00:00:00",
+  "timeStampEnd": "2026-11-04 23:59:00",
+  "hangDiagnostics": [
+    {
+      "version": "1.0.0",
+      "callStackTree": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "C95ED3C1-F639-3822-BC5C-B2D03AFDD182",
+                "binaryName": "ExampleApp",
+                "offsetIntoBinaryTextSegment": 1789400,
+                "address": 4296756696,
+                "sampleCount": 10,
+                "subFrames": [
+                  {
+                    "binaryUUID": "3E0F5B7A-9C1D-3F2E-A4B5-C6D7E8F90A1B",
+                    "binaryName": "UIKitCore",
+                    "offsetIntoBinaryTextSegment": 5830464,
+                    "address": 7678838592,
+                    "sampleCount": 10
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "diagnosticMetaData": {
+        "hangDuration": "2 sec",
+        "appVersion": "1.0",
+        "appBuildVersion": "1",
+        "osVersion": "iPhone OS 26.4"
+      }
+    }
+  ]
+}

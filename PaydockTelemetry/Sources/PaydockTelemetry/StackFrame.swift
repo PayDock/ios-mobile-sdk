@@ -13,7 +13,7 @@ package enum StackFrame {
     /// `<symbol> + <offset>`.
     private static let symbolWithOffset = makeRegex(#"^(.*\S)\s+\+\s+(\d+)$"#)
 
-    /// One `callStackSymbols` line in the § 5.5 iOS form. Raw form: `<index> <image> 0x<address> <symbol> + <offset>`,
+    /// One raw call-stack symbol line in the § 5.5 iOS form. Raw form: `<index> <image> 0x<address> <symbol> + <offset>`,
     /// whitespace-padded. Gives `<image> <symbol> + <offset>`, or `<image> 0x<address>` when the symbol is missing,
     /// `???` or the image name. A line not in the raw form (already sanitised, or from MetricKit) comes back trimmed.
     package static func sanitise(_ line: String) -> String {
@@ -51,5 +51,27 @@ package enum StackFrame {
         } catch {
             preconditionFailure("Invalid pattern \(pattern)")
         }
+    }
+}
+
+extension StackFrame {
+    /// R_08: `<image> 0x<offset>`; a system image with a symbol: `<image> <symbol> + <distance>`; unresolved:
+    /// `??? 0x<address>`. Hex lowercase without padding; image = last path component.
+    package static func describe(_ address: UInt, _ resolved: ResolvedAddress?) -> String {
+        guard let resolved, address >= resolved.imageLoadAddress else {
+            return "??? 0x\(String(address, radix: 16))"
+        }
+        let image = (resolved.imagePath as NSString).lastPathComponent
+        if isSystemImage(resolved.imagePath), let symbol = resolved.symbol, !symbol.isEmpty,
+           let symbolAddress = resolved.symbolAddress, symbolAddress <= address {
+            return "\(image) \(symbol) + \(address - symbolAddress)"
+        }
+        return "\(image) 0x\(String(address - resolved.imageLoadAddress, radix: 16))"
+    }
+
+    /// A path containing `/System/Library/` or `/usr/lib/`, or starting with `/System/` or `/usr/`.
+    package static func isSystemImage(_ path: String) -> Bool {
+        path.contains("/System/Library/") || path.contains("/usr/lib/") || path.hasPrefix("/System/")
+            || path.hasPrefix("/usr/")
     }
 }

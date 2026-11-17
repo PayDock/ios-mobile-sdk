@@ -142,7 +142,7 @@
                 {
                   "key": "exception.stacktrace",
                   "value": {
-                    "stringValue": "MobileSDK.CardDetailsError\n\tat MobileSDK CardDetailsViewModel.handleTokenResult(_:) + 340\n\tat MobileSDK closure #1 in CardDetailsViewModel.tokeniseCard() + 196\nCaused by: NetworkingLib.ErrorRes"
+                    "stringValue": "MobileSDK.CardDetailsError\n\tat ExampleApp 0x1b5a14\n\tat ExampleApp 0x1b5c10\nCaused by: NetworkingLib.ErrorRes"
                   }
                 },
                 {

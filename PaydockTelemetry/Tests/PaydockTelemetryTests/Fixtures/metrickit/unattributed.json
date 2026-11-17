@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "timeStampEnd": "2026-11-04 22:10:03",
+  "crashDiagnostics": [
+    {
+      "callStackTree": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "C95ED3C1-F639-3822-BC5C-B2D03AFDD182",
+                "binaryName": "ExampleApp",
+                "offsetIntoBinaryTextSegment": 2249128,
+                "address": 4297216424,
+                "sampleCount": 1
+              }
+            ]
+          },
+          {
+            "threadAttributed": false,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "5D1C7F2A-0B3E-3C4D-8E9F-1A2B3C4D5E6F",
+                "binaryName": "libsystem_kernel.dylib",
+                "offsetIntoBinaryTextSegment": 4528,
+                "address": 7516197296,
+                "sampleCount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "diagnosticMetaData": {
+        "exceptionType": 10,
+        "exceptionCode": 0,
+        "signal": 6
+      }
+    }
+  ]
+}

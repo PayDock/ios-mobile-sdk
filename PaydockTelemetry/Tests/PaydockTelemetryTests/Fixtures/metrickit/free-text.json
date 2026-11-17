@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "timeStampEnd": "2026-11-04 22:10:03",
+  "crashDiagnostics": [
+    {
+      "callStackTree": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "C95ED3C1-F639-3822-BC5C-B2D03AFDD182",
+                "binaryName": "ExampleApp",
+                "offsetIntoBinaryTextSegment": 1790040,
+                "address": 4296757336,
+                "sampleCount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "diagnosticMetaData": {
+        "exceptionType": 10,
+        "exceptionCode": 0,
+        "signal": 6,
+        "terminationReason": "{{FREE_TEXT}}",
+        "virtualMemoryRegionInfo": "{{FREE_TEXT}}",
+        "exceptionReason": {
+          "composedMessage": "{{FREE_TEXT}}",
+          "formatString": "{{FREE_TEXT}}",
+          "arguments": ["{{FREE_TEXT}}"],
+          "exceptionType": "NSInvalidArgumentException",
+          "exceptionName": "NSInvalidArgumentException",
+          "className": "NSException"
+        }
+      }
+    }
+  ]
+}

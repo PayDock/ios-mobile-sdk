@@ -142,7 +142,7 @@
                 {
                   "key": "exception.stacktrace",
                   "value": {
-                    "stringValue": "Foundation.URLError\n\tat NetworkingLib NetworkService.request(_:) + 280\n\tat MobileSDK GiftCardService.tokenise(_:) + 96"
+                    "stringValue": "Foundation.URLError\n\tat ExampleApp 0x2680c8\n\tat ExampleApp 0x1d7a40"
                   }
                 },
                 {

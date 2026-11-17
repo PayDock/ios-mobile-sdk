@@ -148,7 +148,7 @@
                 {
                   "key": "exception.stacktrace",
                   "value": {
-                    "stringValue": "Swift.DecodingError\n\tat MobileSDK WalletService.decodeCallback(_:) + 120\n\tat MobileSDK closure #1 in WalletViewModel.handleCallback() + 64"
+                    "stringValue": "Swift.DecodingError\n\tat ExampleApp 0x2251a8\n\tat ExampleApp 0x2249c0"
                   }
                 },
                 {

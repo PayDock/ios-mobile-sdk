@@ -7,8 +7,9 @@
 import Foundation
 import PaydockTelemetry
 
-/// An in-memory store, upserting by record id, that records every save and prune, answers prune with a set result and
-/// records the thread and queue label of every call.
+/// An in-memory store, upserting by record id, that records every save, crash save and prune, answers prune with a
+/// set result and records the thread and queue label of every call. `holdLock()` takes the store's lock on a thread of
+/// its own until `releaseLock()`, so a crash save gives up after its timeout.
 final class RecordingDurableStore: DurableStore, @unchecked Sendable {
     struct Call {
         let isMainThread: Bool
@@ -16,6 +17,8 @@ final class RecordingDurableStore: DurableStore, @unchecked Sendable {
     }
 
     private let lock = NSLock()
+    private let holder = LockHolder()
+    private var crashSaveLog: [TelemetryRecord] = []
     private var callLog: [Call] = []
     private var byId: [String: TelemetryRecord] = [:]
     private var saveLog: [TelemetryRecord] = []
@@ -23,6 +26,7 @@ final class RecordingDurableStore: DurableStore, @unchecked Sendable {
     private var scriptedPrune = PruneResult()
 
     var saved: [TelemetryRecord] { locked { saveLog } }
+    var crashSaved: [TelemetryRecord] { locked { crashSaveLog } }
     var pruneTimes: [Int64] { locked { pruneLog } }
     var calls: [Call] { locked { callLog } }
 
@@ -37,6 +41,29 @@ final class RecordingDurableStore: DurableStore, @unchecked Sendable {
             byId[record.id] = record
             saveLog.append(record)
         }
+    }
+
+    /// Noted only once it holds the lock: noting takes the lock too.
+    func saveCrash(_ record: TelemetryRecord, timeout: TimeInterval) -> Bool {
+        let call = currentCall()
+        guard lock.lock(before: Date(timeIntervalSinceNow: timeout)) else {
+            return false
+        }
+        defer { lock.unlock() }
+        callLog.append(call)
+        byId[record.id] = record
+        crashSaveLog.append(record)
+        return true
+    }
+
+    /// Takes the store's lock on another thread and returns once it holds it.
+    func holdLock() {
+        holder.hold(lock)
+    }
+
+    /// Lets the holding thread release the lock, and waits until it has.
+    func releaseLock() {
+        holder.release()
     }
 
     func oldest(max: Int) -> [TelemetryRecord] {
@@ -73,9 +100,12 @@ final class RecordingDurableStore: DurableStore, @unchecked Sendable {
     }
 
     private func noteCall() {
-        let label = String(cString: __dispatch_queue_get_label(nil))
-        let call = Call(isMainThread: Thread.isMainThread, queueLabel: label)
+        let call = currentCall()
         locked { callLog.append(call) }
+    }
+
+    private func currentCall() -> Call {
+        Call(isMainThread: Thread.isMainThread, queueLabel: String(cString: __dispatch_queue_get_label(nil)))
     }
 
     private func locked<T>(_ body: () -> T) -> T {

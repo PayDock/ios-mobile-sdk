@@ -13,8 +13,8 @@
     "error": {
       "type": "MobileSDK.CardDetailsError",
       "frames": [
-        "MobileSDK CardDetailsViewModel.handleTokenResult(_:) + 340",
-        "MobileSDK closure #1 in CardDetailsViewModel.tokeniseCard() + 196"
+        "ExampleApp 0x1b5a14",
+        "ExampleApp 0x1b5c10"
       ],
       "cause": {
         "type": "NetworkingLib.ErrorRes"

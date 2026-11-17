@@ -12,8 +12,8 @@
     "error": {
       "type": "Swift.DecodingError",
       "frames": [
-        "MobileSDK WalletService.decodeCallback(_:) + 120",
-        "MobileSDK closure #1 in WalletViewModel.handleCallback() + 64"
+        "ExampleApp 0x2251a8",
+        "ExampleApp 0x2249c0"
       ]
     }
   },

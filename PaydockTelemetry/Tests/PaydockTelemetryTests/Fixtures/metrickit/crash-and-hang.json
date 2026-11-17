@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "timeStampEnd": "2026-11-04 22:10:03",
+  "hangDiagnostics": [
+    {
+      "callStackTree": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "C95ED3C1-F639-3822-BC5C-B2D03AFDD182",
+                "binaryName": "ExampleApp",
+                "offsetIntoBinaryTextSegment": 1789400,
+                "address": 4296756696,
+                "sampleCount": 10
+              }
+            ]
+          }
+        ]
+      },
+      "diagnosticMetaData": {
+        "hangDuration": "3 sec"
+      }
+    }
+  ],
+  "crashDiagnostics": [
+    {
+      "callStackTree": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "C95ED3C1-F639-3822-BC5C-B2D03AFDD182",
+                "binaryName": "ExampleApp",
+                "offsetIntoBinaryTextSegment": 1790040,
+                "address": 4296757336,
+                "sampleCount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "diagnosticMetaData": {
+        "exceptionType": 6,
+        "signal": 5
+      }
+    }
+  ]
+}

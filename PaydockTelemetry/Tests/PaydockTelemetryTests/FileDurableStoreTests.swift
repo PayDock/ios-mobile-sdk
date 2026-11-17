@@ -282,6 +282,64 @@ final class FileDurableStoreTests: XCTestCase {
         XCTAssertEqual(store.oldest(max: 10), records)
     }
 
+    // MARK: - Crash save
+
+    func testSaveCrash_WritesTheRecord_WithoutPruning() throws {
+        let store = makeStore()
+        let crash = record(1, TelemetryFixtures.crash())
+        let old = record(2, at: Self.time - TelemetryLimits.recordMaxAgeMilliseconds - 1)
+        store.save(old)
+
+        XCTAssertTrue(store.saveCrash(crash, timeout: TelemetryLimits.crashLockTimeoutSeconds))
+
+        XCTAssertEqual(fileNames(), ["\(crash.id).json", "\(old.id).json"])
+        let data = try Data(contentsOf: folder.appendingPathComponent("\(crash.id).json"))
+        XCTAssertEqual(OtlpLogEncoder.parseRecord(data), crash)
+        XCTAssertEqual(store.count(), 2)
+    }
+
+    func testSaveCrash_BeforeTheIndexIsBuilt_IsCountedOnceItIs() {
+        let store = makeStore()
+
+        XCTAssertTrue(store.saveCrash(record(1, TelemetryFixtures.crash()), timeout: 0.5))
+
+        XCTAssertEqual(store.count(), 1)
+        XCTAssertEqual(store.oldest(max: 10).map(\.id), ["\(Self.session)-1"])
+    }
+
+    func testSaveCrash_WithoutADirectory_ReturnsFalse() {
+        XCTAssertFalse(FileDurableStore { nil }.saveCrash(record(1), timeout: 0.5))
+    }
+
+    func testSaveCrash_GivesUp_WhenTheLockIsHeld() {
+        let folder: URL = folder
+        let resolving = DispatchSemaphore(value: 0)
+        let gate = DispatchSemaphore(value: 0)
+        let done = DispatchSemaphore(value: 0)
+        // The directory is resolved under the store's lock: a resolution that waits holds the lock.
+        let store = FileDurableStore {
+            resolving.signal()
+            gate.wait()
+            return folder
+        }
+        DispatchQueue.global().async {
+            _ = store.count()
+            done.signal()
+        }
+        resolving.wait()
+
+        let started = Date()
+        let saved = store.saveCrash(record(1), timeout: 0.1)
+        let waited = Date().timeIntervalSince(started)
+        gate.signal()
+        done.wait()
+
+        XCTAssertFalse(saved)
+        XCTAssertGreaterThanOrEqual(waited, 0.09)
+        XCTAssertLessThan(waited, 5)
+        XCTAssertEqual(store.count(), 0)
+    }
+
     // MARK: - Directory
 
     func testNoDirectory_BeforeTheFirstSave() {

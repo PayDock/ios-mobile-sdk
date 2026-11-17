@@ -425,6 +425,9 @@ final class ActiveTelemetryTests: XCTestCase {
         }
 
         func save(_ record: TelemetryRecord) { inner.save(record) }
+        func saveCrash(_ record: TelemetryRecord, timeout: TimeInterval) -> Bool {
+            inner.saveCrash(record, timeout: timeout)
+        }
         func oldest(max: Int) -> [TelemetryRecord] { inner.oldest(max: max) }
         func remove(ids: [String]) { inner.remove(ids: ids) }
         func count() -> Int { inner.count() }

@@ -27,4 +27,10 @@ package enum TelemetryLimits {
     /// Records created per hour, notices excluded.
     package static let hourlyCap = 400
     package static let hourMilliseconds: Int64 = 3_600_000
+    /// The longest the crashing thread waits for a store's lock before it gives up the record.
+    package static let crashLockTimeoutSeconds: TimeInterval = 0.5
+    /// Builds whose SDK ranges are kept for the frame classifier, the current one included.
+    package static let frameBuildsKept = 3
+    /// The delay before a debug test crash is raised on the main thread.
+    package static let testCrashDelayMilliseconds: Int64 = 3_000
 }

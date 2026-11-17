@@ -48,6 +48,18 @@ package final class FileDurableStore: DurableStore, @unchecked Sendable {
         locked { write(record) }
     }
 
+    /// The crash path: waits at most `timeout` seconds for the lock (`NSLock.lock(before:)`), then writes the record's
+    /// file; false when it gave up or the write failed. Never prunes, and never reads the directory: an index not yet
+    /// built is left to be built from the files, this one included.
+    @discardableResult
+    package func saveCrash(_ record: TelemetryRecord, timeout: TimeInterval) -> Bool {
+        guard lock.lock(before: Date(timeIntervalSinceNow: timeout)) else {
+            return false
+        }
+        defer { lock.unlock() }
+        return writeFile(record)
+    }
+
     package func oldest(max: Int) -> [TelemetryRecord] {
         locked { read(max: max) }
     }
@@ -122,11 +134,16 @@ package final class FileDurableStore: DurableStore, @unchecked Sendable {
         return built
     }
 
-    /// Writes `<id>.json.tmp`, then replaces `<id>.json` with it.
     private func write(_ record: TelemetryRecord) {
-        var current = loadIndex()
+        _ = loadIndex()
+        writeFile(record)
+    }
+
+    /// Writes `<id>.json.tmp`, then replaces `<id>.json` with it; keeps the index when it is built.
+    @discardableResult
+    private func writeFile(_ record: TelemetryRecord) -> Bool {
         guard Self.isFileName(record.id), let directory = directory(), prepare(directory) else {
-            return
+            return false
         }
         let data = OtlpLogEncoder.recordJSON(record)
         let target = directory.appendingPathComponent(Self.fileName(record.id))
@@ -138,10 +155,11 @@ package final class FileDurableStore: DurableStore, @unchecked Sendable {
             } else {
                 try files.moveItem(at: temporary, to: target)
             }
-            current[record.id] = Self.entry(record, bytes: data.count)
-            index = current
+            index?[record.id] = Self.entry(record, bytes: data.count)
+            return true
         } catch {
             try? files.removeItem(at: temporary)
+            return false
         }
     }
 
