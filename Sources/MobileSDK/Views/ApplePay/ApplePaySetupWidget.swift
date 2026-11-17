@@ -19,14 +19,21 @@ import PassKit
 public struct ApplePaySetupWidget: View {
 
     private let appearance: ApplePayWidgetAppearance
+    private let reportsUsage: Bool
 
     /// Initializes the Apple Pay setup widget.
     /// - Parameter appearance: Optional appearance for the button. The button type is always
     ///   forced to `.setUp`; the `style` and `cornerRadius` are honoured.
     public init(appearance: ApplePayWidgetAppearance = ApplePayWidgetAppearance()) {
+        self.init(appearance: appearance, reportsUsage: true)
+    }
+
+    /// `reportsUsage` is false when `ApplePayWidget` embeds the button, so only a standalone setup widget is reported.
+    init(appearance: ApplePayWidgetAppearance, reportsUsage: Bool) {
         var setUpAppearance = appearance
         setUpAppearance.type = .setUp
         self.appearance = setUpAppearance
+        self.reportsUsage = reportsUsage
     }
 
     public var body: some View {
@@ -36,6 +43,11 @@ public struct ApplePaySetupWidget: View {
             isDisabled: false
         ) {
             PKPassLibrary().openPaymentSetup()
+        }
+        .onAppear {
+            if reportsUsage {
+                SdkTelemetry.reportWidgetOpened(.applePaySetup)
+            }
         }
     }
 }

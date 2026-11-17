@@ -35,6 +35,7 @@ class ApplePayVMTests: XCTestCase {
         eventDelegate = nil
         completionResult = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 

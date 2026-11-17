@@ -7,7 +7,7 @@
 
 import XCTest
 import Combine
-import NetworkingLib
+@testable import NetworkingLib
 @testable import MobileSDK
 @testable import DataPaymentSources
 
@@ -23,6 +23,7 @@ class GiftCardVMTests: XCTestCase {
     var eventDelegate: WidgetEventDelegateUtil!
     var completionResult: Result<GiftCardResult, GiftCardError>?
     var cancellables = Set<AnyCancellable>()
+    private let telemetry = RecordingTelemetry()
 
     override func setUp() {
         super.setUp()
@@ -49,6 +50,7 @@ class GiftCardVMTests: XCTestCase {
         eventDelegate = nil
         completionResult = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 
@@ -432,6 +434,70 @@ class GiftCardVMTests: XCTestCase {
         XCTAssertEqual(viewModel.numberOfValidationErrors, 2)
         XCTAssertEqual(viewModel.firstTextFieldWithError, viewModel.giftCardFormManager.firstFieldWithError)
         XCTAssertEqual(viewModel.firstTextFieldWithError, .cardNumber)
+    }
+
+    // MARK: - Telemetry (R_05, R_06)
+
+    private func makeTelemetryVM(service: PaymentSourcesService, expectation: XCTestExpectation) -> GiftCardVM {
+        GiftCardVM(appearance: GiftCardWidgetAppearance(),
+                   viewState: viewState,
+                   paymentSourcesService: service,
+                   config: config,
+                   loadingDelegate: loadingDelegate,
+                   eventDelegate: nil) { result in
+            self.completionResult = result
+            expectation.fulfill()
+        }
+    }
+
+    func testTelemetry_NonRequestFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+        telemetry.bindAsCurrent()
+        mockService.shouldThrowUnknownError = true
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = makeTelemetryVM(service: mockService, expectation: expectation)
+        populateValidFormFields()
+
+        viewModel.tokeniseGiftCard()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.unknownError(nil)) = completionResult else {
+            return XCTFail("Expected unknownError(nil), got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("GIFT_CARD_UNKNOWN", .giftCard)])
+    }
+
+    func testTelemetry_RequestFailure_DeliversAsBefore_AndReportsNothing() async {
+        telemetry.bindAsCurrent()
+        mockService.shouldReturnError = true
+        mockService.errorToReturn = ErrorRes(status: 400, error: .init(message: "Declined", code: "E1", details: nil),
+                                             resource: nil, errorSummary: nil)
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = makeTelemetryVM(service: mockService, expectation: expectation)
+        populateValidFormFields()
+
+        viewModel.tokeniseGiftCard()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.errorTokenisingCard) = completionResult else {
+            return XCTFail("Expected errorTokenisingCard, got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.reports, [])
+    }
+
+    func testTelemetry_ConnectionFailure_DeliversAsBefore_AndReportsNothing() async {
+        telemetry.bindAsCurrent()
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = makeTelemetryVM(service: ErroringPaymentSourcesServiceMock(failure: .connectionError(URLError(.timedOut))),
+                                    expectation: expectation)
+        populateValidFormFields()
+
+        viewModel.tokeniseGiftCard()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.unknownError(.connectionError)) = completionResult else {
+            return XCTFail("Expected unknownError(connectionError), got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.reports, [])
     }
 }
 // swiftlint:enable all

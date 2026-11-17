@@ -26,14 +26,17 @@ public struct ZipWidget: View {
     }
 
     public var body: some View {
-        if viewModel.isLoading && viewModel.showLoaders {
-            zipDisabledButton
-        } else {
-            zipButton
-                .sheet(isPresented: $viewModel.showWebView, content: {
-                    webViewSheetContent
-                })
+        Group {
+            if viewModel.isLoading && viewModel.showLoaders {
+                zipDisabledButton
+            } else {
+                zipButton
+                    .sheet(isPresented: $viewModel.showWebView, content: {
+                        webViewSheetContent
+                    })
+            }
         }
+        .onAppear { SdkTelemetry.reportWidgetOpened(.zip) }
     }
 
     private var zipDisabledButton: some View {

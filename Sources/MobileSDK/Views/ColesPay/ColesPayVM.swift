@@ -59,7 +59,7 @@ class ColesPayVM: ObservableObject {
     }
 
     func getColesPayURL(token: String) {
-        Task {
+        SdkTask.run(widget: .colesPay) { [self] in
             do {
                 updateLoadingState(isLoading: true)
                 let colesPayOrderId = try await chargesService.getColesPayCallback(widgetAccessToken: token)
@@ -70,12 +70,16 @@ class ColesPayVM: ObservableObject {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.errorFetchingColesPayOrder(error: errorResponse)))
+                let failure = ColesPayError.errorFetchingColesPayOrder(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .colesPay)
+                self.completion(.failure(failure))
 
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError(error as? RequestError)))
+                let failure = ColesPayError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .colesPay)
+                self.completion(.failure(failure))
             }
         }
     }
@@ -85,16 +89,18 @@ class ColesPayVM: ObservableObject {
         tokenRequest { [weak self] result in
             switch result {
             case .success(let response):
-                Task {
+                SdkTask.run(widget: .colesPay) {
                     self?.token = response.token
                     self?.getColesPayURL(token: response.token)
                 }
 
             case .failure(let failure):
-                Task {
+                SdkTask.run(widget: .colesPay) {
                     self?.updateLoadingState(isLoading: false)
                     self?.showWebView = false
-                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                    let tokenFailure = ColesPayError.initialisingWalletToken(reason: failure.customMessage)
+                    SdkTelemetry.reportSdkError(tokenFailure, widget: .colesPay)
+                    self?.completion(.failure(tokenFailure))
                 }
             }
         }
@@ -109,12 +115,16 @@ class ColesPayVM: ObservableObject {
     func handleFailure(error: ColesPayError) {
         updateLoadingState(isLoading: false)
         showWebView = false
+        SdkTelemetry.reportSdkError(error, widget: .colesPay)
         completion(.failure(error))
     }
 
     func handleSheetCancellation() {
         updateLoadingState(isLoading: false)
-        completion(.failure(.transactionCanceled))
+        // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+        let failure = ColesPayError.transactionCanceled
+        SdkTelemetry.reportSdkError(failure, widget: .colesPay)
+        completion(.failure(failure))
     }
 
     func updateLoadingState(isLoading: Bool) {

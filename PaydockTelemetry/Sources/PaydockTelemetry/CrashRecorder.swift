@@ -50,7 +50,7 @@ package final class CrashRecorder: CrashRecording, @unchecked Sendable {
         for address in addresses {
             let resolved = resolver.resolve(address)
             described.append(StackFrame.describe(address, resolved))
-            guard let frame = Self.frame(address, resolved, sdkImage: sdkImage) else {
+            guard let frame = FrameAddress.of(address, resolved, sdkImage: sdkImage) else {
                 continue
             }
             frames.append(frame)
@@ -77,19 +77,6 @@ package final class CrashRecorder: CrashRecording, @unchecked Sendable {
                         time: clock.now()),
             timeout: TelemetryLimits.crashLockTimeoutSeconds
         )
-    }
-
-    /// A frame in the SDK's image (same load address) carries the image's UUID; a frame in another image only its
-    /// name. An unresolved address gives no frame to classify.
-    private static func frame(_ address: UInt, _ resolved: ResolvedAddress?, sdkImage: SdkImage?) -> FrameAddress? {
-        guard let resolved, address >= resolved.imageLoadAddress else {
-            return nil
-        }
-        let offset = UInt64(address - resolved.imageLoadAddress)
-        if let sdkImage, resolved.imageLoadAddress == sdkImage.loadAddress {
-            return FrameAddress(imageName: sdkImage.name, uuid: sdkImage.uuid, offset: offset)
-        }
-        return FrameAddress(imageName: (resolved.imagePath as NSString).lastPathComponent, uuid: nil, offset: offset)
     }
 
     private static func threadName() -> String? {

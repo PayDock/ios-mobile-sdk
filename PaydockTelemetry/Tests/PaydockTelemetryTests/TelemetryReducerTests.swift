@@ -147,6 +147,87 @@ final class TelemetryReducerTests: XCTestCase {
         }
     }
 
+    // MARK: - Widgets opened (R_09)
+
+    func testLevelErrors_DropsAWidgetOpened_AndKeepsErrors() {
+        var state = initial
+        state.level = .errors
+
+        let widget = reduce(state, .reported(.widgetOpened(widget: "CardDetailsWidget")))
+        let error = reduce(widget.state, .reported(TelemetryFixtures.sdkError()))
+
+        XCTAssertEqual(widget.effects, [.drop(.levelFiltered)])
+        XCTAssertEqual(widget.state.openedWidgets, [])
+        XCTAssertEqual(error.state.pending, 1)
+    }
+
+    func testASecondOpening_DropsAsAlreadyOpened() {
+        let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
+
+        let first = reduce(initial, .reported(event))
+        let second = reduce(first.state, .reported(event))
+
+        XCTAssertEqual(first.effects, [.persist(pending(1, event)), Self.scheduleFlush])
+        XCTAssertEqual(first.state.openedWidgets, ["CardDetailsWidget"])
+        XCTAssertEqual(second.effects, [.drop(.alreadyOpened)])
+        XCTAssertEqual(second.state, first.state)
+
+        let other = reduce(second.state, .reported(.widgetOpened(widget: "GiftCardWidget")))
+        XCTAssertEqual(other.state.pending, 2, "another widget is recorded")
+    }
+
+    func testANewState_ANewSession_RecordsTheWidgetAgain() {
+        let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
+        _ = reduce(initial, .reported(event))
+
+        let fresh = TelemetryState(level: .all, enabled: true, sessionId: "session-2")
+        let again = reduce(fresh, .reported(event))
+
+        XCTAssertEqual(again.state.pending, 1)
+        XCTAssertEqual(again.state.openedWidgets, ["CardDetailsWidget"])
+    }
+
+    func testAWidgetDroppedByTheLevelOrTheCap_IsNotRemembered() {
+        let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
+        var filtered = initial
+        filtered.level = .errors
+        let byLevel = reduce(filtered, .reported(event))
+        XCTAssertEqual(byLevel.effects, [.drop(.levelFiltered)])
+        XCTAssertEqual(byLevel.state.openedWidgets, [])
+
+        var capped = initial
+        for index in 0..<Limits.hourlyCap {
+            capped = reduce(capped, .reported(TelemetryFixtures.crash()), elapsed: Int64(index)).state
+        }
+        let byCap = reduce(capped, .reported(event), elapsed: 1_000)
+        XCTAssertEqual(byCap.effects.first, .drop(.rateLimit))
+        XCTAssertEqual(byCap.state.openedWidgets, [])
+
+        let afterTheHour = reduce(byCap.state, .reported(event), elapsed: Limits.hourMilliseconds)
+        XCTAssertEqual(afterTheHour.effects.first.map { effect -> Bool in
+            if case let .persist(record) = effect { return record.event == event }
+            return false
+        }, true, "the capped widget is recorded once the cap allows it")
+        XCTAssertEqual(afterTheHour.state.openedWidgets, ["CardDetailsWidget"])
+    }
+
+    func testAlreadyOpened_IsCheckedAfterTheLevel_AndBeforeTheCap() {
+        let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
+        var opened = reduce(initial, .reported(event)).state
+
+        var errorsOnly = opened
+        errorsOnly.level = .errors
+        XCTAssertEqual(reduce(errorsOnly, .reported(event)).effects, [.drop(.levelFiltered)], "the level comes first")
+
+        for index in 0..<Limits.hourlyCap {
+            opened = reduce(opened, .reported(TelemetryFixtures.crash()), elapsed: Int64(index)).state
+        }
+        XCTAssertEqual(opened.createdInWindow, Limits.hourlyCap)
+        let atTheCap = reduce(opened, .reported(event), elapsed: 1_000)
+        XCTAssertEqual(atTheCap.effects, [.drop(.alreadyOpened)], "the cap comes after")
+        XCTAssertEqual(atTheCap.state, opened, "no rate-limit notice")
+    }
+
     func testLevelChanged_SetsTheLevel_WithoutEffects() {
         for level in [TelemetryLevel.off, .errors, .all] {
             let result = reduce(initial, .levelChanged(level))

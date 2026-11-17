@@ -56,8 +56,9 @@ package enum TelemetryReducer {
 
     // MARK: - Intents
 
-    /// The first matching rule: not reportable, disabled, off, filtered by the level; otherwise the hourly cap, or a
-    /// new record, the threshold export and the timer.
+    /// The first matching rule: not reportable, disabled, off, filtered by the level, a widget already opened this
+    /// session; otherwise the hourly cap, or a new record (a widget opened is remembered), the threshold export and the
+    /// timer.
     private static func reported(_ event: TelemetryEvent, _ state: inout TelemetryState, now: Int64, elapsed: Int64,
                                  sequence: RecordSequence) -> [TelemetryEffect] {
         if case .dropped = event {
@@ -72,6 +73,9 @@ package enum TelemetryReducer {
         if state.level == .errors && !isError(event) {
             return [.drop(.levelFiltered)]
         }
+        if case let .widgetOpened(widget) = event, state.openedWidgets.contains(widget) {
+            return [.drop(.alreadyOpened)]
+        }
 
         roll(&state, elapsed: elapsed)
         if state.createdInWindow >= Limits.hourlyCap {
@@ -79,6 +83,9 @@ package enum TelemetryReducer {
         }
         let record = PendingRecord(id: newId(state, sequence), sessionId: state.sessionId, event: event, createdAt: now)
         var effects: [TelemetryEffect] = [.persist(record)]
+        if case let .widgetOpened(widget) = event {
+            state.openedWidgets.insert(widget)
+        }
         state.pending += 1
         state.createdInWindow += 1
         if state.pending >= Limits.flushThreshold {

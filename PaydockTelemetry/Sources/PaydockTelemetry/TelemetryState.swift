@@ -22,6 +22,8 @@ package struct TelemetryState: Sendable, Equatable {
     /// Records created this hour, notices excluded.
     package var createdInWindow: Int = 0
     package var notices: [TelemetryEvent.DroppedReason: DroppedNotice] = [:]
+    /// Widgets whose opened record was stored this session (D19, R_09).
+    package var openedWidgets: Set<String> = []
 
     package init(level: TelemetryLevel, enabled: Bool, sessionId: String) {
         self.level = level

@@ -8,4 +8,12 @@
 package protocol Telemetry: Sendable {
     var isActive: Bool { get }
     func report(_ event: TelemetryEvent)
+    /// An SDK error or an uncaught error with its report site; the runtime describes and classifies the site's
+    /// addresses on its queue (R_03). Any other event is reported as by `report(_:)`.
+    func report(_ event: TelemetryEvent, site: ReportSite)
+}
+
+extension Telemetry {
+    /// Test doubles and the no-op: the site is ignored.
+    package func report(_ event: TelemetryEvent, site: ReportSite) { report(event) }
 }

@@ -83,6 +83,7 @@ class ZipVMTests: XCTestCase {
         config = nil
         completionResult = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 

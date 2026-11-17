@@ -79,11 +79,15 @@ class AfterpayVM: ObservableObject {
             currencyCode: "AUD",
             locale: Locale(identifier: "en_AU"),
             environment: configuration.environment)
+        if afterpayConfig == nil {
+            SdkTelemetry.reportSdkError(SilentFailure.afterpayConfigurationFailed, widget: .afterpay)
+        }
         Afterpay.setConfiguration(afterpayConfig)
     }
 
     func presentAfterpay() {
         guard let vc = UIApplication.shared.topMostViewController() else {
+            SdkTelemetry.reportSdkError(SilentFailure.afterpayNoPresenter, widget: .afterpay)
             return
         }
 
@@ -126,7 +130,7 @@ class AfterpayVM: ObservableObject {
     }
 
     func getAfterpayURL(token: String) {
-        Task {
+        SdkTask.run(widget: .afterpay) { [self] in
             do {
                 isLoading = true
                 let afterPayOrderId = try await chargesService.getAfterpayCallback(widgetAccessToken: token)
@@ -138,19 +142,23 @@ class AfterpayVM: ObservableObject {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 self.isLoading = false
                 self.showWebView = false
-                self.completion(.failure(.errorFetchingAfterpayUrl(error: errorResponse)))
+                let failure = AfterpayError.errorFetchingAfterpayUrl(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                self.completion(.failure(failure))
 
             } catch {
                 self.isLoading = false
                 self.showWebView = false
-                self.completion(.failure(.unknownError(error as? RequestError)))
+                let failure = AfterpayError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                self.completion(.failure(failure))
             }
         }
     }
 
     private func captureWalletCharge() {
         isLoading = true
-        Task {
+        SdkTask.run(widget: .afterpay) { [self] in
             do {
                 let walletChargeData = try await self.chargesService.captureWalletCharge(
                     widgetAccessToken: self.token,
@@ -166,10 +174,14 @@ class AfterpayVM: ObservableObject {
                 completion(.success(chargeResponse))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
-                completion(.failure(.errorCapturingCharge(error: errorResponse)))
+                let failure = AfterpayError.errorCapturingCharge(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                completion(.failure(failure))
             } catch {
                 isLoading = false
-                completion(.failure(.unknownError(error as? RequestError)))
+                let failure = AfterpayError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                completion(.failure(failure))
             }
         }
     }
@@ -177,7 +189,7 @@ class AfterpayVM: ObservableObject {
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
-            Task {
+            SdkTask.run(widget: .afterpay) {
                 switch result {
                 case .success(let response):
                     self?.token = response.token
@@ -186,7 +198,9 @@ class AfterpayVM: ObservableObject {
                 case .failure(let failure):
                     self?.updateLoadingState(isLoading: false)
                     self?.showWebView = false
-                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                    let tokenFailure = AfterpayError.initialisingWalletToken(reason: failure.customMessage)
+                    SdkTelemetry.reportSdkError(tokenFailure, widget: .afterpay)
+                    self?.completion(.failure(tokenFailure))
                 }
             }
         }
@@ -194,18 +208,28 @@ class AfterpayVM: ObservableObject {
 
     func declineWalletTransaction() {
         isLoading = true
-        Task {
+        SdkTask.run(widget: .afterpay) { [self] in
             do {
-                guard let chargeId = decodeChargeId(jwtToken: token) else { return }
+                guard let chargeId = decodeChargeId(jwtToken: token) else {
+                    SdkTelemetry.reportSdkError(SilentFailure.afterpayCancelWithoutChargeId, widget: .afterpay)
+                    return
+                }
                 _ = try await chargesService.declineWalletTransaction(widgetAccessToken: self.token, chargeId: chargeId)
                 isLoading = false
-                completion(.failure(.transactionCanceled))
+                // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+                let failure = AfterpayError.transactionCanceled
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                completion(.failure(failure))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 isLoading = false
-                completion(.failure(.errorCancelingTransaction(error: errorResponse)))
+                let failure = AfterpayError.errorCancelingTransaction(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                completion(.failure(failure))
             } catch {
                 isLoading = false
-                self.completion(.failure(.unknownError(error as? RequestError)))
+                let failure = AfterpayError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .afterpay)
+                self.completion(.failure(failure))
             }
         }
     }

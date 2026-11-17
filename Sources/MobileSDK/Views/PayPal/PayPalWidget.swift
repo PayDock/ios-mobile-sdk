@@ -55,6 +55,7 @@ public struct PayPalWidget: View {
                 }
             }
         }
+        .onAppear { SdkTelemetry.reportWidgetOpened(.payPal) }
     }
 
     private func getProgressViewBackground() -> Color {

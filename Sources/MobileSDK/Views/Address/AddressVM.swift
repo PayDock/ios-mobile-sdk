@@ -39,6 +39,8 @@ class AddressVM: NSObject, ObservableObject {
     // MARK: - Completion Handlers
 
     private weak var eventDelegate: WidgetEventDelegate?
+    /// The completer failure is reported once per widget (see `completer(_:didFailWithError:)`).
+    private let completerFailureReports = ReportOnce()
     private let completion: (Address) -> Void
 
     // MARK: - Custom bindings
@@ -90,7 +92,7 @@ class AddressVM: NSObject, ObservableObject {
 
         anyCancellable = addressFormManager.objectWillChange.sink { [weak self] _ in
             // Defer to avoid publishing during view updates
-            Task {
+            SdkTask.run(widget: .address) {
                 self?.objectWillChange.send()
             }
         }
@@ -126,6 +128,9 @@ class AddressVM: NSObject, ObservableObject {
         search.start { [weak self] (response, error) in
             if error == nil, let coordinate = response?.mapItems.first?.placemark.coordinate {
                 coordinateK = coordinate
+            } else {
+                SdkTelemetry.reportSdkError(SilentFailure.addressSearchFailed(error ?? MKError(.placemarkNotFound)),
+                                            widget: .address)
             }
 
             if let coordinate = coordinateK {
@@ -133,6 +138,9 @@ class AddressVM: NSObject, ObservableObject {
                 CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
 
                     guard let placemark = placemarks?.first else {
+                        SdkTelemetry.reportSdkError(
+                            SilentFailure.addressReverseGeocodeFailed(error ?? CLError(.geocodeFoundNoResult)),
+                            widget: .address)
                         let errorString = error?.localizedDescription ?? "Unexpected Error"
                         print("Unable to reverse geocode the given location. Error: \(errorString)")
                         return
@@ -141,7 +149,7 @@ class AddressVM: NSObject, ObservableObject {
                     let reversedGeoLocation = ReversedGeoLocation(with: placemark)
                     // CLGeocoder's completion isn't guaranteed to run on the main actor, so the Task
                     // must explicitly hop onto it before touching `self`'s main-actor-isolated state.
-                    Task { @MainActor in
+                    SdkTask.run(widget: .address) {
                         self?.addressFormManager.updateFormWith(reversedGeoLocation: reversedGeoLocation)
                         self?.countrySearchBinding.wrappedValue = reversedGeoLocation.country
                     }
@@ -245,7 +253,7 @@ class AddressVM: NSObject, ObservableObject {
 extension AddressVM: MKLocalSearchCompleterDelegate {
 
     nonisolated func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        Task { @MainActor in
+        SdkTask.run(widget: .address) { [self] in
             mkLocalSearchCompletions = completer.results.prefix(4).map { $0 }
             addressSearchSuggestions = mkLocalSearchCompletions.map { "\($0.title), \($0.subtitle)"}
             if addressFormManager.currentTextField == .searchAddress  && !addressFormManager.addressSearchText.isEmpty {
@@ -255,6 +263,13 @@ extension AddressVM: MKLocalSearchCompleterDelegate {
     }
 
     nonisolated func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        // No need to handle errors for now
+        // Swallowed as before (the address widget has no error channel): reported only. The completer fails while the
+        // shopper types (throttled, or no match for a partial query): those are not failures, and any other is
+        // reported once per widget.
+        if let mapKitError = error as? MKError, [.loadingThrottled, .placemarkNotFound].contains(mapKitError.code) {
+            return
+        }
+        SdkTelemetry.reportSdkError(SilentFailure.addressCompleterFailed(error), widget: .address,
+                                    once: (completerFailureReports, "completer"))
     }
 }

@@ -47,6 +47,7 @@ public struct AfterpayWidget: View {
             })
         .modifier(ActivityIndicatorModifier(appearance: appearance.loader, isLoading: viewModel.isLoading))
         .accessibilityHint("Initiates payment using Afterpay.")
+        .onAppear { SdkTelemetry.reportWidgetOpened(.afterpay) }
     }
 }
 

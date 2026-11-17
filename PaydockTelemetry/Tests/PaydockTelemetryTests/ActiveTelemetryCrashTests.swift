@@ -258,6 +258,56 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         XCTAssertEqual(stateStore.markerClearCount, 1)
     }
 
+    // MARK: - Report site (R_03)
+
+    /// The site's addresses are described as image offsets (a system symbol kept) and classified on the queue.
+    func testReportWithASite_StoresAnSdkError_WithOffsetFrames_AndInSdkFromTheClassifier() throws {
+        let telemetry = makeTelemetry()
+        telemetry.start()
+        let site = ReportSite(returnAddresses: [Self.appBase + UInt(Self.sdkOffset), Self.throwSite + 164],
+                              threadName: "main")
+
+        telemetry.report(.sdkError(error: TelemetryFixtures.info("MobileSDK.SilentFailure"), errorCode: "SAMPLE_CODE",
+                                   widget: "CardDetailsWidget"), site: site)
+
+        let saved = try XCTUnwrap(store.saved.first)
+        XCTAssertEqual(store.saved.count, 1)
+        XCTAssertEqual(saved.value("event.name"), .string("paydock.error"))
+        XCTAssertEqual(saved.value("paydock.error.kind"), .string("sdk_error"))
+        XCTAssertEqual(saved.value("exception.stacktrace"), .string(
+            "MobileSDK.SilentFailure\n\tat ExampleApp 0x1b5058\n\tat CoreFoundation __exceptionPreprocess + 164"
+        ))
+        XCTAssertEqual(saved.value("paydock.exception.in_sdk"), .bool(true))
+    }
+
+    func testReportWithASiteOutsideTheSdk_StoresInSdkFalse() throws {
+        let telemetry = makeTelemetry()
+        telemetry.start()
+        let site = ReportSite(returnAddresses: [Self.throwSite + 164, Self.appBase + 0x225100], threadName: nil)
+
+        telemetry.report(.uncaughtException(error: TelemetryFixtures.info("Sample.Error")), site: site)
+
+        let saved = try XCTUnwrap(store.saved.first)
+        XCTAssertEqual(saved.value("paydock.error.kind"), .string("uncaught"))
+        XCTAssertEqual(saved.value("paydock.exception.in_sdk"), .bool(false))
+    }
+
+    /// The failure mode "a crash is recorded twice", with SDK error reporting wired: an Objective-C exception from SDK
+    /// code handled by the crash path gives exactly one `paydock.crash` record and no `paydock.error`.
+    func testOneSdkCrash_GivesOneCriticalRecord_AndNoError() {
+        let telemetry = makeTelemetry(exporter: ScriptedExporter(fallback: .retry(retryAfterMilliseconds: nil)))
+        telemetry.start()
+
+        chain.handle(sdkException())
+
+        let records = store.oldest(max: 100)
+        XCTAssertEqual(records.filter { $0.eventName == "paydock.crash" }.count, 1)
+        XCTAssertEqual(records.filter { $0.eventName == "paydock.error" }.count, 0)
+        XCTAssertEqual(store.crashSaved.count, 1)
+        XCTAssertTrue(store.saved.isEmpty, "the crash also went through the reducer")
+        XCTAssertEqual(Self.forwarded.names, ["NSInvalidArgumentException"])
+    }
+
     // MARK: - The test crash
 
     func testRaiseTestCrash_PostsToTheMainQueueAfter3s() {

@@ -39,6 +39,25 @@ final class NoOpTelemetryTests: XCTestCase {
         XCTAssertFalse(telemetry.isActive)
     }
 
+    /// R_11: the no-op ignores a report with its site: nothing is installed, created or kept.
+    func testReportWithASite_DoesNothing() throws {
+        let before = Self.handlerAddress()
+        let applicationSupport = try TemporaryDirectory()
+        defer { applicationSupport.remove() }
+        let telemetry = NoOpTelemetry()
+        let site = ReportSite(returnAddresses: [0x1_0000_1000, 0x1_0000_2000], threadName: "main")
+
+        for event in [TelemetryEvent.sdkError(error: info, errorCode: "SAMPLE_CODE"), .uncaughtException(error: info),
+                      .widgetOpened(widget: "SampleWidget")] {
+            telemetry.report(event, site: site)
+        }
+        telemetry.report(.sdkError(error: info), site: ReportSite.capture())
+
+        XCTAssertFalse(telemetry.isActive)
+        XCTAssertEqual(Self.handlerAddress(), before)
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.url.path), [])
+    }
+
     func testStart_ReturnsAndCanBeCalledTwice() {
         let telemetry = NoOpTelemetry()
 

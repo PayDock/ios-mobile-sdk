@@ -25,6 +25,7 @@ class PayPalVMTests: XCTestCase {
     var completionResult: Result<ChargeResponse, PayPalError>?
     var tokenRequestResult: Result<WalletTokenResult, WalletTokenError>?
     var cancellables = Set<AnyCancellable>()
+    private let telemetry = RecordingTelemetry()
 
     override func setUp() {
         super.setUp()
@@ -69,6 +70,7 @@ class PayPalVMTests: XCTestCase {
         completionResult = nil
         tokenRequestResult = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 
@@ -478,5 +480,85 @@ class PayPalVMTests: XCTestCase {
         // Then - No events should be recorded in our test delegate
         XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
         XCTAssertNil(eventDelegate.lastEvent)
+    }
+
+    // MARK: - Telemetry (R_05, R_06)
+
+    private func makeTelemetryVM(token: String = "test_token",
+                                 tokenResult: Result<WalletTokenResult, WalletTokenError>? = nil,
+                                 expectation: XCTestExpectation? = nil) -> PayPalVM {
+        PayPalVM(
+            config: config,
+            viewState: viewState,
+            tokenRequest: { completion in
+                completion(tokenResult ?? .success(WalletTokenResult(token: token)))
+            },
+            chargesService: mockChargesService,
+            gatewayService: mockGatewayService,
+            loadingDelegate: loadingDelegate,
+            eventDelegate: eventDelegate,
+            completion: { result in
+                self.completionResult = result
+                expectation?.fulfill()
+            }
+        )
+    }
+
+    func testTelemetry_WalletTokenFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+        telemetry.bindAsCurrent()
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = makeTelemetryVM(tokenResult: .failure(.initialisingWalletToken(reason: "Token error")),
+                                    expectation: expectation)
+
+        viewModel.handleButtonTap()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.initialisingWalletToken(let reason)) = completionResult else {
+            return XCTFail("Expected initialisingWalletToken, got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(reason, "Token error")
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("PAYPAL_WALLET_TOKEN_ERROR", .payPal)])
+    }
+
+    func testTelemetry_CaptureWithoutToken_ReportsOneSdkError_AndDeliversAsBefore() {
+        telemetry.bindAsCurrent()
+        viewModel = makeTelemetryVM(token: "")
+
+        viewModel.capturePayPalPayment(paymentMethodId: "test_payment_method", payerId: "test_payer")
+
+        guard case .failure(.unknownError(nil)) = completionResult else {
+            return XCTFail("Expected unknownError(nil), got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("PAYPAL_UNKNOWN", .payPal)])
+    }
+
+    func testTelemetry_OrderIdNonRequestFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+        telemetry.bindAsCurrent()
+        mockChargesService.shouldThrowUnknownError = true
+        viewModel = makeTelemetryVM()
+
+        let orderId = await viewModel.getOrderId(token: "test_token")
+
+        XCTAssertNil(orderId)
+        guard case .failure(.unknownError(nil)) = completionResult else {
+            return XCTFail("Expected unknownError(nil), got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("PAYPAL_UNKNOWN", .payPal)])
+    }
+
+    func testTelemetry_ClientIdRequestFailure_DeliversAsBefore_AndReportsNothing() async {
+        telemetry.bindAsCurrent()
+        mockGatewayService.shouldReturnError = true
+        mockGatewayService.errorToReturn = ErrorRes(status: 500, error: .init(message: "Test Error", code: "TEST", details: nil),
+                                                    resource: nil, errorSummary: nil)
+        viewModel = makeTelemetryVM()
+
+        let clientId = await viewModel.getClientId()
+
+        XCTAssertNil(clientId)
+        guard case .failure(.getPayPalClientId) = completionResult else {
+            return XCTFail("Expected getPayPalClientId, got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.reports, [])
     }
 }

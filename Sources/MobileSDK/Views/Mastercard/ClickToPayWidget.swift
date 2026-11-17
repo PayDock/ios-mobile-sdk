@@ -33,6 +33,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
     }
 
     public func makeUIView(context: Context) -> UIView {
+        SdkTelemetry.reportWidgetOpened(.clickToPay)
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -135,19 +136,34 @@ public struct ClickToPayWidget: UIViewRepresentable {
                 guard !clientSdkLoadFailureReported else { return }
                 clientSdkLoadFailureReported = true
                 activityIndicator?.stopAnimating()
-                completion(.failure(.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))))
+                let failure = ClickToPayError.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))
+                SdkTelemetry.reportSdkError(failure, widget: .clickToPay)
+                completion(.failure(failure))
                 return
             }
             guard let data = body as? [String: Any],
                   let eventRaw = data["event"] as? String,
                   let event = ClickToPayResult.EventType(rawValue: eventRaw) else {
+                SdkTelemetry.reportSdkError(SilentFailure.clickToPayMessageUnreadable, widget: .clickToPay)
                 completion(.success(ClickToPayResult(event: .checkoutError, mastercardToken: "")))
                 return
             }
 
             guard let outerData = data["data"] as? [String: Any],
                   let innerData = outerData["data"] as? [String: Any],
-                  let token = innerData["token"] as? String else { return }
+                  let token = innerData["token"] as? String else {
+                // Swallowed as before. `checkoutReady` carries no token by design, and a user error is the shopper's
+                // outcome; neither is reported. The error's own text is never read, only its type.
+                switch event {
+                case .checkoutCompleted:
+                    SdkTelemetry.reportSdkError(SilentFailure.clickToPayTokenMissing, widget: .clickToPay)
+                case .checkoutError where (data["data"] as? [String: Any])?["type"] as? String != "UserError":
+                    SdkTelemetry.reportSdkError(SilentFailure.clickToPayCheckoutError, widget: .clickToPay)
+                case .checkoutError, .checkoutReady:
+                    break
+                }
+                return
+            }
 
             completion(.success(ClickToPayResult(event: event, mastercardToken: token)))
         }
@@ -181,7 +197,9 @@ public struct ClickToPayWidget: UIViewRepresentable {
             activityIndicator?.stopAnimating()
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            completion(.failure(.webViewFailed(error: nsError)))
+            let failure = ClickToPayError.webViewFailed(error: nsError)
+            SdkTelemetry.reportSdkError(failure, widget: .clickToPay)
+            completion(.failure(failure))
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -202,7 +220,9 @@ public struct ClickToPayWidget: UIViewRepresentable {
             activityIndicator?.stopAnimating()
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            completion(.failure(.webViewFailed(error: nsError)))
+            let failure = ClickToPayError.webViewFailed(error: nsError)
+            SdkTelemetry.reportSdkError(failure, widget: .clickToPay)
+            completion(.failure(failure))
         }
 
         public func webView(_ webView: WKWebView,
@@ -230,6 +250,7 @@ public struct ClickToPayWidget: UIViewRepresentable {
                         return ""
                     }
                 } catch {
+                    SdkTelemetry.reportSdkError(SilentFailure.clickToPayMetaEncodingFailed(error), widget: .clickToPay)
                     print("Error converting SRC meta to JSON")
                     return ""
                 }

@@ -97,6 +97,7 @@ public struct CardDetailsWidget: View {
             }
         }
         .onChange(of: isValid) { onFormValidityChange?($0) }
+        .onAppear { SdkTelemetry.reportWidgetOpened(.cardDetails) }
     }
 
     private var cardholderNameTextField: some View {
@@ -345,7 +346,7 @@ public struct CardDetailsWidget: View {
         if !viewModel.ctaButtonTapped() && voiceOverRunning {
             let errorCount = viewModel.numberOfValidationErrors
 
-            Task { @MainActor in
+            SdkTask.run(widget: .cardDetails) {
                 // Wait for VoiceOver to finish whatever it was speaking when the button
                 // was activated (button label/hint, "activated", etc.) before announcing
                 // the count — otherwise the default-priority count gets queued behind

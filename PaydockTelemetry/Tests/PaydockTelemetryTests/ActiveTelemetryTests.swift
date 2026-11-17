@@ -131,6 +131,27 @@ final class ActiveTelemetryTests: XCTestCase {
         XCTAssertFalse(serial.post {}, "the blocked queue accepted more than its capacity")
     }
 
+    // MARK: - Widgets opened (R_09)
+
+    func testTwoOpeningsOfOneWidget_StoreOneRecord() {
+        let telemetry = makeTelemetry()
+
+        telemetry.report(.widgetOpened(widget: "CardDetailsWidget"))
+        telemetry.report(.widgetOpened(widget: "CardDetailsWidget"), site: ReportSite.capture())
+
+        XCTAssertEqual(store.saved.count, 1)
+        XCTAssertEqual(store.saved.first?.value("paydock.widget"), .string("CardDetailsWidget"))
+        XCTAssertEqual(telemetry.currentState().openedWidgets, ["CardDetailsWidget"])
+    }
+
+    func testANewActiveTelemetry_StoresTheWidgetAgain() {
+        makeTelemetry().report(.widgetOpened(widget: "CardDetailsWidget"))
+
+        makeTelemetry().report(.widgetOpened(widget: "CardDetailsWidget"))
+
+        XCTAssertEqual(store.saved.filter { $0.value("paydock.widget") == .string("CardDetailsWidget") }.count, 2)
+    }
+
     // MARK: - Threads
 
     /// R_14: every store and transport call runs on the `com.paydock.telemetry` queue, never the main thread.

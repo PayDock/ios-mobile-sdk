@@ -26,15 +26,22 @@ public struct MPGS3DSWidget: UIViewRepresentable {
         validateToken()
     }
 
+    /// The invalid tokens already reported in this process.
+    private static let invalidTokenReports = ReportOnce()
+
     private func validateToken() {
         guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
               decodedToken.format == .html || decodedToken.format == .url else {
-            completion(.failure(.invalidToken))
+            let failure = MPGS3dsError.invalidToken
+            // `init` runs again on every redraw of the parent view: the same token is reported once per process.
+            SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds, once: (Self.invalidTokenReports, config.token))
+            completion(.failure(failure))
             return
         }
     }
 
     public func makeUIView(context: Context) -> UIView {
+        SdkTelemetry.reportWidgetOpened(.mpgs3ds)
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -124,7 +131,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
                 guard !clientSdkLoadFailureReported else { return }
                 clientSdkLoadFailureReported = true
                 activityIndicator?.stopAnimating()
-                completion(.failure(.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))))
+                let failure = MPGS3dsError.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))
+                SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+                completion(.failure(failure))
                 return
             }
             guard let data = body as? [String: Any],
@@ -132,7 +141,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
                   let event = MPGS3dsResult.EventType(rawValue: eventRaw),
                   let token = data["charge3dsId"] as? String
             else {
-                completion(.failure(.mappingFailed))
+                let failure = MPGS3dsError.mappingFailed
+                SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+                completion(.failure(failure))
                 return
             }
             let statusRaw = data["status"] as? String
@@ -155,7 +166,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             activityIndicator?.stopAnimating()
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            completion(.failure(.webViewFailed(error: nsError)))
+            let failure = MPGS3dsError.webViewFailed(error: nsError)
+            SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+            completion(.failure(failure))
         }
 
         public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -175,7 +188,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             activityIndicator?.stopAnimating()
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            completion(.failure(.webViewFailed(error: nsError)))
+            let failure = MPGS3dsError.webViewFailed(error: nsError)
+            SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+            completion(.failure(failure))
         }
 
         public func webView(_ webView: WKWebView,

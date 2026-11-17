@@ -84,6 +84,7 @@ class AfterPayVMTests: XCTestCase {
         //        selectAddressResult = nil
         //        selectShippingOptionResult = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 

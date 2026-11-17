@@ -101,7 +101,7 @@ struct ZipWebView: UIViewRepresentable {
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) { }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            Task { @MainActor in
+            SdkTask.run(widget: .zip) { [self] in
                 isLoaded = true
                 if openTargetBlankInSameWebView {
                     webView.evaluateJavaScript(ZipWebView.openInSameWindowScript, completionHandler: nil)
@@ -132,7 +132,7 @@ struct ZipWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            Task { @MainActor in
+            SdkTask.run(widget: .zip) { [self] in
                 onFailure(.webViewFailed(error: nsError))
             }
         }
@@ -146,13 +146,13 @@ struct ZipWebView: UIViewRepresentable {
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            Task { @MainActor in
+            SdkTask.run(widget: .zip) { [self] in
                 onFailure(.webViewFailed(error: nsError))
             }
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            Task { @MainActor in
+            SdkTask.run(widget: .zip) { [self] in
                 guard let webUrl = webView.url else { return }
 
                 let path = webUrl.path()
@@ -208,7 +208,7 @@ struct ZipWebView: UIViewRepresentable {
 
         /// Handle response callback with 'result' status parameter
         private func handleResponse(params: [String: String]) {
-            Task { @MainActor in
+            SdkTask.run(widget: .zip) { [self] in
                 // Extract status and checkoutId from query parameters
                 guard let resultString = params["result"] else {
                     onFailure(.unexpectedStatus(status: nil, checkoutId: params["checkoutId"]))

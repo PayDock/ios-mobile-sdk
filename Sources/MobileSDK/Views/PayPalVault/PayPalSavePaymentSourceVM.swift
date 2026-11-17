@@ -60,7 +60,7 @@ class PayPalSavePaymentSourceVM: ObservableObject {
     // MARK: - PayPal Initialization
 
     func initializePayPalSDK() {
-        Task {
+        SdkTask.run(widget: .payPalSavePaymentSource) { [self] in
             guard let clientId = await getClientId(),
                   let setupTokenData = await getSetupTokenData() else {
                 updateLoadingState(isLoading: false)
@@ -76,6 +76,8 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
             // Check if app is in foreground before proceeding
             guard UIApplication.shared.applicationState == .active else {
+                // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+                SdkTelemetry.reportSdkError(PayPalVaultError.userCancelled, widget: .payPalSavePaymentSource)
                 completion(.failure(.userCancelled))
                 return
             }
@@ -94,10 +96,14 @@ class PayPalSavePaymentSourceVM: ObservableObject {
         do {
             return try await gatewayService.getClientId(gatewayId: config.gatewayId, widgetAccessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
-            completion(.failure(.getPayPalClientId(error: errorResponse)))
+            let failure = PayPalVaultError.getPayPalClientId(error: errorResponse)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
         } catch {
-            completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalVaultError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
         }
         return nil
@@ -109,10 +115,14 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             let request = DataPaymentSources.CreatePayPalVaultSetupTokenReq(gatewayId: config.gatewayId)
             return try await paymentSourcesService.createSetupTokenData(req: request, widgetAccessToken: config.accessToken)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
-            completion(.failure(.createSetupToken(error: errorResponse)))
+            let failure = PayPalVaultError.createSetupToken(error: errorResponse)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
         } catch {
-            completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalVaultError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
         }
         return nil
@@ -131,11 +141,15 @@ class PayPalSavePaymentSourceVM: ObservableObject {
             completion(.success(PayPalVaultResult(token: tokenData.token, email: tokenData.email)))
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
-            completion(.failure(.createPaymentToken(error: errorResponse)))
+            let failure = PayPalVaultError.createPaymentToken(error: errorResponse)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
 
         } catch {
-            completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalVaultError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
         }
     }
@@ -159,12 +173,18 @@ class PayPalSavePaymentSourceVM: ObservableObject {
 
     private func handleVaultError(_ error: Error) {
         if PayPalWebPayments.PayPalError.isVaultCanceled(error) {
+            // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+            SdkTelemetry.reportSdkError(PayPalVaultError.userCancelled, widget: .payPalSavePaymentSource)
             completion(.failure(.userCancelled))
         } else if let coreError = error as? CoreSDKError {
             let errorDescription = coreError.errorDescription ?? ""
-            completion(.failure(.sdkException(description: errorDescription)))
+            let failure = PayPalVaultError.sdkException(description: errorDescription)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
         } else {
-            completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalVaultError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPalSavePaymentSource)
+            completion(.failure(failure))
         }
 
         updateLoadingState(isLoading: false)

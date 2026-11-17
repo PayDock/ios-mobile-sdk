@@ -64,7 +64,7 @@ class PayPalVM: ObservableObject {
     func handleButtonTap() {
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
-            Task {
+            SdkTask.run(widget: .payPal) {
                 switch result {
                 case .success(let response):
                     self?.token = response.token
@@ -72,14 +72,16 @@ class PayPalVM: ObservableObject {
 
                 case .failure(let failure):
                     self?.updateLoadingState(isLoading: false)
-                    self?.completion(.failure(.initialisingWalletToken(reason: failure.customMessage)))
+                    let tokenFailure = PayPalError.initialisingWalletToken(reason: failure.customMessage)
+                    SdkTelemetry.reportSdkError(tokenFailure, widget: .payPal)
+                    self?.completion(.failure(tokenFailure))
                 }
             }
         }
     }
 
     func initializePayPalSDK() {
-        Task {
+        SdkTask.run(widget: .payPal) { [self] in
             guard let clientId = await getClientId(),
                   let orderId = await getOrderId(token: token) else {
                 updateLoadingState(isLoading: false)
@@ -94,6 +96,8 @@ class PayPalVM: ObservableObject {
 
             // Check if app is in foreground before proceeding
             guard UIApplication.shared.applicationState == .active else {
+                // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+                SdkTelemetry.reportSdkError(PayPalError.userCancelled, widget: .payPal)
                 completion(.failure(.userCancelled))
                 return
             }
@@ -118,11 +122,15 @@ class PayPalVM: ObservableObject {
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             updateLoadingState(isLoading: false)
-            self.completion(.failure(.errorFetchingOrderId(error: errorResponse)))
+            let failure = PayPalError.errorFetchingOrderId(error: errorResponse)
+            SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            self.completion(.failure(failure))
 
         } catch {
             updateLoadingState(isLoading: false)
-            self.completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            self.completion(.failure(failure))
         }
         return nil
     }
@@ -133,11 +141,15 @@ class PayPalVM: ObservableObject {
             return try await gatewayService.getClientId(gatewayId: config.gatewayId, widgetAccessToken: config.accessToken)
 
         } catch let RequestError.requestError(errorResponse: errorResponse) {
-            completion(.failure(.getPayPalClientId(error: errorResponse)))
+            let failure = PayPalError.getPayPalClientId(error: errorResponse)
+            SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
 
         } catch {
-            completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            completion(.failure(failure))
             updateLoadingState(isLoading: false)
         }
         return nil
@@ -147,12 +159,13 @@ class PayPalVM: ObservableObject {
 
     func capturePayPalPayment(paymentMethodId: String, payerId: String) {
         guard !token.isEmpty else {
+            SdkTelemetry.reportSdkError(PayPalError.unknownError(nil), widget: .payPal)
             completion(.failure(.unknownError(nil)))
             updateLoadingState(isLoading: false)
             return
         }
 
-        Task {
+        SdkTask.run(widget: .payPal) { [self] in
             do {
                 let walletChargeData = try await chargesService.captureWalletCharge(
                     widgetAccessToken: token,
@@ -168,11 +181,15 @@ class PayPalVM: ObservableObject {
                 updateLoadingState(isLoading: false)
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
-                self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
+                let failure = PayPalError.errorCapturingCharge(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .payPal)
+                self.completion(.failure(failure))
                 updateLoadingState(isLoading: false)
 
             } catch {
-                self.completion(.failure(.unknownError(error as? RequestError)))
+                let failure = PayPalError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .payPal)
+                self.completion(.failure(failure))
                 updateLoadingState(isLoading: false)
             }
         }
@@ -186,12 +203,18 @@ class PayPalVM: ObservableObject {
 
     private func handlePayPalError(_ error: Error) {
         if PayPalWebPayments.PayPalError.isCheckoutCanceled(error) {
+            // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+            SdkTelemetry.reportSdkError(PayPalError.userCancelled, widget: .payPal)
             completion(.failure(.userCancelled))
         } else if let coreError = error as? CoreSDKError {
             let errorDescription = coreError.errorDescription ?? ""
-            completion(.failure(.sdkException(description: errorDescription)))
+            let failure = PayPalError.sdkException(description: errorDescription)
+            SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            completion(.failure(failure))
         } else {
-            completion(.failure(.unknownError(error as? RequestError)))
+            let failure = PayPalError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            completion(.failure(failure))
         }
 
         updateLoadingState(isLoading: false)

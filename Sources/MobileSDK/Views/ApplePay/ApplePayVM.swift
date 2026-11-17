@@ -74,7 +74,7 @@ class ApplePayVM: NSObject, ObservableObject {
         }
 
         isProcessing = true
-        Task { @MainActor [weak self] in
+        SdkTask.run(widget: .applePay) { [weak self] in
             let shouldPresent = await onShouldPresentPaymentSheet()
             guard let self else { return }
             if shouldPresent {
@@ -93,9 +93,10 @@ class ApplePayVM: NSObject, ObservableObject {
         self.presenter = presenter
         presenter.present(completion: { [weak self] success in
             if !success {
-                Task { @MainActor in
+                SdkTask.run(widget: .applePay) {
                     self?.isProcessing = false
                     self?.error = .unableToPresentPaymentSheet
+                    SdkTelemetry.reportSdkError(ApplePayError.unableToPresentPaymentSheet, widget: .applePay)
                     self?.callCompletion(.failure(.unableToPresentPaymentSheet))
                 }
             }
@@ -317,7 +318,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     nonisolated func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
                                                     didAuthorizePayment payment: PKPayment,
                                                     completion: @escaping (PKPaymentAuthorizationStatus) -> Void) {
-        Task { @MainActor in
+        SdkTask.run(widget: .applePay) {
             self.pkPaymentCompletion = completion
             await self.createOTTToken(payment: payment)
         }
@@ -325,7 +326,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
 
     nonisolated func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
-            Task { @MainActor in
+            SdkTask.run(widget: .applePay) {
                 self.finishAndComplete()
             }
         }
@@ -339,14 +340,16 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
         if paymentStatus == .success, let result = result {
             callCompletion(.success(result))
         } else {
-            callCompletion(.failure(error ?? .userCanceledPayment))
+            let failure = error ?? .userCanceledPayment
+            SdkTelemetry.reportSdkError(failure, widget: .applePay)
+            callCompletion(.failure(failure))
         }
     }
 
     nonisolated func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
                                                     didSelectShippingContact contact: PKContact,
                                                     handler: @escaping (PKPaymentRequestShippingContactUpdate) -> Void) {
-        Task { @MainActor in
+        SdkTask.run(widget: .applePay) {
             if let update = self.onShippingContactSelected?(contact) {
                 handler(update)
             } else {
@@ -359,7 +362,7 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     nonisolated func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
                                                     didSelectShippingMethod shippingMethod: PKShippingMethod,
                                                     handler: @escaping (PKPaymentRequestShippingMethodUpdate) -> Void) {
-        Task { @MainActor in
+        SdkTask.run(widget: .applePay) { [self] in
             if let update = self.onShippingMethodSelected?(shippingMethod) {
                 handler(update)
             } else {

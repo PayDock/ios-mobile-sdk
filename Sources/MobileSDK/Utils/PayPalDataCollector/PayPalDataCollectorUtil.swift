@@ -38,9 +38,13 @@ public class PayPalDataCollectorUtil {
             let clientId = try await service.getClientId(gatewayId: config.gatewayId, widgetAccessToken: config.accessToken)
             return PayPalDataCollectorUtil(config: config, clientId: clientId)
         } catch let RequestError.requestError(errorResponse: errorResponse) {
-            throw PayPalDataCollectorError.initialisationClientId(error: errorResponse)
+            let failure = PayPalDataCollectorError.initialisationClientId(error: errorResponse)
+            SdkTelemetry.reportSdkError(failure, widget: nil)
+            throw failure
         } catch {
-            throw PayPalDataCollectorError.unknownError(error as? RequestError)
+            let failure = PayPalDataCollectorError.unknownError(error as? RequestError)
+            SdkTelemetry.reportSdkError(failure, widget: nil)
+            throw failure
         }
     }
 
@@ -53,6 +57,7 @@ public class PayPalDataCollectorUtil {
             let correlationId = try extractCorrelationId(from: deviceData)
             return correlationId
         } catch {
+            SdkTelemetry.reportSdkError(error, widget: nil)
             throw error
         }
     }

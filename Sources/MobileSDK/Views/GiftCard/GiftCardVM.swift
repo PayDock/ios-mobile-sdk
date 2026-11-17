@@ -71,7 +71,7 @@ class GiftCardVM: ObservableObject {
 
         anyCancellable = giftCardFormManager.objectWillChange.sink { [weak self] _ in
             // Defer to avoid publishing during view updates
-            Task {
+            SdkTask.run(widget: .giftCard) {
                 self?.objectWillChange.send()
             }
         }
@@ -88,7 +88,7 @@ class GiftCardVM: ObservableObject {
         guard !isLoading else { return }
         updateLoadingState(isLoading: true)
 
-        Task {
+        SdkTask.run(widget: .giftCard) { [self] in
             let tokeniseGiftCardReq = CreateGiftCardTokenReq(
                 cardNumber: giftCardFormManager.cardNumberText.replacingOccurrences(of: " ", with: ""),
                 cardPin: giftCardFormManager.pinText,
@@ -103,11 +103,15 @@ class GiftCardVM: ObservableObject {
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
-                completion(.failure(.errorTokenisingCard(error: errorResponse)))
+                let failure = GiftCardError.errorTokenisingCard(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .giftCard)
+                completion(.failure(failure))
 
             } catch {
                 updateLoadingState(isLoading: false)
-                completion(.failure(.unknownError(error as? RequestError)))
+                let failure = GiftCardError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .giftCard)
+                completion(.failure(failure))
             }
         }
     }

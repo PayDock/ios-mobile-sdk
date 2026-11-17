@@ -56,6 +56,7 @@ class ColesPayVMTests: XCTestCase {
         eventDelegate = nil
         config = nil
         completionResult = nil
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 

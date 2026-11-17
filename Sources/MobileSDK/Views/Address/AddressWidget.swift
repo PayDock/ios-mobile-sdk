@@ -60,6 +60,7 @@ public struct AddressWidget: View {
                 .modifier(AddressAutoScrollModifier(textFieldInFocus: textFieldInFocus, proxy: proxy))
             }
             .onAppear {
+                SdkTelemetry.reportWidgetOpened(.address)
                 viewModel.updateAddress()
             }
             .onChange(of: dynamicTypeSize) { _ in
@@ -411,7 +412,7 @@ public struct AddressWidget: View {
         guard voiceOverRunning else { return }
 
         let errorCount = viewModel.numberOfValidationErrors
-        Task { @MainActor in
+        SdkTask.run(widget: .address) {
             // Let VoiceOver finish the button's own utterance before announcing the count.
             try? await Task.sleep(for: .seconds(1))
             announceErrorCount(errorCount)

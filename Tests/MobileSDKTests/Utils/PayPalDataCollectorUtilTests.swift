@@ -15,12 +15,18 @@ class PayPalDataCollectorUtilTests: XCTestCase {
 
     var mockConfig: PayPalDataCollectorConfig!
     var mockService: GatewayMockService!
+    private let telemetry = RecordingTelemetry()
 
     override func setUp() {
         super.setUp()
         mockConfig = PayPalDataCollectorConfig(accessToken: "testAccessToken", gatewayId: "testGateway")
         mockService = GatewayMockService()
         MobileSDK.shared.configureMobileSDK(config: MobileSDKConfig(environment: .sandbox))
+    }
+
+    override func tearDown() {
+        RecordingTelemetry.unbind()
+        super.tearDown()
     }
 
     func testInitializeDataCollector_Success() async throws {
@@ -82,5 +88,43 @@ class PayPalDataCollectorUtilTests: XCTestCase {
             XCTFail("Collecting device data should succeed!")
         }
 
+    }
+
+    // MARK: - Telemetry (R_05, R_06)
+
+    func testTelemetry_NonRequestInitialiseFailure_ReportsOneSdkError_AndThrowsAsBefore() async {
+        telemetry.bindAsCurrent()
+
+        do {
+            _ = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: ThrowingGatewayService())
+            XCTFail("Expected to throw PayPalDataCollectorError.unknownError")
+        } catch PayPalDataCollectorError.unknownError(nil) {
+            XCTAssertEqual(telemetry.sdkErrors, [.reported("PAYPAL_DATA_COLLECTOR_UNKNOWN", nil)])
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testTelemetry_RequestInitialiseFailure_ThrowsAsBefore_AndReportsNothing() async {
+        telemetry.bindAsCurrent()
+        mockService.shouldReturnError = true
+        mockService.errorToReturn = ErrorRes(status: 400, error: .init(message: "Test error", code: "ERROR", details: nil),
+                                             resource: nil, errorSummary: nil)
+
+        do {
+            _ = try await PayPalDataCollectorUtil.initialise(config: mockConfig, service: mockService)
+            XCTFail("Expected to throw PayPalDataCollectorError.initialisationClientId")
+        } catch PayPalDataCollectorError.initialisationClientId {
+            XCTAssertEqual(telemetry.reports, [])
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+}
+
+/// A gateway that fails without a request error, as a transport-level fault outside NetworkingLib would.
+private struct ThrowingGatewayService: GatewayService {
+    func getClientId(gatewayId: String, widgetAccessToken: String) async throws -> String {
+        throw NSError(domain: "MockError", code: -1)
     }
 }

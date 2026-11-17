@@ -35,6 +35,7 @@ public struct ColesPayWidget: View {
             .sheet(isPresented: $viewModel.showWebView, content: {
                 webViewSheetContent
             })
+            .onAppear { SdkTelemetry.reportWidgetOpened(.colesPay) }
     }
 
     private var colesPayButton: some View {

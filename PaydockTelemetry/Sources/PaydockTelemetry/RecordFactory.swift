@@ -40,17 +40,17 @@ package enum RecordFactory {
             fields.put("paydock.crash.reason", crashReason)
             fields.put("thread.name", threadName)
             return kind == .hang ? .error : .fatal
-        case let .sdkError(error, errorCode, widget, apiError):
+        case let .sdkError(error, errorCode, widget, apiError, inSdk):
             fields.put("event.name", "paydock.error")
-            addException(error, inSdk: true, to: &fields)
+            addException(error, inSdk: inSdk, to: &fields)
             fields.put("paydock.error.kind", "sdk_error")
             fields.put("paydock.error.code", errorCode)
             fields.put("paydock.widget", widget)
             addAPIError(apiError, to: &fields)
             return .error
-        case let .uncaughtException(error, threadName, widget):
+        case let .uncaughtException(error, threadName, widget, inSdk):
             fields.put("event.name", "paydock.error")
-            addException(error, inSdk: true, to: &fields)
+            addException(error, inSdk: inSdk, to: &fields)
             fields.put("paydock.error.kind", "uncaught")
             fields.put("thread.name", threadName)
             fields.put("paydock.widget", widget)

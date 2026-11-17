@@ -42,17 +42,20 @@ public struct ApplePayWidget: View {
         // When availability checks are disabled the integrator has already verified support
         // (e.g. via MobileSDK.canMakeApplePayPayments(...)), so render the pay button directly
         // and skip the internal gating/setup-button/error path.
-        if !viewModel.availabilityChecksEnabled || viewModel.canMakePaymentsWithConfiguredNetworksAndCapabilities() {
-            ApplePayButton(
-                appearance: appearance,
-                isDisabled: viewModel.isProcessing
-            ) {
-                viewModel.handleButtonTap()
+        Group {
+            if !viewModel.availabilityChecksEnabled || viewModel.canMakePaymentsWithConfiguredNetworksAndCapabilities() {
+                ApplePayButton(
+                    appearance: appearance,
+                    isDisabled: viewModel.isProcessing
+                ) {
+                    viewModel.handleButtonTap()
+                }
+            } else if viewModel.shouldShowSetupButton() {
+                // Open Wallet for card enrollment — do NOT run the payment flow. Embedded, so it reports no usage.
+                ApplePaySetupWidget(appearance: appearance, reportsUsage: false)
             }
-        } else if viewModel.shouldShowSetupButton() {
-            // Open Wallet for card enrollment — do NOT run the payment flow
-            ApplePaySetupWidget(appearance: appearance)
         }
+        .onAppear { SdkTelemetry.reportWidgetOpened(.applePay) }
     }
 }
 

@@ -218,6 +218,14 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         dispatcher.post { [self] in dispatch(.reported(event)) }
     }
 
+    /// R_03: the site is described and classified here, on the queue, never on the caller's thread.
+    package func report(_ event: TelemetryEvent, site: ReportSite) {
+        dispatcher.post { [self] in
+            dispatch(.reported(ReportSiteResolver.resolve(event, site: site, resolver: ports.resolver,
+                                                          image: image.current, classifier: classifier.current)))
+        }
+    }
+
     /// Runs once: installs the exception handler chain on the calling thread; then, on the queue, builds the frame
     /// classifier and subscribes to the diagnostics, builds the device context, starts the connection monitor,
     /// registers the background flush, counts the stored records and flushes, so records from earlier runs go first.

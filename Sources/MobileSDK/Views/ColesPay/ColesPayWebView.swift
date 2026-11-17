@@ -159,7 +159,7 @@ struct ColesPayWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            Task { @MainActor in
+            SdkTask.run(widget: .colesPay) { [self] in
                 isLoaded = true
             }
         }
@@ -171,7 +171,7 @@ struct ColesPayWebView: UIViewRepresentable {
         public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            Task { @MainActor in
+            SdkTask.run(widget: .colesPay) { [self] in
                 onFailure(.webViewFailed(error: nsError))
             }
         }
@@ -185,13 +185,13 @@ struct ColesPayWebView: UIViewRepresentable {
         public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
-            Task { @MainActor in
+            SdkTask.run(widget: .colesPay) { [self] in
                 onFailure(.webViewFailed(error: nsError))
             }
         }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            Task { @MainActor in
+            SdkTask.run(widget: .colesPay) { [self] in
                 if webView.url?.host() == URL(string: redirectUrlString)?.host() {
                     onApprove()
                 }
@@ -199,8 +199,11 @@ struct ColesPayWebView: UIViewRepresentable {
         }
 
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            Task { @MainActor in
-                guard let messageString = message.body as? String else { return }
+            SdkTask.run(widget: .colesPay) { [self] in
+                guard let messageString = message.body as? String else {
+                    SdkTelemetry.reportSdkError(SilentFailure.colesPayMessageUnreadable, widget: .colesPay)
+                    return
+                }
 
                 if messageString == "paydock://close" {
                     onClose()

@@ -164,6 +164,25 @@ final class RecordFactoryTests: XCTestCase {
         XCTAssertEqual(result.body, "paydock.error · uncaught · MobileSDK.SampleError")
     }
 
+    /// R_03: `in_sdk` comes from the event: true or false as given, absent when nil.
+    func testSdkErrorAndUncaught_WriteInSdkFromTheEvent_AndNoneWhenNil() {
+        let info = TelemetryEvent.ErrorInfo(type: "MobileSDK.SampleError", frames: [Self.frame])
+        for inSdk in [true, false] {
+            XCTAssertEqual(record(.sdkError(error: info, errorCode: "SAMPLE_CODE", inSdk: inSdk))
+                .value("paydock.exception.in_sdk"), .bool(inSdk))
+            XCTAssertEqual(record(.uncaughtException(error: info, inSdk: inSdk)).value("paydock.exception.in_sdk"), .bool(inSdk))
+        }
+
+        let sdkError = record(.sdkError(error: info, errorCode: "SAMPLE_CODE", widget: "CardDetailsWidget", inSdk: nil))
+        let uncaught = record(.uncaughtException(error: info, threadName: "main", inSdk: nil))
+
+        XCTAssertNil(sdkError.value("paydock.exception.in_sdk"))
+        XCTAssertNil(uncaught.value("paydock.exception.in_sdk"))
+        XCTAssertFalse(sdkError.attributes.map(\.key).contains("paydock.exception.in_sdk"))
+        XCTAssertEqual(sdkError.value("paydock.error.code"), .string("SAMPLE_CODE"), "nothing else changes")
+        XCTAssertEqual(uncaught.value("thread.name"), .string("main"))
+    }
+
     // MARK: - Network
 
     func testNetworkFailure_HTTPStatus_HasTheGroupKey() {

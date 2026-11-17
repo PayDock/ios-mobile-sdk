@@ -15,14 +15,15 @@ monitor or session.
 
 ## Usage
 
-From MobileSDK, import the module and refer only to the `Telemetry` facade and `TelemetryEvent`:
+From MobileSDK, import the module and refer only to the `Telemetry` facade, `TelemetryEvent` and `ReportSite`:
 
 ```swift
 import PaydockTelemetry
 ```
 
-`PackageOnlyTests` keeps every declaration at `package` access, and `TelemetrySeamTests` in `MobileSDKTests` keeps
-the rest of the SDK behind the facade and the events.
+SDK code outside `Sources/MobileSDK/Telemetry/` reports only through `SdkTelemetry` and runs its `Task`s only through
+`SdkTask` (see SDK errors, uncaught errors and widget usage). `PackageOnlyTests` keeps every declaration at `package`
+access, and `TelemetrySeamTests` in `MobileSDKTests` keeps the rest of the SDK behind the facade and the events.
 
 ## Records
 
@@ -60,6 +61,40 @@ it with the content-encoding, content-type and basic authorization headers on it
 out of the debug log, never pinned). Failures retry with back-off; 401 or 403 stops sending for the process. All of it
 runs on the `com.paydock.telemetry` queue, never the main thread, and every type that touches the file system, the
 network or the app lifecycle is compiled only in debug builds.
+
+## SDK errors, uncaught errors and widget usage
+
+When active, the SDK reports its own failures, the errors thrown in its `Task`s and the widgets a session opens. A
+release build and a merchant app are unchanged: every call returns at once while telemetry is inactive, never throws,
+and a failure inside telemetry loses the record, never the merchant's result.
+
+- **The calls** live in the main target, `Sources/MobileSDK/Telemetry/`: `SdkTelemetry.reportSdkError(_:widget:)`,
+  `reportUncaught(_:widget:)` and `reportWidgetOpened(_:)`, with the widget names of `SdkWidget` (a widget both
+  platforms have uses Android's name). A failure path calls `reportSdkError` once, right before it delivers the same
+  value to the merchant unchanged; a failure the SDK swallows is reported with a `SilentFailure` code and still not
+  delivered. Every `Task` runs through `SdkTask.run(widget:_:)` on the main actor; an error its body throws is reported
+  as uncaught (`paydock.error.kind` `uncaught`), a `CancellationError` never.
+- **The facts** come from `SdkErrorFacts` and each error type's exhaustive `TelemetryErrorFacts` switch: the type
+  (a request error's case, an `NSError`'s domain and code, else the Swift type), the code (`WidgetError.code` or the
+  `SilentFailure` code) and a cause chain of at most 8 such types. Never a message: no `customMessage`,
+  `debugDescription`, localized description, wallet-token reason, PayPal SDK description or error body text.
+- **The request rule**: an error a failed API request caused (a `RequestError`, or a widget error holding one or an
+  error body) sends no SDK error, so a network failure is not counted twice. User cancellations and providers'
+  outcomes (declined, referred) send none either.
+- **The report site**: `reportSdkError` and `reportUncaught` capture `ReportSite.capture()` on the calling thread
+  (`Thread.callStackReturnAddresses`, at most 64, and the thread's name) and nothing else. `ActiveTelemetry` hands it
+  to `ReportSiteResolver` on the telemetry queue, which describes each address as an image offset (system symbols only)
+  through the crash path's resolver and sets `paydock.exception.in_sdk` from the same frame classifier (absent without
+  one). `RecordFactory` writes `in_sdk` from the event, absent when nil.
+- **Widget usage**: each public widget reports itself once when it appears (an `.onAppear` on its outermost view, or
+  the first statement of `makeUIView`); `ApplePayWidget` embeds `ApplePaySetupWidget` without a report of its own. The
+  reducer remembers the widgets stored this session (`TelemetryState.openedWidgets`) and drops a repeat as
+  `alreadyOpened`, after the level and before the hourly cap; level `errors` drops widget usage. A new SDK session
+  records it again.
+
+`ErrorPathScanTests` and `WidgetUsageScanTests` in `MobileSDKTests` scan the sources: the report calls per file, each
+before its delivery, no `Task` outside `SdkTask`, no message text in the telemetry files, and one usage report per
+widget.
 
 ## Crashes
 

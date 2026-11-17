@@ -18,6 +18,7 @@ final class AddressVMTests: XCTestCase {
     private var config: AddressWidgetConfig!
     private var eventDelegate: WidgetEventDelegateUtil!
     private var completionAddress: Address?
+    private let telemetry = RecordingTelemetry()
 
     override func setUp() {
         super.setUp()
@@ -42,6 +43,7 @@ final class AddressVMTests: XCTestCase {
         config = nil
         eventDelegate = nil
         completionAddress = nil
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 
@@ -344,5 +346,54 @@ final class AddressVMTests: XCTestCase {
         // Then
         XCTAssertEqual(eventDelegate.receivedEvents.count, 0)
         XCTAssertNil(eventDelegate.lastEvent)
+    }
+
+    // MARK: - Telemetry (R_06)
+
+    func testTelemetry_CompleterFailure_ReportsAddressCompleterFailed_AndChangesNothing() {
+        telemetry.bindAsCurrent()
+        let suggestionsBefore = viewModel.addressSearchSuggestions
+
+        viewModel.completer(MKLocalSearchCompleter(), didFailWithError: NSError(domain: MKErrorDomain, code: 2))
+
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("ADDRESS_COMPLETER_FAILED", .address)])
+        guard case let .sdkError(error, _, _, _, _) = telemetry.events.first else {
+            return XCTFail("Expected an SDK error")
+        }
+        XCTAssertEqual(error.causeTypes, ["NSError \(MKErrorDomain) 2"])
+        XCTAssertEqual(viewModel.addressSearchSuggestions, suggestionsBefore)
+        XCTAssertNil(completionAddress)
+        XCTAssertFalse(formManager.showAddressSearchPopup)
+    }
+
+    func testTelemetry_CompleterThrottledOrNoMatch_ReportsNothing() {
+        telemetry.bindAsCurrent()
+
+        viewModel.completer(MKLocalSearchCompleter(), didFailWithError: NSError(domain: MKErrorDomain,
+                                                                                code: Int(MKError.loadingThrottled.rawValue)))
+        viewModel.completer(MKLocalSearchCompleter(), didFailWithError: NSError(domain: MKErrorDomain,
+                                                                                code: Int(MKError.placemarkNotFound.rawValue)))
+
+        XCTAssertEqual(telemetry.reports, [])
+    }
+
+    func testTelemetry_CompleterFailingRepeatedly_ReportsOncePerWidget() {
+        telemetry.bindAsCurrent()
+
+        for _ in 0..<5 {
+            viewModel.completer(MKLocalSearchCompleter(), didFailWithError: NSError(domain: MKErrorDomain, code: 2))
+        }
+
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("ADDRESS_COMPLETER_FAILED", .address)])
+    }
+
+    func testTelemetry_CompleterResults_ReportNothing() async {
+        telemetry.bindAsCurrent()
+
+        viewModel.completerDidUpdateResults(MKLocalSearchCompleter())
+        await telemetry.waitForReports(count: 1, timeout: 0.3)
+
+        XCTAssertEqual(telemetry.reports, [])
+        XCTAssertNil(completionAddress)
     }
 }

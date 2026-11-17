@@ -73,6 +73,7 @@ public struct GiftCardWidget: View {
             }
         }
         .onChange(of: isValid) { onFormValidityChange?($0) }
+        .onAppear { SdkTelemetry.reportWidgetOpened(.giftCard) }
     }
 
     private var cardNumberTextField: some View {
@@ -201,7 +202,7 @@ public struct GiftCardWidget: View {
             if voiceOverRunning { self.announcing = false }
         } else if voiceOverRunning {
             let errorCount = viewModel.numberOfValidationErrors
-            Task { @MainActor in
+            SdkTask.run(widget: .giftCard) {
                 // Let VoiceOver finish the button's own utterance before announcing the count.
                 try? await Task.sleep(for: .seconds(1))
                 announceErrorCount(errorCount)

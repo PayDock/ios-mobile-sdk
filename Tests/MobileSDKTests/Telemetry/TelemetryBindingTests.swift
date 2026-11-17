@@ -300,6 +300,21 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertTrue((MobileSDK.shared.telemetry as? FakeTelemetry) === second)
     }
 
+    /// R_11: with an inactive facade bound, the SDK's reporting calls report nothing.
+    func testInactive_Bound_TheSdkCallsReportNothing() async {
+        let inactive = RecordingTelemetry(isActive: false)
+        TelemetryBinding.bind(TelemetrySelection(telemetry: inactive, runtime: NoOpTelemetry()))
+
+        SdkTelemetry.reportSdkError(SilentFailure.cardExpiryUnreadable, widget: .cardDetails)
+        SdkTelemetry.reportUncaught(SampleSwiftError(), widget: .cardDetails)
+        SdkTelemetry.reportWidgetOpened(.cardDetails)
+        await SdkTask.run(widget: .cardDetails) {
+            throw SampleSwiftError()
+        }.value
+
+        XCTAssertEqual(inactive.reports, [])
+    }
+
     // MARK: - Helpers
 
     @discardableResult

@@ -57,7 +57,7 @@ class ZipVM: ObservableObject {
 
     // swiftlint:disable:next function_body_length
     func createZipCheckout() {
-        Task {
+        SdkTask.run(widget: .zip) { [self] in
             do {
                 updateLoadingState(isLoading: true)
                 let externalCheckoutReq = DataPaymentSources.CreateExternalCheckoutReq(
@@ -133,7 +133,9 @@ class ZipVM: ObservableObject {
                 guard let url = URL(string: link), isValidWebViewUrl(url) else {
                     updateLoadingState(isLoading: false)
                     self.showWebView = false
-                    self.completion(.failure(.invalidCheckoutUrl))
+                    let failure = ZipError.invalidCheckoutUrl
+                    SdkTelemetry.reportSdkError(failure, widget: .zip)
+                    self.completion(.failure(failure))
                     return
                 }
 
@@ -150,12 +152,16 @@ class ZipVM: ObservableObject {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.errorFetchingZipUrl(error: errorResponse)))
+                let failure = ZipError.errorFetchingZipUrl(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .zip)
+                self.completion(.failure(failure))
 
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError(error as? RequestError)))
+                let failure = ZipError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .zip)
+                self.completion(.failure(failure))
             }
         }
     }
@@ -164,11 +170,13 @@ class ZipVM: ObservableObject {
         // On success, create a payment source token (matching web implementation)
         guard let checkoutToken = self.checkoutToken else {
             self.showWebView = false
-            self.completion(.failure(.unknownError(nil)))
+            let failure = ZipError.unknownError(nil)
+            SdkTelemetry.reportSdkError(failure, widget: .zip)
+            self.completion(.failure(failure))
             return
         }
 
-        Task {
+        SdkTask.run(widget: .zip) { [self] in
             do {
                 updateLoadingState(isLoading: true)
 
@@ -186,12 +194,16 @@ class ZipVM: ObservableObject {
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.errorCapturingCharge(error: errorResponse)))
+                let failure = ZipError.errorCapturingCharge(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .zip)
+                self.completion(.failure(failure))
 
             } catch {
                 updateLoadingState(isLoading: false)
                 self.showWebView = false
-                self.completion(.failure(.unknownError(error as? RequestError)))
+                let failure = ZipError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .zip)
+                self.completion(.failure(failure))
             }
         }
     }
@@ -202,12 +214,16 @@ class ZipVM: ObservableObject {
 
     func handleWebViewFailure(_ error: ZipError) {
         showWebView = false
+        SdkTelemetry.reportSdkError(error, widget: .zip)
         completion(.failure(error))
     }
 
     func handleSheetCancellation() {
         // Manual cancellation doesn't have a checkoutId since it happens before Zip returns
-        completion(.failure(.transactionCanceled(checkoutId: nil)))
+        // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
+        let failure = ZipError.transactionCanceled(checkoutId: nil)
+        SdkTelemetry.reportSdkError(failure, widget: .zip)
+        completion(.failure(failure))
     }
 
     func updateLoadingState(isLoading: Bool) {

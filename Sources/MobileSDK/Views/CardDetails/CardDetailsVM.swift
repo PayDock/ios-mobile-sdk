@@ -77,7 +77,7 @@ class CardDetailsVM: ObservableObject {
 
         anyCancellable = cardDetailsFormManager.objectWillChange.sink { [weak self] _ in
             // Defer to avoid publishing during view updates
-            Task {
+            SdkTask.run(widget: .cardDetails) {
                 self?.objectWillChange.send()
             }
         }
@@ -104,9 +104,10 @@ class CardDetailsVM: ObservableObject {
         guard !isLoading else { return }
         updateLoadingState(isLoading: true)
 
-        Task {
+        SdkTask.run(widget: .cardDetails) { [self] in
             guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
+                SdkTelemetry.reportSdkError(SilentFailure.cardExpiryUnreadable, widget: .cardDetails)
                 updateLoadingState(isLoading: false)
                 return
             }
@@ -134,10 +135,14 @@ class CardDetailsVM: ObservableObject {
                 completion(.success(createResult(token: cardToken)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
-                completion(.failure(.errorTokenisingCard(error: errorResponse)))
+                let failure = CardDetailsError.errorTokenisingCard(error: errorResponse)
+                SdkTelemetry.reportSdkError(failure, widget: .cardDetails)
+                completion(.failure(failure))
             } catch {
                 updateLoadingState(isLoading: false)
-                completion(.failure(.unknownError(error as? RequestError)))
+                let failure = CardDetailsError.unknownError(error as? RequestError)
+                SdkTelemetry.reportSdkError(failure, widget: .cardDetails)
+                completion(.failure(failure))
             }
         }
     }

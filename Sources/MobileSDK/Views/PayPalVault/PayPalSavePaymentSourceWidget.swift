@@ -36,6 +36,7 @@ public struct PayPalSavePaymentSourceWidget: View {
             viewModel.initializePayPalSDK()
             viewModel.handleButtonTapAnalytics()
         }
+        .onAppear { SdkTelemetry.reportWidgetOpened(.payPalSavePaymentSource) }
     }
 }
 

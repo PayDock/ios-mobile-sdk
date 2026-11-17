@@ -59,15 +59,22 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         validateToken()
     }
 
+    /// The invalid tokens already reported in this process.
+    private static let invalidTokenReports = ReportOnce()
+
     private func validateToken() {
         guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
               decodedToken.format == .standalone3ds else {
-            completion(.failure(.invalidToken))
+            let failure = Standalone3DSError.invalidToken
+            // `init` runs again on every redraw of the parent view: the same token is reported once per process.
+            SdkTelemetry.reportSdkError(failure, widget: .standalone3ds, once: (Self.invalidTokenReports, config.token))
+            completion(.failure(failure))
             return
         }
     }
 
     public func makeUIView(context: Context) -> UIView {
+        SdkTelemetry.reportWidgetOpened(.standalone3ds)
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -201,7 +208,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                   let eventRaw = data["event"] as? String
             else {
                 notifyLoadingFinish()
-                completion(.failure(.mappingFailed))
+                let failure = Standalone3DSError.mappingFailed
+                SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+                completion(.failure(failure))
                 return
             }
 
@@ -260,7 +269,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             case .chargeAuthChallenge, .chargeAuthDecoupled, .chargeAuthSuccess, .chargeAuthReject:
                 guard let charge3dsId else {
                     notifyLoadingFinish()
-                    completion(.failure(.mappingFailed))
+                    let failure = Standalone3DSError.mappingFailed
+                    SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+                    completion(.failure(failure))
                     return
                 }
                 switch event {
@@ -293,7 +304,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
             notifyLoadingFinish()
-            completion(.failure(.webViewFailed(error: withContext(nsError))))
+            let failure = Standalone3DSError.webViewFailed(error: withContext(nsError))
+            SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+            completion(.failure(failure))
         }
 
         /**
@@ -312,7 +325,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             guard !hasEnded else { return }
             hasEnded = true
             notifyLoadingFinish()
-            completion(.failure(.webViewFailed(error: withContext(error))))
+            let failure = Standalone3DSError.webViewFailed(error: withContext(error))
+            SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+            completion(.failure(failure))
         }
 
         /// Adds the session context (charge 3DS id, background state) to a WebView failure, keeping its domain, code
@@ -346,7 +361,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             let nsError = error as NSError
             if nsError.isWebViewNavigationCancellation { return }
             notifyLoadingFinish()
-            completion(.failure(.webViewFailed(error: withContext(nsError))))
+            let failure = Standalone3DSError.webViewFailed(error: withContext(nsError))
+            SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+            completion(.failure(failure))
         }
 
         public func webView(_ webView: WKWebView,

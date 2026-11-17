@@ -21,6 +21,7 @@ class CardDetailsVMTests: XCTestCase {
     private var eventDelegate: WidgetEventDelegateUtil!
     private var completionResult: Result<CardResult, CardDetailsError>?
     private var cancellables = Set<AnyCancellable>()
+    private let telemetry = RecordingTelemetry()
 
     override func setUp() {
         super.setUp()
@@ -57,6 +58,7 @@ class CardDetailsVMTests: XCTestCase {
         loadingDelegate = nil
         eventDelegate = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 
@@ -1093,6 +1095,98 @@ class CardDetailsVMTests: XCTestCase {
         XCTAssertFalse(viewModel.isValidURLString("not a url"))
         XCTAssertFalse(viewModel.isValidURLString(""))
         XCTAssertFalse(viewModel.isValidURLString(nil))
+    }
+
+    // MARK: - Telemetry (R_05, R_06)
+
+    func testTelemetry_NonRequestFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+        telemetry.bindAsCurrent()
+        mockService.shouldThrowUnknownError = true
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.unknownError(nil)) = completionResult else {
+            return XCTFail("Expected unknownError(nil), got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("CARD_UNKNOWN", .cardDetails)])
+    }
+
+    func testTelemetry_RequestFailure_DeliversAsBefore_AndReportsNothing() async {
+        telemetry.bindAsCurrent()
+        mockService.shouldReturnError = true
+        mockService.errorToReturn = ErrorRes(status: 400, error: .init(message: "Card declined", code: "E123", details: nil),
+                                             resource: nil, errorSummary: nil)
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.errorTokenisingCard) = completionResult else {
+            return XCTFail("Expected errorTokenisingCard, got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.reports, [])
+    }
+
+    func testTelemetry_ConnectionFailure_DeliversAsBefore_AndReportsNothing() async {
+        telemetry.bindAsCurrent()
+        let expectation = XCTestExpectation(description: "failure")
+        viewModel = CardDetailsVM(
+            paymentSourcesService: ErroringPaymentSourcesServiceMock(failure: .connectionError(URLError(.timedOut))),
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                self.completionResult = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        viewModel.tokeniseCardDetails()
+
+        await fulfillment(of: [expectation], timeout: 2.0)
+        guard case .failure(.unknownError(.connectionError)) = completionResult else {
+            return XCTFail("Expected unknownError(connectionError), got: \(String(describing: completionResult))")
+        }
+        XCTAssertEqual(telemetry.reports, [])
+    }
+
+    func testTelemetry_UnreadableExpiry_ReportsCardExpiryUnreadable_AndDeliversNothing() async {
+        telemetry.bindAsCurrent()
+        viewModel = makeVM(service: mockService, config: makeConfig())
+        populateValidFormFields()
+        viewModel.cardDetailsFormManager.expiryDateText = ""
+
+        viewModel.tokeniseCardDetails()
+        await telemetry.waitForReports(count: 1)
+
+        XCTAssertEqual(telemetry.sdkErrors, [.reported("CARD_EXPIRY_UNREADABLE", .cardDetails)])
+        XCTAssertNil(completionResult)
+        XCTAssertFalse(viewModel.isLoading)
     }
 }
 // swiftlint:enable all

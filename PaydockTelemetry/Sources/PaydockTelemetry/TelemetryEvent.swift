@@ -21,11 +21,14 @@ package enum TelemetryEvent: Sendable, Equatable {
 
     /// An error that escaped SDK-owned code (a `Task` or an async entry point) while the process kept running —
     /// unlike `.crash(source: .nsException)`, which is the process dying.
-    case uncaughtException(error: ErrorInfo, threadName: String? = nil, widget: String? = nil)
+    /// `inSdk`: the frame classifier's answer over the report site (spec § 7.2), nil when it cannot tell.
+    case uncaughtException(error: ErrorInfo, threadName: String? = nil, widget: String? = nil, inSdk: Bool? = true)
 
     /// `errorCode` is `WidgetError.code` where one exists.
     /// `apiError`: the § 5.4 API codes when the error carries a Paydock API error body (Android R_03, MD-8).
-    case sdkError(error: ErrorInfo, errorCode: String? = nil, widget: String? = nil, apiError: APIError? = nil)
+    /// `inSdk`: the frame classifier's answer over the report site (spec § 7.2), nil when it cannot tell.
+    case sdkError(error: ErrorInfo, errorCode: String? = nil, widget: String? = nil, apiError: APIError? = nil,
+                  inSdk: Bool? = true)
 
     /// `urlTemplate` is a path template, never real ids. The status code and the failure kind cannot disagree.
     case networkFailure(

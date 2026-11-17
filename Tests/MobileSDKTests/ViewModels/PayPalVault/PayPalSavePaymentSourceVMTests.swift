@@ -28,6 +28,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
     var config: PayPalVaultConfig!
     var completionResult: Result<PayPalVaultResult, PayPalVaultError>?
     var cancellables = Set<AnyCancellable>()
+    let telemetry = RecordingTelemetry()
 
     // MARK: - Setup & Teardown
 
@@ -52,6 +53,7 @@ class PayPalSavePaymentSourceVMTests: XCTestCase {
         config = nil
         completionResult = nil
         cancellables.removeAll()
+        RecordingTelemetry.unbind()
         super.tearDown()
     }
 

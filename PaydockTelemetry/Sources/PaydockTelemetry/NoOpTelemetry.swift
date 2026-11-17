@@ -10,6 +10,7 @@ package struct NoOpTelemetry: Telemetry, TelemetryRuntime {
     package init() {}
     package var isActive: Bool { false }
     package func report(_ event: TelemetryEvent) {}
+    package func report(_ event: TelemetryEvent, site: ReportSite) {}
     package func start() {}
     package func sendTestRecord() {}
     package func raiseTestCrash() {}
