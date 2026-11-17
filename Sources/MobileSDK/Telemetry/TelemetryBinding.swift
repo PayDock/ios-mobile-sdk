@@ -33,18 +33,33 @@ enum TelemetryBinding {
                                        environmentName: environment.rawValue)
             }
         )
+        return bind(selection, sendTestRecord: env[EnvironmentCredentialsProvider.sendTestRecordKey]?.lowercased() == "true")
         #else
-        let selection = TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry())
+        return bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
         #endif
-        return bind(selection)
     }
 
-    /// Makes `selection.telemetry` the facade, then calls `selection.runtime.start()` once if it is active.
+    /// Makes `selection.telemetry` the facade, then calls `selection.runtime.start()` once if it is active, and after
+    /// it `selection.runtime.sendTestRecord()` when active and `sendTestRecord` is set (R_16). While an active facade
+    /// is bound, another active selection is ignored and the bound facade returned: one runtime owns the store's
+    /// directory for the process, so a second `configureMobileSDK` never starts a second one sending the same files.
     @discardableResult
-    static func bind(_ selection: TelemetrySelection) -> any Telemetry {
-        lock.withLock { bound = selection.telemetry }
+    static func bind(_ selection: TelemetrySelection, sendTestRecord: Bool = false) -> any Telemetry {
+        let kept: (any Telemetry)? = lock.withLock {
+            if selection.telemetry.isActive, bound.isActive {
+                return bound
+            }
+            bound = selection.telemetry
+            return nil
+        }
+        if let kept {
+            return kept
+        }
         if selection.telemetry.isActive {
             selection.runtime.start()
+            if sendTestRecord {
+                selection.runtime.sendTestRecord()
+            }
         }
         return selection.telemetry
     }
@@ -64,6 +79,8 @@ struct EnvironmentCredentialsProvider: TelemetryCredentialsProvider {
     static let endpointKey = "PAYDOCK_TELEMETRY_OTLP_ENDPOINT"
     static let authorizationKey = "PAYDOCK_TELEMETRY_OTLP_AUTH"
     static let levelKey = "PAYDOCK_TELEMETRY_LEVEL"
+    /// `true` (any case) makes an active runtime store and send one test record right after start (R_16).
+    static let sendTestRecordKey = "PAYDOCK_TELEMETRY_SEND_TEST_RECORD"
 
     let environment: [String: String]
 

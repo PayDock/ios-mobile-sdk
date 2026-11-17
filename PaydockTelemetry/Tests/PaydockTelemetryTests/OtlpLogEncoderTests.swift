@@ -88,6 +88,73 @@ final class OtlpLogEncoderTests: XCTestCase {
         XCTAssertEqual(OtlpLogEncoder.scopeName, "paydock.telemetry")
     }
 
+    // MARK: - The store's file format
+
+    func testRecordJSON_IsOneLogRecord_AsTheExportRequestWritesIt() throws {
+        let stored = record.with("log.record.uid", .string(record.id))
+        let data = OtlpLogEncoder.recordJSON(stored)
+        let request = try XCTUnwrap(String(data: OtlpLogEncoder.encode(resource: resource, records: [stored]), encoding: .utf8))
+        let json = try XCTUnwrap(String(data: data, encoding: .utf8))
+
+        XCTAssertTrue(json.hasPrefix("{\"attributes\":["), json)
+        XCTAssertTrue(request.contains(#""logRecords":["# + json + "]"), json)
+        XCTAssertEqual(OtlpLogEncoder.recordJSON(stored), data)
+    }
+
+    func testParseRecord_RoundTripsEveryValueKind() {
+        let stored = record.with("log.record.uid", .string(record.id))
+
+        XCTAssertEqual(OtlpLogEncoder.parseRecord(OtlpLogEncoder.recordJSON(stored)), stored)
+    }
+
+    func testParseRecord_IsNil_WithoutTheIdTimeOrSeverity_OrForAnythingButAnObject() {
+        let valid: [String: Any] = [
+            "timeUnixNano": "1793830203000000000", "severityNumber": 13, "body": ["stringValue": "body"],
+            "attributes": [["key": "log.record.uid", "value": ["stringValue": record.id]]]
+        ]
+        XCTAssertEqual(parse(valid)?.timeUnixMillis, 1_793_830_203_000)
+        XCTAssertEqual(parse(valid)?.id, record.id)
+        for key in ["timeUnixNano", "severityNumber", "attributes"] {
+            XCTAssertNil(parse(valid.filter { $0.key != key }), key)
+        }
+        XCTAssertNil(parse(valid.merging(["severityNumber": 4]) { $1 }), "unknown severity")
+        XCTAssertNil(parse(valid.merging(["timeUnixNano": "-5"]) { $1 }), "negative time")
+        XCTAssertNil(OtlpLogEncoder.parseRecord(Data("not json".utf8)))
+        XCTAssertNil(OtlpLogEncoder.parseRecord(Data("[]".utf8)))
+        XCTAssertNil(OtlpLogEncoder.parseRecord(Data()))
+    }
+
+    func testParseRecord_SkipsAnAttributeOfAnUnknownShape_AndReadsANumericIntValue() {
+        let object: [String: Any] = [
+            "timeUnixNano": "0", "severityNumber": 9, "body": ["stringValue": "body"],
+            "attributes": [
+                ["key": "log.record.uid", "value": ["stringValue": record.id]],
+                ["key": "paydock.dropped.count", "value": ["intValue": 7]],
+                ["key": "paydock.sample.list", "value": ["arrayValue": ["values": []]]],
+                ["key": "paydock.sample.missing"],
+                ["value": ["stringValue": "no key"]],
+                "not an object"
+            ]
+        ]
+
+        let parsed = parse(object)
+
+        XCTAssertEqual(parsed?.attributes, [
+            TelemetryAttribute(key: "log.record.uid", value: .string(record.id)),
+            TelemetryAttribute(key: "paydock.dropped.count", value: .int(7))
+        ])
+        XCTAssertEqual(parsed?.timeUnixMillis, 0)
+        XCTAssertEqual(parsed?.severity, .info)
+        XCTAssertEqual(parsed?.body, "body")
+    }
+
+    private func parse(_ object: [String: Any]) -> TelemetryRecord? {
+        guard let data = try? JSONSerialization.data(withJSONObject: object) else {
+            return nil
+        }
+        return OtlpLogEncoder.parseRecord(data)
+    }
+
     private func resourceAttributes(_ data: Data) throws -> [[String: Any]] {
         let root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let resourceLogs = try XCTUnwrap(root["resourceLogs"] as? [[String: Any]])

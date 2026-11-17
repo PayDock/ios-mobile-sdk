@@ -47,4 +47,28 @@ final class NoOpTelemetryTests: XCTestCase {
 
         XCTAssertFalse(telemetry.isActive)
     }
+
+    func testSendTestRecord_DoesNothing() {
+        let telemetry = NoOpTelemetry()
+
+        telemetry.start()
+        telemetry.sendTestRecord()
+        telemetry.sendTestRecord()
+
+        XCTAssertFalse(telemetry.isActive)
+    }
+
+    /// R_15, MD-36 acceptance: the no-op leaves an application-support stand-in without a telemetry directory.
+    func testInactive_CreatesNoTelemetryDirectory() throws {
+        let applicationSupport = try TemporaryDirectory()
+        defer { applicationSupport.remove() }
+        let telemetry = NoOpTelemetry()
+
+        telemetry.start()
+        telemetry.report(TelemetryFixtures.crash())
+        telemetry.sendTestRecord()
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: applicationSupport.child("paydock_telemetry").path))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.url.path), [])
+    }
 }

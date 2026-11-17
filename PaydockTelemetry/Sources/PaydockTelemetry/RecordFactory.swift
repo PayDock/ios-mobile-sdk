@@ -5,7 +5,7 @@
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 /// Builds a telemetry record from a pending record (spec § 5.2), mirroring generate.py `record()`.
-/// Only typed event fields enter a record, never message text.
+/// Only typed event fields enter a record, never message text. `paydock.occurrences` is the duplicate gate's.
 package enum RecordFactory {
 
     package static func create(_ pending: PendingRecord, connection: NetworkConnectionType) -> TelemetryRecord {
@@ -13,9 +13,6 @@ package enum RecordFactory {
         fields.put("session.id", pending.sessionId)
         fields.put("log.record.uid", pending.id)
         fields.put("network.connection.type", connection.rawValue)
-        if pending.occurrences > 1 {
-            fields.put("paydock.occurrences", Int64(pending.occurrences))
-        }
         let severity = addEvent(pending.event, to: &fields)
         let attributes = Allowlist.recordKeys.compactMap { key in
             fields.values[key].map { TelemetryAttribute(key: key, value: $0) }
@@ -24,12 +21,12 @@ package enum RecordFactory {
                                body: RecordBody.of(attributes), attributes: attributes)
     }
 
-    /// The crash's own time, or else when the record was built.
+    /// The crash's own time, or else when the reducer created the record.
     private static func time(of pending: PendingRecord) -> Int64 {
         if case let .crash(_, _, _, _, _, _, occurredAt) = pending.event, let occurredAt {
             return occurredAt
         }
-        return pending.firstSeenAt
+        return pending.createdAt
     }
 
     /// Adds `event.name` and the event's fields; gives the record's severity.

@@ -34,16 +34,14 @@ final class RecordFactoryTests: XCTestCase {
 
     // MARK: - Common fields
 
-    func testCommonFields_AndOccurrencesOnlyAboveOne() {
+    func testCommonFields_AndNoOccurrences() {
         let once = record(.widgetOpened(widget: "CardDetailsWidget"))
         XCTAssertEqual(once.id, "\(Self.sessionId)-1")
         XCTAssertEqual(once.value("session.id"), .string(Self.sessionId))
         XCTAssertEqual(once.value("log.record.uid"), .string("\(Self.sessionId)-1"))
         XCTAssertEqual(once.value("network.connection.type"), .string("wifi"))
-        XCTAssertNil(once.value("paydock.occurrences"))
-
-        let repeated = record(.widgetOpened(widget: "CardDetailsWidget"), occurrences: 4)
-        XCTAssertEqual(repeated.value("paydock.occurrences"), .int(4))
+        XCTAssertNil(once.value("paydock.occurrences"), "the duplicate gate writes paydock.occurrences, never the factory")
+        XCTAssertEqual(once.timeUnixMillis, Self.builtAt)
     }
 
     // MARK: - Crash
@@ -212,9 +210,8 @@ final class RecordFactoryTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func record(_ event: TelemetryEvent, occurrences: Int = 1) -> TelemetryRecord {
-        let pending = PendingRecord(id: "\(Self.sessionId)-1", sessionId: Self.sessionId, event: event, firstSeenAt: Self.builtAt,
-                                    occurrences: occurrences)
+    private func record(_ event: TelemetryEvent) -> TelemetryRecord {
+        let pending = PendingRecord(id: "\(Self.sessionId)-1", sessionId: Self.sessionId, event: event, createdAt: Self.builtAt)
         return RecordFactory.create(pending, connection: .wifi)
     }
 

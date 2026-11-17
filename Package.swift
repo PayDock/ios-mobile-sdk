@@ -19,7 +19,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/afterpay/sdk-ios", exact: "5.9.0"),
         .package(url: "https://github.com/paypal/paypal-ios/", exact: "2.0.1"),
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.3.0"),
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.5.0"),
         .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", exact: "0.59.1")
     ],
     targets: [
@@ -178,7 +178,9 @@ let package = Package(
         // Internal telemetry (dormant until activation, MD-33); not a product, its declarations use package access
         .target(
             name: "PaydockTelemetry",
-            dependencies: [],
+            dependencies: [
+                .product(name: "NetworkingLib", package: "ios-core-networking")
+            ],
             path: "PaydockTelemetry/Sources/PaydockTelemetry"
         ),
         .testTarget(

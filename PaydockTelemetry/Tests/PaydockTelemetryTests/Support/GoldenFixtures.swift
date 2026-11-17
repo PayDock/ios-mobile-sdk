@@ -8,7 +8,8 @@ import Foundation
 import PaydockTelemetry
 
 /// The golden fixtures (`Fixtures/`, copied from the planning repo and never edited) and the mapping of each input
-/// onto the record pipeline: a pending record, then RecordFactory → Allowlist.filter → SendStamp → OtlpLogEncoder.
+/// onto the record pipeline: a pending record, then RecordFactory → the duplicate gate's occurrences → Allowlist.filter
+/// → SendStamp → OtlpLogEncoder.
 enum GoldenFixtures {
     static let folders = ["shared", "ios"]
     private static let inputSuffix = ".input.json"
@@ -148,7 +149,7 @@ enum GoldenFixtures {
         let input = fixture.input
         let connection = try required(NetworkConnectionType(rawValue: input.connection), "connection \(input.connection)")
         let built = RecordFactory.create(try pending(input), connection: connection)
-        return SendStamp.stamp(Allowlist.filter(built), sentAt: try millis(input.sentTime),
+        return SendStamp.stamp(Allowlist.filter(merged(built, occurrences: input.occurrences)), sentAt: try millis(input.sentTime),
                                clockOffsetMilliseconds: input.clockOffsetMs ?? 0)
     }
 
@@ -160,8 +161,15 @@ enum GoldenFixtures {
     static func pending(_ input: Input) throws -> PendingRecord {
         let builtTime = try millis(input.builtTime)
         return PendingRecord(id: "\(input.sessionId)-\(input.sequence)", sessionId: input.sessionId,
-                             event: try event(input, builtTime: builtTime), firstSeenAt: builtTime,
-                             occurrences: input.occurrences ?? 1)
+                             event: try event(input, builtTime: builtTime), createdAt: builtTime)
+    }
+
+    /// The input's `occurrences`, as the duplicate gate writes them: `paydock.occurrences` only when above 1.
+    static func merged(_ record: TelemetryRecord, occurrences: Int?) -> TelemetryRecord {
+        guard let occurrences, occurrences > 1 else {
+            return record
+        }
+        return record.with("paydock.occurrences", .int(Int64(occurrences)))
     }
 
     /// UTC epoch milliseconds of a fixture time.

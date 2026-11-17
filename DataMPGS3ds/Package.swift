@@ -9,7 +9,7 @@ let package = Package(
     ],
     products: [.library(name: "DataMPGS3ds", targets: ["DataMPGS3ds"])],
     dependencies: [
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.2"),
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.5.0"),
         .package(path: "../CommonModels")
     ],
     targets: [

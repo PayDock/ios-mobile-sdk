@@ -7,5 +7,5 @@
 /// Sends nothing and reports success.
 package struct NoOpExporter: Exporter {
     package init() {}
-    package func export(_ batch: ExportBatch) -> ExportResult { .success }
+    package func export(_ batch: ExportBatch) -> ExportResult { .success(rejectedRecords: 0) }
 }

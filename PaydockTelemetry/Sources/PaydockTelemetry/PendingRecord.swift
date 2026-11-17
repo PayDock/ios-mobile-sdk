@@ -4,22 +4,19 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-/// A reported event on its way to becoming a record (RecordFactory, I5). Typed fields only.
+/// A reported event on its way to becoming a record (RecordFactory). Typed fields only.
 package struct PendingRecord: Sendable, Equatable {
-    /// `"<sessionId>-<sequence>"`, deterministic.
+    /// `"<sessionId>-<sequence>"` (`log.record.uid`).
     package let id: String
     package let sessionId: String
     package let event: TelemetryEvent
-    /// UTC epoch milliseconds.
-    package let firstSeenAt: Int64
-    /// `paydock.occurrences`.
-    package var occurrences: Int
+    /// UTC epoch milliseconds, when the reducer created it.
+    package let createdAt: Int64
 
-    package init(id: String, sessionId: String, event: TelemetryEvent, firstSeenAt: Int64, occurrences: Int = 1) {
+    package init(id: String, sessionId: String, event: TelemetryEvent, createdAt: Int64) {
         self.id = id
         self.sessionId = sessionId
         self.event = event
-        self.firstSeenAt = firstSeenAt
-        self.occurrences = occurrences
+        self.createdAt = createdAt
     }
 }

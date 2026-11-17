@@ -4,50 +4,44 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-import Foundation
-
-/// Pure: no I/O, no clock, no randomness. Same inputs, same outputs.
+/// Pure apart from the session's record sequence: no I/O, no clock, no randomness. The same state, intent, times and
+/// sequence give the same output. A new ID is always `"<sessionId>-<sequence.next()>"`.
 package enum TelemetryReducer {
-    package static let flushIntervalMilliseconds: Int64 = 10_000
-    package static let flushThreshold = 20
-    package static let maxBatch = 50
-    package static let collapseWindowMilliseconds: Int64 = 60_000
-    /// Module names that mark a frame as Paydock code.
-    package static let paydockModules = ["MobileSDK", "PaydockTelemetry", "BinProcessing", "CommonModels",
-        "DataCharges", "DataCustomer", "DataGateways", "DataMPGS3ds", "DataPaymentSources", "DataStandalone3ds", "DataVault"]
+    private typealias Limits = TelemetryLimits
 
-    package static func reduce(_ state: TelemetryState, _ intent: TelemetryIntent, now: Int64)
-        -> (state: TelemetryState, effects: [TelemetryEffect]) {
+    /// `now`: UTC epoch milliseconds; `elapsed`: monotonic milliseconds, which alone roll the hour.
+    package static func reduce(_ state: TelemetryState, _ intent: TelemetryIntent, now: Int64, elapsed: Int64,
+                               sequence: RecordSequence) -> (state: TelemetryState, effects: [TelemetryEffect]) {
+        var next = state
+        var effects: [TelemetryEffect] = []
         switch intent {
         case let .reported(event):
-            return reported(event, state, now: now)
-        case .flush:
-            return flush(state, now: now)
+            effects = reported(event, &next, now: now, elapsed: elapsed, sequence: sequence)
+        case let .flush(source):
+            if source == .timer {
+                next.flushScheduled = false
+            }
+            effects = export(&next, now: now)
         case .appBackgrounded:
-            return appBackgrounded(state, now: now)
+            effects = export(&next, now: now)
         case let .levelChanged(level):
-            var next = state
             next.level = level
-            return (next, [])
+        case let .recordsDropped(reason, count):
+            guard count > 0, next.enabled, next.level != .off else {
+                return (state, [])
+            }
+            roll(&next, elapsed: elapsed)
+            effects = notice(reason, count, &next, now: now, sequence: sequence)
+            effects += schedule(&next)
+        case let .pendingCounted(count):
+            next.pending = count
+            effects = schedule(&next)
+        case let .noticesExported(ids):
+            next.notices = next.notices.filter { !ids.contains($0.value.id) }
+        case .exportStopped:
+            next.exportStopped = true
         }
-    }
-
-    /// `"<name>|<exceptionType>|<topPaydockFrame>"`; a network failure appends `"|<method>|<urlTemplate>|<failure>"`.
-    /// A widget opened is `"paydock.widget.opened|<widget>"`, a dropped notice `"paydock.telemetry.dropped|<reason>"`.
-    package static func fingerprint(_ event: TelemetryEvent) -> String {
-        switch event {
-        case let .crash(error, _, _, _, _, _, _):
-            return key("paydock.crash", error)
-        case let .uncaughtException(error, _, _), let .sdkError(error, _, _, _):
-            return key("paydock.error", error)
-        case let .networkFailure(method, urlTemplate, _, failure, _, _, _):
-            let base = key("paydock.network.failure", failureError(failure))
-            return "\(base)|\(method.rawValue)|\(urlTemplate)|\(failureName(failure))"
-        case let .widgetOpened(widget):
-            return "paydock.widget.opened|\(widget)"
-        case let .dropped(reason, _):
-            return "paydock.telemetry.dropped|\(reason.rawValue)"
-        }
+        return (next, effects)
     }
 
     /// True for the four error kinds; a widget opened and a dropped notice are not errors, so level `errors` drops them.
@@ -62,155 +56,85 @@ package enum TelemetryReducer {
 
     // MARK: - Intents
 
-    private static func reported(_ event: TelemetryEvent, _ state: TelemetryState, now: Int64)
-        -> (state: TelemetryState, effects: [TelemetryEffect]) {
+    /// The first matching rule: not reportable, disabled, off, filtered by the level; otherwise the hourly cap, or a
+    /// new record, the threshold export and the timer.
+    private static func reported(_ event: TelemetryEvent, _ state: inout TelemetryState, now: Int64, elapsed: Int64,
+                                 sequence: RecordSequence) -> [TelemetryEffect] {
+        if case .dropped = event {
+            return [.drop(.notReportable)]
+        }
         guard state.enabled else {
-            return (state, [.drop(.disabled)])
+            return [.drop(.disabled)]
         }
         if state.level == .off {
-            return (state, [.drop(.levelOff)])
+            return [.drop(.levelOff)]
         }
         if state.level == .errors && !isError(event) {
-            return (state, [.drop(.levelFiltered)])
+            return [.drop(.levelFiltered)]
         }
 
-        var next = state
-        var effects: [TelemetryEffect] = []
-        next.nextSequence += 1
-        let record = PendingRecord(id: "\(next.sessionId)-\(next.nextSequence)", sessionId: next.sessionId, event: event,
-                                   firstSeenAt: now)
-
-        if case .crash = event {
-            effects += [.persist(record), .enqueue(record)]
-            next.persisted += 1
-            next.queued += 1
-        } else {
-            let fingerprintKey = fingerprint(event)
-            if var held = next.collapsing[fingerprintKey], now - held.firstSeenAt < collapseWindowMilliseconds {
-                held.occurrences += 1
-                next.collapsing[fingerprintKey] = held
-            } else {
-                effects += release(fingerprintKey, from: &next)
-                next.collapsing[fingerprintKey] = record
-                effects.append(.persist(record))
-                next.persisted += 1
-            }
+        roll(&state, elapsed: elapsed)
+        if state.createdInWindow >= Limits.hourlyCap {
+            return [.drop(.rateLimit)] + notice(.rateLimit, 1, &state, now: now, sequence: sequence) + schedule(&state)
         }
-
-        if next.queued >= flushThreshold {
-            effects.append(.export(maxRecords: maxBatch))
-            next.queued -= min(next.queued, maxBatch)
-            next.lastExport = now
+        let record = PendingRecord(id: newId(state, sequence), sessionId: state.sessionId, event: event, createdAt: now)
+        var effects: [TelemetryEffect] = [.persist(record)]
+        state.pending += 1
+        state.createdInWindow += 1
+        if state.pending >= Limits.flushThreshold {
+            effects += export(&state, now: now)
         }
-        effects += reschedule(&next)
-        return (next, effects)
-    }
-
-    private static func flush(_ state: TelemetryState, now: Int64) -> (state: TelemetryState, effects: [TelemetryEffect]) {
-        var next = state
-        next.flushScheduled = false
-        var effects: [TelemetryEffect] = []
-        for fingerprintKey in next.collapsing.keys.sorted() {
-            if let held = next.collapsing[fingerprintKey], now - held.firstSeenAt >= collapseWindowMilliseconds {
-                effects += release(fingerprintKey, from: &next)
-            }
-        }
-        effects += exportAll(&next, now: now)
-        effects += reschedule(&next)
-        return (next, effects)
-    }
-
-    private static func appBackgrounded(_ state: TelemetryState, now: Int64)
-        -> (state: TelemetryState, effects: [TelemetryEffect]) {
-        var next = state
-        var effects: [TelemetryEffect] = []
-        for fingerprintKey in next.collapsing.keys.sorted() {
-            effects += release(fingerprintKey, from: &next)
-        }
-        effects += exportAll(&next, now: now)
-        return (next, effects)
+        return effects + schedule(&state)
     }
 
     // MARK: - Rules
 
-    /// Rule R: removes the held record for `fingerprintKey`, enqueues it, and persists it again when it collapsed others.
-    private static func release(_ fingerprintKey: String, from state: inout TelemetryState) -> [TelemetryEffect] {
-        guard let held = state.collapsing.removeValue(forKey: fingerprintKey) else {
+    /// Starts a new hour when none has started or a full hour has elapsed.
+    private static func roll(_ state: inout TelemetryState, elapsed: Int64) {
+        if let windowStart = state.windowStart, elapsed - windowStart < Limits.hourMilliseconds {
+            return
+        }
+        state.windowStart = elapsed
+        state.createdInWindow = 0
+        state.notices = [:]
+    }
+
+    /// Updates the reason's unsent notice in place, or creates one with a new ID. Never counts toward the cap.
+    private static func notice(_ reason: TelemetryEvent.DroppedReason, _ count: Int, _ state: inout TelemetryState,
+                               now: Int64, sequence: RecordSequence) -> [TelemetryEffect] {
+        let notice: DroppedNotice
+        if let existing = state.notices[reason] {
+            notice = DroppedNotice(id: existing.id, count: existing.count + count, createdAt: existing.createdAt)
+        } else {
+            notice = DroppedNotice(id: newId(state, sequence), count: count, createdAt: now)
+        }
+        state.notices[reason] = notice
+        state.pending += 1
+        let record = PendingRecord(id: notice.id, sessionId: state.sessionId,
+                                   event: .dropped(reason: reason, count: notice.count), createdAt: notice.createdAt)
+        return [.persist(record)]
+    }
+
+    /// Exports everything pending unless sending has stopped.
+    private static func export(_ state: inout TelemetryState, now: Int64) -> [TelemetryEffect] {
+        guard !state.exportStopped else {
             return []
         }
-        state.queued += 1
-        return held.occurrences > 1 ? [.enqueue(held), .persist(held)] : [.enqueue(held)]
+        state.pending = 0
+        state.lastExport = now
+        return [.export(maxRecords: Limits.batchMaxRecords)]
     }
 
-    /// Exports in batches of `maxBatch` while anything is queued.
-    private static func exportAll(_ state: inout TelemetryState, now: Int64) -> [TelemetryEffect] {
-        var effects: [TelemetryEffect] = []
-        while state.queued > 0 {
-            effects.append(.export(maxRecords: maxBatch))
-            state.queued -= min(state.queued, maxBatch)
-        }
-        if !effects.isEmpty {
-            state.lastExport = now
-        }
-        return effects
-    }
-
-    private static func reschedule(_ state: inout TelemetryState) -> [TelemetryEffect] {
-        guard (state.queued > 0 || !state.collapsing.isEmpty) && !state.flushScheduled else {
+    /// Arms the timer when records are pending, none is armed and sending has not stopped.
+    private static func schedule(_ state: inout TelemetryState) -> [TelemetryEffect] {
+        guard state.pending > 0, !state.flushScheduled, !state.exportStopped else {
             return []
         }
         state.flushScheduled = true
-        return [.scheduleFlush(delayMilliseconds: flushIntervalMilliseconds)]
+        return [.scheduleFlush(delayMilliseconds: Limits.flushIntervalMilliseconds)]
     }
 
-    // MARK: - Fingerprint parts
-
-    private static func key(_ name: String, _ error: TelemetryEvent.ErrorInfo?) -> String {
-        "\(name)|\(error?.type ?? "")|\(topPaydockFrame(error?.frames ?? []))"
-    }
-
-    private static func failureError(_ failure: TelemetryEvent.NetworkError) -> TelemetryEvent.ErrorInfo? {
-        switch failure {
-        case .httpStatus:
-            return nil
-        case let .transport(_, error), let .decode(_, error):
-            return error
-        }
-    }
-
-    private static func failureName(_ failure: TelemetryEvent.NetworkError) -> String {
-        switch failure {
-        case let .httpStatus(code):
-            return "http_\(code)"
-        case let .transport(kind, _):
-            return "transport_\(kind.rawValue)"
-        case .decode:
-            return "decode"
-        }
-    }
-
-    /// The first frame that holds a Paydock module name as a whole word, or `""`.
-    private static func topPaydockFrame(_ frames: [String]) -> String {
-        frames.first { frame in paydockModules.contains { containsWord($0, in: frame) } } ?? ""
-    }
-
-    private static func containsWord(_ word: String, in text: String) -> Bool {
-        var searchStart = text.startIndex
-        while let range = text.range(of: word, range: searchStart..<text.endIndex) {
-            let before = range.lowerBound == text.startIndex ? nil : text[text.index(before: range.lowerBound)]
-            let after = range.upperBound == text.endIndex ? nil : text[range.upperBound]
-            if !isWordCharacter(before) && !isWordCharacter(after) {
-                return true
-            }
-            searchStart = text.index(after: range.lowerBound)
-        }
-        return false
-    }
-
-    private static func isWordCharacter(_ character: Character?) -> Bool {
-        guard let character else {
-            return false
-        }
-        return character.isLetter || character.isNumber || character == "_"
+    private static func newId(_ state: TelemetryState, _ sequence: RecordSequence) -> String {
+        "\(state.sessionId)-\(sequence.next())"
     }
 }

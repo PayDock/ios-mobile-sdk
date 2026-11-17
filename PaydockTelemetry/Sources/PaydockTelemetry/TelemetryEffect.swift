@@ -6,15 +6,12 @@
 
 /// What the reducer asks the effect handler to do.
 package enum TelemetryEffect: Sendable, Equatable {
-    case enqueue(PendingRecord)
-    /// Upsert by record id.
+    /// Build, filter, upsert by record id.
     case persist(PendingRecord)
     case scheduleFlush(delayMilliseconds: Int64)
-    /// Drain up to `maxRecords` and export them.
+    /// Flush everything pending, in batches of `maxRecords`.
     case export(maxRecords: Int)
     case drop(DropReason)
 
-    package enum DropReason: Sendable, Equatable {
-        case disabled, levelOff, levelFiltered
-    }
+    package enum DropReason: Sendable, Equatable { case disabled, levelOff, levelFiltered, rateLimit, notReportable }
 }

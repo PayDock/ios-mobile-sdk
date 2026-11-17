@@ -14,11 +14,15 @@ let package = Package(
             name: "PaydockTelemetry",
             targets: ["PaydockTelemetry"])
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.5.0")
+    ],
     targets: [
         .target(
             name: "PaydockTelemetry",
-            dependencies: [],
+            dependencies: [
+                .product(name: "NetworkingLib", package: "ios-core-networking")
+            ],
             path: "Sources/PaydockTelemetry"
         ),
         .testTarget(

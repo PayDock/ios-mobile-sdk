@@ -9,15 +9,19 @@ package struct TelemetryState: Sendable, Equatable {
     package var level: TelemetryLevel
     package var enabled: Bool
     package var sessionId: String
-    package var queued: Int = 0
-    package var persisted: Int = 0
+    /// Records on disk not yet exported, as last counted.
+    package var pending: Int = 0
     /// UTC epoch milliseconds.
     package var lastExport: Int64?
+    /// A 10 s timer is armed; only its own tick clears it.
     package var flushScheduled: Bool = false
-    /// The last sequence used in this session, `0` at the start; the first record is `<sessionId>-1` (R_09).
-    package var nextSequence: Int64 = 0
-    /// Fingerprint → the record held in its collapse window.
-    package var collapsing: [String: PendingRecord] = [:]
+    /// 401/403 or give-up: no export or timer for the rest of the process.
+    package var exportStopped: Bool = false
+    /// Monotonic milliseconds; the start of the current hour of the cap and the notices.
+    package var windowStart: Int64?
+    /// Records created this hour, notices excluded.
+    package var createdInWindow: Int = 0
+    package var notices: [TelemetryEvent.DroppedReason: DroppedNotice] = [:]
 
     package init(level: TelemetryLevel, enabled: Bool, sessionId: String) {
         self.level = level

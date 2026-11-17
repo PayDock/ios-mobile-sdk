@@ -28,7 +28,7 @@ final class AllowlistTests: XCTestCase {
     private lazy var base: TelemetryRecord = {
         let pending = PendingRecord(id: "\(Samples.sessionId)-4", sessionId: Samples.sessionId,
                                     event: .sdkError(error: TelemetryEvent.ErrorInfo(type: "Sample.Error", frames: [])),
-                                    firstSeenAt: Samples.builtAt)
+                                    createdAt: Samples.builtAt)
         return RecordFactory.create(pending, connection: .wifi)
     }()
 
@@ -151,19 +151,64 @@ final class AllowlistTests: XCTestCase {
         let records = sensitiveValues.map { tainted("paydock.error.code", .string($0.value)) }
         let messages = Allowlist.violations(resource: sampleResource(), records: records).joined(separator: "\n")
 
-        XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: records).count, sensitiveValues.count)
+        // One for the attribute, one for the body the value reaches.
+        XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: records).count, 2 * sensitiveValues.count)
         for (name, value) in sensitiveValues {
             XCTAssertFalse(messages.contains(value), name)
         }
     }
 
-    func testCardNumber_OnlyAsAWholeLuhnValidRunOf13To19Digits() {
+    func testCardNumber_AsALuhnValidRunOf13To19Digits() {
         XCTAssertTrue(Allowlist.isSensitive("card \(Samples.cardNumber.replacingOccurrences(of: "0000", with: "00-00"))"))
         XCTAssertFalse(Allowlist.isSensitive("A\(Samples.cardNumber)"), "touches a letter")
         let checkDigit = Samples.cardNumber.last?.wholeNumberValue ?? 0
         XCTAssertFalse(Allowlist.isSensitive(String(Samples.cardNumber.dropLast()) + String((checkDigit + 1) % 10)), "fails Luhn")
         XCTAssertFalse(Allowlist.isSensitive("123456789012"), "too short")
         XCTAssertFalse(Allowlist.isSensitive("MobileSDK 0x0000000104a3c1f0"))
+    }
+
+    // MARK: - Hardening (R_19)
+
+    func testACardNumber_InsideALongerDigitRun_IsFlagged() {
+        for suffix in [" 123", " 12 28", "-123", " 12-28"] {
+            XCTAssertTrue(Allowlist.isSensitive("ref \(Samples.cardNumber)\(suffix)"), "followed by a \(suffix.count)-character run")
+            XCTAssertTrue(Allowlist.isSensitive("\(Samples.groupedCardNumber)\(suffix)"), "grouped, followed by a run")
+            XCTAssertTrue(Allowlist.isSensitive(String(suffix.dropFirst()) + " " + Samples.cardNumber), "preceded by a run")
+            let record = tainted("paydock.error.code", .string("CODE \(Samples.cardNumber)\(suffix)"))
+            XCTAssertFalse(Allowlist.violations(resource: sampleResource(), records: [record]).isEmpty)
+            XCTAssertEqual(Allowlist.filter(record), base)
+        }
+        XCTAssertFalse(Allowlist.isSensitive("A\(Samples.cardNumber) 123"), "the run touches a letter")
+        XCTAssertFalse(Allowlist.isSensitive("12  \(String(Samples.cardNumber.prefix(12)))"), "no window of 13 digits")
+    }
+
+    func testAStackTraceWithAddresses_StillPasses() {
+        let frames = SensitiveSamples.rawFrames.map(StackFrame.sanitise) + [
+            "3   MobileSDK   0x0000000104a3c1f0 0x104a30000 + 49648",
+            "4   libsystem_kernel.dylib   0x00000001a5c1e8f0 __pthread_kill + 8"
+        ]
+        let stackTrace = (["Sample.Error"] + frames.map { "\tat \($0)" }).joined(separator: "\n")
+        let traced = base.with("exception.stacktrace", .string(stackTrace))
+
+        XCTAssertFalse(Allowlist.isSensitive(stackTrace, checkingLongSecrets: false))
+        XCTAssertEqual(Allowlist.filter(traced), traced)
+        XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: [traced]), [])
+    }
+
+    func testABody_DifferingFromTheBodyRule_OrHoldingAnEmail_IsAViolation() {
+        let differing = TelemetryRecord(id: base.id, timeUnixMillis: base.timeUnixMillis, severity: base.severity,
+                                        body: base.body + " · extra", attributes: base.attributes)
+        let violations = Allowlist.violations(resource: sampleResource(), records: [differing])
+        XCTAssertEqual(violations, ["record 0: body differs from the body rule"])
+        XCTAssertEqual(Allowlist.filter(differing), base, "the filter rebuilds the body")
+
+        let withEmail = TelemetryRecord(id: base.id, timeUnixMillis: base.timeUnixMillis, severity: base.severity,
+                                        body: "\(base.body) · \(Samples.email)", attributes: base.attributes)
+        let messages = Allowlist.violations(resource: sampleResource(), records: [withEmail])
+        XCTAssertTrue(messages.contains("record 0: body holds a sensitive value"), "\(messages.count) violations")
+        XCTAssertFalse(messages.joined().contains(Samples.email))
+
+        XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: [base]), [])
     }
 
     // MARK: - Helpers

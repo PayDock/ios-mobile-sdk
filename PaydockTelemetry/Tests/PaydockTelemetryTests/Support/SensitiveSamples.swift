@@ -83,12 +83,14 @@ enum SensitiveSamples {
         ]
     }
 
-    /// Each event built into a record of `sessionId`, sequences from 1.
+    /// Each event built into a record of `sessionId`, sequences from 1; every second and third record carries the
+    /// duplicate gate's `paydock.occurrences`.
     static func builtRecords() -> [TelemetryRecord] {
         events().enumerated().map { index, event in
-            let pending = PendingRecord(id: "\(sessionId)-\(index + 1)", sessionId: sessionId, event: event,
-                                        firstSeenAt: builtAt, occurrences: index % 3 + 1)
-            return RecordFactory.create(pending, connection: .cell)
+            let pending = PendingRecord(id: "\(sessionId)-\(index + 1)", sessionId: sessionId, event: event, createdAt: builtAt)
+            let record = RecordFactory.create(pending, connection: .cell)
+            let occurrences = index % 3 + 1
+            return occurrences > 1 ? record.with("paydock.occurrences", .int(Int64(occurrences))) : record
         }
     }
 

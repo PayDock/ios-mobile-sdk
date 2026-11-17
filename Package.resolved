@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PayDock/ios-core-networking",
       "state" : {
-        "revision" : "f153cc08b10c9562cf17b716dc0568dcd846d857",
-        "version" : "1.3.0"
+        "revision" : "151460a67ea2a0a6bc7762a86dded98b2aac930f",
+        "version" : "1.5.0"
       }
     },
     {

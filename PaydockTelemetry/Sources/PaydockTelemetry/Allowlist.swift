@@ -72,14 +72,15 @@ package enum Allowlist {
                                body: RecordBody.of(kept), attributes: kept)
     }
 
-    /// True when the value holds a card number, an email, a JWT, an authorization value, or (unless
-    /// `checkingLongSecrets` is false) a long secret.
+    /// True when the value holds a card number (also inside a longer digit run), an email, a JWT, an authorization
+    /// value, or (unless `checkingLongSecrets` is false) a long secret.
     package static func isSensitive(_ value: String, checkingLongSecrets: Bool = true) -> Bool {
         hasCardNumber(value) || found(email, in: value) || found(jwt, in: value) || found(authorization, in: value)
             || (checkingLongSecrets && hasLongSecret(value))
     }
 
-    /// Why a batch must not be sent; empty when it may. I7's exporter sends only a batch with no violation.
+    /// Why a batch must not be sent; empty when it may. The exporter sends only a batch with no violation. A record
+    /// whose body is not `RecordBody.of(attributes)`, or holds a sensitive value, is a violation too (R_19).
     /// A violation names keys and positions only, never a value.
     package static func violations(resource: ResourceAttributes, records: [TelemetryRecord]) -> [String] {
         var found: [String] = []
@@ -107,6 +108,12 @@ package enum Allowlist {
             if let problem = problem(attribute, sessionId: record.sessionId) {
                 found.append(problem)
             }
+        }
+        if record.body != RecordBody.of(record.attributes) {
+            found.append("body differs from the body rule")
+        }
+        if isSensitive(record.body) {
+            found.append("body holds a sensitive value")
         }
         return found
     }
@@ -149,18 +156,28 @@ package enum Allowlist {
 
     // MARK: - Sensitive values
 
-    /// A maximal run of digits, single spaces or dashes between them, touching no ASCII letter or digit at either
-    /// end, holding 13 to 19 digits and passing Luhn.
+    /// A maximal run of digits joined by single spaces or dashes, touching no ASCII letter or digit at either end, whose
+    /// digits, separators removed, hold a contiguous window of 13 to 19 digits that passes Luhn (R_19): a card number
+    /// inside a longer run is still caught.
     private static func hasCardNumber(_ value: String) -> Bool {
         ranges(digitRun, in: value).contains { range in
-            let digits = value[range].compactMap(\.wholeNumberValue)
-            return (13...19).contains(digits.count) && passesLuhn(digits)
-                && !isASCIILetterOrDigit(range.lowerBound == value.startIndex ? nil : value[value.index(before: range.lowerBound)])
-                && !isASCIILetterOrDigit(range.upperBound == value.endIndex ? nil : value[range.upperBound])
+            let before = range.lowerBound == value.startIndex ? nil : value[value.index(before: range.lowerBound)]
+            let after = range.upperBound == value.endIndex ? nil : value[range.upperBound]
+            return !isASCIILetterOrDigit(before) && !isASCIILetterOrDigit(after)
+                && hasLuhnWindow(value[range].compactMap(\.wholeNumberValue))
         }
     }
 
-    private static func passesLuhn(_ digits: [Int]) -> Bool {
+    private static func hasLuhnWindow(_ digits: [Int]) -> Bool {
+        for length in 13...19 where length <= digits.count {
+            for start in 0...(digits.count - length) where passesLuhn(digits[start..<(start + length)]) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private static func passesLuhn(_ digits: ArraySlice<Int>) -> Bool {
         var sum = 0
         for (position, digit) in digits.reversed().enumerated() {
             let weighted = position % 2 == 1 ? digit * 2 : digit

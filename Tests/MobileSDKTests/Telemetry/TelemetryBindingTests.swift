@@ -22,15 +22,25 @@ final class TelemetryBindingTests: XCTestCase {
         EnvironmentCredentialsProvider.authorizationKey: authorization
     ]
 
-    private var factory = CountingActiveFactory()
+    /// A temporary stand-in for the app's application-support directory.
+    private var applicationSupport = URL(fileURLWithPath: NSTemporaryDirectory())
+    private var factory = CountingActiveFactory(applicationSupport: URL(fileURLWithPath: NSTemporaryDirectory()))
 
-    override func setUp() {
-        super.setUp()
-        factory = CountingActiveFactory()
+    private var telemetryDirectory: URL {
+        applicationSupport.appendingPathComponent(FileDurableStore.directoryName, isDirectory: true)
+    }
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        applicationSupport = FileManager.default.temporaryDirectory
+            .appendingPathComponent("TelemetryBindingTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: applicationSupport, withIntermediateDirectories: true)
+        factory = CountingActiveFactory(applicationSupport: applicationSupport)
     }
 
     override func tearDown() {
         TelemetryBinding.bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
+        try? FileManager.default.removeItem(at: applicationSupport)
         super.tearDown()
     }
 
@@ -49,6 +59,10 @@ final class TelemetryBindingTests: XCTestCase {
 
             XCTAssertNil(EnvironmentCredentialsProvider(environment: environment).credentials(), "\(key) missing")
         }
+    }
+
+    func testEnvironmentProvider_TheTestRecordVariable() {
+        XCTAssertEqual(EnvironmentCredentialsProvider.sendTestRecordKey, "PAYDOCK_TELEMETRY_SEND_TEST_RECORD")
     }
 
     func testEnvironmentProvider_EitherVariableBlank_GivesNil() {
@@ -84,6 +98,40 @@ final class TelemetryBindingTests: XCTestCase {
         assertNoOp(select(host: nil))
         assertNoOp(select(host: Self.merchantHost))
         XCTAssertEqual(factory.callCount, 0)
+    }
+
+    /// R_15, MD-36 acceptance: inactive, bound and asked for a test record, nothing is created, written or registered.
+    func testInactive_Bound_CreatesNoDirectory_AndRegistersNothing() throws {
+        for selection in [select(provider: StubCredentialsProvider(value: nil)), select(environment: .production),
+                          select(level: .off), select(host: Self.merchantHost)] {
+            TelemetryBinding.bind(selection, sendTestRecord: true)
+            selection.telemetry.report(.widgetOpened(widget: "SampleWidget"))
+        }
+
+        XCTAssertEqual(factory.callCount, 0)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: telemetryDirectory.path))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.path), [])
+        XCTAssertEqual(factory.lifecycle.registerCount, 0)
+        XCTAssertEqual(factory.connection.startCount, 0)
+    }
+
+    func testActive_Bound_RegistersTheLifecycleAndTheMonitorOnce() {
+        let selection = select()
+
+        TelemetryBinding.bind(selection)
+        TelemetryBinding.bind(selection)
+
+        XCTAssertEqual(factory.callCount, 1)
+        XCTAssertEqual(factory.lifecycle.registerCount, 1)
+        XCTAssertEqual(factory.connection.startCount, 1)
+    }
+
+    /// R_16: the test record goes to the store directory when active and asked for.
+    func testActive_BoundWithTheTestRecord_StoresIt() throws {
+        TelemetryBinding.bind(select(), sendTestRecord: true)
+
+        let files = try FileManager.default.contentsOfDirectory(atPath: telemetryDirectory.path)
+        XCTAssertEqual(files.count, 1)
     }
 
     func testSelect_EveryConditionHolds_CreatesOnce_AndGivesThatActiveTelemetryAsBothHandles() throws {
@@ -141,6 +189,56 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(runtime.startCount, 0)
     }
 
+    func testBind_Active_WithTheTestRecord_SendsItOnce_AfterStart() {
+        let runtime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime), sendTestRecord: true)
+
+        XCTAssertEqual(runtime.calls, ["start", "sendTestRecord"])
+    }
+
+    func testBind_Active_WithoutTheTestRecord_NeverSendsIt() {
+        let runtime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime),
+                              sendTestRecord: false)
+
+        XCTAssertEqual(runtime.calls, ["start"])
+    }
+
+    /// A second `configureMobileSDK` never starts a second runtime on the same store directory.
+    func testBind_ActiveWhileActiveIsBound_KeepsTheFirst_AndNeverStartsTheSecond() {
+        let first = FakeTelemetry(isActive: true)
+        let firstRuntime = CountingRuntime()
+        let secondRuntime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: first, runtime: firstRuntime))
+        let bound = TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: secondRuntime),
+                                          sendTestRecord: true)
+
+        XCTAssertTrue((bound as? FakeTelemetry) === first)
+        XCTAssertTrue((TelemetryBinding.current as? FakeTelemetry) === first)
+        XCTAssertEqual(firstRuntime.calls, ["start"])
+        XCTAssertEqual(secondRuntime.calls, [])
+    }
+
+    func testBind_InactiveWhileActiveIsBound_ReplacesIt() {
+        let inactive = FakeTelemetry(isActive: false)
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: CountingRuntime()))
+        TelemetryBinding.bind(TelemetrySelection(telemetry: inactive, runtime: CountingRuntime()))
+
+        XCTAssertTrue((TelemetryBinding.current as? FakeTelemetry) === inactive)
+    }
+
+    func testBind_Inactive_WithTheTestRecord_NeverSendsIt() {
+        let runtime = CountingRuntime()
+
+        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: false), runtime: runtime), sendTestRecord: true)
+
+        XCTAssertEqual(runtime.calls, [])
+    }
+
     func testBind_Rebinding_ReplacesTheFacade() {
         let first = FakeTelemetry(isActive: false)
         let second = FakeTelemetry(isActive: false)
@@ -195,18 +293,33 @@ private final class FakeTelemetry: Telemetry {
     func report(_ event: TelemetryEvent) {}
 }
 
-/// Builds `ActiveTelemetry` with an inline dispatcher and a fixed device context, and counts its calls.
+/// Builds `ActiveTelemetry` with an inline dispatcher, a fixed device context, a file store under the given
+/// application-support stand-in and recording lifecycle and monitor, and counts its calls.
 private final class CountingActiveFactory {
     let provider = FakeDeviceContextProvider()
+    let lifecycle = RecordingLifecycle()
+    let connection = RecordingConnectionMonitor()
+    private let applicationSupport: URL
     private(set) var arguments: [(credentials: TelemetryCredentials, level: TelemetryLevel)] = []
     private(set) var created: ActiveTelemetry?
 
     var callCount: Int { arguments.count }
 
+    init(applicationSupport: URL) {
+        self.applicationSupport = applicationSupport
+    }
+
     func make(credentials: TelemetryCredentials, level: TelemetryLevel) -> ActiveTelemetry {
         arguments.append((credentials, level))
-        let telemetry = ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: provider,
-                                        dispatcher: ImmediateDispatcher())
+        let directory = applicationSupport.appendingPathComponent(FileDurableStore.directoryName, isDirectory: true)
+        let telemetry = ActiveTelemetry(
+            credentials: credentials,
+            level: level,
+            deviceContextProvider: provider,
+            dispatcher: ImmediateDispatcher(),
+            ports: ActiveTelemetry.Ports(store: FileDurableStore(directory: { directory }), lifecycle: lifecycle,
+                                         connection: connection)
+        )
         created = telemetry
         return telemetry
     }
@@ -248,7 +361,20 @@ private final class FakeDeviceContextProvider: DeviceContextProvider, @unchecked
     }
 }
 
-private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
+/// Counts every registration.
+private final class RecordingLifecycle: AppLifecycle, @unchecked Sendable {
+    private let lock = NSLock()
+    private var registrations = 0
+
+    var registerCount: Int { lock.withLock { registrations } }
+
+    func register(onBackground: @escaping @Sendable (_ finished: @escaping @Sendable () -> Void) -> Void) {
+        lock.withLock { registrations += 1 }
+    }
+}
+
+/// Counts every start; the type stays unknown.
+private final class RecordingConnectionMonitor: ConnectionMonitor, @unchecked Sendable {
     private let lock = NSLock()
     private var starts = 0
 
@@ -256,6 +382,25 @@ private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
 
     func start() {
         lock.withLock { starts += 1 }
+    }
+
+    func current() -> NetworkConnectionType { .unknown }
+}
+
+/// Records every call, in order.
+private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
+    private let lock = NSLock()
+    private var log: [String] = []
+
+    var calls: [String] { lock.withLock { log } }
+    var startCount: Int { calls.filter { $0 == "start" }.count }
+
+    func start() {
+        lock.withLock { log.append("start") }
+    }
+
+    func sendTestRecord() {
+        lock.withLock { log.append("sendTestRecord") }
     }
 }
 #endif

@@ -15,7 +15,7 @@ let package = Package(
             targets: ["DataGateways"])
     ],
     dependencies: [
-        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.2.2"),
+        .package(url: "https://github.com/PayDock/ios-core-networking", exact: "1.5.0"),
         .package(path: "../CommonModels")
     ],
     targets: [

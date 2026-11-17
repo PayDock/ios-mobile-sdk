@@ -4,10 +4,14 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-/// Records kept across launches until exported.
+/// The disk is the queue: every record is kept until its batch is accepted or rejected (R_05, R_06).
 package protocol DurableStore: Sendable {
-    func save(_ record: PendingRecord)
-    func loadAll() -> [PendingRecord]
+    /// Upsert by record id; atomic.
+    func save(_ record: TelemetryRecord)
+    /// By `timeUnixMillis`, then the id's sequence as a number.
+    func oldest(max: Int) -> [TelemetryRecord]
     func remove(ids: [String])
-    func prune(now: Int64)
+    /// `now`: UTC epoch milliseconds.
+    func prune(now: Int64) -> PruneResult
+    func count() -> Int
 }
