@@ -21,7 +21,8 @@ let package = Package(
             dependencies: [],
             path: "Sources/BinProcessing",
             resources: [
-                .copy("Resources/JSON/card-schemes.json")
+                .copy("Resources/JSON/card-schemes.json"),
+                .copy("Resources/PrivacyInfo.xcprivacy")
             ]
         ),
         .testTarget(

@@ -4,7 +4,7 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG && os(iOS) && canImport(MetricKit)
+#if os(iOS) && canImport(MetricKit)
 import Foundation
 import MetricKit
 

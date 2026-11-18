@@ -26,8 +26,10 @@ extension RecordingTelemetry {
         }
     }
 
-    /// Binds this facade as `TelemetryBinding.current`; `RecordingTelemetry.unbind()` rebinds the no-op.
+    /// Binds this facade as `TelemetryBinding.current`; `RecordingTelemetry.unbind()` rebinds the no-op. Unbinds
+    /// first: an active selection never replaces an active facade that is already bound.
     func bindAsCurrent() {
+        Self.unbind()
         TelemetryBinding.bind(TelemetrySelection(telemetry: self, runtime: NoOpTelemetry()))
     }
 

@@ -12,6 +12,11 @@ package struct NoOpTelemetry: Telemetry, TelemetryRuntime {
     package func report(_ event: TelemetryEvent) {}
     package func report(_ event: TelemetryEvent, site: ReportSite) {}
     package func start() {}
+}
+
+#if DEBUG
+extension NoOpTelemetry: TelemetryDebugHooks {
     package func sendTestRecord() {}
     package func raiseTestCrash() {}
 }
+#endif

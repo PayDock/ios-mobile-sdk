@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import NetworkingLib
 
 /// R_01, R_09: forwards to `previous` first, then reports `NetworkFailureFacts.event(observation,
@@ -28,4 +27,3 @@ package final class NetworkFailureObserver: RequestObserver, @unchecked Sendable
         }
     }
 }
-#endif

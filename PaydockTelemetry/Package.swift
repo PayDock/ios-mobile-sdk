@@ -23,7 +23,8 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkingLib", package: "ios-core-networking")
             ],
-            path: "Sources/PaydockTelemetry"
+            path: "Sources/PaydockTelemetry",
+            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "PaydockTelemetryTests",

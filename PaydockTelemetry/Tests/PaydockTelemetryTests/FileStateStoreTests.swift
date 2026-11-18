@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import PaydockTelemetry
 import XCTest
@@ -200,4 +199,3 @@ final class FileStateStoreTests: XCTestCase {
         try Data("{not json".utf8).write(to: state.appendingPathComponent(name))
     }
 }
-#endif

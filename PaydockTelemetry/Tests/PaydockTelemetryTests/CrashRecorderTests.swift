@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import PaydockTelemetry
 import XCTest
@@ -258,4 +257,3 @@ final class CrashRecorderTests: XCTestCase {
                           addresses: [Self.throwSite + 164, Self.objcThrow + 60, top])
     }
 }
-#endif

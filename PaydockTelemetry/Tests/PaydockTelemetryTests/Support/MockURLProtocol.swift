@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import NetworkingLib
 
@@ -112,4 +111,3 @@ final class MockURLProtocol: URLProtocol {
         var sslPinningManager: SSLPinningManager? { nil }
     }
 }
-#endif

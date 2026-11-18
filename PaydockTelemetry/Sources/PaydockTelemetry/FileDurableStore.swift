@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// The disk is the queue (R_05, R_06): one `<id>.json` file per record, holding `OtlpLogEncoder.recordJSON`, in a
@@ -285,4 +284,3 @@ package final class FileDurableStore: DurableStore, @unchecked Sendable {
         id.split(separator: "-").last.flatMap { Int64($0) } ?? Int64.max
     }
 }
-#endif

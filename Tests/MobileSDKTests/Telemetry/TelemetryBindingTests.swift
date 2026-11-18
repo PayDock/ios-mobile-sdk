@@ -19,8 +19,8 @@ final class TelemetryBindingTests: XCTestCase {
     private static let merchantHost = "com.merchant.shop"
 
     private static let fullEnvironment = [
-        EnvironmentCredentialsProvider.endpointKey: endpoint,
-        EnvironmentCredentialsProvider.authorizationKey: authorization
+        LocalTelemetryOverride.endpointKey: endpoint,
+        LocalTelemetryOverride.authorizationKey: authorization
     ]
 
     /// A temporary stand-in for the app's application-support directory.
@@ -37,48 +37,14 @@ final class TelemetryBindingTests: XCTestCase {
             .appendingPathComponent("TelemetryBindingTests-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: applicationSupport, withIntermediateDirectories: true)
         factory = CountingActiveFactory(applicationSupport: applicationSupport)
+        // A `configureMobileSDK` on sandbox or staging elsewhere in the process binds the collector's runtime.
+        TelemetryBinding.bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
     }
 
     override func tearDown() {
         TelemetryBinding.bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
         try? FileManager.default.removeItem(at: applicationSupport)
         super.tearDown()
-    }
-
-    // MARK: - EnvironmentCredentialsProvider
-
-    func testEnvironmentProvider_BothVariablesSet_GivesCredentials() {
-        let credentials = EnvironmentCredentialsProvider(environment: Self.fullEnvironment).credentials()
-
-        XCTAssertEqual(credentials, TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization))
-    }
-
-    func testEnvironmentProvider_EitherVariableMissing_GivesNil() {
-        for key in [EnvironmentCredentialsProvider.endpointKey, EnvironmentCredentialsProvider.authorizationKey] {
-            var environment = Self.fullEnvironment
-            environment[key] = nil
-
-            XCTAssertNil(EnvironmentCredentialsProvider(environment: environment).credentials(), "\(key) missing")
-        }
-    }
-
-    func testEnvironmentProvider_TheTestRecordVariable() {
-        XCTAssertEqual(EnvironmentCredentialsProvider.sendTestRecordKey, "PAYDOCK_TELEMETRY_SEND_TEST_RECORD")
-    }
-
-    func testEnvironmentProvider_TheTestCrashVariable() {
-        XCTAssertEqual(EnvironmentCredentialsProvider.testCrashKey, "PAYDOCK_TELEMETRY_TEST_CRASH")
-    }
-
-    func testEnvironmentProvider_EitherVariableBlank_GivesNil() {
-        for key in [EnvironmentCredentialsProvider.endpointKey, EnvironmentCredentialsProvider.authorizationKey] {
-            for blank in ["", "   "] {
-                var environment = Self.fullEnvironment
-                environment[key] = blank
-
-                XCTAssertNil(EnvironmentCredentialsProvider(environment: environment).credentials(), "\(key) blank")
-            }
-        }
     }
 
     // MARK: - selectTelemetry
@@ -88,9 +54,8 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_ProductionOrStaging_GivesNoOp_AndCreatesNothing() {
-        assertNoOp(select(environment: .production))
-        assertNoOp(select(environment: .staging))
+    func testSelect_BlankEndpoint_GivesNoOp_AndCreatesNothing() {
+        assertNoOp(select(provider: StubCredentialsProvider(value: TelemetryCredentials(endpoint: " ", authorization: ""))))
         XCTAssertEqual(factory.callCount, 0)
     }
 
@@ -99,18 +64,21 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_NilOrMerchantHost_GivesNoOp_AndCreatesNothing() {
-        assertNoOp(select(host: nil))
-        assertNoOp(select(host: Self.merchantHost))
-        XCTAssertEqual(factory.callCount, 0)
+    func testSelect_EmptyAuthorization_IsActive() throws {
+        let selection = select(provider: StubCredentialsProvider(value: TelemetryCredentials(endpoint: Self.endpoint,
+                                                                                             authorization: "")))
+
+        XCTAssertTrue(try XCTUnwrap(selection.telemetry as? ActiveTelemetry).isActive)
+        XCTAssertEqual(factory.callCount, 1)
     }
 
     /// R_15, MD-36 acceptance: inactive, bound and asked for a test record and a test crash, nothing is created,
     /// written, registered, installed or subscribed: the process's uncaught-exception handler slot is unchanged.
     func testInactive_Bound_CreatesNoDirectory_AndRegistersNothing() throws {
         let handlerBefore = Self.processHandlerAddress()
-        for selection in [select(provider: StubCredentialsProvider(value: nil)), select(environment: .production),
-                          select(level: .off), select(host: Self.merchantHost)] {
+        for selection in [select(provider: StubCredentialsProvider(value: nil)),
+                          select(provider: SdkTelemetryCredentialsProvider(environment: .production, override: nil)),
+                          select(level: .off)] {
             TelemetryBinding.bind(selection, sendTestRecord: true, raiseTestCrash: true)
             selection.telemetry.report(.widgetOpened(widget: "SampleWidget"))
         }
@@ -134,17 +102,15 @@ final class TelemetryBindingTests: XCTestCase {
         let credentials = TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization)
         let inactive = [
             InactiveCondition(provider: StubCredentialsProvider(value: nil)),
-            InactiveCondition(provider: StubCredentialsProvider(value: credentials), environment: .production),
-            InactiveCondition(provider: StubCredentialsProvider(value: credentials), level: .off),
-            InactiveCondition(provider: StubCredentialsProvider(value: credentials), host: Self.merchantHost)
+            InactiveCondition(provider: SdkTelemetryCredentialsProvider(environment: .production, override: nil)),
+            InactiveCondition(provider: StubCredentialsProvider(value: credentials), level: .off)
         ]
 
         for condition in inactive {
             let selection = selectTelemetry(
-                credentialsProvider: condition.provider, sdkEnvironment: condition.environment, level: condition.level,
-                hostBundleIdentifier: condition.host,
+                credentialsProvider: condition.provider, level: condition.level,
                 createActive: { ActiveTelemetry.create(credentials: $0, level: $1, sdkVersion: SDKVersion.current,
-                                                       environmentName: condition.environment.rawValue) }
+                                                       environmentName: SDKEnvironment.production.rawValue) }
             )
             TelemetryBinding.bind(selection)
             assertNoOp(selection)
@@ -351,17 +317,9 @@ final class TelemetryBindingTests: XCTestCase {
         provider: any TelemetryCredentialsProvider = StubCredentialsProvider(
             value: TelemetryCredentials(endpoint: TelemetryBindingTests.endpoint, authorization: TelemetryBindingTests.authorization)
         ),
-        environment: SDKEnvironment = .sandbox,
-        level: TelemetryLevel = .all,
-        host: String? = TelemetryBindingTests.paydockHost
+        level: TelemetryLevel = .all
     ) -> TelemetrySelection {
-        selectTelemetry(
-            credentialsProvider: provider,
-            sdkEnvironment: environment,
-            level: level,
-            hostBundleIdentifier: host,
-            createActive: factory.make
-        )
+        selectTelemetry(credentialsProvider: provider, level: level, createActive: factory.make)
     }
 
     /// The process's uncaught-exception handler, as an address; nil when there is none.
@@ -379,9 +337,7 @@ final class TelemetryBindingTests: XCTestCase {
 /// One way to be inactive; every other condition holds.
 private struct InactiveCondition {
     let provider: any TelemetryCredentialsProvider
-    var environment: SDKEnvironment = .sandbox
     var level: TelemetryLevel = .all
-    var host: String? = "com.paydock.multitenant.sandbox"
 }
 
 private struct StubCredentialsProvider: TelemetryCredentialsProvider {
@@ -533,7 +489,7 @@ private final class CountingHandlerSlot: ExceptionHandlerSlot, @unchecked Sendab
 }
 
 /// Records every call, in order.
-private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
+private final class CountingRuntime: TelemetryRuntime, TelemetryDebugHooks, @unchecked Sendable {
     private let lock = NSLock()
     private var log: [String] = []
 

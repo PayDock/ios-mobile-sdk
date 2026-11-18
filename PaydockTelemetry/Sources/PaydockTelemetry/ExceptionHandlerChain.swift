@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// R_03, R_06: one link per process in the uncaught-exception handler chain. It records the exception, then always
@@ -92,4 +91,3 @@ package final class ExceptionHandlerChain: @unchecked Sendable {
         unsafeBitCast(lhs, to: UnsafeRawPointer.self) == unsafeBitCast(rhs, to: UnsafeRawPointer.self)
     }
 }
-#endif

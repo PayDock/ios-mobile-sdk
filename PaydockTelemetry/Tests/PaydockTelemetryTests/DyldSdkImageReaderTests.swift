@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import MachO
 import PaydockTelemetry
@@ -77,4 +76,3 @@ final class DyldSdkImageReaderTests: XCTestCase {
         XCTAssertNil(resolver.resolve(0))
     }
 }
-#endif

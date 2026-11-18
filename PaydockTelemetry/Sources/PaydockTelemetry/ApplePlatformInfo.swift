@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// Reads the OS version, the model identifier and the host app's bundle. Only random IDs and these platform values:
@@ -46,9 +45,12 @@ package struct ApplePlatformInfo: PlatformInfo {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
     }
 
-    /// True: this type exists only in debug builds of the SDK, which a host compiles in its own debug configuration.
+    /// Follows the build configuration the host compiles the SDK in: true in debug, false in release (R_07).
     package var appDebuggable: Bool {
+        #if DEBUG
         true
+        #else
+        false
+        #endif
     }
 }
-#endif

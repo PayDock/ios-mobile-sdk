@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// `dladdr`: the image's path (`dli_fname`) and load address (`dli_fbase`), and the nearest exported symbol below the
@@ -24,4 +23,3 @@ package struct DladdrAddressResolver: AddressResolving {
                                symbolAddress: info.dli_saddr.map { UInt(bitPattern: $0) })
     }
 }
-#endif

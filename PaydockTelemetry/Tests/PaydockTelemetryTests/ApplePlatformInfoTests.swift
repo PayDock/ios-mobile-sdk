@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import PaydockTelemetry
 import XCTest
 
@@ -24,8 +23,12 @@ final class ApplePlatformInfoTests: XCTestCase {
         XCTAssertTrue(parts.allSatisfy { Int($0) != nil }, ApplePlatformInfo().osVersion)
     }
 
-    func testAppDebuggable_IsTrue() {
+    /// R_07: follows the build configuration, true in debug and false in release.
+    func testAppDebuggable_FollowsTheBuildConfiguration() {
+        #if DEBUG
         XCTAssertTrue(ApplePlatformInfo().appDebuggable)
+        #else
+        XCTAssertFalse(ApplePlatformInfo().appDebuggable)
+        #endif
     }
 }
-#endif

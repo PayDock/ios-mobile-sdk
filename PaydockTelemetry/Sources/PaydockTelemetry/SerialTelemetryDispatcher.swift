@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// One serial utility queue with a capacity: a task `post`ed while `capacity` tasks are pending is dropped, never
@@ -59,4 +58,3 @@ package final class SerialTelemetryDispatcher: TelemetryDispatcher, @unchecked S
         pending -= 1
     }
 }
-#endif

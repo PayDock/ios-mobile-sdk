@@ -145,28 +145,67 @@ SERVICE_ID_ZIP=your_gateway_id_zip
 *   `ExampleApp Production`
 4.  **Run the App:** Click the "Run" button (gray play icon) in Xcode to build and run the sample app on a simulator or a connected device.
 
-## Telemetry (debug builds)
+## Telemetry
 
-A debug build of the sample app on the sandbox environment can send the SDK's telemetry to devdock, and its
-**Config → Telemetry triggers** screen raises each kind of record on demand. A release build holds neither the screen
-nor any telemetry I/O, and a merchant app is unchanged. Details of the records: `PaydockTelemetry/README.md`.
+From 4.10.0 the SDK sends its own diagnostics, in every build of every app, debug and release, when it is configured
+for the **sandbox** or **staging** environment: crashes in the app (marked when they come from the SDK), the SDK's own
+errors, the failed attempts of its Paydock API requests and the widgets a session opens. Records carry codes, types
+and a random per-install ID, never card data, message text, request or response bodies, headers or real IDs. They go
+to Paydock's dev collector over HTTPS, gzipped, with no credential: the SDK holds no key. **Production** sends
+nothing. Details of the records: `PaydockTelemetry/README.md`.
 
-### Scheme set-up
+There is nothing to set up and no API change: `configureMobileSDK` is unchanged, and telemetry never throws, never
+blocks your app and never changes a result the SDK delivers to you. A crash handler you install is chained and always
+called.
+
+### Privacy
+
+- **App Store privacy labels**: declare **Crash Data** and **Other Diagnostic Data**, not linked to the user, not used
+  for tracking.
+- **Privacy manifests**: the SDK ships two, which Xcode merges into your app's privacy report: the telemetry target's
+  (`PaydockTelemetry/Sources/PaydockTelemetry/Resources/PrivacyInfo.xcprivacy`: no tracking; crash data and other
+  diagnostic data, not linked, not tracking, for app functionality; the required-reason APIs UserDefaults `CA92.1`,
+  for the installation ID, and system boot time `35F9.1`, for the monotonic clock) and the BIN-processing target's
+  (`BinProcessing/Sources/BinProcessing/Resources/PrivacyInfo.xcprivacy`: no tracking, no collected data, UserDefaults
+  `CA92.1` for its cache).
+
+### For Paydock engineers: the local override
+
+A debug build of a Paydock app (bundle ID `com.paydock.*`) can point telemetry at another endpoint, such as the
+devdock gateway, and set its level. The variables are read only there: a release build holds neither the keys nor the
+reading, and a merchant's app ignores them, debug or not. The sample app's **Config → Telemetry triggers** screen
+(debug builds only) raises each kind of record on demand.
 
 Duplicate the `ExampleApp Sandbox` scheme as an **unshared** copy (Product → Scheme → Manage Schemes, untick
 *Shared*, so it lands in the gitignored `xcuserdata/`) and add the variables under Run → Arguments → Environment
 Variables. Values come from the telemetry gateway's owner; never put them in a shared scheme, a config file or a
 commit.
 
-- `PAYDOCK_TELEMETRY_OTLP_ENDPOINT`: the telemetry gateway's OTLP endpoint (required).
-- `PAYDOCK_TELEMETRY_OTLP_AUTH`: its authorization (required).
-- `PAYDOCK_TELEMETRY_LEVEL`: `off`, `errors` or `all` (optional, default `all`).
+- `PAYDOCK_TELEMETRY_OTLP_ENDPOINT`: an OTLP logs endpoint (optional). When set it wins in every environment,
+  production included.
+- `PAYDOCK_TELEMETRY_OTLP_AUTH`: its authorization (optional). When empty, no `Authorization` header is sent.
+- `PAYDOCK_TELEMETRY_LEVEL`: `off`, `errors` or `all` (optional, default `all`). It applies even without an endpoint,
+  so `off` silences the collector in a Paydock debug app.
 - `PAYDOCK_TELEMETRY_SEND_TEST_RECORD` = `true`: store and send one test record right after start (optional).
 - `PAYDOCK_TELEMETRY_TEST_CRASH` = `true`: raise a test crash from SDK code 3 s after start (optional; ends the
   process).
 - `EXAMPLE_APP_TEST_CRASH` = `true`: raise a test crash from app code 3 s after launch (optional; ends the process).
 
-Without the first two, telemetry stays inactive and the triggers record nothing.
+Without an endpoint, sandbox and staging send to the dev collector and production sends nothing. Test processes (the
+Xcode test runner and hosted unit tests) always bind the no-op: a test that calls `configureMobileSDK` starts no
+runtime and creates no telemetry directory.
+
+The release configuration has its own tests, `TelemetryReleaseTests`, which skip in a debug run:
+
+```bash
+xcodebuild test -scheme MobileSDK -configuration Release ENABLE_TESTABILITY=YES \
+  -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:MobileSDKTests/TelemetryReleaseTests \
+  -collect-test-diagnostics never -skipPackagePluginValidation -derivedDataPath .build/DerivedData-release-tests
+```
+
+Its collector case (`testBindTelemetry_WithTheOverrideVariables_BindsTheCollector`) binds as an app outside a test
+process would, so it starts a real runtime in the Release test process: it creates the `paydock_telemetry` directory
+under the test process's Application Support and may send to the dev collector.
 
 ### Triggers
 
@@ -184,9 +223,10 @@ Without the first two, telemetry stays inactive and the triggers record nothing.
 | Offline | `paydock.network.failure`, a connection failure: the same call on a closed loopback port; two records (attempts 1 and 2) |
 
 Timeout and offline point the SDK at a stand-in host for that one call only and restore the API host afterwards; a
-debug build accepts the two stand-ins, a release build never does. The SDK's own test crash has no button: set
-`PAYDOCK_TELEMETRY_TEST_CRASH`. Uncaught errors have no trigger; the SDK's tests cover them. The screen also lists the
-names of the config IDs that are empty in the current `*.xcconfig`, never their values.
+debug build accepts the two stand-ins, a release build never does, and a release build of the sample app has no
+triggers screen. The SDK's own test crash has no button: set `PAYDOCK_TELEMETRY_TEST_CRASH`. Uncaught errors have no
+trigger; the SDK's tests cover them. The screen also lists the names of the config IDs that are empty in the current
+`*.xcconfig`, never their values.
 
 ### The hang (manual)
 

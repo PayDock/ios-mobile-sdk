@@ -166,7 +166,8 @@ let package = Package(
             dependencies: [],
             path: "BinProcessing/Sources/BinProcessing",
             resources: [
-                .copy("Resources/JSON/card-schemes.json")
+                .copy("Resources/JSON/card-schemes.json"),
+                .copy("Resources/PrivacyInfo.xcprivacy")
             ]
         ),
         .testTarget(
@@ -181,7 +182,8 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkingLib", package: "ios-core-networking")
             ],
-            path: "PaydockTelemetry/Sources/PaydockTelemetry"
+            path: "PaydockTelemetry/Sources/PaydockTelemetry",
+            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "PaydockTelemetryTests",

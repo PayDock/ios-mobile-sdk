@@ -13,8 +13,11 @@ import XCTest
 final class TelemetrySeamTests: XCTestCase {
 
     /// Repo-relative paths of the files allowed to name the lifecycle types: only the activation binding (MD-33),
-    /// which keeps the runtime to itself and hands SDK code the facade.
-    private static let lifecycleAllowlist: Set<String> = ["Sources/MobileSDK/Telemetry/TelemetryBinding.swift"]
+    /// which keeps the runtime to itself and hands SDK code the facade, and the debug override it reads the level from.
+    private static let lifecycleAllowlist: Set<String> = [
+        "Sources/MobileSDK/Telemetry/TelemetryBinding.swift",
+        "Sources/MobileSDK/Telemetry/LocalTelemetryOverride.swift"
+    ]
 
     private static let lifecycleNames = makeRegex(#"\b(TelemetryRuntime|NoOpTelemetry|TelemetryIntent|TelemetryLevel)\b"#)
     private static let anyImport = makeRegex(#"^\s*(?:@\w+\s+)*import\s+(?:\w+\s+)?PaydockTelemetry\b"#)

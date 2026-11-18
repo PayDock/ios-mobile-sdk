@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// `<directory>/state/frame-points.json` and `<directory>/state/crash-marker.json`, JSON, written atomically
@@ -130,4 +129,3 @@ package final class FileStateStore: TelemetryStateStore, @unchecked Sendable {
         return body()
     }
 }
-#endif

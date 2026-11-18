@@ -4,7 +4,7 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG && canImport(Network)
+#if canImport(Network)
 import Foundation
 import Network
 

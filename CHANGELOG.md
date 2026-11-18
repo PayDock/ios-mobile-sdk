@@ -12,6 +12,14 @@
 - `MobileSDK.shared.loadedClientSdkVersion`: the Client SDK version the most recent widget page reported after loading
   (e.g. `"v1.150.2"`), also printed in debug builds. `nil` until a page has reported one, e.g. with a Client SDK
   release that does not report its version.
+- Telemetry is on in sandbox and staging, in debug and release builds: the SDK sends its own crashes, errors, failed
+  Paydock API request attempts and widget usage to Paydock's dev collector, with no credential and never card data,
+  message text, bodies, headers or real IDs. Production sends nothing. Nothing to set up and no API change; telemetry
+  never throws, never blocks and never changes a result. In App Store Connect, declare Crash Data and Other Diagnostic
+  Data, not linked to the user, not used for tracking (see README, Telemetry).
+- Privacy manifests (`PrivacyInfo.xcprivacy`) for the telemetry and BIN-processing targets: no tracking; crash data
+  and other diagnostic data, not linked, not tracking, for app functionality; the required-reason APIs UserDefaults
+  (`CA92.1`) and system boot time (`35F9.1`).
 
 ### Changed
 - The Mobile SDK no longer compiles an exact Client SDK version in. It supports the Client SDK line `v1.150` and,
@@ -21,6 +29,9 @@
 - `ClickToPayWidget` and `MPGS3DSWidget` end with `webViewFailed` when the Client SDK script fails to load or loads
   without providing the Client SDK (e.g. the address answers with a page that is not a script), instead of waiting.
   `Standalone3DSWidget` already did for a failed load and now also does when the Client SDK is missing.
+- For Paydock engineers: the `PAYDOCK_TELEMETRY_*` scheme override now works only in a debug build of a Paydock
+  (`com.paydock.*`) app; a merchant's app ignores it, debug or not. Its level applies even without an endpoint, and an
+  empty authorization sends no `Authorization` header.
 
 ### Release
 - A release requires the supported line's aliases: the release pipeline's `check_client_sdk_aliases` job refuses it

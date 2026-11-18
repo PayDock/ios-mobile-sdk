@@ -339,6 +339,8 @@ class PayPalVMTests: XCTestCase {
 
     // MARK: - CapturePayPalPayment Tests
 
+    #if DEBUG
+    /// Debug only: it sets the token through the debug-only `test_setToken`.
     func testCapturePayPalPaymentSuccess() {
         // Given
         let expectation = XCTestExpectation(description: "Capture payment success")
@@ -382,6 +384,7 @@ class PayPalVMTests: XCTestCase {
             XCTFail("Expected success result, got: \(String(describing: completionResult))")
         }
     }
+    #endif
 
     func testCapturePayPalPaymentWithEmptyToken() {
         // Given

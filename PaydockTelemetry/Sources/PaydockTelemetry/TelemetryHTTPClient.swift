@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import NetworkingLib
 
@@ -23,4 +22,3 @@ package struct TelemetryHTTPClient: HTTPClient {
         session = URLSession(configuration: configuration)
     }
 }
-#endif

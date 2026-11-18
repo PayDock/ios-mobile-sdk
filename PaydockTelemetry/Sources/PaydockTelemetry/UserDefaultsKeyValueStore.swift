@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// The key-value store backed by `UserDefaults`, the only file allowed to use it (D16).
@@ -23,4 +22,3 @@ package struct UserDefaultsKeyValueStore: KeyValueStore, @unchecked Sendable {
         defaults.set(value, forKey: key)
     }
 }
-#endif

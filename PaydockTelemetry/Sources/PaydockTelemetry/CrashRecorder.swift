@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// R_04, R_05, R_07, on the calling (crashing) thread: resolves `exception.callStackReturnAddresses` (at most 64),
@@ -89,4 +88,3 @@ package final class CrashRecorder: CrashRecording, @unchecked Sendable {
         return name
     }
 }
-#endif

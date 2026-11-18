@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import NetworkingLib
 import PaydockTelemetry
@@ -167,7 +166,13 @@ final class ActiveTelemetryTests: XCTestCase {
 
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
+        #if DEBUG
         telemetry.sendTestRecord()
+        #else
+        for index in 1..<TelemetryLimits.flushThreshold {
+            telemetry.report(distinct(index))
+        }
+        #endif
         waitUntil { transport.calls.count == 1 }
         drain(serial)
 
@@ -189,7 +194,9 @@ final class ActiveTelemetryTests: XCTestCase {
         let telemetry = makeTelemetry()
 
         telemetry.report(TelemetryFixtures.crash())
+        #if DEBUG
         telemetry.sendTestRecord()
+        #endif
         dispatcher.runDelayed()
         XCTAssertEqual(lifecycle.registerCount, 0)
         XCTAssertEqual(connection.startCount, 0)
@@ -270,6 +277,7 @@ final class ActiveTelemetryTests: XCTestCase {
         XCTAssertEqual(store.saved, [late])
     }
 
+    #if DEBUG
     /// R_16: the test record is stored and sent, an SDK error with the test code.
     func testSendTestRecord_StoresAndSendsARecordWithTheTestCode() throws {
         let exporter = ScriptedExporter()
@@ -289,6 +297,7 @@ final class ActiveTelemetryTests: XCTestCase {
         XCTAssertEqual(exporter.batchIds, [[saved.id]])
         XCTAssertEqual(store.count(), 0)
     }
+    #endif
 
     /// MD-36 acceptance: every batch carries the installation ID and every record its session ID.
     func testEveryBatch_CarriesTheInstallationId_AndEveryRecordItsSessionId() {
@@ -330,7 +339,11 @@ final class ActiveTelemetryTests: XCTestCase {
         for index in 26...50 {
             telemetry.report(distinct(index))
         }
+        #if DEBUG
         telemetry.sendTestRecord()
+        #else
+        telemetry.report(distinct(51))
+        #endif
         dispatcher.runDelayed()
 
         XCTAssertEqual(transport.calls.count, 1)
@@ -585,4 +598,3 @@ final class ActiveTelemetryTests: XCTestCase {
         XCTAssertTrue(condition(), "the condition did not hold within \(timeout) s")
     }
 }
-#endif

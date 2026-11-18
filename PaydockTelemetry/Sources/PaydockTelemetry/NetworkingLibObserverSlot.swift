@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import NetworkingLib
 
 /// `NetworkingLib.shared.requestObserver`.
@@ -19,4 +18,3 @@ package struct NetworkingLibObserverSlot: RequestObserverSlot {
         NetworkingLib.shared.requestObserver = observer
     }
 }
-#endif

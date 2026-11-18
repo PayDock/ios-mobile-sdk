@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// Bound when activation passes. `report` hands the event to the dispatcher and returns; the reducer, the effect
@@ -121,13 +120,6 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             return fresh
         }
     }
-
-    /// The test record's `paydock.error.code` (R_16).
-    package static let testRecordCode = "TelemetryTestRecord"
-    /// The test record's `exception.type`.
-    package static let testRecordType = "PaydockTelemetry.TelemetryTestRecord"
-    /// The debug test crash's exception name (R_13).
-    package static let testCrashName = "PaydockTelemetryTestCrash"
 
     package let credentials: TelemetryCredentials
     package let level: TelemetryLevel
@@ -277,19 +269,6 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         }
     }
 
-    /// Stores and sends one test record, an SDK error with the test code (R_16).
-    package func sendTestRecord() {
-        let event = TelemetryEvent.sdkError(error: TelemetryEvent.ErrorInfo(type: Self.testRecordType, frames: []),
-                                            errorCode: Self.testRecordCode)
-        dispatcher.post { [self] in dispatch(.reported(event)) }
-        post(.flush(.debugSend), after: 0)
-    }
-
-    /// R_13: raises a test Objective-C exception from SDK code on the main thread after testCrashDelayMilliseconds.
-    package func raiseTestCrash() {
-        scheduleOnMain(TelemetryLimits.testCrashDelayMilliseconds) { Self.raiseTestException() }
-    }
-
     /// For tests.
     package func currentState() -> TelemetryState {
         lock.lock()
@@ -345,11 +324,6 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         }
     }
 
-    /// A non-nil reason: CoreFoundation crashes on a nil one before any handler runs.
-    private static func raiseTestException() {
-        NSException(name: NSExceptionName(testCrashName), reason: "test", userInfo: nil).raise()
-    }
-
     private static func platformDiagnostics() -> any DiagnosticSource {
         #if os(iOS) && canImport(MetricKit)
         MetricKitDiagnosticSource()
@@ -372,6 +346,35 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         #else
         NoOpConnectionMonitor()
         #endif
+    }
+}
+
+#if DEBUG
+/// The debug-only test hooks: compiled only in debug builds, so a release binary can't raise the test crash.
+extension ActiveTelemetry: TelemetryDebugHooks {
+    /// The test record's `paydock.error.code` (R_16).
+    package static let testRecordCode = "TelemetryTestRecord"
+    /// The test record's `exception.type`.
+    package static let testRecordType = "PaydockTelemetry.TelemetryTestRecord"
+    /// The debug test crash's exception name (R_13).
+    package static let testCrashName = "PaydockTelemetryTestCrash"
+
+    /// Stores and sends one test record, an SDK error with the test code (R_16).
+    package func sendTestRecord() {
+        let event = TelemetryEvent.sdkError(error: TelemetryEvent.ErrorInfo(type: Self.testRecordType, frames: []),
+                                            errorCode: Self.testRecordCode)
+        dispatcher.post { [self] in dispatch(.reported(event)) }
+        post(.flush(.debugSend), after: 0)
+    }
+
+    /// R_13: raises a test Objective-C exception from SDK code on the main thread after testCrashDelayMilliseconds.
+    package func raiseTestCrash() {
+        scheduleOnMain(TelemetryLimits.testCrashDelayMilliseconds) { Self.raiseTestException() }
+    }
+
+    /// A non-nil reason: CoreFoundation crashes on a nil one before any handler runs.
+    private static func raiseTestException() {
+        NSException(name: NSExceptionName(testCrashName), reason: "test", userInfo: nil).raise()
     }
 }
 #endif

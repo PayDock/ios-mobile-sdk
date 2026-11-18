@@ -5,6 +5,7 @@
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 /// Where telemetry is sent and the authorization header value. Never prints or reflects the authorization.
+/// `authorization` may be empty: no Authorization header is then sent (R_05). Descriptions still redact it.
 package struct TelemetryCredentials: Sendable, Equatable, CustomStringConvertible, CustomDebugStringConvertible,
     CustomReflectable {
     package let endpoint: String

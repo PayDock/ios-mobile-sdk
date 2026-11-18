@@ -18,35 +18,86 @@ enum TelemetryBinding {
     /// The facade SDK code reads: `NoOpTelemetry` until `bind`.
     static var current: any Telemetry { lock.withLock { bound } }
 
-    /// Selects and binds at `configureMobileSDK`. A release build always binds the no-op (D14).
+    /// Selects and binds at `configureMobileSDK`, in every build. A test process (`TelemetryTestHost.isTestProcess`)
+    /// binds the no-op and creates nothing (R_14). Otherwise the credentials come from the environment's collector
+    /// (R_01) or, in a debug build of a Paydock app only, the local override (R_03); the level is the override's when an
+    /// override exists, with or without an endpoint (R_04), else `.all`. In a debug build with the override, its test
+    /// record and test crash flags pass to `bind`.
     @discardableResult
-    static func bindTelemetry(environment: SDKEnvironment) -> any Telemetry {
+    static func bindTelemetry(
+        environment: SDKEnvironment,
+        processEnvironment: [String: String] = ProcessInfo.processInfo.environment,
+        hostBundleIdentifier: String? = Bundle.main.bundleIdentifier
+    ) -> any Telemetry {
+        if TelemetryTestHost.isTestProcess(environment: processEnvironment, bundleIdentifier: hostBundleIdentifier) {
+            return bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
+        }
+        let createActive: (TelemetryCredentials, TelemetryLevel) -> ActiveTelemetry = {
+            ActiveTelemetry.create(credentials: $0, level: $1, sdkVersion: SDKVersion.current,
+                                   environmentName: environment.rawValue)
+        }
         #if DEBUG
-        let env = ProcessInfo.processInfo.environment
+        let override = LocalTelemetryOverride.read(environment: processEnvironment,
+                                                   hostBundleIdentifier: hostBundleIdentifier)
         let selection = selectTelemetry(
-            credentialsProvider: EnvironmentCredentialsProvider(environment: env),
-            sdkEnvironment: environment,
-            level: TelemetryLevel.parse(env[EnvironmentCredentialsProvider.levelKey]),
-            hostBundleIdentifier: Bundle.main.bundleIdentifier,
-            createActive: {
-                ActiveTelemetry.create(credentials: $0, level: $1, sdkVersion: SDKVersion.current,
-                                       environmentName: environment.rawValue)
-            }
+            credentialsProvider: SdkTelemetryCredentialsProvider(environment: environment, override: override),
+            level: level(for: override),
+            createActive: createActive
         )
-        return bind(selection, sendTestRecord: env[EnvironmentCredentialsProvider.sendTestRecordKey]?.lowercased() == "true",
-                    raiseTestCrash: env[EnvironmentCredentialsProvider.testCrashKey]?.lowercased() == "true")
+        return bind(selection, sendTestRecord: override?.sendTestRecord ?? false,
+                    raiseTestCrash: override?.raiseTestCrash ?? false)
         #else
-        return bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
+        let selection = selectTelemetry(
+            credentialsProvider: SdkTelemetryCredentialsProvider(environment: environment),
+            level: .all,
+            createActive: createActive
+        )
+        return bind(selection)
         #endif
     }
 
+    #if DEBUG
+    /// The override's level when an override exists (a Paydock debug app), with or without an endpoint; else `.all`.
+    static func level(for override: LocalTelemetryOverride?) -> TelemetryLevel {
+        override?.level ?? .all
+    }
+
     /// Makes `selection.telemetry` the facade, then calls `selection.runtime.start()` once if it is active, and after
-    /// it `selection.runtime.sendTestRecord()` when active and `sendTestRecord` is set (R_16), then
-    /// `selection.runtime.raiseTestCrash()` when active and `raiseTestCrash` is set (R_13). While an active facade
-    /// is bound, another active selection is ignored and the bound facade returned: one runtime owns the store's
-    /// directory for the process, so a second `configureMobileSDK` never starts a second one sending the same files.
+    /// it the runtime's debug hooks: `sendTestRecord()` when active and `sendTestRecord` is set (R_16), then
+    /// `raiseTestCrash()` when active and `raiseTestCrash` is set (R_13). While an active facade is bound, another
+    /// active selection is ignored and the bound facade returned: one runtime owns the store's directory for the
+    /// process, so a second `configureMobileSDK` never starts a second one sending the same files.
     @discardableResult
     static func bind(_ selection: TelemetrySelection, sendTestRecord: Bool = false, raiseTestCrash: Bool = false) -> any Telemetry {
+        let outcome = install(selection)
+        if let kept = outcome.kept {
+            return kept
+        }
+        if outcome.started {
+            let hooks = selection.runtime as? any TelemetryDebugHooks
+            if sendTestRecord {
+                hooks?.sendTestRecord()
+            }
+            if raiseTestCrash {
+                hooks?.raiseTestCrash()
+            }
+        }
+        return selection.telemetry
+    }
+    #else
+    /// Makes `selection.telemetry` the facade, then calls `selection.runtime.start()` once if it is active. While an
+    /// active facade is bound, another active selection is ignored and the bound facade returned: one runtime owns the
+    /// store's directory for the process, so a second `configureMobileSDK` never starts a second one sending the same
+    /// files.
+    @discardableResult
+    static func bind(_ selection: TelemetrySelection) -> any Telemetry {
+        install(selection).kept ?? selection.telemetry
+    }
+    #endif
+
+    /// Binds `selection` unless an active facade is bound and `selection` is active too, and then starts the runtime
+    /// when it is active. `kept` is the bound facade when the selection was ignored.
+    private static func install(_ selection: TelemetrySelection) -> (kept: (any Telemetry)?, started: Bool) {
         let kept: (any Telemetry)? = lock.withLock {
             if selection.telemetry.isActive, bound.isActive {
                 return bound
@@ -55,18 +106,13 @@ enum TelemetryBinding {
             return nil
         }
         if let kept {
-            return kept
+            return (kept, false)
         }
         if selection.telemetry.isActive {
             selection.runtime.start()
-            if sendTestRecord {
-                selection.runtime.sendTestRecord()
-            }
-            if raiseTestCrash {
-                selection.runtime.raiseTestCrash()
-            }
+            return (nil, true)
         }
-        return selection.telemetry
+        return (nil, false)
     }
 
     private static let lock = NSLock()
@@ -78,54 +124,18 @@ extension MobileSDK {
     var telemetry: any Telemetry { TelemetryBinding.current }
 }
 
-#if DEBUG
-/// Reads the local scheme's variables (spec § 8). Compiled only in debug builds (D14).
-struct EnvironmentCredentialsProvider: TelemetryCredentialsProvider {
-    static let endpointKey = "PAYDOCK_TELEMETRY_OTLP_ENDPOINT"
-    static let authorizationKey = "PAYDOCK_TELEMETRY_OTLP_AUTH"
-    static let levelKey = "PAYDOCK_TELEMETRY_LEVEL"
-    /// `true` (any case) makes an active runtime store and send one test record right after start (R_16).
-    static let sendTestRecordKey = "PAYDOCK_TELEMETRY_SEND_TEST_RECORD"
-    /// `true` (any case) makes an active runtime raise a test Objective-C exception from SDK code on the main thread
-    /// 3 s after start (R_13).
-    static let testCrashKey = "PAYDOCK_TELEMETRY_TEST_CRASH"
-
-    let environment: [String: String]
-
-    /// Nil when the trimmed endpoint or authorization is empty or absent.
-    func credentials() -> TelemetryCredentials? {
-        guard
-            let endpoint = environment[Self.endpointKey]?.trimmingCharacters(in: .whitespacesAndNewlines),
-            let authorization = environment[Self.authorizationKey]?.trimmingCharacters(in: .whitespacesAndNewlines),
-            !endpoint.isEmpty,
-            !authorization.isEmpty
-        else {
-            return nil
-        }
-        return TelemetryCredentials(endpoint: endpoint, authorization: authorization)
-    }
-}
-
-/// The decision with every input injectable: one `ActiveTelemetry` as both handles when active, else `NoOpTelemetry()`.
-/// `createActive` is called only when the decision passes, so nothing is created or written while inactive.
+/// The decision with every input injectable, in every build: one `ActiveTelemetry` as both handles when
+/// `TelemetryActivation.isActive(credentials:level:)`, else `NoOpTelemetry()`. `createActive` is called only when
+/// active, so nothing is created or written while inactive.
 func selectTelemetry(
     credentialsProvider: any TelemetryCredentialsProvider,
-    sdkEnvironment: SDKEnvironment,
     level: TelemetryLevel,
-    hostBundleIdentifier: String?,
     createActive: (TelemetryCredentials, TelemetryLevel) -> ActiveTelemetry
 ) -> TelemetrySelection {
     let credentials = credentialsProvider.credentials()
-    let isActive = TelemetryActivation.isActive(
-        credentials: credentials,
-        isSandbox: sdkEnvironment == .sandbox,
-        level: level,
-        hostBundleIdentifier: hostBundleIdentifier
-    )
-    guard isActive, let credentials else {
+    guard TelemetryActivation.isActive(credentials: credentials, level: level), let credentials else {
         return TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry())
     }
     let active = createActive(credentials, level)
     return TelemetrySelection(telemetry: active, runtime: active)
 }
-#endif

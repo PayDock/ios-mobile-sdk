@@ -4,7 +4,7 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG && canImport(UIKit)
+#if canImport(UIKit)
 import Foundation
 import UIKit
 

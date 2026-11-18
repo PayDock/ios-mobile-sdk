@@ -22,6 +22,16 @@ final class RequiredReasonApiTests: XCTestCase {
     private static let fileManager = "FileManager"
     private static let fileManagerFiles: Set<String> = ["FileDurableStore.swift", "FileStateStore.swift"]
     private static let monotonicClock = "clock_gettime_nsec_np"
+    /// An API name used ⇒ its category and reason declared in `PrivacyInfo.xcprivacy`.
+    private struct DeclarationRule {
+        let name: String
+        let category: String
+        let reason: String
+    }
+    private static let declarationRules = [
+        DeclarationRule(name: userDefaults, category: "NSPrivacyAccessedAPICategoryUserDefaults", reason: "CA92.1"),
+        DeclarationRule(name: monotonicClock, category: "NSPrivacyAccessedAPICategorySystemBootTime", reason: "35F9.1")
+    ]
 
     func testSources_UseNoOtherRequiredReasonApi() throws {
         for file in try SourceScan.sourceFiles() {
@@ -66,7 +76,7 @@ final class RequiredReasonApiTests: XCTestCase {
         XCTAssertEqual(storesUsingIt, Self.fileManagerFiles, "a file store was not found or no longer uses FileManager")
     }
 
-    /// The monotonic clock is not on Apple's required-reason list, so it stays allowed.
+    /// The monotonic clock stays allowed: the privacy manifest declares it as system boot time (35F9.1).
     func testTheMonotonicClock_IsAllowed() throws {
         XCTAssertFalse(Self.forbidden.contains { SourceScan.matches($0, "clock_gettime_nsec_np(CLOCK_MONOTONIC)") })
         let uses = try SourceScan.sourceFiles().filter { file in
@@ -74,6 +84,22 @@ final class RequiredReasonApiTests: XCTestCase {
             return !SourceScan.findings(in: text, file: file.lastPathComponent, names: [Self.monotonicClock]).isEmpty
         }
         XCTAssertEqual(uses.map(\.lastPathComponent), ["SystemMonotonicClock.swift"])
+    }
+
+    /// R_10: an API the sources use is declared in the privacy manifest with its reason: `UserDefaults` ⇒ UserDefaults
+    /// with CA92.1, `clock_gettime_nsec_np` ⇒ SystemBootTime (35F9.1 declared, the clock being boot-relative).
+    func testEveryRequiredReasonApiUsed_IsDeclaredInThePrivacyManifest() throws {
+        let declared = PrivacyManifest.accessedApiReasons(try PrivacyManifest.packaged())
+        for rule in Self.declarationRules {
+            let users = try SourceScan.sourceFiles().filter { file in
+                let text = try String(contentsOf: file, encoding: .utf8)
+                return !SourceScan.findings(in: text, file: file.lastPathComponent, names: [rule.name]).isEmpty
+            }
+            if !users.isEmpty {
+                XCTAssertTrue(declared[rule.category]?.contains(rule.reason) ?? false,
+                              "\(rule.name) is used but \(rule.category) \(rule.reason) is not declared")
+            }
+        }
     }
 
     /// The frame classifier reads the loaded image through dyld and `dladdr`, which are not on Apple's list.

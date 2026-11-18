@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import NetworkingLib
 
@@ -172,4 +171,3 @@ package final class OtlpHttpTransport: TelemetryTransport, @unchecked Sendable {
         return client
     }
 }
-#endif

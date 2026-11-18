@@ -36,6 +36,20 @@ final class OtlpExporterTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(transport.calls.first).headers["Authorization"], "Basic c3ludGhldGlj")
     }
 
+    /// R_05: an empty or blank authorization sends exactly the content-encoding and content-type headers.
+    func testEmptyOrBlankAuthorization_SendsExactlyTheTwoHeaders() throws {
+        for authorization in ["", " ", "\t\n "] {
+            let transport = RecordingTransport()
+            let credentials = TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: authorization)
+
+            _ = OtlpExporter(transport: transport, credentials: credentials).export(batch)
+
+            XCTAssertEqual(try XCTUnwrap(transport.calls.first).headers,
+                           ["Content-Encoding": "gzip", "Content-Type": "application/json"],
+                           "authorization: \(authorization.debugDescription)")
+        }
+    }
+
     func testPartialSuccess_PassesTheRejectedCount() {
         XCTAssertEqual(result(.success(status: 200, rejectedRecords: 3)), .success(rejectedRecords: 3))
     }

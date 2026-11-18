@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import PaydockTelemetry
 import XCTest
@@ -118,7 +117,9 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         let telemetry = makeTelemetry(dispatcher: serial)
 
         telemetry.report(TelemetryFixtures.crash())
+        #if DEBUG
         telemetry.sendTestRecord()
+        #endif
         XCTAssertFalse(chain.isInstalled)
         XCTAssertEqual(slot.setCount, 0)
 
@@ -310,6 +311,7 @@ final class ActiveTelemetryCrashTests: XCTestCase {
 
     // MARK: - The test crash
 
+    #if DEBUG
     func testRaiseTestCrash_PostsToTheMainQueueAfter3s() {
         let scheduler = RecordingScheduler()
         let telemetry = makeTelemetry(scheduleOnMain: { scheduler.schedule($0, $1) })
@@ -321,6 +323,7 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         XCTAssertEqual(dispatcher.delayedMilliseconds, [], "the test crash went through the telemetry queue")
         XCTAssertEqual(ActiveTelemetry.testCrashName, "PaydockTelemetryTestCrash")
     }
+    #endif
 
     func testTheMainQueueScheduler_RunsTheTaskOnTheMainThread() {
         let ran = expectation(description: "the task ran")
@@ -402,4 +405,3 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         wait(for: [done], timeout: 5)
     }
 }
-#endif

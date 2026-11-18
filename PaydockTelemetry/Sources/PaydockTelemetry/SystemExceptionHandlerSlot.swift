@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// The process's slot: `NSGetUncaughtExceptionHandler` and `NSSetUncaughtExceptionHandler`.
@@ -19,4 +18,3 @@ package struct SystemExceptionHandlerSlot: ExceptionHandlerSlot {
         NSSetUncaughtExceptionHandler(handler)
     }
 }
-#endif

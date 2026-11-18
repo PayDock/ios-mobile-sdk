@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 
 /// `clock_gettime_nsec_np(CLOCK_MONOTONIC)` in milliseconds: counts during sleep, and is not a boot-time
@@ -16,4 +15,3 @@ package struct SystemMonotonicClock: MonotonicClock {
         Int64(clock_gettime_nsec_np(CLOCK_MONOTONIC) / 1_000_000)
     }
 }
-#endif

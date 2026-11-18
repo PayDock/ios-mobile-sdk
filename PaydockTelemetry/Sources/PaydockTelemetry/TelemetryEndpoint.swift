@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import NetworkingLib
 
@@ -36,4 +35,3 @@ package struct TelemetryEndpoint: Endpoint {
         self.body = body
     }
 }
-#endif

@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import PaydockTelemetry
 import XCTest
@@ -420,4 +419,3 @@ final class FileDurableStoreTests: XCTestCase {
         ((try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []).sorted()
     }
 }
-#endif

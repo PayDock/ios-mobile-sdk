@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import PaydockTelemetry
 import XCTest
@@ -278,4 +277,3 @@ final class ExceptionHandlerChainTests: XCTestCase {
         unsafeBitCast(lhs, to: UnsafeRawPointer.self) == unsafeBitCast(rhs, to: UnsafeRawPointer.self)
     }
 }
-#endif

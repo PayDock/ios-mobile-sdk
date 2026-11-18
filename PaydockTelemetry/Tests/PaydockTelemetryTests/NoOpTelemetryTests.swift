@@ -68,6 +68,7 @@ final class NoOpTelemetryTests: XCTestCase {
         XCTAssertFalse(telemetry.isActive)
     }
 
+    #if DEBUG
     func testSendTestRecord_DoesNothing() {
         let telemetry = NoOpTelemetry()
 
@@ -88,6 +89,7 @@ final class NoOpTelemetryTests: XCTestCase {
 
         XCTAssertFalse(telemetry.isActive)
     }
+    #endif
 
     /// R_03, R_15: inactive, no handler is installed: the process's uncaught-exception handler slot is unchanged.
     func testInactive_InstallsNoExceptionHandler() {
@@ -96,8 +98,10 @@ final class NoOpTelemetryTests: XCTestCase {
 
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
+        #if DEBUG
         telemetry.sendTestRecord()
         telemetry.raiseTestCrash()
+        #endif
 
         XCTAssertEqual(Self.handlerAddress(), before)
     }
@@ -110,8 +114,10 @@ final class NoOpTelemetryTests: XCTestCase {
 
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
+        #if DEBUG
         telemetry.sendTestRecord()
         telemetry.raiseTestCrash()
+        #endif
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: applicationSupport.child("paydock_telemetry").path))
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.url.path), [])

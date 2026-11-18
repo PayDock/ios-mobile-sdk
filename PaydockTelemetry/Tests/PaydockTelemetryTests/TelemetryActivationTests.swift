@@ -8,63 +8,47 @@ import Foundation
 import PaydockTelemetry
 import XCTest
 
+/// R_02: active with a non-blank endpoint and a level other than off.
 final class TelemetryActivationTests: XCTestCase {
 
     private static let credentials = TelemetryCredentials(
         endpoint: "https://otlp.invalid/v1/logs",
         authorization: "synthetic-not-a-credential"
     )
-    private static let paydockHost = "com.paydock.multitenant.sandbox"
-    private static let merchantHost = "com.merchant.shop"
 
-    func testTruthTable_IsActiveOnlyWhenEveryConditionHolds() {
+    func testTwoInputTable_IsActiveOnlyWithCredentialsAndALevelOtherThanOff() {
         var rows = 0
         for credentials in [Self.credentials, nil] {
-            for isSandbox in [true, false] {
-                for level in [TelemetryLevel.all, .off] {
-                    for host in [Self.paydockHost, Self.merchantHost] {
-                        let expected = credentials != nil && isSandbox && level == .all && host == Self.paydockHost
-                        let actual = TelemetryActivation.isActive(
-                            credentials: credentials,
-                            isSandbox: isSandbox,
-                            level: level,
-                            hostBundleIdentifier: host
-                        )
-                        XCTAssertEqual(
-                            actual,
-                            expected,
-                            "credentials: \(credentials != nil), sandbox: \(isSandbox), level: \(level), host: \(host)"
-                        )
-                        rows += 1
-                    }
-                }
+            for level in [TelemetryLevel.all, .errors, .off] {
+                let expected = credentials != nil && level != .off
+                XCTAssertEqual(
+                    TelemetryActivation.isActive(credentials: credentials, level: level),
+                    expected,
+                    "credentials: \(credentials != nil), level: \(level)"
+                )
+                rows += 1
             }
         }
-        XCTAssertEqual(rows, 16)
+        XCTAssertEqual(rows, 6)
     }
 
-    func testErrorsLevel_IsActive() {
-        XCTAssertTrue(isActive(level: .errors, host: Self.paydockHost))
+    func testEmptyAuthorization_IsActive() {
+        let credentials = TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: "")
+
+        XCTAssertTrue(TelemetryActivation.isActive(credentials: credentials, level: .all))
     }
 
-    func testNilHost_IsInactive() {
-        XCTAssertFalse(isActive(level: .all, host: nil))
+    func testBlankAuthorization_IsActive() {
+        let credentials = TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: "  \n")
+
+        XCTAssertTrue(TelemetryActivation.isActive(credentials: credentials, level: .errors))
     }
 
-    func testHostThatOnlyStartsLikePaydock_IsInactive() {
-        XCTAssertFalse(isActive(level: .all, host: "com.paydockx.app"))
-    }
+    func testEmptyOrBlankEndpoint_IsInactive() {
+        for endpoint in ["", " ", "\t\n "] {
+            let credentials = TelemetryCredentials(endpoint: endpoint, authorization: "synthetic-not-a-credential")
 
-    func testPaydockHostPrefix() {
-        XCTAssertEqual(TelemetryActivation.paydockHostPrefix, "com.paydock.")
-    }
-
-    private func isActive(level: TelemetryLevel, host: String?) -> Bool {
-        TelemetryActivation.isActive(
-            credentials: Self.credentials,
-            isSandbox: true,
-            level: level,
-            hostBundleIdentifier: host
-        )
+            XCTAssertFalse(TelemetryActivation.isActive(credentials: credentials, level: .all), "endpoint: \(endpoint.debugDescription)")
+        }
     }
 }

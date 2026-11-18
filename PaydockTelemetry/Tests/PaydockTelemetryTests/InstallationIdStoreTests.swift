@@ -52,7 +52,6 @@ final class InstallationIdStoreTests: XCTestCase {
         XCTAssertTrue(backing.contents.isEmpty)
     }
 
-    #if DEBUG
     func testUserDefaultsStore_RoundTripsThroughAThrowawaySuite() throws {
         let suiteName = "com.paydock.telemetry.tests.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
@@ -67,5 +66,4 @@ final class InstallationIdStoreTests: XCTestCase {
         XCTAssertEqual(defaults.string(forKey: InstallationIdStore.key), first)
         XCTAssertNotNil(UUID(uuidString: first))
     }
-    #endif
 }

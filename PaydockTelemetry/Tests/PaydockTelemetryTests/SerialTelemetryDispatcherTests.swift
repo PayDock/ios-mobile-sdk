@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import PaydockTelemetry
 import XCTest
@@ -108,4 +107,3 @@ final class SerialTelemetryDispatcherTests: XCTestCase {
         XCTAssertEqual(log.values, [2])
     }
 }
-#endif

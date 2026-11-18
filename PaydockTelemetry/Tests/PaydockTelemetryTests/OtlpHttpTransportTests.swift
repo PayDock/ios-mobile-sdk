@@ -4,7 +4,6 @@
 //
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
-#if DEBUG
 import Foundation
 import NetworkingLib
 import PaydockTelemetry
@@ -276,4 +275,3 @@ final class OtlpHttpTransportTests: XCTestCase {
         return Allowlist.filter(RecordFactory.create(pending, connection: .wifi))
     }
 }
-#endif
