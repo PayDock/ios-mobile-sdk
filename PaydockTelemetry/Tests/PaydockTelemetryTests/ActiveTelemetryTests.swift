@@ -6,6 +6,7 @@
 
 #if DEBUG
 import Foundation
+import NetworkingLib
 import PaydockTelemetry
 import XCTest
 
@@ -430,6 +431,71 @@ final class ActiveTelemetryTests: XCTestCase {
         XCTAssertTrue(telemetry.currentState().notices.isEmpty)
     }
 
+    // MARK: - Network failures (R_01, R_09)
+
+    /// Start sets one observer, which keeps the earlier one and forwards to it; a failed observed attempt is stored as
+    /// a network failure.
+    func testStart_SetsOneObserver_KeepingThePrevious_AndAFailedAttemptIsStoredAsANetworkFailure() throws {
+        let previous = RecordingRequestObserver()
+        let slot = FakeRequestObserverSlot(previous)
+        let telemetry = makeTelemetry(requestObservers: slot)
+        XCTAssertEqual(slot.setCount, 0, "an observer was set before start")
+
+        telemetry.start()
+
+        XCTAssertEqual(slot.setCount, 1)
+        let observer = try XCTUnwrap(slot.current)
+        XCTAssertFalse(observer === previous)
+        observer.requestDidFinish(NetworkObservations.observation(method: .get, path: "/v1/gateways/63f0c1d2/wallet-config",
+                                                                  statusCode: 503))
+        XCTAssertEqual(previous.observations.count, 1)
+        XCTAssertEqual(store.saved.count, 1)
+        let record = try XCTUnwrap(store.saved.first)
+        XCTAssertEqual(record.eventName, "paydock.network.failure")
+        XCTAssertEqual(record.value("url.template"), .string("/v1/gateways/{id}/wallet-config"))
+        XCTAssertEqual(record.value("paydock.group.key"), .string("http GET /v1/gateways/{id}/wallet-config 503"))
+    }
+
+    /// The telemetry endpoint's host is excluded, a success gives nothing, and both still reach the earlier observer.
+    func testTheObserver_ExcludesTheTelemetryHost_AndIgnoresSuccesses() throws {
+        let previous = RecordingRequestObserver()
+        let slot = FakeRequestObserverSlot(previous)
+        let credentials = TelemetryCredentials(endpoint: "https://api-sandbox.paydock.com/v1/logs",
+                                               authorization: "synthetic-not-a-credential")
+        let telemetry = ActiveTelemetry(credentials: credentials, level: .all, deviceContextProvider: provider, clock: clock,
+                                        monotonic: FixedMonotonicClock(), idGenerator: FixedIdGenerator(id: Self.sessionId),
+                                        dispatcher: dispatcher,
+                                        ports: ActiveTelemetry.Ports(store: store, requestObservers: slot))
+        telemetry.start()
+        let observer = try XCTUnwrap(slot.current)
+
+        observer.requestDidFinish(NetworkObservations.observation(path: "/v1/logs", statusCode: 500))
+        observer.requestDidFinish(NetworkObservations.observation(statusCode: 200))
+
+        XCTAssertEqual(store.saved, [])
+        XCTAssertEqual(previous.observations.count, 2)
+    }
+
+    func testASecondStart_SetsNothing() {
+        let slot = FakeRequestObserverSlot()
+        let telemetry = makeTelemetry(requestObservers: slot)
+
+        telemetry.start()
+        let first = slot.current
+        telemetry.start()
+
+        XCTAssertEqual(slot.setCount, 1)
+        XCTAssertTrue(slot.current === first)
+    }
+
+    func testWithoutASlot_StartRegistersNothing() {
+        let before = NetworkingLib.shared.requestObserver
+
+        makeTelemetry().start()
+
+        XCTAssertTrue(NetworkingLib.shared.requestObserver === before)
+    }
+
     // MARK: - Helpers
 
     /// A recording store whose next prune reports one record lost to the cap when asked, as a full store does when a
@@ -468,7 +534,8 @@ final class ActiveTelemetryTests: XCTestCase {
         exporter: any Exporter = ScriptedExporter(),
         level: TelemetryLevel = .all,
         dispatcher: (any TelemetryDispatcher)? = nil,
-        clockOffset: ClockOffset? = nil
+        clockOffset: ClockOffset? = nil,
+        requestObservers: (any RequestObserverSlot)? = nil
     ) -> ActiveTelemetry {
         ActiveTelemetry(
             credentials: TelemetryFixtures.credentials,
@@ -484,7 +551,8 @@ final class ActiveTelemetryTests: XCTestCase {
                 lifecycle: lifecycle,
                 connection: connection,
                 clockOffset: clockOffset ?? ClockOffset(clock: clock),
-                retryPolicy: RetryPolicy(random: FixedRandom().function)
+                retryPolicy: RetryPolicy(random: FixedRandom().function),
+                requestObservers: requestObservers
             )
         )
     }

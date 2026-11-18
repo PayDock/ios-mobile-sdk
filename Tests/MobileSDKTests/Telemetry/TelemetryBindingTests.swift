@@ -8,6 +8,7 @@
 import Foundation
 import XCTest
 @testable import MobileSDK
+import NetworkingLib
 import PaydockTelemetry
 
 final class TelemetryBindingTests: XCTestCase {
@@ -122,6 +123,34 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(factory.diagnostics.startCount, 0)
         XCTAssertFalse(factory.exceptionHandlers.isInstalled)
         XCTAssertEqual(Self.processHandlerAddress(), handlerBefore)
+    }
+
+    /// R_01: inactive, bound with the real `ActiveTelemetry.create` as the factory, no request observer is set:
+    /// `NetworkingLib.shared.requestObserver` stays nil.
+    func testInactive_Bound_LeavesTheRequestObserverNil() {
+        let observerBefore = NetworkingLib.shared.requestObserver
+        NetworkingLib.shared.requestObserver = nil
+        defer { NetworkingLib.shared.requestObserver = observerBefore }
+        let credentials = TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization)
+        let inactive = [
+            InactiveCondition(provider: StubCredentialsProvider(value: nil)),
+            InactiveCondition(provider: StubCredentialsProvider(value: credentials), environment: .production),
+            InactiveCondition(provider: StubCredentialsProvider(value: credentials), level: .off),
+            InactiveCondition(provider: StubCredentialsProvider(value: credentials), host: Self.merchantHost)
+        ]
+
+        for condition in inactive {
+            let selection = selectTelemetry(
+                credentialsProvider: condition.provider, sdkEnvironment: condition.environment, level: condition.level,
+                hostBundleIdentifier: condition.host,
+                createActive: { ActiveTelemetry.create(credentials: $0, level: $1, sdkVersion: SDKVersion.current,
+                                                       environmentName: condition.environment.rawValue) }
+            )
+            TelemetryBinding.bind(selection)
+            assertNoOp(selection)
+        }
+
+        XCTAssertNil(NetworkingLib.shared.requestObserver)
     }
 
     func testActive_Bound_RegistersTheLifecycleTheMonitorTheHandlerAndTheDiagnosticsOnce() {
@@ -345,6 +374,14 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertTrue(selection.runtime is NoOpTelemetry, file: file, line: line)
         XCTAssertFalse(selection.telemetry.isActive, file: file, line: line)
     }
+}
+
+/// One way to be inactive; every other condition holds.
+private struct InactiveCondition {
+    let provider: any TelemetryCredentialsProvider
+    var environment: SDKEnvironment = .sandbox
+    var level: TelemetryLevel = .all
+    var host: String? = "com.paydock.multitenant.sandbox"
 }
 
 private struct StubCredentialsProvider: TelemetryCredentialsProvider {

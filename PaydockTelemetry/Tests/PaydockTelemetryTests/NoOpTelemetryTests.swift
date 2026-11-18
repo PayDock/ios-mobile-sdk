@@ -5,6 +5,7 @@
 //  Copyright © 2026 Paydock Ltd. All rights reserved.
 
 import Foundation
+import NetworkingLib
 import PaydockTelemetry
 import XCTest
 
@@ -114,6 +115,18 @@ final class NoOpTelemetryTests: XCTestCase {
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: applicationSupport.child("paydock_telemetry").path))
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.url.path), [])
+    }
+
+    /// R_01: inactive, no request observer is set: NetworkingLib's slot is unchanged.
+    func testInactive_SetsNoRequestObserver() {
+        let before = NetworkingLib.shared.requestObserver
+        let telemetry = NoOpTelemetry()
+
+        telemetry.start()
+        telemetry.start()
+        telemetry.report(TelemetryFixtures.networkFailure())
+
+        XCTAssertTrue(NetworkingLib.shared.requestObserver === before)
     }
 
     /// The process's uncaught-exception handler, as an address; nil when there is none.

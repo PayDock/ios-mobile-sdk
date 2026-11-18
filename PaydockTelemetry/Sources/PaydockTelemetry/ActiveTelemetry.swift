@@ -18,6 +18,10 @@ import Foundation
 ///
 /// Crashes (R_03, R_09, R_11): start installs the exception handler chain on the calling thread, then, on the queue,
 /// builds the frame classifier from the SDK's image and the saved ranges before it subscribes to the diagnostics.
+///
+/// Network failures (R_01, R_09): right after the exception handler, still on the calling thread, start registers one
+/// `NetworkFailureObserver` in the request observer slot, keeping the earlier observer and forwarding to it; telemetry's
+/// own endpoint host is excluded.
 package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sendable {
     package struct Ports: Sendable {
         package let store: any DurableStore
@@ -32,6 +36,8 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         /// Nil: no handler is installed.
         package let exceptionHandlers: ExceptionHandlerChain?
         package let resolver: any AddressResolving
+        /// Nil: no request observer is registered.
+        package let requestObservers: (any RequestObserverSlot)?
 
         package init(store: any DurableStore = NoOpDurableStore(), exporter: any Exporter = NoOpExporter(),
                      lifecycle: any AppLifecycle = NoOpAppLifecycle(),
@@ -41,7 +47,8 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
                      imageReader: any SdkImageReading = NoOpSdkImageReader(),
                      diagnostics: any DiagnosticSource = NoOpDiagnosticSource(),
                      exceptionHandlers: ExceptionHandlerChain? = nil,
-                     resolver: any AddressResolving = NoOpAddressResolver()) {
+                     resolver: any AddressResolving = NoOpAddressResolver(),
+                     requestObservers: (any RequestObserverSlot)? = nil) {
             self.store = store
             self.exporter = exporter
             self.lifecycle = lifecycle
@@ -53,6 +60,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             self.diagnostics = diagnostics
             self.exceptionHandlers = exceptionHandlers
             self.resolver = resolver
+            self.requestObservers = requestObservers
         }
     }
 
@@ -209,7 +217,8 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             imageReader: DyldSdkImageReader(),
             diagnostics: platformDiagnostics(),
             exceptionHandlers: ExceptionHandlerChain.shared,
-            resolver: DladdrAddressResolver()
+            resolver: DladdrAddressResolver(),
+            requestObservers: NetworkingLibObserverSlot()
         )
         return ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: provider, ports: ports)
     }
@@ -226,9 +235,10 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         }
     }
 
-    /// Runs once: installs the exception handler chain on the calling thread; then, on the queue, builds the frame
-    /// classifier and subscribes to the diagnostics, builds the device context, starts the connection monitor,
-    /// registers the background flush, counts the stored records and flushes, so records from earlier runs go first.
+    /// Runs once: installs the exception handler chain and registers the network failure observer on the calling
+    /// thread; then, on the queue, builds the frame classifier and subscribes to the diagnostics, builds the device
+    /// context, starts the connection monitor, registers the background flush, counts the stored records and flushes,
+    /// so records from earlier runs go first.
     package func start() {
         lock.lock()
         let isFirst = !started
@@ -242,6 +252,9 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             image: { [image] in image.current }, classifier: classifier, resolver: ports.resolver,
             connection: ports.connection, clock: clock
         ))
+        ports.requestObservers.map { $0.set(NetworkFailureObserver(report: { [weak self] in self?.report($0) },
+                                                                   excludedHost: URL(string: credentials.endpoint)?.host,
+                                                                   previous: $0.current)) }
         dispatcher.post { [self] in
             buildClassifier()
             ports.diagnostics.start { [weak self] diagnostics in

@@ -144,3 +144,70 @@ SERVICE_ID_ZIP=your_gateway_id_zip
 *   `ExampleApp Sandbox`
 *   `ExampleApp Production`
 4.  **Run the App:** Click the "Run" button (gray play icon) in Xcode to build and run the sample app on a simulator or a connected device.
+
+## Telemetry (debug builds)
+
+A debug build of the sample app on the sandbox environment can send the SDK's telemetry to devdock, and its
+**Config → Telemetry triggers** screen raises each kind of record on demand. A release build holds neither the screen
+nor any telemetry I/O, and a merchant app is unchanged. Details of the records: `PaydockTelemetry/README.md`.
+
+### Scheme set-up
+
+Duplicate the `ExampleApp Sandbox` scheme as an **unshared** copy (Product → Scheme → Manage Schemes, untick
+*Shared*, so it lands in the gitignored `xcuserdata/`) and add the variables under Run → Arguments → Environment
+Variables. Values come from the telemetry gateway's owner; never put them in a shared scheme, a config file or a
+commit.
+
+- `PAYDOCK_TELEMETRY_OTLP_ENDPOINT`: the telemetry gateway's OTLP endpoint (required).
+- `PAYDOCK_TELEMETRY_OTLP_AUTH`: its authorization (required).
+- `PAYDOCK_TELEMETRY_LEVEL`: `off`, `errors` or `all` (optional, default `all`).
+- `PAYDOCK_TELEMETRY_SEND_TEST_RECORD` = `true`: store and send one test record right after start (optional).
+- `PAYDOCK_TELEMETRY_TEST_CRASH` = `true`: raise a test crash from SDK code 3 s after start (optional; ends the
+  process).
+- `EXAMPLE_APP_TEST_CRASH` = `true`: raise a test crash from app code 3 s after launch (optional; ends the process).
+
+Without the first two, telemetry stays inactive and the triggers record nothing.
+
+### Triggers
+
+**Config → Telemetry triggers** (debug builds only) runs one trigger at a time and shows only the result's type name:
+
+| Trigger | Records |
+|---|---|
+| App crash | `paydock.crash`, kind `exception`, `ExampleAppTestCrash` from app code, `in_sdk` false; ends the process, the record is sent on the next launch |
+| Hang | `paydock.crash`, kind `hang`, from MetricKit (see below) |
+| SDK error | `paydock.error`: the standalone 3DS widget opened with an empty token |
+| Widget opened | `paydock.widget.opened`: the Apple Pay set-up widget |
+| HTTP 4xx | `paydock.network.failure`: GET `/v1/gateways/{id}/wallet-config` with a blank token and the fake gateway ID `telemetry-test-gateway` |
+| HTTP 5xx | `paydock.network.failure`: the same call with an obviously malformed token |
+| Timeout | `paydock.network.failure`, `error_type` `timeout`: the same call on a non-routable stand-in host; the call is retried once, so two records (attempts 1 and 2), after about two minutes |
+| Offline | `paydock.network.failure`, a connection failure: the same call on a closed loopback port; two records (attempts 1 and 2) |
+
+Timeout and offline point the SDK at a stand-in host for that one call only and restore the API host afterwards; a
+debug build accepts the two stand-ins, a release build never does. The SDK's own test crash has no button: set
+`PAYDOCK_TELEMETRY_TEST_CRASH`. Uncaught errors have no trigger; the SDK's tests cover them. The screen also lists the
+names of the config IDs that are empty in the current `*.xcconfig`, never their values.
+
+### The hang (manual)
+
+1. Run a debug build with the scheme above **on a device**: the simulator delivers no MetricKit payloads.
+2. Tap **Hang**: it blocks the main thread for 5 s.
+3. Keep the app installed and open it again the next day: MetricKit delivers the hang diagnostic about a day later, and
+   the SDK records it on that launch.
+
+### Devdock queries
+
+In Grafana Explore on the devdock Loki data source:
+
+```
+{service_name="paydock-mobile-sdk"} | app_installation_id="<id>"
+{service_name="paydock-mobile-sdk"} | session_id="<id>"
+{service_name="paydock-mobile-sdk"} | event_name="paydock.network.failure" | error_type="timeout"
+```
+
+Per record type, add one of: `| event_name="paydock.crash"`, `| event_name="paydock.error"`,
+`| event_name="paydock.network.failure"`, `| event_name="paydock.widget.opened"`,
+`| event_name="paydock.telemetry.dropped"`.
+
+The attribute names follow Loki's OTLP mapping (dots become underscores) and are to be confirmed at the first devdock
+run.

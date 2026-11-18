@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D7E1A0012F00000000000011 /* TelemetryTrigger.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E1A0012F00000000000001 /* TelemetryTrigger.swift */; };
+		D7E1A0012F00000000000012 /* TelemetryTriggersVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E1A0012F00000000000002 /* TelemetryTriggersVM.swift */; };
+		D7E1A0012F00000000000013 /* TelemetryTriggersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E1A0012F00000000000003 /* TelemetryTriggersView.swift */; };
 		2808B3422A7056F100E86C7E /* CardDetailsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808B3412A7056F100E86C7E /* CardDetailsExampleView.swift */; };
 		280E96322B176ED000BE8C3E /* Standalone3DSExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96312B176ED000BE8C3E /* Standalone3DSExampleView.swift */; };
 		280E96342B176FD600BE8C3E /* Standalone3DSExampleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 280E96332B176FD600BE8C3E /* Standalone3DSExampleVM.swift */; };
@@ -187,6 +190,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D7E1A0012F00000000000001 /* TelemetryTrigger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryTrigger.swift; sourceTree = "<group>"; };
+		D7E1A0012F00000000000002 /* TelemetryTriggersVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryTriggersVM.swift; sourceTree = "<group>"; };
+		D7E1A0012F00000000000003 /* TelemetryTriggersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryTriggersView.swift; sourceTree = "<group>"; };
 		2808B3412A7056F100E86C7E /* CardDetailsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailsExampleView.swift; sourceTree = "<group>"; };
 		280CD6742C189640004C8788 /* Sandbox.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Sandbox.xcconfig; sourceTree = "<group>"; };
 		280CD6752C189653004C8788 /* Staging.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Staging.xcconfig; sourceTree = "<group>"; };
@@ -384,6 +390,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D7E1A0012F00000000000020 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				D7E1A0012F00000000000001 /* TelemetryTrigger.swift */,
+				D7E1A0012F00000000000002 /* TelemetryTriggersVM.swift */,
+				D7E1A0012F00000000000003 /* TelemetryTriggersView.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
 		2808B3402A7056E300E86C7E /* CardDetails */ = {
 			isa = PBXGroup;
 			children = (
@@ -428,6 +444,7 @@
 				282D315C2A66A64900E3ECAD /* Widgets */,
 				282D31612A66B7F600E3ECAD /* Style */,
 				58D3D0DA2E8DA3190059584D /* Config */,
+				D7E1A0012F00000000000020 /* Debug */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -1254,6 +1271,9 @@
 				58D3D0DD2E8DA3190059584D /* ConfigCheckoutOptionsView.swift in Sources */,
 				58D3D0DE2E8DA3190059584D /* ConfigTextFieldView.swift in Sources */,
 				58D3D0DF2E8DA3190059584D /* ConfigWidgetListView.swift in Sources */,
+				D7E1A0012F00000000000011 /* TelemetryTrigger.swift in Sources */,
+				D7E1A0012F00000000000012 /* TelemetryTriggersVM.swift in Sources */,
+				D7E1A0012F00000000000013 /* TelemetryTriggersView.swift in Sources */,
 				58D3D0E12E8DA3190059584D /* ConfigToggleView.swift in Sources */,
 				58D3D0E22E8DA3190059584D /* ConfigWidgetItem.swift in Sources */,
 				581E29EC2FC493C1004E325A /* OverlayLoaderStyleView.swift in Sources */,

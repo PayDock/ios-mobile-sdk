@@ -96,6 +96,46 @@ and a failure inside telemetry loses the record, never the merchant's result.
 before its delivery, no `Task` outside `SdkTask`, no message text in the telemetry files, and one usage report per
 widget.
 
+## Network failures
+
+When active, the SDK records every failed attempt of a Paydock API request as one `paydock.network.failure` record
+(spec § 5.4). A release build and a merchant app are unchanged: the observer, its library slot and the stand-in hosts
+are compiled only in debug builds, and `NoOpTelemetry` registers nothing.
+
+- **The observer**: `start` registers one `NetworkFailureObserver` in `NetworkingLib.shared.requestObserver`
+  (through `NetworkingLibObserverSlot`), on the calling thread, once per process. NetworkingLib calls it once per
+  attempt, on the task that ran it. It forwards the observation to the observer it replaced first, then maps it with
+  the pure `NetworkFailureFacts.event` and hands any event to the facade's `report`: it never blocks, never runs the
+  reducer on the caller's thread and never changes the request. A retried connection failure gives one record per
+  attempt (`attempt` 1, 2, …), so a timeout on the two retried calls (the wallet callback and the wallet config) gives
+  two. A cancellation, a 2xx and an observation without a known method give none.
+- **The failure** (`error.type`): a non-2xx status is `http_4xx` or `http_5xx` with the status, its group key and
+  the API's structured codes from the error body (`ApiErrorBody`: `status`, `error.code`, `error_summary.code` and the
+  gateway-specific codes); a 2xx that fails to decode is `decode` with its status; a URL error is a transport failure
+  whose kind (`timeout`, `connection`, `tls`, `unknown`) comes from its code (`NetworkFailureFacts.transportKind`). A
+  decode or transport failure's `exception.type` is its `RequestError` case or its `NSError` domain and code, with
+  causes and no frames.
+- **The templates**: `RouteTemplates` maps the real path to one of the eight § 5.4 templates, string for string with
+  Android (`/v1/payment_sources/tokens`, `/v1/payment_sources/external_checkout`, `/v1/payment_sources/setup-tokens`,
+  `/v1/payment_sources/setup-tokens/{id}/tokens`, `/v1/charges/wallet/capture`, `/v1/charges/wallet/{id}/decline`,
+  `/v1/charges/wallet/callback`, `/v1/gateways/{id}/wallet-config`), after dropping the query and fragment; an empty
+  ID segment still becomes `{id}`. A path outside the eight keeps only template literals and version segments, every
+  other segment becomes `{id}`. `EndpointTemplateTests` in `MobileSDKTests` builds every SDK endpoint case and checks
+  each maps to its template.
+- **The hosts**: only the three API hosts (`NetworkFailureFacts.apiHosts`: `api.paydock.com`,
+  `api-sandbox.paydock.com`, `apista.paydock.com`, the hosts `Constants.baseURL` gives each `SDKEnvironment`,
+  `ApiHostsTests`) are reported, in every build. A debug build also accepts the two `DebugStandInHosts` the example
+  app's timeout and offline triggers point the SDK at for one call; a release binary holds neither address. Telemetry's
+  own endpoint host is excluded, so the exporter's requests never loop back as records; other traffic (BIN data, web
+  views, the PayPal and Afterpay SDKs) never passes through NetworkingLib.
+- **What is never sent**: the real path (its IDs), the query, the request or response body, a header, the error body's
+  messages and descriptions, an error message or user info value, and a decode failure's field path. The record
+  carries the method, the template, the host, the status or transport kind, the attempt and the API codes only; the
+  allowlist checks the template and the group key shapes. Tests plant card-like, email-like and token-like values in
+  each and check that none reaches a record.
+
+A failed request also sends no SDK error (the request rule above), so it is recorded once (`NetworkFailureOnceTests`).
+
 ## Crashes
 
 When active, the SDK records every crash in the app and marks the SDK's own with `paydock.exception.in_sdk`. A release

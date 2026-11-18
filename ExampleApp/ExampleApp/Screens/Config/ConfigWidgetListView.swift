@@ -54,6 +54,14 @@ struct ConfigWidgetListView: View {
                     stylizedNavigationLink(item: item, destination: item.destination(viewModel: viewModel))
                 }
 
+                #if DEBUG
+                NavigationLink(destination: TelemetryTriggersView()) {
+                    cell(icon: Image(systemName: "ant"), title: "Telemetry triggers")
+                }
+                .listRowSeparatorTint(.black)
+                .listRowBackground(Color(hex: "#EAE0D7"))
+                #endif
+
                 VStack(alignment: .center, spacing: 4) {
                     Text(appVersionString)
                         .font(.caption)
