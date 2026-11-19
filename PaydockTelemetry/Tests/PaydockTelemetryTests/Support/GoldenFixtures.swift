@@ -61,6 +61,9 @@ enum GoldenFixtures {
         let apiError: APIErrorInput?
         let attempt: Int?
         let count: Int?
+        let paymentId: String?
+        let outcome: String?
+        let durationMs: Int64?
     }
 
     /// A class, so an error can hold its cause.
@@ -210,6 +213,16 @@ enum GoldenFixtures {
             return try networkFailure(event)
         case "WidgetOpened":
             return .widgetOpened(widget: try required(event.widget, "widget"))
+        case "PaymentStarted":
+            return .paymentStarted(widget: try required(event.widget, "widget"), paymentId: try required(event.paymentId, "paymentId"))
+        case "PaymentFinished":
+            return .paymentFinished(
+                widget: try required(event.widget, "widget"),
+                paymentId: try required(event.paymentId, "paymentId"),
+                outcome: try required(TelemetryEvent.PaymentOutcome(rawValue: event.outcome ?? ""), "outcome"),
+                errorCode: event.code,
+                durationMs: event.durationMs
+            )
         case "Dropped":
             return .dropped(reason: try required(TelemetryEvent.DroppedReason(rawValue: event.reason ?? ""), "dropped reason"),
                             count: try required(event.count, "count"))

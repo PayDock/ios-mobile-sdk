@@ -34,6 +34,8 @@ public struct Standalone3DSWidget: UIViewRepresentable {
     private let base64Decoder: Base64Decoder = Base64Decoder()
     private let onProgress: ((Standalone3DSProgress) -> Void)?
     private let completion: (Result<Standalone3DSResult, Standalone3DSError>) -> Void
+    /// Whether the token decodes as a standalone 3DS token; `makeUIView` starts no payment attempt otherwise (D24).
+    private let hasValidToken: Bool
 
     /// Creates a Standalone 3DS widget.
     /// - Parameters:
@@ -55,19 +57,26 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         self.loadingDelegate = loadingDelegate
         self.onProgress = onProgress
         self.completion = completion
+        self.hasValidToken = Self.isValidToken(config.token, decoder: base64Decoder)
 
         validateToken()
     }
 
     /// The invalid tokens already reported in this process.
     private static let invalidTokenReports = ReportOnce()
+    /// The invalid tokens already recorded as failed payment attempts in this process (D24).
+    static let invalidTokenPayments = ReportOnce()
+
+    private static func isValidToken(_ token: String, decoder: Base64Decoder) -> Bool {
+        decoder.decodeBase64(token, to: Decoded3DSToken.self)?.format == .standalone3ds
+    }
 
     private func validateToken() {
-        guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
-              decodedToken.format == .standalone3ds else {
+        guard hasValidToken else {
             let failure = Standalone3DSError.invalidToken
             // `init` runs again on every redraw of the parent view: the same token is reported once per process.
             SdkTelemetry.reportSdkError(failure, widget: .standalone3ds, once: (Self.invalidTokenReports, config.token))
+            SdkTelemetry.recordFailedPayment(.standalone3ds, error: failure, once: (Self.invalidTokenPayments, config.token))
             completion(.failure(failure))
             return
         }
@@ -75,6 +84,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> UIView {
         SdkTelemetry.reportWidgetOpened(.standalone3ds)
+        if hasValidToken { context.coordinator.payment = SdkTelemetry.startPayment(.standalone3ds) }
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -159,6 +169,8 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         /// Set once the page can no longer progress (its process was terminated or the Client SDK script failed):
         /// the failure is reported once and the page is never loaded again.
         private(set) var hasEnded = false
+        /// The open payment attempt (D24), from `makeUIView` until the flow's final outcome or failure.
+        var payment: PaymentAttempt?
 
         init(completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void,
              loadingDelegate: WidgetLoadingDelegate? = nil,
@@ -210,6 +222,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                 notifyLoadingFinish()
                 let failure = Standalone3DSError.mappingFailed
                 SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 completion(.failure(failure))
                 return
             }
@@ -265,12 +278,14 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                 completion(.success(result(charge3dsId ?? lastCharge3dsId ?? "")))
             case .chargeError:
                 notifyLoadingFinish()
+                SdkTelemetry.finishPayment(&payment, .failedWithCode("CHARGE_ERROR"))
                 completion(.success(result(charge3dsId ?? lastCharge3dsId ?? "")))
             case .chargeAuthChallenge, .chargeAuthDecoupled, .chargeAuthSuccess, .chargeAuthReject:
                 guard let charge3dsId else {
                     notifyLoadingFinish()
                     let failure = Standalone3DSError.mappingFailed
                     SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+                    SdkTelemetry.finishPayment(&payment, .failed(failure))
                     completion(.failure(failure))
                     return
                 }
@@ -286,6 +301,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                     onProgress?(.decoupled(charge3dsId: charge3dsId, description: details.rawDescription))
                 default:
                     notifyLoadingFinish()
+                    SdkTelemetry.finishPayment(&payment, event == .chargeAuthSuccess ? .success : .declined)
                     completion(.success(result(charge3dsId)))
                 }
             }
@@ -306,6 +322,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             notifyLoadingFinish()
             let failure = Standalone3DSError.webViewFailed(error: withContext(nsError))
             SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         }
 
@@ -327,6 +344,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             notifyLoadingFinish()
             let failure = Standalone3DSError.webViewFailed(error: withContext(error))
             SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         }
 
@@ -363,6 +381,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             notifyLoadingFinish()
             let failure = Standalone3DSError.webViewFailed(error: withContext(nsError))
             SdkTelemetry.reportSdkError(failure, widget: .standalone3ds)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         }
 

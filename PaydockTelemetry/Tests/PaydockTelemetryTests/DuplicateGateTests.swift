@@ -88,6 +88,22 @@ final class DuplicateGateTests: XCTestCase {
         XCTAssertEqual(DuplicateGate.merge(notices).map(\.record), notices)
     }
 
+    func testIdenticalPaymentRecords_InOneSession_NeverMerge() {
+        let paymentId = "2c7d9a05-6e18-4b3f-9d42-8a1f5e0c7b63"
+        let started = TelemetryEvent.paymentStarted(widget: "Standalone3DSWidget", paymentId: paymentId)
+        let finished = TelemetryEvent.paymentFinished(widget: "Standalone3DSWidget", paymentId: paymentId, outcome: .declined,
+                                                      durationMs: 18_342)
+        let records = [built(1, started), built(2, started), built(3, finished), built(4, finished)]
+
+        let merged = DuplicateGate.merge(records)
+
+        XCTAssertNil(DuplicateGate.signature(records[0]))
+        XCTAssertNil(DuplicateGate.signature(records[2]))
+        XCTAssertEqual(merged.map(\.record), records)
+        XCTAssertEqual(merged.map(\.sourceIds), records.map { [$0.id] })
+        XCTAssertTrue(merged.allSatisfy { $0.record.value("paydock.occurrences") == nil })
+    }
+
     func testARecordWithoutASessionId_IsNeverMerged() {
         let records = [1, 2].map { sequence in
             let record = built(sequence, TelemetryFixtures.sdkError())

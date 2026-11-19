@@ -116,6 +116,9 @@ final class ReportSiteResolverTests: XCTestCase {
             TelemetryFixtures.crash(),
             TelemetryFixtures.networkFailure(),
             .widgetOpened(widget: "CardDetailsWidget"),
+            .paymentStarted(widget: "CardDetailsWidget", paymentId: "e4a1c8b7-3f29-4d06-b5e8-7c2d9f1a0b34"),
+            .paymentFinished(widget: "CardDetailsWidget", paymentId: "e4a1c8b7-3f29-4d06-b5e8-7c2d9f1a0b34", outcome: .error,
+                             errorCode: "CARD_TOKENISE_ERROR", durationMs: 2_215),
             .dropped(reason: .rateLimit, count: 2)
         ]
 

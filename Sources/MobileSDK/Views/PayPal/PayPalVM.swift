@@ -28,6 +28,8 @@ class PayPalVM: ObservableObject {
     @Published var showLoaders = true
     var viewState: ViewState
     private var token = ""
+    /// The open payment attempt (D24), from the button tap until the checkout's end.
+    var payment: PaymentAttempt?
 
     // MARK: - Handlers
 
@@ -62,6 +64,7 @@ class PayPalVM: ObservableObject {
     // MARK: - Prepare for checkout
 
     func handleButtonTap() {
+        payment = SdkTelemetry.startPayment(.payPal)
         updateLoadingState(isLoading: true)
         tokenRequest { [weak self] result in
             SdkTask.run(widget: .payPal) {
@@ -74,6 +77,7 @@ class PayPalVM: ObservableObject {
                     self?.updateLoadingState(isLoading: false)
                     let tokenFailure = PayPalError.initialisingWalletToken(reason: failure.customMessage)
                     SdkTelemetry.reportSdkError(tokenFailure, widget: .payPal)
+                    if let self { SdkTelemetry.finishPayment(&self.payment, .failed(tokenFailure)) }
                     self?.completion(.failure(tokenFailure))
                 }
             }
@@ -98,6 +102,7 @@ class PayPalVM: ObservableObject {
             guard UIApplication.shared.applicationState == .active else {
                 // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
                 SdkTelemetry.reportSdkError(PayPalError.userCancelled, widget: .payPal)
+                SdkTelemetry.finishPayment(&payment, .cancelled)
                 completion(.failure(.userCancelled))
                 return
             }
@@ -124,12 +129,14 @@ class PayPalVM: ObservableObject {
             updateLoadingState(isLoading: false)
             let failure = PayPalError.errorFetchingOrderId(error: errorResponse)
             SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             self.completion(.failure(failure))
 
         } catch {
             updateLoadingState(isLoading: false)
             let failure = PayPalError.unknownError(error as? RequestError)
             SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             self.completion(.failure(failure))
         }
         return nil
@@ -143,12 +150,14 @@ class PayPalVM: ObservableObject {
         } catch let RequestError.requestError(errorResponse: errorResponse) {
             let failure = PayPalError.getPayPalClientId(error: errorResponse)
             SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
             updateLoadingState(isLoading: false)
 
         } catch {
             let failure = PayPalError.unknownError(error as? RequestError)
             SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
             updateLoadingState(isLoading: false)
         }
@@ -160,6 +169,7 @@ class PayPalVM: ObservableObject {
     func capturePayPalPayment(paymentMethodId: String, payerId: String) {
         guard !token.isEmpty else {
             SdkTelemetry.reportSdkError(PayPalError.unknownError(nil), widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(PayPalError.unknownError(nil)))
             completion(.failure(.unknownError(nil)))
             updateLoadingState(isLoading: false)
             return
@@ -177,18 +187,21 @@ class PayPalVM: ObservableObject {
                     currency: walletChargeData.currency
                 )
 
+                SdkTelemetry.finishPayment(&payment, .success)
                 self.completion(.success(chargeResponse))
                 updateLoadingState(isLoading: false)
 
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 let failure = PayPalError.errorCapturingCharge(error: errorResponse)
                 SdkTelemetry.reportSdkError(failure, widget: .payPal)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 self.completion(.failure(failure))
                 updateLoadingState(isLoading: false)
 
             } catch {
                 let failure = PayPalError.unknownError(error as? RequestError)
                 SdkTelemetry.reportSdkError(failure, widget: .payPal)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 self.completion(.failure(failure))
                 updateLoadingState(isLoading: false)
             }
@@ -201,19 +214,22 @@ class PayPalVM: ObservableObject {
         capturePayPalPayment(paymentMethodId: result.orderID, payerId: result.payerID)
     }
 
-    private func handlePayPalError(_ error: Error) {
+    func handlePayPalError(_ error: Error) {
         if PayPalWebPayments.PayPalError.isCheckoutCanceled(error) {
             // An outcome: SdkTelemetry drops it (R_05); the call keeps one per delivery (R_06).
             SdkTelemetry.reportSdkError(PayPalError.userCancelled, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .cancelled)
             completion(.failure(.userCancelled))
         } else if let coreError = error as? CoreSDKError {
             let errorDescription = coreError.errorDescription ?? ""
             let failure = PayPalError.sdkException(description: errorDescription)
             SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         } else {
             let failure = PayPalError.unknownError(error as? RequestError)
             SdkTelemetry.reportSdkError(failure, widget: .payPal)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         }
 

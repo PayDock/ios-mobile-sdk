@@ -15,6 +15,8 @@ public struct MPGS3DSWidget: UIViewRepresentable {
     private let appearance: MPG3dsWidgetAppearance
     private let completion: (Result<MPGS3dsResult, MPGS3dsError>) -> Void
     private let base64Decoder: Base64Decoder = Base64Decoder()
+    /// Whether the token decodes as an MPGS 3DS token; `makeUIView` starts no payment attempt otherwise (D24).
+    private let hasValidToken: Bool
 
     public init(config: ThreeDSConfig,
                 appearance: MPG3dsWidgetAppearance = MPG3dsWidgetAppearance(),
@@ -22,19 +24,29 @@ public struct MPGS3DSWidget: UIViewRepresentable {
         self.config = config
         self.appearance = appearance
         self.completion = completion
+        self.hasValidToken = Self.isValidToken(config.token, decoder: base64Decoder)
 
         validateToken()
     }
 
     /// The invalid tokens already reported in this process.
     private static let invalidTokenReports = ReportOnce()
+    /// The invalid tokens already recorded as failed payment attempts in this process (D24).
+    static let invalidTokenPayments = ReportOnce()
+
+    private static func isValidToken(_ token: String, decoder: Base64Decoder) -> Bool {
+        guard let decodedToken = decoder.decodeBase64(token, to: Decoded3DSToken.self) else {
+            return false
+        }
+        return decodedToken.format == .html || decodedToken.format == .url
+    }
 
     private func validateToken() {
-        guard let decodedToken = base64Decoder.decodeBase64(config.token, to: Decoded3DSToken.self),
-              decodedToken.format == .html || decodedToken.format == .url else {
+        guard hasValidToken else {
             let failure = MPGS3dsError.invalidToken
             // `init` runs again on every redraw of the parent view: the same token is reported once per process.
             SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds, once: (Self.invalidTokenReports, config.token))
+            SdkTelemetry.recordFailedPayment(.mpgs3ds, error: failure, once: (Self.invalidTokenPayments, config.token))
             completion(.failure(failure))
             return
         }
@@ -42,6 +54,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> UIView {
         SdkTelemetry.reportWidgetOpened(.mpgs3ds)
+        if hasValidToken { context.coordinator.payment = SdkTelemetry.startPayment(.mpgs3ds) }
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -113,6 +126,8 @@ public struct MPGS3DSWidget: UIViewRepresentable {
         var activityIndicator: UIActivityIndicatorView?  // Store a reference to the activity indicator
         private let clientSdkHost: String?
         private var clientSdkLoadFailureReported = false
+        /// The open payment attempt (D24), from `makeUIView` until the flow's final outcome or failure.
+        var payment: PaymentAttempt?
 
         init(completion: @escaping (Result<MPGS3dsResult, MPGS3dsError>) -> Void,
              clientSdkHost: String? = nil) {
@@ -133,6 +148,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
                 activityIndicator?.stopAnimating()
                 let failure = MPGS3dsError.webViewFailed(error: ClientSdkPage.loadFailedError(host: clientSdkHost))
                 SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 completion(.failure(failure))
                 return
             }
@@ -143,13 +159,26 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             else {
                 let failure = MPGS3dsError.mappingFailed
                 SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 completion(.failure(failure))
                 return
             }
             let statusRaw = data["status"] as? String
             _ = MPGS3dsStatus(rawValue: statusRaw ?? "") // Not used currently
 
+            if let end = Self.paymentEnd(of: event) { SdkTelemetry.finishPayment(&payment, end) }
             completion(.success(MPGS3dsResult(event: event, charge3dsId: token)))
+        }
+
+        /// The payment attempt's end for a final event (D24); nil for `chargeAuth` and `additionalDataCollectSuccess`,
+        /// after which the flow goes on.
+        private static func paymentEnd(of event: MPGS3dsResult.EventType) -> PaymentEnd? {
+            switch event {
+            case .chargeAuthSuccess: return .success
+            case .chargeAuthReject, .additionalDataCollectReject: return .declined
+            case .chargeAuthCancelled: return .cancelled
+            case .chargeAuth, .additionalDataCollectSuccess: return nil
+            }
         }
 
         public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -168,6 +197,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             if nsError.isWebViewNavigationCancellation { return }
             let failure = MPGS3dsError.webViewFailed(error: nsError)
             SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         }
 
@@ -190,6 +220,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             if nsError.isWebViewNavigationCancellation { return }
             let failure = MPGS3dsError.webViewFailed(error: nsError)
             SdkTelemetry.reportSdkError(failure, widget: .mpgs3ds)
+            SdkTelemetry.finishPayment(&payment, .failed(failure))
             completion(.failure(failure))
         }
 

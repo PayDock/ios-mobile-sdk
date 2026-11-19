@@ -211,7 +211,86 @@ final class AllowlistTests: XCTestCase {
         XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: [base]), [])
     }
 
+    // MARK: - Payments (D24)
+
+    func testThePaymentKeys_EndTheRecordKeys_WithTheirKinds() {
+        XCTAssertEqual(Array(Allowlist.recordKeys.suffix(5)), [
+            "paydock.dropped.reason", "paydock.dropped.count",
+            "paydock.payment.id", "paydock.payment.outcome", "paydock.payment.duration_ms"
+        ])
+        XCTAssertEqual(Allowlist.recordKinds["paydock.payment.id"], .string)
+        XCTAssertEqual(Allowlist.recordKinds["paydock.payment.outcome"], .string)
+        XCTAssertEqual(Allowlist.recordKinds["paydock.payment.duration_ms"], .int)
+    }
+
+    func testAPaymentRecord_IsSendable_AndKeptWhole() {
+        let record = payment(outcome: .error, errorCode: "CARD_TOKENISE_ERROR")
+
+        XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: [record]), [])
+        XCTAssertEqual(Allowlist.filter(record), record)
+    }
+
+    func testANonUUIDPaymentId_IsDropped() {
+        for paymentId in ["not-a-payment", "9b2e4f61-7c3a-4d58-a1e9", "9b2e4f617c3a4d58a1e93f0d6b8c2a17", ""] {
+            let record = payment(outcome: .success).with("paydock.payment.id", .string(paymentId))
+
+            XCTAssertFalse(Allowlist.violations(resource: sampleResource(), records: [record]).isEmpty, paymentId)
+            XCTAssertNil(Allowlist.filter(record).value("paydock.payment.id"), paymentId)
+        }
+    }
+
+    func testAnUnknownOutcome_IsDropped() {
+        for outcome in ["failed", "SUCCESS", "canceled", ""] {
+            let record = payment(outcome: .success).with("paydock.payment.outcome", .string(outcome))
+
+            XCTAssertFalse(Allowlist.violations(resource: sampleResource(), records: [record]).isEmpty, outcome)
+            let filtered = Allowlist.filter(record)
+            XCTAssertNil(filtered.value("paydock.payment.outcome"), outcome)
+            XCTAssertEqual(filtered.body, "paydock.payment.finished · PayPalWidget", outcome)
+        }
+        for outcome in TelemetryEvent.PaymentOutcome.allCases {
+            let record = payment(outcome: outcome)
+            XCTAssertEqual(Allowlist.filter(record), record, outcome.rawValue)
+        }
+    }
+
+    /// A random UUID can hold an all-digit run whose window passes Luhn: the shape check alone keeps it. The UUID is
+    /// built at run time from the synthetic card number, so no source file holds a Luhn-valid digit run.
+    func testAUUIDWhoseDigitGroupsFormALuhnValidRun_IsKept() {
+        let digitsOnly = allDigitUUID(Samples.cardNumber + String(repeating: "7", count: 16))
+        XCTAssertTrue(Allowlist.isSensitive(digitsOnly), "the card check alone would reject it")
+
+        let record = RecordFactory.create(
+            PendingRecord(id: "\(Samples.sessionId)-6", sessionId: Samples.sessionId,
+                          event: .paymentStarted(widget: "CardDetailsWidget", paymentId: digitsOnly), createdAt: Samples.builtAt),
+            connection: .wifi
+        )
+
+        XCTAssertEqual(record.value("paydock.payment.id"), .string(digitsOnly))
+        XCTAssertEqual(Allowlist.filter(record), record)
+        XCTAssertEqual(Allowlist.violations(resource: sampleResource(), records: [record]), [])
+    }
+
     // MARK: - Helpers
+
+    /// 32 digits grouped 8-4-4-4-12, the UUID shape.
+    private func allDigitUUID(_ digits: String) -> String {
+        precondition(digits.count == 32 && digits.allSatisfy(\.isNumber))
+        var rest = Substring(digits)
+        return [8, 4, 4, 4, 12].map { length -> String in
+            defer { rest = rest.dropFirst(length) }
+            return String(rest.prefix(length))
+        }.joined(separator: "-")
+    }
+
+    /// A finished payment record of `PayPalWidget`, as the factory builds it.
+    private func payment(outcome: TelemetryEvent.PaymentOutcome, errorCode: String? = nil) -> TelemetryRecord {
+        let event = TelemetryEvent.paymentFinished(widget: "PayPalWidget", paymentId: "9b2e4f61-7c3a-4d58-a1e9-3f0d6b8c2a17",
+                                                   outcome: outcome, errorCode: errorCode, durationMs: 41_873)
+        let pending = PendingRecord(id: "\(Samples.sessionId)-5", sessionId: Samples.sessionId, event: event,
+                                    createdAt: Samples.builtAt)
+        return RecordFactory.create(pending, connection: .wifi)
+    }
 
     private var sensitiveValues: [(name: String, value: String)] {
         [

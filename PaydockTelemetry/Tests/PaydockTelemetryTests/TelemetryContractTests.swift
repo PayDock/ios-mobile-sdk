@@ -20,7 +20,7 @@ final class TelemetryContractTests: XCTestCase {
         XCTAssertFalse(rawErrorPaths(in: ("probe", NSError(domain: "SampleDomain", code: 1)), path: "probe").isEmpty)
 
         let events = Self.everyEvent()
-        XCTAssertEqual(Set(events.map(Self.kind)).count, 6)
+        XCTAssertEqual(Set(events.map(Self.kind)).count, 8)
         XCTAssertEqual(Set(Self.everyNetworkError().map(Self.kind)).count, 3)
 
         for event in events {
@@ -96,6 +96,9 @@ final class TelemetryContractTests: XCTestCase {
             .uncaughtException(error: info, threadName: "worker", widget: "SampleWidget"),
             .sdkError(error: info, errorCode: "SAMPLE_CODE", widget: "SampleWidget", apiError: apiError),
             .widgetOpened(widget: "SampleWidget"),
+            .paymentStarted(widget: "SampleWidget", paymentId: "9b2e4f61-7c3a-4d58-a1e9-3f0d6b8c2a17"),
+            .paymentFinished(widget: "SampleWidget", paymentId: "9b2e4f61-7c3a-4d58-a1e9-3f0d6b8c2a17", outcome: .error,
+                             errorCode: "SAMPLE_CODE", durationMs: 1_200),
             .dropped(reason: .storeFull, count: 2)
         ]
         let failures: [TelemetryEvent] = everyNetworkError().map { failure in
@@ -120,6 +123,8 @@ final class TelemetryContractTests: XCTestCase {
         case .sdkError: return "sdkError"
         case .networkFailure: return "networkFailure"
         case .widgetOpened: return "widgetOpened"
+        case .paymentStarted: return "paymentStarted"
+        case .paymentFinished: return "paymentFinished"
         case .dropped: return "dropped"
         }
     }

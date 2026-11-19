@@ -26,6 +26,50 @@ extension RecordingTelemetry {
         }
     }
 
+    /// A payment record as the widget tests read it (D24): the widget, the outcome and the error code.
+    enum PaymentReport: Equatable {
+        case started(SdkWidget?)
+        case finished(SdkWidget?, TelemetryEvent.PaymentOutcome, String?)
+    }
+
+    /// Every `.paymentStarted` and `.paymentFinished` reported, in order.
+    var payments: [PaymentReport] {
+        events.compactMap { event in
+            switch event {
+            case let .paymentStarted(widget, _):
+                return .started(SdkWidget(rawValue: widget))
+            case let .paymentFinished(widget, _, outcome, errorCode, _):
+                return .finished(SdkWidget(rawValue: widget), outcome, errorCode)
+            default:
+                return nil
+            }
+        }
+    }
+
+    /// The payment ID of each entry of `payments`, in the same order, to compare the pairing of a start and its
+    /// finish.
+    var paymentIds: [String] {
+        events.compactMap { event in
+            switch event {
+            case let .paymentStarted(_, paymentId), let .paymentFinished(_, paymentId, _, _, _):
+                return paymentId
+            default:
+                return nil
+            }
+        }
+    }
+
+    /// True when the payments are start-finish pairs, each finish with the ID of the start right before it, and every
+    /// pair has its own ID.
+    var paymentsArePaired: Bool {
+        let ids = paymentIds
+        guard ids.count.isMultiple(of: 2) else {
+            return false
+        }
+        let pairs = stride(from: 0, to: ids.count, by: 2).map { (ids[$0], ids[$0 + 1]) }
+        return pairs.allSatisfy { $0.0 == $0.1 } && Set(pairs.map(\.0)).count == pairs.count
+    }
+
     /// Binds this facade as `TelemetryBinding.current`; `RecordingTelemetry.unbind()` rebinds the no-op. Unbinds
     /// first: an active selection never replaces an active facade that is already bound.
     func bindAsCurrent() {

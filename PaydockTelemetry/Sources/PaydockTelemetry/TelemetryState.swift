@@ -23,9 +23,23 @@ package struct TelemetryState: Sendable, Equatable {
     package var notices: [TelemetryEvent.DroppedReason: DroppedNotice] = [:]
     /// Widgets whose opened record was stored this session (D19, R_09).
     package var openedWidgets: Set<String> = []
+    /// Attempts whose started record was stored and that have not finished, oldest first, at most maxOpenPayments.
+    package var openPayments: [OpenPayment] = []
 
     package init(enabled: Bool, sessionId: String) {
         self.enabled = enabled
         self.sessionId = sessionId
+    }
+
+    /// A payment attempt whose started record was stored (D24).
+    package struct OpenPayment: Sendable, Equatable {
+        package let id: String
+        /// Monotonic milliseconds when its started record was created.
+        package let startedAt: Int64
+
+        package init(id: String, startedAt: Int64) {
+            self.id = id
+            self.startedAt = startedAt
+        }
     }
 }

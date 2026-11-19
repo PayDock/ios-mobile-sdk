@@ -8,7 +8,10 @@
 package enum DuplicateGate {
     private static let occurrencesKey = "paydock.occurrences"
     private static let attemptKey = "paydock.http.attempt"
-    private static let noticeName = "paydock.telemetry.dropped"
+    /// Never merged: a notice, and the payment records (each attempt is its own).
+    private static let unmergedNames: Set<String> = [
+        "paydock.telemetry.dropped", "paydock.payment.started", "paydock.payment.finished"
+    ]
 
     private static let commonKeys = ["exception.type", "exception.stacktrace", "paydock.widget"]
     private static let keysByEvent: [String: [String]] = [
@@ -44,9 +47,9 @@ package enum DuplicateGate {
     }
 
     /// `"<session.id>\0<event.name>"`, then `"\0<key>=<value>"` for each signature key present, in order; nil for a
-    /// notice or a record without `session.id`, which are never merged.
+    /// notice, a payment record or a record without `session.id`, which are never merged.
     package static func signature(_ record: TelemetryRecord) -> String? {
-        guard let sessionId = record.sessionId, record.eventName != noticeName else {
+        guard let sessionId = record.sessionId, !unmergedNames.contains(record.eventName ?? "") else {
             return nil
         }
         let name = record.eventName ?? ""

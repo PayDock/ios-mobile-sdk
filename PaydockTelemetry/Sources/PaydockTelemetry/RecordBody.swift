@@ -26,6 +26,10 @@ package enum RecordBody {
             parts = [network(values), request(values)]
         case "paydock.widget.opened":
             parts = [values.text("paydock.widget")]
+        case "paydock.payment.started":
+            parts = [values.text("paydock.widget")]
+        case "paydock.payment.finished":
+            parts = [values.text("paydock.widget"), values.text("paydock.payment.outcome"), values.text("paydock.error.code")]
         case "paydock.telemetry.dropped":
             parts = [values.text("paydock.dropped.reason"), values.text("paydock.dropped.count").map { "\($0) records" }]
         default:

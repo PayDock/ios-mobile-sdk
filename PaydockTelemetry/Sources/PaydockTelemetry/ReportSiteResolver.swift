@@ -20,7 +20,7 @@ package enum ReportSiteResolver {
             let resolved = describe(site, resolver: resolver, image: image, classifier: classifier)
             return .uncaughtException(error: located(error, resolved.frames), threadName: threadName ?? site.threadName,
                                       widget: widget, inSdk: resolved.inSdk)
-        case .crash, .networkFailure, .widgetOpened, .dropped:
+        case .crash, .networkFailure, .widgetOpened, .paymentStarted, .paymentFinished, .dropped:
             return event
         }
     }

@@ -44,8 +44,10 @@ package enum TelemetryReducer {
 
     // MARK: - Intents
 
-    /// The first matching rule: not reportable, disabled, a widget already opened this session; otherwise the hourly
-    /// cap, or a new record (a widget opened is remembered), the threshold export and the timer.
+    /// The first matching rule: not reportable, disabled, a widget already opened this session; a payment finished
+    /// without an open attempt, or else its record with the measured duration and no cap check; otherwise the hourly
+    /// cap, or a new record (a widget opened is remembered, a payment started is opened), the threshold export and the
+    /// timer.
     private static func reported(_ event: TelemetryEvent, _ state: inout TelemetryState, now: Int64, elapsed: Int64,
                                  sequence: RecordSequence) -> [TelemetryEffect] {
         if case .dropped = event {
@@ -57,16 +59,38 @@ package enum TelemetryReducer {
         if case let .widgetOpened(widget) = event, state.openedWidgets.contains(widget) {
             return [.drop(.alreadyOpened)]
         }
+        if case let .paymentFinished(widget, paymentId, outcome, errorCode, _) = event {
+            guard let index = state.openPayments.firstIndex(where: { $0.id == paymentId }) else {
+                return [.drop(.paymentNotOpen)]
+            }
+            let attempt = state.openPayments.remove(at: index)
+            roll(&state, elapsed: elapsed)
+            let finished = TelemetryEvent.paymentFinished(widget: widget, paymentId: paymentId, outcome: outcome,
+                                                          errorCode: errorCode, durationMs: max(0, elapsed - attempt.startedAt))
+            return created(finished, &state, now: now, sequence: sequence)
+        }
 
         roll(&state, elapsed: elapsed)
         if state.createdInWindow >= Limits.hourlyCap {
             return [.drop(.rateLimit)] + notice(.rateLimit, 1, &state, now: now, sequence: sequence) + schedule(&state)
         }
-        let record = PendingRecord(id: newId(state, sequence), sessionId: state.sessionId, event: event, createdAt: now)
-        var effects: [TelemetryEffect] = [.persist(record)]
         if case let .widgetOpened(widget) = event {
             state.openedWidgets.insert(widget)
         }
+        if case let .paymentStarted(_, paymentId) = event {
+            state.openPayments.append(TelemetryState.OpenPayment(id: paymentId, startedAt: elapsed))
+            if state.openPayments.count > Limits.maxOpenPayments {
+                state.openPayments.removeFirst(state.openPayments.count - Limits.maxOpenPayments)
+            }
+        }
+        return created(event, &state, now: now, sequence: sequence)
+    }
+
+    /// A new record: persisted, counted in `pending` and the hour, then the threshold export and the timer.
+    private static func created(_ event: TelemetryEvent, _ state: inout TelemetryState, now: Int64,
+                                sequence: RecordSequence) -> [TelemetryEffect] {
+        let record = PendingRecord(id: newId(state, sequence), sessionId: state.sessionId, event: event, createdAt: now)
+        var effects: [TelemetryEffect] = [.persist(record)]
         state.pending += 1
         state.createdInWindow += 1
         if state.pending >= Limits.flushThreshold {

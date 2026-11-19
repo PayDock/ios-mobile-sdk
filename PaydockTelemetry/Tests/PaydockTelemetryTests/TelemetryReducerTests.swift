@@ -35,6 +35,7 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(Limits.retryMaxDelayMilliseconds, 60_000)
         XCTAssertEqual(Limits.hourlyCap, 400)
         XCTAssertEqual(Limits.hourMilliseconds, 3_600_000)
+        XCTAssertEqual(Limits.maxOpenPayments, 20)
     }
 
     // MARK: - Reported
@@ -316,6 +317,101 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(rolled.state.notices, [:])
     }
 
+    // MARK: - Payments (D24)
+
+    func testAStartThenAFinish_GiveTwoRecords_TheFinishWithTheElapsedDifference() {
+        let started = reduce(initial, .reported(Self.started("payment-a")), now: Self.start, elapsed: 1_000)
+        XCTAssertEqual(started.effects, [.persist(pending(1, Self.started("payment-a"))), Self.scheduleFlush])
+        XCTAssertEqual(started.state.openPayments, [TelemetryState.OpenPayment(id: "payment-a", startedAt: 1_000)])
+
+        let finished = reduce(started.state, .reported(Self.finished("payment-a", outcome: .error, code: "CARD_TOKENISE_ERROR",
+                                                                     durationMs: 7)),
+                              now: Self.start + 41_873, elapsed: 42_873)
+        let expected = Self.finished("payment-a", outcome: .error, code: "CARD_TOKENISE_ERROR", durationMs: 41_873)
+        XCTAssertEqual(finished.effects, [.persist(pending(2, expected, at: Self.start + 41_873))],
+                       "the caller's duration is replaced by the measured one")
+        XCTAssertEqual(finished.state.openPayments, [])
+        XCTAssertEqual(finished.state.pending, 2)
+        XCTAssertEqual(finished.state.createdInWindow, 2)
+    }
+
+    func testAFinishWithoutAStart_IsDropped_AndASecondFinishToo() {
+        let stray = reduce(initial, .reported(Self.finished("payment-a")))
+        XCTAssertEqual(stray.effects, [.drop(.paymentNotOpen)])
+        XCTAssertEqual(stray.state, initial)
+
+        let started = reduce(initial, .reported(Self.started("payment-a"))).state
+        let first = reduce(started, .reported(Self.finished("payment-a")), elapsed: 10)
+        guard case .persist = first.effects.first else {
+            return XCTFail("the first finish was not recorded: \(first.effects)")
+        }
+        let second = reduce(first.state, .reported(Self.finished("payment-a")), elapsed: 20)
+        XCTAssertEqual(second.effects, [.drop(.paymentNotOpen)])
+        XCTAssertEqual(second.state, first.state)
+    }
+
+    func testThe21stOpenAttempt_DropsTheOldest_WhoseFinishIsThenDropped() {
+        var state = initial
+        for index in 1...(Limits.maxOpenPayments + 1) {
+            state = reduce(state, .reported(Self.started("payment-\(index)")), elapsed: Int64(index)).state
+        }
+
+        XCTAssertEqual(state.openPayments.count, Limits.maxOpenPayments)
+        XCTAssertEqual(state.openPayments.map(\.id), (2...(Limits.maxOpenPayments + 1)).map { "payment-\($0)" })
+        XCTAssertEqual(reduce(state, .reported(Self.finished("payment-1")), elapsed: 100).effects, [.drop(.paymentNotOpen)])
+        guard case let .persist(record) = reduce(state, .reported(Self.finished("payment-2")), elapsed: 100).effects.first else {
+            return XCTFail("the second attempt's finish was not recorded")
+        }
+        XCTAssertEqual(record.event, Self.finished("payment-2", durationMs: 98))
+    }
+
+    func testAtTheCap_AStartIsDropped_AndOpensNothing_ButAnEarlierStartsFinish_IsRecordedAndCounted() {
+        var state = reduce(initial, .reported(Self.started("payment-a")), elapsed: 0).state
+        for index in 1..<Limits.hourlyCap {
+            state = reduce(state, .reported(TelemetryFixtures.crash()), elapsed: Int64(index)).state
+        }
+        XCTAssertEqual(state.createdInWindow, Limits.hourlyCap)
+
+        let capped = reduce(state, .reported(Self.started("payment-b")), now: Self.start + 1, elapsed: 1_000)
+        XCTAssertEqual(capped.effects.first, .drop(.rateLimit))
+        XCTAssertEqual(capped.state.openPayments.map(\.id), ["payment-a"], "a capped start opens nothing")
+
+        let finished = reduce(capped.state, .reported(Self.finished("payment-a", outcome: .success)), now: Self.start + 2,
+                              elapsed: 2_000)
+        guard case let .persist(record) = finished.effects.first else {
+            return XCTFail("the finish was capped: \(finished.effects)")
+        }
+        XCTAssertEqual(record.event, Self.finished("payment-a", outcome: .success, durationMs: 2_000))
+        XCTAssertEqual(finished.state.createdInWindow, Limits.hourlyCap + 1)
+        XCTAssertEqual(finished.state.pending, capped.state.pending + 1)
+        XCTAssertEqual(finished.state.openPayments, [])
+
+        let cappedFinish = reduce(finished.state, .reported(Self.finished("payment-b")), elapsed: 3_000)
+        XCTAssertEqual(cappedFinish.effects, [.drop(.paymentNotOpen)])
+    }
+
+    func testDisabled_DropsAStartAndAFinish() {
+        let disabled = TelemetryState(enabled: false, sessionId: "session")
+
+        let started = reduce(disabled, .reported(Self.started("payment-a")))
+        XCTAssertEqual(started.effects, [.drop(.disabled)])
+        XCTAssertEqual(started.state, disabled)
+
+        var withAttempt = disabled
+        withAttempt.openPayments = [TelemetryState.OpenPayment(id: "payment-a", startedAt: 0)]
+        let finished = reduce(withAttempt, .reported(Self.finished("payment-a")), elapsed: 10)
+        XCTAssertEqual(finished.effects, [.drop(.disabled)])
+        XCTAssertEqual(finished.state, withAttempt)
+    }
+
+    func testANegativeElapsedDifference_GivesZero() {
+        let started = reduce(initial, .reported(Self.started("payment-a")), elapsed: 5_000).state
+
+        let finished = reduce(started, .reported(Self.finished("payment-a", durationMs: 300)), elapsed: 1_000)
+
+        XCTAssertEqual(finished.effects.first, .persist(pending(2, Self.finished("payment-a", durationMs: 0))))
+    }
+
     // MARK: - Dropped notices
 
     func testRecordsDropped_CreatesTheNotice_ThenUpdatesIt_AndNoticesSkipTheCap() {
@@ -427,6 +523,15 @@ final class TelemetryReducerTests: XCTestCase {
 
     private func pending(_ sequence: Int, _ event: TelemetryEvent, at createdAt: Int64 = TelemetryReducerTests.start) -> PendingRecord {
         PendingRecord(id: "session-\(sequence)", sessionId: "session", event: event, createdAt: createdAt)
+    }
+
+    private static func started(_ id: String) -> TelemetryEvent {
+        .paymentStarted(widget: "CardDetailsWidget", paymentId: id)
+    }
+
+    private static func finished(_ id: String, outcome: TelemetryEvent.PaymentOutcome = .cancelled, code: String? = nil,
+                                 durationMs: Int64? = nil) -> TelemetryEvent {
+        .paymentFinished(widget: "CardDetailsWidget", paymentId: id, outcome: outcome, errorCode: code, durationMs: durationMs)
     }
 
     private func everyKind() -> [TelemetryEvent] {

@@ -164,6 +164,144 @@ final class SdkTelemetryTests: XCTestCase {
         XCTAssertEqual(telemetry.reports, [RecordingTelemetry.Report(event: .widgetOpened(widget: "MPGS3dsWidget"), site: nil)])
     }
 
+    // MARK: - Payment attempts (D24)
+
+    func testStartPayment_Inactive_IsNil_AndReportsNothing() {
+        let inactive = RecordingTelemetry(isActive: false)
+
+        var attempt = SdkTelemetry.startPayment(.cardDetails, telemetry: inactive)
+        SdkTelemetry.finishPayment(&attempt, .success, telemetry: inactive)
+        SdkTelemetry.recordFailedPayment(.mpgs3ds, error: MPGS3dsError.invalidToken, once: (ReportOnce(), "token"),
+                                         telemetry: inactive)
+
+        XCTAssertNil(attempt)
+        XCTAssertEqual(inactive.reports, [])
+    }
+
+    func testStartPayment_ReportsAStart_WithANewLowercaseUuid_AndNoSite() throws {
+        let attempt = try XCTUnwrap(SdkTelemetry.startPayment(.payPal, telemetry: telemetry))
+        let second = try XCTUnwrap(SdkTelemetry.startPayment(.payPal, telemetry: telemetry))
+
+        XCTAssertEqual(attempt.widget, .payPal)
+        XCTAssertNotNil(UUID(uuidString: attempt.id))
+        XCTAssertEqual(attempt.id, attempt.id.lowercased())
+        XCTAssertNotEqual(attempt.id, second.id)
+        XCTAssertEqual(telemetry.reports.first,
+                       RecordingTelemetry.Report(event: .paymentStarted(widget: "PayPalWidget", paymentId: attempt.id),
+                                                 site: nil))
+    }
+
+    func testFinishPayment_Twice_ReportsOnce_AndClearsTheAttempt() throws {
+        var attempt = SdkTelemetry.startPayment(.applePay, telemetry: telemetry)
+        let id = try XCTUnwrap(attempt?.id)
+
+        SdkTelemetry.finishPayment(&attempt, .success, telemetry: telemetry)
+        SdkTelemetry.finishPayment(&attempt, .cancelled, telemetry: telemetry)
+
+        XCTAssertNil(attempt)
+        XCTAssertEqual(telemetry.events, [
+            .paymentStarted(widget: "ApplePayWidget", paymentId: id),
+            .paymentFinished(widget: "ApplePayWidget", paymentId: id, outcome: .success)
+        ])
+    }
+
+    func testFinishPayment_ANilAttempt_ReportsNothing() {
+        var attempt: PaymentAttempt?
+
+        SdkTelemetry.finishPayment(&attempt, .failed(SilentFailure.cardExpiryUnreadable), telemetry: telemetry)
+
+        XCTAssertEqual(telemetry.reports, [])
+    }
+
+    func testFinishPayment_EachEnd_ReportsItsOutcome() {
+        let ends: [(PaymentEnd, TelemetryEvent.PaymentOutcome)] = [
+            (.success, .success), (.declined, .declined), (.cancelled, .cancelled), (.failed(SampleSwiftError()), .error)
+        ]
+
+        for (end, _) in ends {
+            var attempt = SdkTelemetry.startPayment(.mpgs3ds, telemetry: telemetry)
+            SdkTelemetry.finishPayment(&attempt, end, telemetry: telemetry)
+        }
+
+        XCTAssertEqual(telemetry.payments, ends.flatMap { [.started(.mpgs3ds), .finished(.mpgs3ds, $0.1, nil)] })
+        XCTAssertTrue(telemetry.paymentsArePaired)
+    }
+
+    func testFinishPayment_Failed_CarriesTheErrorsCode_AndAnErrorWithoutOneNone() {
+        let errors: [any Error] = [
+            CardDetailsError.errorTokenisingCard(error: Self.errorRes),
+            CardDetailsError.unknownError(.connectionError(URLError(.timedOut))),
+            SilentFailure.cardExpiryUnreadable,
+            PayPalError.userCancelled,
+            SampleSwiftError()
+        ]
+
+        for error in errors {
+            var attempt = SdkTelemetry.startPayment(.cardDetails, telemetry: telemetry)
+            SdkTelemetry.finishPayment(&attempt, .failed(error), telemetry: telemetry)
+        }
+
+        XCTAssertEqual(telemetry.payments.filter { if case .finished = $0 { return true } else { return false } }, [
+            .finished(.cardDetails, .error, "CARD_TOKENISE_ERROR"),
+            .finished(.cardDetails, .error, "CARD_NETWORK"),
+            .finished(.cardDetails, .error, "CARD_EXPIRY_UNREADABLE"),
+            .finished(.cardDetails, .error, "PAYPAL_USER_CANCELED"),
+            .finished(.cardDetails, .error, nil)
+        ])
+        XCTAssertEqual(telemetry.sdkErrors, [], "a finish is not an SDK error")
+    }
+
+    func testFinishPayment_FailedWithCode_CarriesItsCode() {
+        var attempt = SdkTelemetry.startPayment(.standalone3ds, telemetry: telemetry)
+
+        SdkTelemetry.finishPayment(&attempt, .failedWithCode("CHARGE_ERROR"), telemetry: telemetry)
+
+        XCTAssertNil(attempt)
+        XCTAssertEqual(telemetry.payments, [
+            .started(.standalone3ds), .finished(.standalone3ds, .error, "CHARGE_ERROR")
+        ])
+        XCTAssertTrue(telemetry.paymentsArePaired)
+        XCTAssertEqual(telemetry.sdkErrors, [], "a finish is not an SDK error")
+    }
+
+    func testFinishPayment_TurnedInactiveAfterTheStart_ClearsTheAttempt_AndReportsNothing() {
+        var attempt = SdkTelemetry.startPayment(.payPal, telemetry: telemetry)
+        let inactive = RecordingTelemetry(isActive: false)
+
+        SdkTelemetry.finishPayment(&attempt, .success, telemetry: inactive)
+
+        XCTAssertNil(attempt)
+        XCTAssertEqual(inactive.reports, [])
+    }
+
+    func testRecordFailedPayment_ReportsAStartAndAnErrorFinish_OncePerKey() {
+        let memory = ReportOnce()
+
+        SdkTelemetry.recordFailedPayment(.standalone3ds, error: Standalone3DSError.invalidToken, once: (memory, "a"),
+                                         telemetry: telemetry)
+        SdkTelemetry.recordFailedPayment(.standalone3ds, error: Standalone3DSError.invalidToken, once: (memory, "a"),
+                                         telemetry: telemetry)
+        SdkTelemetry.recordFailedPayment(.standalone3ds, error: Standalone3DSError.invalidToken, once: (memory, "b"),
+                                         telemetry: telemetry)
+
+        XCTAssertEqual(telemetry.payments, [
+            .started(.standalone3ds), .finished(.standalone3ds, .error, "STANDALONE_3DS_INVALID_TOKEN"),
+            .started(.standalone3ds), .finished(.standalone3ds, .error, "STANDALONE_3DS_INVALID_TOKEN")
+        ])
+        XCTAssertTrue(telemetry.paymentsArePaired)
+    }
+
+    func testRecordFailedPayment_Inactive_ClaimsNothing() {
+        let memory = ReportOnce()
+
+        SdkTelemetry.recordFailedPayment(.mpgs3ds, error: MPGS3dsError.invalidToken, once: (memory, "key"),
+                                         telemetry: RecordingTelemetry(isActive: false))
+        SdkTelemetry.recordFailedPayment(.mpgs3ds, error: MPGS3dsError.invalidToken, once: (memory, "key"),
+                                         telemetry: telemetry)
+
+        XCTAssertEqual(telemetry.payments, [.started(.mpgs3ds), .finished(.mpgs3ds, .error, "MPGS_3DS_INVALID_TOKEN")])
+    }
+
     // MARK: - The bound facade
 
     func testTheCalls_DefaultToTheBoundFacade() {

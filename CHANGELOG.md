@@ -20,6 +20,11 @@
   `paydock_app_debuggable="true"`. Nothing to set up and no API change; telemetry never throws, never blocks and never
   changes a result. In App Store Connect, declare Crash Data and Other Diagnostic Data, not linked to the user, not
   used for tracking (see README, Telemetry).
+- Telemetry records the payment journey (D24) of `CardDetailsWidget`, `Standalone3DSWidget`, `MPGS3DSWidget`,
+  `PayPalWidget` and `ApplePayWidget`: one `paydock.payment.started` record when an attempt starts and one
+  `paydock.payment.finished` record when it ends, with its outcome (`success`, `declined`, `error`, `cancelled`), its
+  duration in milliseconds and, for an error, the error code your app receives. Each attempt has a random ID; no
+  amount, card data or message is sent. No API change: every result the widgets deliver is unchanged.
 - Privacy manifests (`PrivacyInfo.xcprivacy`) for the telemetry and BIN-processing targets: no tracking; crash data
   and other diagnostic data, not linked, not tracking, for app functionality; the required-reason APIs UserDefaults
   (`CA92.1`) and system boot time (`35F9.1`).

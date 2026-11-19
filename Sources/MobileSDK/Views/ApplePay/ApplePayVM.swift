@@ -26,6 +26,8 @@ class ApplePayVM: NSObject, ObservableObject {
     var result: ApplePayResult?
     var error: ApplePayError?
     @Published var isProcessing = false
+    /// The open payment attempt (D24), from presenting the sheet until the sheet's outcome.
+    var payment: PaymentAttempt?
 
     private var isCompletionCalled = false
     private var pkPaymentCompletion: ((PKPaymentAuthorizationStatus) -> Void)?
@@ -87,6 +89,7 @@ class ApplePayVM: NSObject, ObservableObject {
 
     func startPayment() {
         resetAttemptState()
+        payment = SdkTelemetry.startPayment(.applePay)
         isProcessing = true
         let presenter = presenterFactory.makePresenter(for: config.pkPaymentRequest)
         presenter.delegate = self
@@ -97,6 +100,7 @@ class ApplePayVM: NSObject, ObservableObject {
                     self?.isProcessing = false
                     self?.error = .unableToPresentPaymentSheet
                     SdkTelemetry.reportSdkError(ApplePayError.unableToPresentPaymentSheet, widget: .applePay)
+                    if let self { SdkTelemetry.finishPayment(&self.payment, .failed(ApplePayError.unableToPresentPaymentSheet)) }
                     self?.callCompletion(.failure(.unableToPresentPaymentSheet))
                 }
             }
@@ -338,12 +342,22 @@ extension ApplePayVM: PKPaymentAuthorizationControllerDelegate {
     func finishAndComplete() {
         isProcessing = false
         if paymentStatus == .success, let result = result {
+            SdkTelemetry.finishPayment(&payment, .success)
             callCompletion(.success(result))
         } else {
             let failure = error ?? .userCanceledPayment
             SdkTelemetry.reportSdkError(failure, widget: .applePay)
+            SdkTelemetry.finishPayment(&payment, Self.paymentEnd(of: failure))
             callCompletion(.failure(failure))
         }
+    }
+
+    /// D24: a sheet closed without a result is a cancellation; any other error ends the attempt as an error.
+    private static func paymentEnd(of failure: ApplePayError) -> PaymentEnd {
+        if case .userCanceledPayment = failure {
+            return .cancelled
+        }
+        return .failed(failure)
     }
 
     nonisolated func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,

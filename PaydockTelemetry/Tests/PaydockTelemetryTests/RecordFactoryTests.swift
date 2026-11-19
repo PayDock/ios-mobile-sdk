@@ -12,6 +12,7 @@ final class RecordFactoryTests: XCTestCase {
     private static let sessionId = "3f2a1c9e-8b7d-4e6f-a5c4-1b2d3e4f5a6b"
     private static let builtAt: Int64 = 1_793_052_603_000
     private static let frame = "MobileSDK $s9MobileSDK3fooyyF + 340"
+    private static let paymentId = "9b2e4f61-7c3a-4d58-a1e9-3f0d6b8c2a17"
 
     // MARK: - Severity
 
@@ -22,7 +23,10 @@ final class RecordFactoryTests: XCTestCase {
             (crash(kind: .hang), .error),
             (.sdkError(error: info), .error), (.uncaughtException(error: info), .error),
             (network(.httpStatus(code: 503)), .error),
-            (.widgetOpened(widget: "CardDetailsWidget"), .info), (.dropped(reason: .tooOld, count: 3), .warn)
+            (.widgetOpened(widget: "CardDetailsWidget"), .info), (.dropped(reason: .tooOld, count: 3), .warn),
+            (.paymentStarted(widget: "PayPalWidget", paymentId: Self.paymentId), .info),
+            (.paymentFinished(widget: "PayPalWidget", paymentId: Self.paymentId, outcome: .error, errorCode: "PAYPAL_UNKNOWN",
+                              durationMs: 10), .info)
         ]
         for (event, severity) in cases {
             XCTAssertEqual(record(event).severity, severity, "\(event)")
@@ -245,6 +249,61 @@ final class RecordFactoryTests: XCTestCase {
         XCTAssertEqual(dropped.value("paydock.dropped.reason"), .string("store_full"))
         XCTAssertEqual(dropped.value("paydock.dropped.count"), .int(7))
         XCTAssertEqual(dropped.body, "paydock.telemetry.dropped · store_full · 7 records")
+    }
+
+    // MARK: - Payments (D24)
+
+    func testPaymentStarted_FieldsInKeyOrder() {
+        let started = record(.paymentStarted(widget: "PayPalWidget", paymentId: Self.paymentId))
+
+        XCTAssertEqual(started.severity, .info)
+        XCTAssertEqual(started.attributes.map(\.key), [
+            "event.name", "session.id", "log.record.uid", "network.connection.type", "paydock.widget", "paydock.payment.id"
+        ])
+        XCTAssertEqual(started.eventName, "paydock.payment.started")
+        XCTAssertEqual(started.value("paydock.widget"), .string("PayPalWidget"))
+        XCTAssertEqual(started.value("paydock.payment.id"), .string(Self.paymentId))
+        XCTAssertEqual(started.body, "paydock.payment.started · PayPalWidget")
+    }
+
+    func testPaymentFinished_AnError_KeepsItsCode_FieldsInKeyOrder() {
+        let finished = record(.paymentFinished(widget: "CardDetailsWidget", paymentId: Self.paymentId, outcome: .error,
+                                               errorCode: "CARD_TOKENISE_ERROR", durationMs: 2_215))
+
+        XCTAssertEqual(finished.severity, .info)
+        XCTAssertEqual(finished.attributes.map(\.key), [
+            "event.name", "session.id", "log.record.uid", "network.connection.type", "paydock.widget", "paydock.error.code",
+            "paydock.payment.id", "paydock.payment.outcome", "paydock.payment.duration_ms"
+        ])
+        XCTAssertEqual(finished.eventName, "paydock.payment.finished")
+        XCTAssertEqual(finished.value("paydock.error.code"), .string("CARD_TOKENISE_ERROR"))
+        XCTAssertEqual(finished.value("paydock.payment.outcome"), .string("error"))
+        XCTAssertEqual(finished.value("paydock.payment.duration_ms"), .int(2_215))
+        XCTAssertEqual(finished.body, "paydock.payment.finished · CardDetailsWidget · error · CARD_TOKENISE_ERROR")
+    }
+
+    func testPaymentFinished_DropsTheCode_ForEveryOtherOutcome() {
+        for outcome in TelemetryEvent.PaymentOutcome.allCases where outcome != .error {
+            let finished = record(.paymentFinished(widget: "ApplePayWidget", paymentId: Self.paymentId, outcome: outcome,
+                                                   errorCode: "APPLE_PAY_PRESENT_FAILED", durationMs: 900))
+
+            XCTAssertNil(finished.value("paydock.error.code"), outcome.rawValue)
+            XCTAssertEqual(finished.attributes.map(\.key), [
+                "event.name", "session.id", "log.record.uid", "network.connection.type", "paydock.widget",
+                "paydock.payment.id", "paydock.payment.outcome", "paydock.payment.duration_ms"
+            ], outcome.rawValue)
+            XCTAssertEqual(finished.value("paydock.payment.outcome"), .string(outcome.rawValue))
+            XCTAssertEqual(finished.body, "paydock.payment.finished · ApplePayWidget · \(outcome.rawValue)")
+        }
+        XCTAssertEqual(TelemetryEvent.PaymentOutcome.allCases.map(\.rawValue), ["success", "declined", "error", "cancelled"])
+    }
+
+    func testPaymentFinished_AnErrorWithoutACode_HasNone() {
+        let finished = record(.paymentFinished(widget: "Standalone3DSWidget", paymentId: Self.paymentId, outcome: .error,
+                                               durationMs: 5))
+
+        XCTAssertNil(finished.value("paydock.error.code"))
+        XCTAssertEqual(finished.body, "paydock.payment.finished · Standalone3DSWidget · error")
     }
 
     // MARK: - Helpers

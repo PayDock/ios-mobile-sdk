@@ -69,11 +69,33 @@ package enum RecordFactory {
             fields.put("event.name", "paydock.widget.opened")
             fields.put("paydock.widget", widget)
             return .info
+        case .paymentStarted, .paymentFinished:
+            addPayment(event, to: &fields)
+            return .info
         case let .dropped(reason, count):
             fields.put("event.name", "paydock.telemetry.dropped")
             fields.put("paydock.dropped.reason", reason.rawValue)
             fields.put("paydock.dropped.count", Int64(count))
             return .warn
+        }
+    }
+
+    /// D24: a payment record's fields; `paydock.error.code` only for the `error` outcome.
+    private static func addPayment(_ event: TelemetryEvent, to fields: inout Fields) {
+        switch event {
+        case let .paymentStarted(widget, paymentId):
+            fields.put("event.name", "paydock.payment.started")
+            fields.put("paydock.widget", widget)
+            fields.put("paydock.payment.id", paymentId)
+        case let .paymentFinished(widget, paymentId, outcome, errorCode, durationMs):
+            fields.put("event.name", "paydock.payment.finished")
+            fields.put("paydock.widget", widget)
+            fields.put("paydock.error.code", outcome == .error ? errorCode : nil)
+            fields.put("paydock.payment.id", paymentId)
+            fields.put("paydock.payment.outcome", outcome.rawValue)
+            fields.put("paydock.payment.duration_ms", durationMs)
+        default:
+            break
         }
     }
 

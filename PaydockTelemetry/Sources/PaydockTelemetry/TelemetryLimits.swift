@@ -31,4 +31,6 @@ package enum TelemetryLimits {
     package static let crashLockTimeoutSeconds: TimeInterval = 0.5
     /// Builds whose SDK ranges are kept for the frame classifier, the current one included.
     package static let frameBuildsKept = 3
+    /// Payment attempts open at once (started, not finished); the oldest is forgotten past it.
+    package static let maxOpenPayments = 20
 }

@@ -39,7 +39,9 @@ package enum Allowlist {
         ("paydock.api.error.code", .string), ("paydock.api.error.summary_code", .string),
         ("paydock.api.gateway.codes", .string), ("paydock.http.attempt", .int),
         // Dropped
-        ("paydock.dropped.reason", .string), ("paydock.dropped.count", .int)
+        ("paydock.dropped.reason", .string), ("paydock.dropped.count", .int),
+        // Payment (D24)
+        ("paydock.payment.id", .string), ("paydock.payment.outcome", .string), ("paydock.payment.duration_ms", .int)
     ]
 
     // MARK: - Patterns
@@ -136,8 +138,11 @@ package enum Allowlist {
 
     private static func passes(_ key: String, _ text: String, sessionId: String?) -> Bool {
         switch key {
-        case "session.id":
+        case "session.id", "paydock.payment.id":
+            // The shape alone: a random UUID can hold an all-digit run the card check would reject.
             return matches(uuidShape, text)
+        case "paydock.payment.outcome":
+            return TelemetryEvent.PaymentOutcome(rawValue: text) != nil
         case "log.record.uid":
             guard let sessionId, text.hasPrefix("\(sessionId)-") else {
                 return false

@@ -4,6 +4,7 @@
 //
 //  Copyright © 2026 Paydock Ltd.
 
+import Foundation
 import PaydockTelemetry
 
 /// The SDK's only reporting calls (RS-4). Each returns at once when `telemetry.isActive` is false (R_11).
@@ -46,5 +47,57 @@ enum SdkTelemetry {
             return
         }
         telemetry.report(.widgetOpened(widget: widget.rawValue))
+    }
+
+    /// D24: nil while inactive; else reports `.paymentStarted` with a new id and returns the attempt.
+    static func startPayment(_ widget: SdkWidget, telemetry: any Telemetry = TelemetryBinding.current) -> PaymentAttempt? {
+        guard telemetry.isActive else {
+            return nil
+        }
+        let attempt = PaymentAttempt(widget: widget, id: UUID().uuidString.lowercased())
+        telemetry.report(.paymentStarted(widget: widget.rawValue, paymentId: attempt.id))
+        return attempt
+    }
+
+    /// D24: returns at once for a nil attempt. Sets it to nil, then, when active, reports `.paymentFinished` with the
+    /// end's outcome and, for `.failed` and `.failedWithCode`, its code. A second call on the same variable does nothing.
+    static func finishPayment(_ attempt: inout PaymentAttempt?, _ end: PaymentEnd,
+                              telemetry: any Telemetry = TelemetryBinding.current) {
+        guard let finished = attempt else {
+            return
+        }
+        attempt = nil
+        guard telemetry.isActive else {
+            return
+        }
+        let outcome: TelemetryEvent.PaymentOutcome
+        var errorCode: String?
+        switch end {
+        case .success:
+            outcome = .success
+        case .declined:
+            outcome = .declined
+        case .cancelled:
+            outcome = .cancelled
+        case let .failed(error):
+            outcome = .error
+            errorCode = SdkErrorFacts.code(error)
+        case let .failedWithCode(code):
+            outcome = .error
+            errorCode = code
+        }
+        telemetry.report(.paymentFinished(widget: finished.widget.rawValue, paymentId: finished.id, outcome: outcome,
+                                          errorCode: errorCode))
+    }
+
+    /// D24: an attempt that fails before its widget loads (an invalid 3DS token): when active and the key is new in
+    /// its memory, a start and an error finish with the error's code.
+    static func recordFailedPayment(_ widget: SdkWidget, error: any Error, once: (memory: ReportOnce, key: AnyHashable),
+                                    telemetry: any Telemetry = TelemetryBinding.current) {
+        guard telemetry.isActive, once.memory.claim(once.key) else {
+            return
+        }
+        var attempt = startPayment(widget, telemetry: telemetry)
+        finishPayment(&attempt, .failed(error), telemetry: telemetry)
     }
 }

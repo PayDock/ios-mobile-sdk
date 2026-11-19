@@ -54,6 +54,29 @@ final class RecordBodyTests: XCTestCase {
                        "paydock.widget.opened · CardDetailsWidget")
     }
 
+    func testPaymentStarted_TheWidget() {
+        XCTAssertEqual(body(["event.name": "paydock.payment.started", "paydock.widget": "PayPalWidget",
+                             "paydock.payment.id": "9b2e4f61-7c3a-4d58-a1e9-3f0d6b8c2a17"]),
+                       "paydock.payment.started · PayPalWidget")
+    }
+
+    func testPaymentFinished_TheWidgetAndOutcome_ThenTheCodeWhenPresent() {
+        let attributes = [
+            TelemetryAttribute(key: "event.name", value: .string("paydock.payment.finished")),
+            TelemetryAttribute(key: "paydock.widget", value: .string("CardDetailsWidget")),
+            TelemetryAttribute(key: "paydock.error.code", value: .string("CARD_TOKENISE_ERROR")),
+            TelemetryAttribute(key: "paydock.payment.id", value: .string("e4a1c8b7-3f29-4d06-b5e8-7c2d9f1a0b34")),
+            TelemetryAttribute(key: "paydock.payment.outcome", value: .string("error")),
+            TelemetryAttribute(key: "paydock.payment.duration_ms", value: .int(2_215))
+        ]
+
+        XCTAssertEqual(RecordBody.of(attributes), "paydock.payment.finished · CardDetailsWidget · error · CARD_TOKENISE_ERROR")
+        XCTAssertEqual(RecordBody.of(attributes.filter { $0.key != "paydock.error.code" }),
+                       "paydock.payment.finished · CardDetailsWidget · error")
+        XCTAssertEqual(body(["event.name": "paydock.payment.finished", "paydock.widget": "PayPalWidget",
+                             "paydock.payment.outcome": "success"]), "paydock.payment.finished · PayPalWidget · success")
+    }
+
     func testDropped_ReasonThenCount() {
         let attributes = [
             TelemetryAttribute(key: "event.name", value: .string("paydock.telemetry.dropped")),

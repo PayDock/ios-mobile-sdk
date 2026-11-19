@@ -103,6 +103,34 @@ inside telemetry loses the record, never the merchant's result.
 before its delivery, no `Task` outside `SdkTask`, no message text in the telemetry files, and one usage report per
 widget.
 
+## Payment attempts
+
+When active, the SDK records each payment attempt in its payment widgets as two `INFO` records (D24, spec § 5.9),
+so conversion and duration can be read per widget. They carry no amount, token, card data, message text or real ID.
+
+- **`paydock.payment.started`** (`TelemetryEvent.paymentStarted`): `paydock.widget` and `paydock.payment.id`, a random
+  lowercase UUID new per attempt. Body `paydock.payment.started · <widget>`.
+- **`paydock.payment.finished`** (`TelemetryEvent.paymentFinished`): `paydock.widget`, `paydock.payment.id`,
+  `paydock.payment.outcome` (`PaymentOutcome`: `success`, `declined`, `error` or `cancelled`),
+  `paydock.payment.duration_ms` and, for the `error` outcome only, `paydock.error.code`, the code the merchant
+  receives. Body `paydock.payment.finished · <widget> · <outcome>[ · <paydock.error.code>]`.
+
+The reducer's rules:
+
+- It keeps the open attempts (`TelemetryState.openPayments`): those whose started record was stored and that have not
+  finished, oldest first, at most `TelemetryLimits.maxOpenPayments` (20). A 21st forgets the oldest.
+- A start goes through the hourly cap like any record; a capped start opens nothing.
+- A finish without an open attempt of its ID (never started, capped, forgotten, already finished, or started before
+  the app relaunched) is dropped as `paymentNotOpen`, so every finished record has its started record.
+- A finish of an open attempt is never capped: its record is created and counted even at the cap, so a started
+  attempt is not counted as abandoned by the cap alone.
+- `paydock.payment.duration_ms` is measured by the reducer on the monotonic clock (`elapsed` at the finish minus at the
+  start, at least 0); any duration a caller passes is replaced.
+
+`Allowlist` accepts the three payment keys, a payment ID only in the UUID shape (the card-number check would reject a
+random UUID with a long all-digit run) and an outcome only among the four values. `DuplicateGate` never merges payment
+records: each attempt is its own.
+
 ## Network failures
 
 When active, the SDK records every failed attempt of a Paydock API request as one `paydock.network.failure` record

@@ -23,6 +23,8 @@ class CardDetailsVM: ObservableObject {
     // MARK: - Properties
 
     @Published var isLoading = false
+    /// The open payment attempt (D24), from the tokenisation's start until its end.
+    var payment: PaymentAttempt?
     @Published var showLoaders = true
     @Published var policyAccepted = false {
         didSet {
@@ -102,12 +104,14 @@ class CardDetailsVM: ObservableObject {
         // arriving before the Task body has actually started still sees isLoading == true rather
         // than racing it — this is what makes callers' own re-entrancy guards durable.
         guard !isLoading else { return }
+        payment = SdkTelemetry.startPayment(.cardDetails)
         updateLoadingState(isLoading: true)
 
         SdkTask.run(widget: .cardDetails) { [self] in
             guard let expireMonth = self.cardDetailsFormManager.expiryDateText.split(separator: "/").first,
                   let expireYear = self.cardDetailsFormManager.expiryDateText.split(separator: "/").last else {
                 SdkTelemetry.reportSdkError(SilentFailure.cardExpiryUnreadable, widget: .cardDetails)
+                SdkTelemetry.finishPayment(&payment, .failed(SilentFailure.cardExpiryUnreadable))
                 updateLoadingState(isLoading: false)
                 return
             }
@@ -132,16 +136,19 @@ class CardDetailsVM: ObservableObject {
                     widgetAccessToken: config.accessToken)
 
                 updateLoadingState(isLoading: false)
+                SdkTelemetry.finishPayment(&payment, .success)
                 completion(.success(createResult(token: cardToken)))
             } catch let RequestError.requestError(errorResponse: errorResponse) {
                 updateLoadingState(isLoading: false)
                 let failure = CardDetailsError.errorTokenisingCard(error: errorResponse)
                 SdkTelemetry.reportSdkError(failure, widget: .cardDetails)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 completion(.failure(failure))
             } catch {
                 updateLoadingState(isLoading: false)
                 let failure = CardDetailsError.unknownError(error as? RequestError)
                 SdkTelemetry.reportSdkError(failure, widget: .cardDetails)
+                SdkTelemetry.finishPayment(&payment, .failed(failure))
                 completion(.failure(failure))
             }
         }

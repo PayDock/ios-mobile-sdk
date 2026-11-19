@@ -1148,7 +1148,7 @@ class CardDetailsVMTests: XCTestCase {
         guard case .failure(.errorTokenisingCard) = completionResult else {
             return XCTFail("Expected errorTokenisingCard, got: \(String(describing: completionResult))")
         }
-        XCTAssertEqual(telemetry.reports, [])
+        XCTAssertEqual(telemetry.sdkErrors, [])
     }
 
     func testTelemetry_ConnectionFailure_DeliversAsBefore_AndReportsNothing() async {
@@ -1172,7 +1172,7 @@ class CardDetailsVMTests: XCTestCase {
         guard case .failure(.unknownError(.connectionError)) = completionResult else {
             return XCTFail("Expected unknownError(connectionError), got: \(String(describing: completionResult))")
         }
-        XCTAssertEqual(telemetry.reports, [])
+        XCTAssertEqual(telemetry.sdkErrors, [])
     }
 
     func testTelemetry_UnreadableExpiry_ReportsCardExpiryUnreadable_AndDeliversNothing() async {
@@ -1182,11 +1182,143 @@ class CardDetailsVMTests: XCTestCase {
         viewModel.cardDetailsFormManager.expiryDateText = ""
 
         viewModel.tokeniseCardDetails()
-        await telemetry.waitForReports(count: 1)
+        await telemetry.waitForReports(count: 3) // the payment's start, the SDK error, the payment's finish
 
         XCTAssertEqual(telemetry.sdkErrors, [.reported("CARD_EXPIRY_UNREADABLE", .cardDetails)])
         XCTAssertNil(completionResult)
         XCTAssertFalse(viewModel.isLoading)
+    }
+
+    // MARK: - Payment attempts (D24)
+
+    /// Tokenises with `service` and waits for the merchant's result.
+    private func tokeniseAndWait(service: PaymentSourcesService) async -> Result<CardResult, CardDetailsError>? {
+        let expectation = XCTestExpectation(description: "completion")
+        var delivered: Result<CardResult, CardDetailsError>?
+        viewModel = CardDetailsVM(
+            paymentSourcesService: service,
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { result in
+                delivered = result
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+        viewModel.tokeniseCardDetails()
+        await fulfillment(of: [expectation], timeout: 2.0)
+        return delivered
+    }
+
+    func testPayment_Tokenisation_GivesAStartAndASuccessFinish_WithTheSameId() async {
+        telemetry.bindAsCurrent()
+        mockService.tokenResult = "tok_payment"
+
+        let result = await tokeniseAndWait(service: mockService)
+
+        guard case .success(let cardResult)? = result else { return XCTFail("Expected success") }
+        XCTAssertEqual(cardResult.token, "tok_payment")
+        XCTAssertEqual(telemetry.payments, [.started(.cardDetails), .finished(.cardDetails, .success, nil)])
+        XCTAssertTrue(telemetry.paymentsArePaired)
+        XCTAssertNil(viewModel.payment)
+    }
+
+    func testPayment_FailureThenRetry_GivesTwoAttempts_ErrorThenSuccess() async {
+        telemetry.bindAsCurrent()
+        mockService.shouldThrowUnknownError = true
+        let expectation = XCTestExpectation(description: "two completions")
+        expectation.expectedFulfillmentCount = 2
+        var delivered: [Result<CardResult, CardDetailsError>] = []
+        viewModel = CardDetailsVM(
+            paymentSourcesService: mockService,
+            viewState: viewState,
+            config: makeConfig(),
+            appearance: CardDetailsWidgetAppearance(),
+            loadingDelegate: loadingDelegate,
+            eventDelegate: nil) { [mockService] result in
+                delivered.append(result)
+                mockService?.shouldThrowUnknownError = false
+                expectation.fulfill()
+            }
+        populateValidFormFields()
+
+        viewModel.tokeniseCardDetails()
+        await telemetry.waitForReports(count: 3)
+        XCTAssertFalse(viewModel.isLoading)
+        viewModel.tokeniseCardDetails()
+        await fulfillment(of: [expectation], timeout: 2.0)
+
+        XCTAssertEqual(delivered.count, 2)
+        guard case .failure(.unknownError(nil)) = delivered.first, case .success = delivered.last else {
+            return XCTFail("Expected unknownError(nil) then success, got: \(delivered)")
+        }
+        XCTAssertEqual(telemetry.payments, [
+            .started(.cardDetails), .finished(.cardDetails, .error, "CARD_UNKNOWN"),
+            .started(.cardDetails), .finished(.cardDetails, .success, nil)
+        ])
+        XCTAssertTrue(telemetry.paymentsArePaired)
+    }
+
+    func testPayment_EachFailure_CarriesItsCode_AndDeliversAsBefore() async {
+        telemetry.bindAsCurrent()
+        let declining = PaymentSourcesMockService()
+        declining.shouldReturnError = true
+        declining.errorToReturn = ErrorRes(status: 400, error: .init(message: "Card declined", code: "E123", details: nil),
+                                           resource: nil, errorSummary: nil)
+        let cases: [(PaymentSourcesService, String)] = [
+            (declining, "CARD_TOKENISE_ERROR"),
+            (ErroringPaymentSourcesServiceMock(failure: .connectionError(URLError(.timedOut))), "CARD_NETWORK"),
+            (ErroringPaymentSourcesServiceMock(failure: .genericError), "CARD_UNKNOWN")
+        ]
+
+        for (service, code) in cases {
+            let result = await tokeniseAndWait(service: service)
+
+            guard case .failure(let error)? = result else { return XCTFail("Expected a failure for \(code)") }
+            XCTAssertEqual(error.code, code)
+        }
+
+        XCTAssertEqual(telemetry.payments, cases.flatMap { [.started(.cardDetails), .finished(.cardDetails, .error, $0.1)] })
+        XCTAssertTrue(telemetry.paymentsArePaired)
+    }
+
+    func testPayment_UnreadableExpiry_GivesAnErrorFinish_AndDeliversNothing() async {
+        telemetry.bindAsCurrent()
+        viewModel = makeVM(service: mockService, config: makeConfig())
+        populateValidFormFields()
+        viewModel.cardDetailsFormManager.expiryDateText = ""
+
+        viewModel.tokeniseCardDetails()
+        await telemetry.waitForReports(count: 3)
+
+        XCTAssertEqual(telemetry.payments, [
+            .started(.cardDetails), .finished(.cardDetails, .error, "CARD_EXPIRY_UNREADABLE")
+        ])
+        XCTAssertTrue(telemetry.paymentsArePaired)
+        XCTAssertNil(completionResult)
+    }
+
+    func testPayment_FailedValidation_GivesNothing() {
+        telemetry.bindAsCurrent()
+        viewModel = makeVM(service: CapturingPaymentSourcesServiceMock(), config: makeConfig())
+
+        XCTAssertFalse(viewModel.ctaButtonTapped())
+
+        XCTAssertEqual(telemetry.payments, [])
+        XCTAssertNil(viewModel.payment)
+    }
+
+    func testPayment_Inactive_StartsNoAttempt_AndDeliversAsBefore() async {
+        RecordingTelemetry.unbind()
+        mockService.tokenResult = "tok_inactive"
+
+        let result = await tokeniseAndWait(service: mockService)
+
+        guard case .success(let cardResult)? = result else { return XCTFail("Expected success") }
+        XCTAssertEqual(cardResult.token, "tok_inactive")
+        XCTAssertNil(viewModel.payment)
+        XCTAssertEqual(telemetry.reports, [])
     }
 }
 // swiftlint:enable all

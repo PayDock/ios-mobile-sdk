@@ -44,6 +44,14 @@ package enum TelemetryEvent: Sendable, Equatable {
     /// D19: the first time a widget appears on screen in an SDK session.
     case widgetOpened(widget: String)
 
+    /// D24, § 5.9: an attempt started in a payment widget. `paymentId`: a random lowercase UUID, new per attempt.
+    case paymentStarted(widget: String, paymentId: String)
+
+    /// D24, § 5.9. `errorCode` only for `.error`: the code the merchant receives. `durationMs` is the reducer's: any value
+    /// a caller passes is replaced by the measured duration.
+    case paymentFinished(widget: String, paymentId: String, outcome: PaymentOutcome, errorCode: String? = nil,
+                         durationMs: Int64? = nil)
+
     /// Spec § 5.8. Only the telemetry target creates it (I7); SDK code never reports it.
     case dropped(reason: DroppedReason, count: Int)
 
@@ -140,6 +148,9 @@ package enum TelemetryEvent: Sendable, Equatable {
 
     /// Raw values are the wire names (`paydock.crash.kind`).
     package enum CrashKind: String, Sendable, Equatable { case exception, signal, hang, osKill = "os_kill" }
+
+    /// Raw values are the wire names (`paydock.payment.outcome`).
+    package enum PaymentOutcome: String, Sendable, Equatable, CaseIterable { case success, declined, error, cancelled }
 
     /// Raw values are the wire names (`paydock.dropped.reason`).
     package enum DroppedReason: String, Sendable, Equatable {
