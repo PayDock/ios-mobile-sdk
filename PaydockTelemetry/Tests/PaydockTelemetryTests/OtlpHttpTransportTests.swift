@@ -32,8 +32,7 @@ final class OtlpHttpTransportTests: XCTestCase {
 
     private static let endpoint = "https://otlp.invalid/otlp/v1/logs"
     private static let deviceNow: Int64 = 1_793_852_047_512
-    private static let headers = ["Content-Encoding": "gzip", "Content-Type": "application/json",
-                                  "Authorization": "Basic synthetic-not-a-credential"]
+    private static let headers = ["Content-Encoding": "gzip", "Content-Type": "application/json"]
 
     private let clock = FixedClock(OtlpHttpTransportTests.deviceNow)
     private lazy var offset = ClockOffset(clock: clock)
@@ -49,9 +48,9 @@ final class OtlpHttpTransportTests: XCTestCase {
 
     // MARK: - MD-35
 
-    func testGzippedOtlpBody_WithTheThreeHeaders_And204_IsSuccess() throws {
+    func testGzippedOtlpBody_WithTheTwoContentHeaders_And204_IsSuccess() throws {
         MockURLProtocol.answer(.response(status: 204, headers: [:], body: Data()))
-        let exporter = OtlpExporter(transport: makeTransport(), credentials: TelemetryFixtures.credentials)
+        let exporter = OtlpExporter(transport: makeTransport())
         let record = Self.record()
         let batch = ExportBatch(resource: FakeDeviceContextProvider.attributes, records: [record])
 
@@ -67,7 +66,7 @@ final class OtlpHttpTransportTests: XCTestCase {
         XCTAssertEqual(request.method, "POST")
         XCTAssertEqual(request.headers["Content-Encoding"], "gzip")
         XCTAssertEqual(request.headers["Content-Type"], "application/json")
-        XCTAssertEqual(request.headers["Authorization"], "Basic synthetic-not-a-credential")
+        XCTAssertFalse(request.headers.keys.contains { $0.lowercased() == "authorization" }, "an authorization header was sent")
         XCTAssertEqual(Array(request.body.prefix(3)), [0x1F, 0x8B, 0x08])
         let json = OtlpLogEncoder.encode(resource: FakeDeviceContextProvider.attributes, records: [record])
         XCTAssertEqual(request.body, Gzip.compress(json))
@@ -143,6 +142,17 @@ final class OtlpHttpTransportTests: XCTestCase {
 
         MockURLProtocol.answer(.response(status: 200, headers: [:], body: Data(#"{"partialSuccess":{"rejectedLogRecords":2}}"#.utf8)))
         XCTAssertEqual(send(), .success(status: 200, rejectedRecords: 2))
+    }
+
+    /// D22: the collector's `200 {"partialSuccess":{}}` is a success with nothing rejected.
+    func testD22EmptyPartialSuccess_IsSuccess_WithZeroRejected() {
+        let body = Data(#"{"partialSuccess":{}}"#.utf8)
+        MockURLProtocol.answer(.response(status: 200, headers: ["Content-Type": "application/json"], body: body))
+        XCTAssertEqual(send(), .success(status: 200, rejectedRecords: 0))
+
+        MockURLProtocol.answer(.response(status: 200, headers: ["Content-Type": "application/json"], body: body))
+        let batch = ExportBatch(resource: FakeDeviceContextProvider.attributes, records: [Self.record()])
+        XCTAssertEqual(OtlpExporter(transport: makeTransport()).export(batch), .success(rejectedRecords: 0))
     }
 
     func testPartialSuccess_AnythingElse_IsZero() {

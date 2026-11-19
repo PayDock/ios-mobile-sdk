@@ -6,7 +6,6 @@
 
 /// What the reducer remembers between intents.
 package struct TelemetryState: Sendable, Equatable {
-    package var level: TelemetryLevel
     package var enabled: Bool
     package var sessionId: String
     /// Records on disk not yet exported, as last counted.
@@ -25,8 +24,7 @@ package struct TelemetryState: Sendable, Equatable {
     /// Widgets whose opened record was stored this session (D19, R_09).
     package var openedWidgets: Set<String> = []
 
-    package init(level: TelemetryLevel, enabled: Bool, sessionId: String) {
-        self.level = level
+    package init(enabled: Bool, sessionId: String) {
         self.enabled = enabled
         self.sessionId = sessionId
     }

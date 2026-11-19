@@ -24,10 +24,8 @@ package enum TelemetryReducer {
             effects = export(&next, now: now)
         case .appBackgrounded:
             effects = export(&next, now: now)
-        case let .levelChanged(level):
-            next.level = level
         case let .recordsDropped(reason, count):
-            guard count > 0, next.enabled, next.level != .off else {
+            guard count > 0, next.enabled else {
                 return (state, [])
             }
             roll(&next, elapsed: elapsed)
@@ -44,21 +42,10 @@ package enum TelemetryReducer {
         return (next, effects)
     }
 
-    /// True for the four error kinds; a widget opened and a dropped notice are not errors, so level `errors` drops them.
-    package static func isError(_ event: TelemetryEvent) -> Bool {
-        switch event {
-        case .crash, .uncaughtException, .sdkError, .networkFailure:
-            return true
-        case .widgetOpened, .dropped:
-            return false
-        }
-    }
-
     // MARK: - Intents
 
-    /// The first matching rule: not reportable, disabled, off, filtered by the level, a widget already opened this
-    /// session; otherwise the hourly cap, or a new record (a widget opened is remembered), the threshold export and the
-    /// timer.
+    /// The first matching rule: not reportable, disabled, a widget already opened this session; otherwise the hourly
+    /// cap, or a new record (a widget opened is remembered), the threshold export and the timer.
     private static func reported(_ event: TelemetryEvent, _ state: inout TelemetryState, now: Int64, elapsed: Int64,
                                  sequence: RecordSequence) -> [TelemetryEffect] {
         if case .dropped = event {
@@ -66,12 +53,6 @@ package enum TelemetryReducer {
         }
         guard state.enabled else {
             return [.drop(.disabled)]
-        }
-        if state.level == .off {
-            return [.drop(.levelOff)]
-        }
-        if state.level == .errors && !isError(event) {
-            return [.drop(.levelFiltered)]
         }
         if case let .widgetOpened(widget) = event, state.openedWidgets.contains(widget) {
             return [.drop(.alreadyOpened)]

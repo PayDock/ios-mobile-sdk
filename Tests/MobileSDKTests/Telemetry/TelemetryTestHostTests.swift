@@ -14,11 +14,6 @@ import PaydockTelemetry
 final class TelemetryTestHostTests: XCTestCase {
 
     private static let appBundleIdentifier = "com.paydock.multitenant.sandbox"
-    private static let overrideVariables = [
-        "PAYDOCK_TELEMETRY_OTLP_ENDPOINT": "https://otlp.invalid/v1/logs",
-        "PAYDOCK_TELEMETRY_OTLP_AUTH": "synthetic-not-a-credential",
-        "PAYDOCK_TELEMETRY_LEVEL": "all"
-    ]
 
     override func tearDown() {
         TelemetryBinding.bind(TelemetrySelection(telemetry: NoOpTelemetry(), runtime: NoOpTelemetry()))
@@ -42,27 +37,25 @@ final class TelemetryTestHostTests: XCTestCase {
     }
 
     func testAnAppBundleIdentifier_WithoutTheKey_IsNotATestProcess() {
-        XCTAssertFalse(TelemetryTestHost.isTestProcess(environment: Self.overrideVariables,
+        XCTAssertFalse(TelemetryTestHost.isTestProcess(environment: ["PATH": "/usr/bin"],
                                                        bundleIdentifier: Self.appBundleIdentifier))
         XCTAssertFalse(TelemetryTestHost.isTestProcess(environment: [:], bundleIdentifier: nil))
     }
 
     // MARK: - bindTelemetry in a test process
 
-    /// R_14: on sandbox and staging, with the override variables of a Paydock app, a test process binds the no-op and
-    /// creates, registers and installs nothing.
+    /// R_14: in every environment, a test process binds the no-op and creates, registers and installs nothing.
     func testBindTelemetry_InATestProcess_BindsTheNoOp_AndCreatesNothing() throws {
         let testProcesses: [(environment: [String: String], bundleIdentifier: String?)] = [
-            (Self.overrideVariables, TelemetryTestHost.testRunnerBundleIdentifier),
-            (Self.overrideVariables.merging([TelemetryTestHost.configurationKey: "/tmp/run.xctestconfiguration"]) { $1 },
-             Self.appBundleIdentifier)
+            ([:], TelemetryTestHost.testRunnerBundleIdentifier),
+            ([TelemetryTestHost.configurationKey: "/tmp/run.xctestconfiguration"], Self.appBundleIdentifier)
         ]
         let directoryBefore = Self.telemetryDirectoryContents()
         let observerBefore = NetworkingLib.shared.requestObserver.map { ObjectIdentifier($0 as AnyObject) }
         let handlerBefore = Self.processHandlerAddress()
 
         for process in testProcesses {
-            for environment in [SDKEnvironment.sandbox, .staging] {
+            for environment in [SDKEnvironment.sandbox, .staging, .production] {
                 let bound = TelemetryBinding.bindTelemetry(environment: environment, processEnvironment: process.environment,
                                                            hostBundleIdentifier: process.bundleIdentifier)
 

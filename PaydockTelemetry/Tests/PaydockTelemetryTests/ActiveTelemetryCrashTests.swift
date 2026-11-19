@@ -37,24 +37,6 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         }
     }
 
-    /// Records each delay and keeps its task; a test never runs the test crash's task.
-    private final class RecordingScheduler: @unchecked Sendable {
-        private let lock = NSLock()
-        private var delays: [Int64] = []
-
-        var delayedMilliseconds: [Int64] {
-            lock.lock()
-            defer { lock.unlock() }
-            return delays
-        }
-
-        func schedule(_ milliseconds: Int64, _ task: @escaping @Sendable () -> Void) {
-            lock.lock()
-            delays.append(milliseconds)
-            lock.unlock()
-        }
-    }
-
     private struct FixedIdGenerator: IdGenerator {
         let id: String
 
@@ -117,9 +99,6 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         let telemetry = makeTelemetry(dispatcher: serial)
 
         telemetry.report(TelemetryFixtures.crash())
-        #if DEBUG
-        telemetry.sendTestRecord()
-        #endif
         XCTAssertFalse(chain.isInstalled)
         XCTAssertEqual(slot.setCount, 0)
 
@@ -309,21 +288,7 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         XCTAssertEqual(Self.forwarded.names, ["NSInvalidArgumentException"])
     }
 
-    // MARK: - The test crash
-
-    #if DEBUG
-    func testRaiseTestCrash_PostsToTheMainQueueAfter3s() {
-        let scheduler = RecordingScheduler()
-        let telemetry = makeTelemetry(scheduleOnMain: { scheduler.schedule($0, $1) })
-
-        telemetry.raiseTestCrash()
-
-        XCTAssertEqual(scheduler.delayedMilliseconds, [TelemetryLimits.testCrashDelayMilliseconds])
-        XCTAssertEqual(TelemetryLimits.testCrashDelayMilliseconds, 3_000)
-        XCTAssertEqual(dispatcher.delayedMilliseconds, [], "the test crash went through the telemetry queue")
-        XCTAssertEqual(ActiveTelemetry.testCrashName, "PaydockTelemetryTestCrash")
-    }
-    #endif
+    // MARK: - The main queue
 
     func testTheMainQueueScheduler_RunsTheTaskOnTheMainThread() {
         let ran = expectation(description: "the task ran")
@@ -365,12 +330,10 @@ final class ActiveTelemetryCrashTests: XCTestCase {
         stateStore: InMemoryStateStore? = nil,
         source: ScriptedDiagnosticSource? = nil,
         sessionId: String = ActiveTelemetryCrashTests.sessionId,
-        installsHandlers: Bool = true,
-        scheduleOnMain: @escaping ActiveTelemetry.MainScheduler = { _, _ in }
+        installsHandlers: Bool = true
     ) -> ActiveTelemetry {
         ActiveTelemetry(
-            credentials: TelemetryFixtures.credentials,
-            level: .all,
+            endpoint: TelemetryFixtures.endpoint,
             deviceContextProvider: FakeDeviceContextProvider(),
             clock: clock,
             monotonic: FixedMonotonicClock(),
@@ -388,7 +351,7 @@ final class ActiveTelemetryCrashTests: XCTestCase {
                 exceptionHandlers: installsHandlers ? chain : nil,
                 resolver: Self.resolver
             ),
-            scheduleOnMain: scheduleOnMain
+            scheduleOnMain: { _, _ in }
         )
     }
 

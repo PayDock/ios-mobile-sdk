@@ -15,7 +15,7 @@ struct ExampleApp: App {
     init() {
         setupMobileSDK()
         #if DEBUG
-        raiseTestCrashIfAsked()
+        crashIfAsked()
         #endif
     }
 
@@ -38,8 +38,9 @@ struct ExampleApp: App {
 
     #if DEBUG
     /// Debug builds only: `EXAMPLE_APP_TEST_CRASH=true` raises an exception from app code on the main thread 3 s after
-    /// launch, the app case of `scripts/check-crash-in-sdk.sh`. A non-nil reason: CoreFoundation crashes on a nil one.
-    private func raiseTestCrashIfAsked() {
+    /// launch, the same app crash as the triggers screen's, from a scheme variable. A non-nil reason: CoreFoundation
+    /// crashes on a nil one.
+    private func crashIfAsked() {
         guard ProcessInfo.processInfo.environment["EXAMPLE_APP_TEST_CRASH"] == "true" else {
             return
         }

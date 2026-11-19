@@ -7,9 +7,9 @@
 import Foundation
 import PaydockTelemetry
 
-/// Synthetic events and credentials for the core tests. No card data, no real credential.
+/// Synthetic events and the endpoint for the core tests. No card data.
 enum TelemetryFixtures {
-    static let credentials = TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: "synthetic-not-a-credential")
+    static let endpoint = "https://otlp.invalid/v1/logs"
 
     static func info(_ type: String = "Sample.Error", frames: [String] = []) -> TelemetryEvent.ErrorInfo {
         TelemetryEvent.ErrorInfo(type: type, frames: frames)

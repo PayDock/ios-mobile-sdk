@@ -9,19 +9,16 @@ It is internal to MobileSDK: a dependency of the `MobileSDK` target, never a pro
 `package` access, so nothing in it is visible to merchants.
 
 The SDK binds telemetry at start (`Sources/MobileSDK/Telemetry/TelemetryBinding.swift`), in every build, debug and
-release. On the sandbox and staging environments it binds `ActiveTelemetry` at level `all`, sending to the dev collector
-(`TelemetryCollector.devLogsURL`) with no credential, so no `Authorization` header; production has no collector and binds
-`NoOpTelemetry`, which creates no file, directory, client, observer, monitor or session. `TelemetryActivation` needs a
-non-blank endpoint and a level other than `off`. A test process (the Xcode test runner, or any process with
-`XCTestConfigurationFilePath`: hosted unit tests) always binds the no-op (`TelemetryTestHost`).
+release, by one path: the collector table is the only input. Sandbox and staging send to the dev collector
+(`TelemetryCollector.devLogsURL`) and production to the prod collector (`TelemetryCollector.prodLogsURL`); an
+environment without a collector binds `NoOpTelemetry`, which creates no file, directory, client, observer, monitor or
+session. `TelemetryActivation` needs a non-blank endpoint. No build sends a key or reads a local setting. A test process
+(the Xcode test runner, or any process with `XCTestConfigurationFilePath`: hosted unit tests) always binds the no-op
+(`TelemetryTestHost`).
 
-A debug build of a Paydock app (bundle ID `com.paydock.*`) also reads the local override (`LocalTelemetryOverride`, the
-`PAYDOCK_TELEMETRY_*` scheme variables): its endpoint and authorization win in every environment, production included,
-and its level applies even without an endpoint. The override, the test record, the test crash
-(`TelemetryDebugHooks`) and the stand-in hosts are compiled only in debug builds, so a release binary holds none of
-them; a merchant's app ignores the variables, debug or not. `app.debuggable` is true in a debug build, false in a
-release one. The privacy manifest, `Resources/PrivacyInfo.xcprivacy`, is a resource of this target
-(`PrivacyManifestTests`).
+The stand-in hosts are compiled only in debug builds, so a release binary holds none of them. `app.debuggable` is true
+in a debug build, false in a release one. The privacy manifest, `Resources/PrivacyInfo.xcprivacy`, is a resource of
+this target (`PrivacyManifestTests`).
 
 ## Usage
 
@@ -67,9 +64,10 @@ attribute (`RequiredReasonApiTests`).
 right after start (so records from earlier runs go first) and when the app goes to the background (inside a short
 background task). It sends batches of at most 50 records and 256 KB of JSON, oldest first, each stamped at send with
 the gateway's clock offset and checked by the allowlist. `OtlpExporter` gzips each batch and `OtlpHttpTransport` posts
-it with the content-encoding and content-type headers, plus a basic authorization header only when the credential's
-authorization is non-blank (the collector's is empty), on its own NetworkingLib client (15 s, kept out of the debug
-log, never pinned). Failures retry with back-off; 401 or 403 stops sending for the process. All of it runs on the
+it with exactly the content-encoding and content-type headers on its own NetworkingLib client (15 s, kept out of the
+debug log, never pinned). A success, a partial success included, removes the batch and counts any records the
+collector refused; a 400 or any other non-retried status removes the batch as rejected, with no retry; 408, 429 and
+5xx retry with back-off, honouring `Retry-After`; 413 splits the batch; 401 or 403 stops sending for the process. All of it runs on the
 `com.paydock.telemetry` queue, never the main thread.
 
 ## SDK errors, uncaught errors and widget usage
@@ -99,8 +97,7 @@ inside telemetry loses the record, never the merchant's result.
 - **Widget usage**: each public widget reports itself once when it appears (an `.onAppear` on its outermost view, or
   the first statement of `makeUIView`); `ApplePayWidget` embeds `ApplePaySetupWidget` without a report of its own. The
   reducer remembers the widgets stored this session (`TelemetryState.openedWidgets`) and drops a repeat as
-  `alreadyOpened`, after the level and before the hourly cap; level `errors` drops widget usage. A new SDK session
-  records it again.
+  `alreadyOpened`, before the hourly cap. A new SDK session records it again.
 
 `ErrorPathScanTests` and `WidgetUsageScanTests` in `MobileSDKTests` scan the sources: the report calls per file, each
 before its delivery, no `Task` outside `SdkTask`, no message text in the telemetry files, and one usage report per
@@ -171,36 +168,7 @@ crash handling is unchanged: the SDK's handler is chained, always calls the one 
 check on the first real device crash, as the simulator delivers no MetricKit payloads. If it holds the image's load
 address instead, the offset is `address` minus it, changed in `MetricKitPayload` only.
 
-### Test crashes
-
-In the same unshared scheme as the telemetry override (Run → Arguments → Environment Variables), debug builds of a
-Paydock app only:
-
-- `PAYDOCK_TELEMETRY_TEST_CRASH` = `true`: an active runtime raises a test Objective-C exception
-  (`PaydockTelemetryTestCrash`) from SDK code on the main thread 3 s after start, recorded with `in_sdk` true. It does
-  nothing while telemetry is inactive.
-- `EXAMPLE_APP_TEST_CRASH` = `true`: the example app raises `ExampleAppTestCrash` from app code on the main thread 3 s
-  after launch, recorded with `in_sdk` false.
-
-Both end the process. Never put them in a shared scheme.
-
-`scripts/check-crash-in-sdk.sh [<simulator udid>]` proves the classifier on a stripped build: it builds the example
-app like a release (`SWIFT_OPTIMIZATION_LEVEL=-O SWIFT_COMPILATION_MODE=wholemodule ENABLE_TESTABILITY=NO
-LD_EXPORT_GLOBAL_SYMBOLS=NO ENABLE_DEBUG_DYLIB=NO`: a debug configuration enables testability and exports global
-symbols, which `strip` must keep), strips every symbol from the executable itself (`xcrun strip`: the target sets
-`STRIP_INSTALLED_PRODUCT = NO` for its debug configurations, so build settings strip nothing) and re-signs the app ad
-hoc (`codesign --force --sign -`), fails while any `MobileSDK` symbol is left, then runs both test crashes on the
-simulator (telemetry active against a gateway that never answers) and expects one `nsexception` crash record each, with
-`in_sdk` true for the SDK's and false for the app's. It prints one PASS or FAIL line per case and never collects
-diagnostics.
-
-## Test record
-
-Set `PAYDOCK_TELEMETRY_SEND_TEST_RECORD` to `true` in the same unshared scheme as the telemetry override (Run →
-Arguments → Environment Variables) to make an active runtime store and send one test record right after start: an SDK
-error with `paydock.error.code` `TelemetryTestRecord` (`exception.type` `PaydockTelemetry.TelemetryTestRecord`). It
-shows in devdock with the other records of the session. Only a debug build of a Paydock app reads it (a release build
-has no such path), and it does nothing while telemetry is inactive. Never put it in a shared scheme.
+## Golden fixtures
 
 `GoldenFixturesTests` checks every shared and iOS golden fixture in `Tests/PaydockTelemetryTests/Fixtures` against its
 expected JSON. The fixtures are copied from the planning repo and never edited here: a mismatch is fixed in the

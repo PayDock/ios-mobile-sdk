@@ -68,29 +68,6 @@ final class NoOpTelemetryTests: XCTestCase {
         XCTAssertFalse(telemetry.isActive)
     }
 
-    #if DEBUG
-    func testSendTestRecord_DoesNothing() {
-        let telemetry = NoOpTelemetry()
-
-        telemetry.start()
-        telemetry.sendTestRecord()
-        telemetry.sendTestRecord()
-
-        XCTAssertFalse(telemetry.isActive)
-    }
-
-    /// R_13: nothing is scheduled, so nothing is raised once the active runtime's delay has passed.
-    func testRaiseTestCrash_DoesNothing() {
-        let telemetry = NoOpTelemetry()
-
-        telemetry.start()
-        telemetry.raiseTestCrash()
-        RunLoop.main.run(until: Date(timeIntervalSinceNow: Double(TelemetryLimits.testCrashDelayMilliseconds) / 1_000 + 0.2))
-
-        XCTAssertFalse(telemetry.isActive)
-    }
-    #endif
-
     /// R_03, R_15: inactive, no handler is installed: the process's uncaught-exception handler slot is unchanged.
     func testInactive_InstallsNoExceptionHandler() {
         let before = Self.handlerAddress()
@@ -98,10 +75,6 @@ final class NoOpTelemetryTests: XCTestCase {
 
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
-        #if DEBUG
-        telemetry.sendTestRecord()
-        telemetry.raiseTestCrash()
-        #endif
 
         XCTAssertEqual(Self.handlerAddress(), before)
     }
@@ -114,10 +87,6 @@ final class NoOpTelemetryTests: XCTestCase {
 
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
-        #if DEBUG
-        telemetry.sendTestRecord()
-        telemetry.raiseTestCrash()
-        #endif
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: applicationSupport.child("paydock_telemetry").path))
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: applicationSupport.url.path), [])

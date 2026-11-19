@@ -145,8 +145,8 @@ final class TelemetryEffectHandlerTests: XCTestCase {
     }
 
     func testDrop_DoesNothing() {
-        let followUps = makeHandler().run([.drop(.disabled), .drop(.levelOff), .drop(.levelFiltered), .drop(.rateLimit),
-                                           .drop(.notReportable)])
+        let followUps = makeHandler().run([.drop(.disabled), .drop(.rateLimit), .drop(.notReportable),
+                                           .drop(.alreadyOpened)])
 
         XCTAssertEqual(store.saved, [])
         XCTAssertEqual(store.pruneTimes, [])

@@ -31,6 +31,4 @@ package enum TelemetryLimits {
     package static let crashLockTimeoutSeconds: TimeInterval = 0.5
     /// Builds whose SDK ranges are kept for the frame classifier, the current one included.
     package static let frameBuildsKept = 3
-    /// The delay before a debug test crash is raised on the main thread.
-    package static let testCrashDelayMilliseconds: Int64 = 3_000
 }

@@ -16,7 +16,7 @@ final class TelemetryReducerTests: XCTestCase {
     private static let scheduleFlush = TelemetryEffect.scheduleFlush(delayMilliseconds: TelemetryLimits.flushIntervalMilliseconds)
     private static let export = TelemetryEffect.export(maxRecords: TelemetryLimits.batchMaxRecords)
 
-    private let initial = TelemetryState(level: .all, enabled: true, sessionId: "session")
+    private let initial = TelemetryState(enabled: true, sessionId: "session")
     private var sequence = RecordSequence()
 
     // MARK: - Limits
@@ -99,7 +99,7 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(sequence.next(), 1, "a refused report used a sequence number")
     }
 
-    // MARK: - Enabled and level
+    // MARK: - Enabled
 
     func testDisabled_DropsWithoutStateChange() {
         var state = initial
@@ -111,55 +111,13 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(result.effects, [.drop(.disabled)])
     }
 
-    func testLevelOff_DropsWithoutStateChange() {
-        var state = initial
-        state.level = .off
-
-        for event in everyKind() + [.widgetOpened(widget: "CardDetailsWidget")] {
-            let result = reduce(state, .reported(event))
-
-            XCTAssertEqual(result.state, state)
-            XCTAssertEqual(result.effects, [.drop(.levelOff)])
-        }
-        XCTAssertEqual(sequence.next(), 1)
-    }
-
-    func testLevelErrors_KeepsEveryErrorKind_AndDropsWidgetOpened() {
-        var state = initial
-        state.level = .errors
-
-        for event in everyKind() {
-            XCTAssertTrue(TelemetryReducer.isError(event))
-            XCTAssertEqual(reduce(state, .reported(event)).state.pending, 1)
-        }
-        let widget = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
-        let result = reduce(state, .reported(widget))
-
-        XCTAssertFalse(TelemetryReducer.isError(widget))
-        XCTAssertFalse(TelemetryReducer.isError(.dropped(reason: .tooOld, count: 1)))
-        XCTAssertEqual(result.state, state)
-        XCTAssertEqual(result.effects, [.drop(.levelFiltered)])
-    }
-
-    func testLevelAll_KeepsEveryReportableKind() {
+    func testEnabled_KeepsEveryReportableKind() {
         for event in everyKind() + [.widgetOpened(widget: "CardDetailsWidget")] {
             XCTAssertEqual(reduce(initial, .reported(event)).state.pending, 1)
         }
     }
 
     // MARK: - Widgets opened (R_09)
-
-    func testLevelErrors_DropsAWidgetOpened_AndKeepsErrors() {
-        var state = initial
-        state.level = .errors
-
-        let widget = reduce(state, .reported(.widgetOpened(widget: "CardDetailsWidget")))
-        let error = reduce(widget.state, .reported(TelemetryFixtures.sdkError()))
-
-        XCTAssertEqual(widget.effects, [.drop(.levelFiltered)])
-        XCTAssertEqual(widget.state.openedWidgets, [])
-        XCTAssertEqual(error.state.pending, 1)
-    }
 
     func testASecondOpening_DropsAsAlreadyOpened() {
         let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
@@ -180,21 +138,15 @@ final class TelemetryReducerTests: XCTestCase {
         let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
         _ = reduce(initial, .reported(event))
 
-        let fresh = TelemetryState(level: .all, enabled: true, sessionId: "session-2")
+        let fresh = TelemetryState(enabled: true, sessionId: "session-2")
         let again = reduce(fresh, .reported(event))
 
         XCTAssertEqual(again.state.pending, 1)
         XCTAssertEqual(again.state.openedWidgets, ["CardDetailsWidget"])
     }
 
-    func testAWidgetDroppedByTheLevelOrTheCap_IsNotRemembered() {
+    func testAWidgetDroppedByTheCap_IsNotRemembered() {
         let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
-        var filtered = initial
-        filtered.level = .errors
-        let byLevel = reduce(filtered, .reported(event))
-        XCTAssertEqual(byLevel.effects, [.drop(.levelFiltered)])
-        XCTAssertEqual(byLevel.state.openedWidgets, [])
-
         var capped = initial
         for index in 0..<Limits.hourlyCap {
             capped = reduce(capped, .reported(TelemetryFixtures.crash()), elapsed: Int64(index)).state
@@ -211,13 +163,9 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(afterTheHour.state.openedWidgets, ["CardDetailsWidget"])
     }
 
-    func testAlreadyOpened_IsCheckedAfterTheLevel_AndBeforeTheCap() {
+    func testAlreadyOpened_IsCheckedBeforeTheCap() {
         let event = TelemetryEvent.widgetOpened(widget: "CardDetailsWidget")
         var opened = reduce(initial, .reported(event)).state
-
-        var errorsOnly = opened
-        errorsOnly.level = .errors
-        XCTAssertEqual(reduce(errorsOnly, .reported(event)).effects, [.drop(.levelFiltered)], "the level comes first")
 
         for index in 0..<Limits.hourlyCap {
             opened = reduce(opened, .reported(TelemetryFixtures.crash()), elapsed: Int64(index)).state
@@ -228,26 +176,13 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertEqual(atTheCap.state, opened, "no rate-limit notice")
     }
 
-    func testLevelChanged_SetsTheLevel_WithoutEffects() {
-        for level in [TelemetryLevel.off, .errors, .all] {
-            let result = reduce(initial, .levelChanged(level))
-
-            var expected = initial
-            expected.level = level
-            XCTAssertEqual(result.state, expected)
-            XCTAssertEqual(result.effects, [])
-        }
-        let off = reduce(initial, .levelChanged(.off)).state
-        XCTAssertEqual(reduce(off, .reported(TelemetryFixtures.crash())).effects, [.drop(.levelOff)])
-    }
-
     // MARK: - Flush and export
 
     func testOnlyATimerFlush_ClearsFlushScheduled() {
         var state = initial
         state.flushScheduled = true
 
-        for source in [TelemetryIntent.FlushSource.start, .debugSend, .retry] {
+        for source in [TelemetryIntent.FlushSource.start, .retry] {
             XCTAssertTrue(reduce(state, .flush(source)).state.flushScheduled, "\(source)")
         }
         XCTAssertTrue(reduce(state, .appBackgrounded).state.flushScheduled)
@@ -255,7 +190,7 @@ final class TelemetryReducerTests: XCTestCase {
     }
 
     func testFlushAndBackground_ExportEvenAtZeroPending() {
-        let intents: [TelemetryIntent] = [.flush(.timer), .flush(.start), .flush(.debugSend), .flush(.retry), .appBackgrounded]
+        let intents: [TelemetryIntent] = [.flush(.timer), .flush(.start), .flush(.retry), .appBackgrounded]
         for intent in intents {
             let result = reduce(initial, intent, now: Self.start)
 
@@ -423,12 +358,10 @@ final class TelemetryReducerTests: XCTestCase {
         XCTAssertTrue(state.notices.values.allSatisfy { $0.count == 2 })
     }
 
-    func testRecordsDropped_IsIgnored_ForZeroDisabledAndOff() {
+    func testRecordsDropped_IsIgnored_ForZeroAndDisabled() {
         var disabled = initial
         disabled.enabled = false
-        var off = initial
-        off.level = .off
-        let cases: [(TelemetryState, Int)] = [(initial, 0), (initial, -1), (disabled, 3), (off, 3)]
+        let cases: [(TelemetryState, Int)] = [(initial, 0), (initial, -1), (disabled, 3)]
 
         for (state, count) in cases {
             let result = reduce(state, .recordsDropped(reason: .rejected, count: count))
@@ -436,9 +369,7 @@ final class TelemetryReducerTests: XCTestCase {
             XCTAssertEqual(result.state, state)
             XCTAssertEqual(result.effects, [])
         }
-        var errors = initial
-        errors.level = .errors
-        XCTAssertEqual(reduce(errors, .recordsDropped(reason: .rejected, count: 1)).state.notices.count, 1)
+        XCTAssertEqual(reduce(initial, .recordsDropped(reason: .rejected, count: 1)).state.notices.count, 1)
     }
 
     func testAfterNoticesExported_TheNextDropStartsANewNotice_WithANewIdAndOnlyTheNewCount() {
@@ -462,7 +393,7 @@ final class TelemetryReducerTests: XCTestCase {
     func testReduce_IsDeterministic_WithTwoFreshSequences() {
         let intents: [TelemetryIntent] = everyKind().map { .reported($0) } + [
             .recordsDropped(reason: .storeFull, count: 2), .flush(.start), .pendingCounted(4), .appBackgrounded,
-            .noticesExported(["session-5"]), .levelChanged(.errors), .reported(.widgetOpened(widget: "CardDetailsWidget")),
+            .noticesExported(["session-5"]), .reported(.widgetOpened(widget: "CardDetailsWidget")),
             .flush(.timer), .exportStopped, .reported(TelemetryFixtures.crash())
         ]
         let first = run(intents, sequence: RecordSequence())

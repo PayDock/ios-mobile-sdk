@@ -13,5 +13,5 @@ package enum TelemetryEffect: Sendable, Equatable {
     case export(maxRecords: Int)
     case drop(DropReason)
 
-    package enum DropReason: Sendable, Equatable { case disabled, levelOff, levelFiltered, rateLimit, notReportable, alreadyOpened }
+    package enum DropReason: Sendable, Equatable { case disabled, rateLimit, notReportable, alreadyOpened }
 }

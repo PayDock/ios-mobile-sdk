@@ -8,11 +8,11 @@ import Foundation
 
 /// The one activation decision. Pure: the SDK passes in what the target cannot see.
 package enum TelemetryActivation {
-    /// R_02: a non-blank endpoint and a level other than off.
-    package static func isActive(credentials: TelemetryCredentials?, level: TelemetryLevel) -> Bool {
-        guard let credentials else {
+    /// R_02: a non-blank (trimmed) endpoint.
+    package static func isActive(endpoint: String?) -> Bool {
+        guard let endpoint else {
             return false
         }
-        return !credentials.endpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && level != .off
+        return !endpoint.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

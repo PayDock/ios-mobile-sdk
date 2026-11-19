@@ -9,11 +9,10 @@ package enum TelemetryIntent: Sendable, Equatable {
     case reported(TelemetryEvent)
     case flush(FlushSource)
     case appBackgrounded
-    case levelChanged(TelemetryLevel)
     case recordsDropped(reason: TelemetryEvent.DroppedReason, count: Int)
     case pendingCounted(Int)
     case noticesExported(Set<String>)
     case exportStopped
 
-    package enum FlushSource: Sendable, Equatable { case timer, start, debugSend, retry }
+    package enum FlushSource: Sendable, Equatable { case timer, start, retry }
 }

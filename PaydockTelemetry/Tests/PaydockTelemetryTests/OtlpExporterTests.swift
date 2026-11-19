@@ -15,38 +15,53 @@ final class OtlpExporterTests: XCTestCase {
 
     private let batch = ExportBatch(resource: FakeDeviceContextProvider.attributes, records: [OtlpExporterTests.record()])
 
-    func testSuccess_SendsTheGzippedBatch_WithTheThreeHeaders() throws {
+    private static let contentHeaders = ["Content-Encoding": "gzip", "Content-Type": "application/json"]
+
+    func testSuccess_SendsTheGzippedBatch_WithTheTwoContentHeaders() throws {
         let transport = RecordingTransport([.success(status: 204, rejectedRecords: 0)])
 
         XCTAssertEqual(exporter(transport).export(batch), .success(rejectedRecords: 0))
 
         let call = try XCTUnwrap(transport.calls.first)
         XCTAssertEqual(transport.calls.count, 1)
-        XCTAssertEqual(call.headers, ["Content-Encoding": "gzip", "Content-Type": "application/json",
-                                      "Authorization": "Basic synthetic-not-a-credential"])
+        XCTAssertEqual(call.headers, Self.contentHeaders)
         XCTAssertEqual(call.payload, Gzip.compress(OtlpLogEncoder.encode(resource: batch.resource, records: batch.records)))
     }
 
-    func testAuthorization_AlreadyBasic_IsSentAsIs() throws {
-        let transport = RecordingTransport()
-        let credentials = TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: "Basic c3ludGhldGlj")
+    /// R_05, D22: every request carries exactly the two content headers, whatever the response, and never an
+    /// authorization header.
+    func testEveryRequest_CarriesExactlyTheTwoContentHeaders() throws {
+        let results: [TransportResult] = [
+            .success(status: 200, rejectedRecords: 0), .httpError(status: 400, retryAfterMilliseconds: nil),
+            .httpError(status: 401, retryAfterMilliseconds: nil), .httpError(status: 503, retryAfterMilliseconds: 1_000),
+            .timeout, .connectionFailure
+        ]
+        let transport = RecordingTransport(results)
+        let exporter = exporter(transport)
 
-        _ = OtlpExporter(transport: transport, credentials: credentials).export(batch)
+        for _ in results {
+            _ = exporter.export(batch)
+        }
 
-        XCTAssertEqual(try XCTUnwrap(transport.calls.first).headers["Authorization"], "Basic c3ludGhldGlj")
+        XCTAssertEqual(transport.calls.count, results.count)
+        for call in transport.calls {
+            XCTAssertEqual(call.headers, Self.contentHeaders)
+        }
     }
 
-    /// R_05: an empty or blank authorization sends exactly the content-encoding and content-type headers.
-    func testEmptyOrBlankAuthorization_SendsExactlyTheTwoHeaders() throws {
-        for authorization in ["", " ", "\t\n "] {
-            let transport = RecordingTransport()
-            let credentials = TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: authorization)
+    /// D22: a 400 is rejected, not retried.
+    func test400_IsRejected() {
+        XCTAssertEqual(result(.httpError(status: 400, retryAfterMilliseconds: nil)), .rejected)
+        XCTAssertEqual(result(.httpError(status: 400, retryAfterMilliseconds: 1_000)), .rejected)
+    }
 
-            _ = OtlpExporter(transport: transport, credentials: credentials).export(batch)
-
-            XCTAssertEqual(try XCTUnwrap(transport.calls.first).headers,
-                           ["Content-Encoding": "gzip", "Content-Type": "application/json"],
-                           "authorization: \(authorization.debugDescription)")
+    /// D22: 429, 502, 503 and 504 are retried, with the `Retry-After` carried.
+    func testD22RetryStatuses_AreRetried_WithRetryAfterCarried() {
+        for status in [429, 502, 503, 504] {
+            XCTAssertEqual(result(.httpError(status: status, retryAfterMilliseconds: 4_000)),
+                           .retry(retryAfterMilliseconds: 4_000), "\(status)")
+            XCTAssertEqual(result(.httpError(status: status, retryAfterMilliseconds: nil)),
+                           .retry(retryAfterMilliseconds: nil), "\(status)")
         }
     }
 
@@ -94,7 +109,7 @@ final class OtlpExporterTests: XCTestCase {
     // MARK: - Helpers
 
     private func exporter(_ transport: RecordingTransport) -> OtlpExporter {
-        OtlpExporter(transport: transport, credentials: TelemetryFixtures.credentials)
+        OtlpExporter(transport: transport)
     }
 
     private func result(_ transportResult: TransportResult) -> ExportResult {

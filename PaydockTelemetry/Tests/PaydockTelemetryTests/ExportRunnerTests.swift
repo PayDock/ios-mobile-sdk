@@ -280,6 +280,20 @@ final class ExportRunnerTests: XCTestCase {
         XCTAssertEqual(store.count(), 0)
     }
 
+    /// D22: a batch the collector rejects (`400`) is removed and counted rejected, and no retry is scheduled.
+    func testRejectedBatch_IsRemoved_CountedRejected_AndNotRetried() {
+        save((1...2).map { record($0) })
+        let exporter = ScriptedExporter([.rejected])
+
+        let report = makeRunner(exporter).flush(now: Self.now, maxRecords: 50)
+
+        XCTAssertEqual(exporter.batchIds, [[id(1), id(2)]])
+        XCTAssertEqual(report.rejected, 2)
+        XCTAssertFalse(report.stopped)
+        XCTAssertEqual(store.count(), 0)
+        XCTAssertTrue(retries.values.isEmpty)
+    }
+
     func testUnauthorized_StopsForTheProcess_AndKeepsTheFiles() {
         save((1...3).map { record($0) })
         let exporter = ScriptedExporter([.unauthorized])

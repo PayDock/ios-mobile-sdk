@@ -8,9 +8,9 @@
 import SwiftUI
 import MobileSDK
 
-/// Debug builds only: one row per telemetry trigger with what it records and its note, the SDK test crash's launch
-/// variable, the uncovered uncaught errors and the empty config IDs. Records reach devdock only while telemetry is
-/// active (see the README's "Telemetry (debug builds)").
+/// Debug builds only: one row per telemetry trigger with what it records and its note, the uncovered uncaught errors
+/// and the empty config IDs. Records go to the configured environment's collector, the dev collector (and devdock) for
+/// sandbox and staging (see the README's "Telemetry" → "Triggers").
 struct TelemetryTriggersView: View {
 
     @StateObject private var viewModel = TelemetryTriggersVM()
@@ -35,8 +35,6 @@ struct TelemetryTriggersView: View {
             }
 
             Section {
-                Text("SDK crash: set PAYDOCK_TELEMETRY_TEST_CRASH to true in an unshared copy of the scheme and launch.")
-                    .font(.caption)
                 Text("Uncaught errors: no trigger, covered by the SDK's tests.")
                     .font(.caption)
             } header: {

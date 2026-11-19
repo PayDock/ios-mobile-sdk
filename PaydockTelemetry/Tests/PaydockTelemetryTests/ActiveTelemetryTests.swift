@@ -61,25 +61,24 @@ final class ActiveTelemetryTests: XCTestCase {
 
     // MARK: - Identity and state
 
-    func testIsActive_IsTrue_AndKeepsCredentialsAndLevel() {
-        let telemetry = makeTelemetry(level: .errors)
+    func testIsActive_IsTrue_AndKeepsTheEndpoint() {
+        let telemetry = makeTelemetry()
 
         XCTAssertTrue(telemetry.isActive)
-        XCTAssertEqual(telemetry.credentials, TelemetryFixtures.credentials)
-        XCTAssertEqual(telemetry.level, .errors)
+        XCTAssertEqual(telemetry.endpoint, TelemetryFixtures.endpoint)
     }
 
-    func testInitialState_IsEnabled_AtTheLevel_WithTheSessionId() {
-        let telemetry = makeTelemetry(level: .errors)
+    func testInitialState_IsEnabled_WithTheSessionId() {
+        let telemetry = makeTelemetry()
 
         XCTAssertEqual(telemetry.sessionId, Self.sessionId)
-        XCTAssertEqual(telemetry.currentState(), TelemetryState(level: .errors, enabled: true, sessionId: Self.sessionId))
+        XCTAssertEqual(telemetry.currentState(), TelemetryState(enabled: true, sessionId: Self.sessionId))
     }
 
     func testTwoInstances_HaveDifferentSessionIds() {
-        let first = ActiveTelemetry(credentials: TelemetryFixtures.credentials, level: .all, deviceContextProvider: provider,
+        let first = ActiveTelemetry(endpoint: TelemetryFixtures.endpoint, deviceContextProvider: provider,
                                     dispatcher: dispatcher)
-        let second = ActiveTelemetry(credentials: TelemetryFixtures.credentials, level: .all, deviceContextProvider: provider,
+        let second = ActiveTelemetry(endpoint: TelemetryFixtures.endpoint, deviceContextProvider: provider,
                                      dispatcher: dispatcher)
 
         XCTAssertNotEqual(first.sessionId, second.sessionId)
@@ -117,7 +116,7 @@ final class ActiveTelemetryTests: XCTestCase {
         let gate = DispatchSemaphore(value: 0)
         defer { gate.signal() }
         XCTAssertTrue(serial.post { gate.wait() })
-        let telemetry = ActiveTelemetry(credentials: TelemetryFixtures.credentials, level: .all, deviceContextProvider: provider,
+        let telemetry = ActiveTelemetry(endpoint: TelemetryFixtures.endpoint, deviceContextProvider: provider,
                                         dispatcher: serial)
         let event = TelemetryFixtures.sdkError()
 
@@ -159,20 +158,16 @@ final class ActiveTelemetryTests: XCTestCase {
         let serial = SerialTelemetryDispatcher()
         let transport = RecordingTransport()
         let telemetry = makeTelemetry(
-            exporter: OtlpExporter(transport: transport, credentials: TelemetryFixtures.credentials),
+            exporter: OtlpExporter(transport: transport),
             dispatcher: serial
         )
         XCTAssertTrue(Thread.isMainThread)
 
         telemetry.start()
         telemetry.report(TelemetryFixtures.crash())
-        #if DEBUG
-        telemetry.sendTestRecord()
-        #else
         for index in 1..<TelemetryLimits.flushThreshold {
             telemetry.report(distinct(index))
         }
-        #endif
         waitUntil { transport.calls.count == 1 }
         drain(serial)
 
@@ -194,9 +189,6 @@ final class ActiveTelemetryTests: XCTestCase {
         let telemetry = makeTelemetry()
 
         telemetry.report(TelemetryFixtures.crash())
-        #if DEBUG
-        telemetry.sendTestRecord()
-        #endif
         dispatcher.runDelayed()
         XCTAssertEqual(lifecycle.registerCount, 0)
         XCTAssertEqual(connection.startCount, 0)
@@ -277,28 +269,6 @@ final class ActiveTelemetryTests: XCTestCase {
         XCTAssertEqual(store.saved, [late])
     }
 
-    #if DEBUG
-    /// R_16: the test record is stored and sent, an SDK error with the test code.
-    func testSendTestRecord_StoresAndSendsARecordWithTheTestCode() throws {
-        let exporter = ScriptedExporter()
-        let telemetry = makeTelemetry(exporter: exporter, level: .errors)
-        telemetry.start()
-
-        telemetry.sendTestRecord()
-        XCTAssertEqual(dispatcher.delayedMilliseconds.last, 0, "the test record's flush was not posted after 0 ms")
-        dispatcher.runDelayed()
-
-        let saved = try XCTUnwrap(store.saved.first)
-        XCTAssertEqual(store.saved.count, 1)
-        XCTAssertEqual(saved.eventName, "paydock.error")
-        XCTAssertEqual(saved.value("paydock.error.code"), .string(ActiveTelemetry.testRecordCode))
-        XCTAssertEqual(saved.value("exception.type"), .string(ActiveTelemetry.testRecordType))
-        XCTAssertEqual(ActiveTelemetry.testRecordCode, "TelemetryTestRecord")
-        XCTAssertEqual(exporter.batchIds, [[saved.id]])
-        XCTAssertEqual(store.count(), 0)
-    }
-    #endif
-
     /// MD-36 acceptance: every batch carries the installation ID and every record its session ID.
     func testEveryBatch_CarriesTheInstallationId_AndEveryRecordItsSessionId() {
         let exporter = ScriptedExporter()
@@ -329,7 +299,7 @@ final class ActiveTelemetryTests: XCTestCase {
     /// R_12: 401 stops sending for the rest of the process.
     func testATransportThatAlwaysAnswers401_SendsOnce_ThenStops() {
         let transport = RecordingTransport(fallback: .httpError(status: 401, retryAfterMilliseconds: nil))
-        let telemetry = makeTelemetry(exporter: OtlpExporter(transport: transport, credentials: TelemetryFixtures.credentials))
+        let telemetry = makeTelemetry(exporter: OtlpExporter(transport: transport))
         telemetry.start()
 
         for index in 1...25 {
@@ -339,11 +309,7 @@ final class ActiveTelemetryTests: XCTestCase {
         for index in 26...50 {
             telemetry.report(distinct(index))
         }
-        #if DEBUG
-        telemetry.sendTestRecord()
-        #else
         telemetry.report(distinct(51))
-        #endif
         dispatcher.runDelayed()
 
         XCTAssertEqual(transport.calls.count, 1)
@@ -406,8 +372,7 @@ final class ActiveTelemetryTests: XCTestCase {
 
         let exporter = ScriptedExporter()
         let second = ActiveTelemetry(
-            credentials: TelemetryFixtures.credentials,
-            level: .all,
+            endpoint: TelemetryFixtures.endpoint,
             deviceContextProvider: provider,
             clock: clock,
             monotonic: FixedMonotonicClock(),
@@ -473,9 +438,8 @@ final class ActiveTelemetryTests: XCTestCase {
     func testTheObserver_ExcludesTheTelemetryHost_AndIgnoresSuccesses() throws {
         let previous = RecordingRequestObserver()
         let slot = FakeRequestObserverSlot(previous)
-        let credentials = TelemetryCredentials(endpoint: "https://api-sandbox.paydock.com/v1/logs",
-                                               authorization: "synthetic-not-a-credential")
-        let telemetry = ActiveTelemetry(credentials: credentials, level: .all, deviceContextProvider: provider, clock: clock,
+        let telemetry = ActiveTelemetry(endpoint: "https://api-sandbox.paydock.com/v1/logs", deviceContextProvider: provider,
+                                        clock: clock,
                                         monotonic: FixedMonotonicClock(), idGenerator: FixedIdGenerator(id: Self.sessionId),
                                         dispatcher: dispatcher,
                                         ports: ActiveTelemetry.Ports(store: store, requestObservers: slot))
@@ -545,14 +509,12 @@ final class ActiveTelemetryTests: XCTestCase {
     private func makeTelemetry(
         store: (any DurableStore)? = nil,
         exporter: any Exporter = ScriptedExporter(),
-        level: TelemetryLevel = .all,
         dispatcher: (any TelemetryDispatcher)? = nil,
         clockOffset: ClockOffset? = nil,
         requestObservers: (any RequestObserverSlot)? = nil
     ) -> ActiveTelemetry {
         ActiveTelemetry(
-            credentials: TelemetryFixtures.credentials,
-            level: level,
+            endpoint: TelemetryFixtures.endpoint,
             deviceContextProvider: provider,
             clock: clock,
             monotonic: FixedMonotonicClock(),

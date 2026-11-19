@@ -12,7 +12,7 @@ import Foundation
 /// `dispatch(intent)` works through a first-in, first-out list inside one queue task: reduce with the clock, the
 /// monotonic clock and the session's sequence, run the effects, append their follow-ups, until the list is empty. No
 /// follow-up goes back through the dispatcher. Reports use the bounded `post`; every module signal (the flush timer,
-/// the runner's retry, the background callback, the test record's flush, a delivered diagnostic) uses `postDelayed`,
+/// the runner's retry, the background callback, a delivered diagnostic) uses `postDelayed`,
 /// which never drops.
 ///
 /// Crashes (R_03, R_09, R_11): start installs the exception handler chain on the calling thread, then, on the queue,
@@ -121,8 +121,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         }
     }
 
-    package let credentials: TelemetryCredentials
-    package let level: TelemetryLevel
+    package let endpoint: String
     /// `idGenerator.newId()`, once, at init.
     package let sessionId: String
     /// This session's record IDs.
@@ -146,8 +145,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
     private var handler: TelemetryEffectHandler?
 
     package init(
-        credentials: TelemetryCredentials,
-        level: TelemetryLevel,
+        endpoint: String,
         deviceContextProvider: any DeviceContextProvider,
         clock: any Clock = SystemClock(),
         monotonic: any MonotonicClock = SystemMonotonicClock(),
@@ -156,8 +154,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         ports: Ports = Ports(),
         scheduleOnMain: @escaping MainScheduler = ActiveTelemetry.mainQueue
     ) {
-        self.credentials = credentials
-        self.level = level
+        self.endpoint = endpoint
         self.deviceContext = DeviceContextCache(provider: deviceContextProvider)
         self.clock = clock
         self.monotonic = monotonic
@@ -167,7 +164,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         self.sequence = RecordSequence()
         let sessionId = idGenerator.newId()
         self.sessionId = sessionId
-        self.state = TelemetryState(level: level, enabled: true, sessionId: sessionId)
+        self.state = TelemetryState(enabled: true, sessionId: sessionId)
         let runner = ExportRunner(
             store: ports.store,
             exporter: ports.exporter,
@@ -189,8 +186,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
 
     /// Production wiring; no I/O on the calling thread: the file store resolves its directory on first use, the
     /// transport builds its client on the first send, and the lifecycle and the monitor register only at start.
-    package static func create(credentials: TelemetryCredentials, level: TelemetryLevel, sdkVersion: String,
-                               environmentName: String) -> ActiveTelemetry {
+    package static func create(endpoint: String, sdkVersion: String, environmentName: String) -> ActiveTelemetry {
         let provider = DefaultDeviceContextProvider(
             platform: ApplePlatformInfo(),
             installationIds: InstallationIdStore(store: UserDefaultsKeyValueStore(), idGenerator: RandomIdGenerator()),
@@ -198,10 +194,10 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             environmentName: environmentName
         )
         let clockOffset = ClockOffset(clock: SystemClock())
-        let transport = OtlpHttpTransport(endpoint: credentials.endpoint, clockOffset: clockOffset)
+        let transport = OtlpHttpTransport(endpoint: endpoint, clockOffset: clockOffset)
         let ports = Ports(
             store: FileDurableStore(directory: { FileDurableStore.defaultDirectory() }),
-            exporter: OtlpExporter(transport: transport, credentials: credentials),
+            exporter: OtlpExporter(transport: transport),
             lifecycle: platformLifecycle(),
             connection: platformConnectionMonitor(),
             clockOffset: clockOffset,
@@ -212,7 +208,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             resolver: DladdrAddressResolver(),
             requestObservers: NetworkingLibObserverSlot()
         )
-        return ActiveTelemetry(credentials: credentials, level: level, deviceContextProvider: provider, ports: ports)
+        return ActiveTelemetry(endpoint: endpoint, deviceContextProvider: provider, ports: ports)
     }
 
     package func report(_ event: TelemetryEvent) {
@@ -245,7 +241,7 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
             connection: ports.connection, clock: clock
         ))
         ports.requestObservers.map { $0.set(NetworkFailureObserver(report: { [weak self] in self?.report($0) },
-                                                                   excludedHost: URL(string: credentials.endpoint)?.host,
+                                                                   excludedHost: URL(string: endpoint)?.host,
                                                                    previous: $0.current)) }
         dispatcher.post { [self] in
             buildClassifier()
@@ -348,33 +344,3 @@ package final class ActiveTelemetry: Telemetry, TelemetryRuntime, @unchecked Sen
         #endif
     }
 }
-
-#if DEBUG
-/// The debug-only test hooks: compiled only in debug builds, so a release binary can't raise the test crash.
-extension ActiveTelemetry: TelemetryDebugHooks {
-    /// The test record's `paydock.error.code` (R_16).
-    package static let testRecordCode = "TelemetryTestRecord"
-    /// The test record's `exception.type`.
-    package static let testRecordType = "PaydockTelemetry.TelemetryTestRecord"
-    /// The debug test crash's exception name (R_13).
-    package static let testCrashName = "PaydockTelemetryTestCrash"
-
-    /// Stores and sends one test record, an SDK error with the test code (R_16).
-    package func sendTestRecord() {
-        let event = TelemetryEvent.sdkError(error: TelemetryEvent.ErrorInfo(type: Self.testRecordType, frames: []),
-                                            errorCode: Self.testRecordCode)
-        dispatcher.post { [self] in dispatch(.reported(event)) }
-        post(.flush(.debugSend), after: 0)
-    }
-
-    /// R_13: raises a test Objective-C exception from SDK code on the main thread after testCrashDelayMilliseconds.
-    package func raiseTestCrash() {
-        scheduleOnMain(TelemetryLimits.testCrashDelayMilliseconds) { Self.raiseTestException() }
-    }
-
-    /// A non-nil reason: CoreFoundation crashes on a nil one before any handler runs.
-    private static func raiseTestException() {
-        NSException(name: NSExceptionName(testCrashName), reason: "test", userInfo: nil).raise()
-    }
-}
-#endif

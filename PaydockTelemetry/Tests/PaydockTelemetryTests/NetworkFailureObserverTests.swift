@@ -34,7 +34,7 @@ final class NetworkFailureObserverTests: XCTestCase {
     private typealias Endpoint = NetworkObservations.TestEndpoint
     private typealias ErrorInfo = TelemetryEvent.ErrorInfo
 
-    private static let telemetryHost = URL(string: TelemetryFixtures.credentials.endpoint)?.host
+    private static let telemetryHost = URL(string: TelemetryFixtures.endpoint)?.host
     private static let realId = "5f8a1c2e9b3d4a6f7e8c9d0a"
 
     private let slot = FakeRequestObserverSlot(alsoSetsTheLibrary: true)
@@ -245,7 +245,7 @@ final class NetworkFailureObserverTests: XCTestCase {
     func testRequestDidFinish_ReturnsWithoutRunningTheReducer() async throws {
         let dispatcher = QueueingDispatcher()
         let store = RecordingDurableStore()
-        let telemetry = ActiveTelemetry(credentials: TelemetryFixtures.credentials, level: .all,
+        let telemetry = ActiveTelemetry(endpoint: TelemetryFixtures.endpoint,
                                         deviceContextProvider: FakeDeviceContextProvider(), dispatcher: dispatcher,
                                         ports: ActiveTelemetry.Ports(store: store, requestObservers: slot))
         telemetry.start()

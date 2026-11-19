@@ -6,28 +6,19 @@
 
 import Foundation
 
-/// Encodes a batch as OTLP/HTTP JSON, gzips it and posts it with the content-encoding and content-type headers, plus
-/// the basic authorization header only for a non-blank credential (R_03, R_05), then maps the transport's result to
-/// the retry rules (R_12).
+/// Encodes a batch as OTLP/HTTP JSON, gzips it and posts it with exactly the content-encoding and content-type headers
+/// (R_03, R_05), then maps the transport's result to the retry rules (R_12).
 package final class OtlpExporter: Exporter, @unchecked Sendable {
-    private static let basicPrefix = "Basic "
+    /// Every request's headers, and no other.
+    private static let headers = [
+        "Content-Encoding": "gzip",
+        "Content-Type": "application/json"
+    ]
 
     private let transport: any TelemetryTransport
-    private let headers: [String: String]
 
-    package init(transport: any TelemetryTransport, credentials: TelemetryCredentials) {
+    package init(transport: any TelemetryTransport) {
         self.transport = transport
-        var headers = [
-            "Content-Encoding": "gzip",
-            "Content-Type": "application/json"
-        ]
-        let authorization = credentials.authorization
-        if !authorization.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            headers["Authorization"] = authorization.hasPrefix(Self.basicPrefix)
-                ? authorization
-                : Self.basicPrefix + authorization
-        }
-        self.headers = headers
     }
 
     package func export(_ batch: ExportBatch) -> ExportResult {
@@ -35,12 +26,13 @@ package final class OtlpExporter: Exporter, @unchecked Sendable {
         guard let payload = Gzip.compress(json) else {
             return .retry(retryAfterMilliseconds: nil)
         }
-        switch transport.send(payload, headers: headers) {
+        switch transport.send(payload, headers: Self.headers) {
         case let .success(_, rejectedRecords):
             return .success(rejectedRecords: rejectedRecords)
         case let .httpError(status, retryAfterMilliseconds):
             switch status {
             case 401, 403:
+                // The collector refuses this app: stop sending for the process.
                 return .unauthorized
             case 413:
                 return .tooLarge

@@ -10,7 +10,7 @@ package enum ExportResult: Sendable, Equatable {
     case success(rejectedRecords: Int64)
     /// No connection, a timeout, a failure, 408, 429 or a 5xx.
     case retry(retryAfterMilliseconds: Int64?)
-    /// 401, 403.
+    /// 401, 403: the collector refuses this app; sending stops for the process.
     case unauthorized
     /// 413.
     case tooLarge

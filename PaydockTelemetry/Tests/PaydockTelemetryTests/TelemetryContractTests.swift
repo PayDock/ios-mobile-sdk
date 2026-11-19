@@ -38,8 +38,7 @@ final class TelemetryContractTests: XCTestCase {
 
     func testActiveTelemetry_IsBothFacadeAndRuntime() {
         let active = ActiveTelemetry(
-            credentials: TelemetryCredentials(endpoint: "https://otlp.invalid/v1/logs", authorization: "synthetic-not-a-credential"),
-            level: .all,
+            endpoint: TelemetryFixtures.endpoint,
             deviceContextProvider: FakeDeviceContextProvider(),
             dispatcher: ImmediateDispatcher()
         )

@@ -7,8 +7,8 @@
 import Foundation
 import NetworkingLib
 
-/// The gateway request: a `POST` of the gzipped batch to the credential's endpoint. Kept out of NetworkingLib's debug
-/// log (`logsTraffic` false), so the authorization header never reaches the console.
+/// The collector request: a `POST` of the gzipped batch to the telemetry endpoint. Kept out of NetworkingLib's debug
+/// log (`logsTraffic` false), so telemetry's own traffic never reaches the console.
 package struct TelemetryEndpoint: Endpoint {
     package let scheme: String
     package let host: String

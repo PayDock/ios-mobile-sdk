@@ -14,14 +14,6 @@ import PaydockTelemetry
 final class TelemetryBindingTests: XCTestCase {
 
     private static let endpoint = "https://otlp.invalid/v1/logs"
-    private static let authorization = "synthetic-not-a-credential"
-    private static let paydockHost = "com.paydock.multitenant.sandbox"
-    private static let merchantHost = "com.merchant.shop"
-
-    private static let fullEnvironment = [
-        LocalTelemetryOverride.endpointKey: endpoint,
-        LocalTelemetryOverride.authorizationKey: authorization
-    ]
 
     /// A temporary stand-in for the app's application-support directory.
     private var applicationSupport = URL(fileURLWithPath: NSTemporaryDirectory())
@@ -49,37 +41,47 @@ final class TelemetryBindingTests: XCTestCase {
 
     // MARK: - selectTelemetry
 
-    func testSelect_WithoutCredentials_GivesNoOp_AndCreatesNothing() {
-        assertNoOp(select(provider: StubCredentialsProvider(value: nil)))
+    // MARK: - The collector table
+
+    /// R_01: production binds the prod collector; sandbox and staging keep the dev collector.
+    func testCollector_ProductionIsTheProdURL_SandboxAndStagingTheDevURL() {
+        XCTAssertEqual(TelemetryCollector.prodLogsURL, "https://mobile-telemetry.shared.apac.paydock.com/v1/logs")
+        XCTAssertEqual(TelemetryCollector.devLogsURL, "https://mobile-telemetry-dev.shared.apac.paydock.com/v1/logs")
+        XCTAssertEqual(TelemetryCollector.logsURL(for: .production), TelemetryCollector.prodLogsURL)
+        XCTAssertEqual(TelemetryCollector.logsURL(for: .sandbox), TelemetryCollector.devLogsURL)
+        XCTAssertEqual(TelemetryCollector.logsURL(for: .staging), TelemetryCollector.devLogsURL)
+    }
+
+    /// R_01: each environment's collector selects the active runtime with that URL as its endpoint.
+    func testSelect_EachEnvironmentsCollector_BindsTheActiveRuntime_WithItsURL() throws {
+        let expected: [(SDKEnvironment, String)] = [(.production, TelemetryCollector.prodLogsURL),
+                                                    (.sandbox, TelemetryCollector.devLogsURL),
+                                                    (.staging, TelemetryCollector.devLogsURL)]
+        for (environment, url) in expected {
+            let selection = select(endpoint: TelemetryCollector.logsURL(for: environment))
+
+            let telemetry = try XCTUnwrap(selection.telemetry as? ActiveTelemetry, environment.rawValue)
+            XCTAssertTrue(selection.runtime as? ActiveTelemetry === telemetry, environment.rawValue)
+            XCTAssertEqual(telemetry.endpoint, url, environment.rawValue)
+        }
+        XCTAssertEqual(factory.endpoints, [TelemetryCollector.prodLogsURL, TelemetryCollector.devLogsURL,
+                                           TelemetryCollector.devLogsURL])
+    }
+
+    /// R_01: a nil, empty or blank URL binds the no-op and creates nothing.
+    func testSelect_NilEmptyOrBlankURL_GivesNoOp_AndCreatesNothing() {
+        for endpoint in [nil, "", " ", " \n\t "] as [String?] {
+            assertNoOp(select(endpoint: endpoint))
+        }
         XCTAssertEqual(factory.callCount, 0)
     }
 
-    func testSelect_BlankEndpoint_GivesNoOp_AndCreatesNothing() {
-        assertNoOp(select(provider: StubCredentialsProvider(value: TelemetryCredentials(endpoint: " ", authorization: ""))))
-        XCTAssertEqual(factory.callCount, 0)
-    }
-
-    func testSelect_LevelOff_GivesNoOp_AndCreatesNothing() {
-        assertNoOp(select(level: .off))
-        XCTAssertEqual(factory.callCount, 0)
-    }
-
-    func testSelect_EmptyAuthorization_IsActive() throws {
-        let selection = select(provider: StubCredentialsProvider(value: TelemetryCredentials(endpoint: Self.endpoint,
-                                                                                             authorization: "")))
-
-        XCTAssertTrue(try XCTUnwrap(selection.telemetry as? ActiveTelemetry).isActive)
-        XCTAssertEqual(factory.callCount, 1)
-    }
-
-    /// R_15, MD-36 acceptance: inactive, bound and asked for a test record and a test crash, nothing is created,
-    /// written, registered, installed or subscribed: the process's uncaught-exception handler slot is unchanged.
+    /// R_15, MD-36 acceptance: inactive and bound, nothing is created, written, registered, installed or subscribed:
+    /// the process's uncaught-exception handler slot is unchanged.
     func testInactive_Bound_CreatesNoDirectory_AndRegistersNothing() throws {
         let handlerBefore = Self.processHandlerAddress()
-        for selection in [select(provider: StubCredentialsProvider(value: nil)),
-                          select(provider: SdkTelemetryCredentialsProvider(environment: .production, override: nil)),
-                          select(level: .off)] {
-            TelemetryBinding.bind(selection, sendTestRecord: true, raiseTestCrash: true)
+        for selection in [select(endpoint: nil), select(endpoint: " ")] {
+            TelemetryBinding.bind(selection)
             selection.telemetry.report(.widgetOpened(widget: "SampleWidget"))
         }
 
@@ -99,17 +101,10 @@ final class TelemetryBindingTests: XCTestCase {
         let observerBefore = NetworkingLib.shared.requestObserver
         NetworkingLib.shared.requestObserver = nil
         defer { NetworkingLib.shared.requestObserver = observerBefore }
-        let credentials = TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization)
-        let inactive = [
-            InactiveCondition(provider: StubCredentialsProvider(value: nil)),
-            InactiveCondition(provider: SdkTelemetryCredentialsProvider(environment: .production, override: nil)),
-            InactiveCondition(provider: StubCredentialsProvider(value: credentials), level: .off)
-        ]
-
-        for condition in inactive {
+        for endpoint in [nil, "", " "] as [String?] {
             let selection = selectTelemetry(
-                credentialsProvider: condition.provider, level: condition.level,
-                createActive: { ActiveTelemetry.create(credentials: $0, level: $1, sdkVersion: SDKVersion.current,
+                endpoint: endpoint,
+                createActive: { ActiveTelemetry.create(endpoint: $0, sdkVersion: SDKVersion.current,
                                                        environmentName: SDKEnvironment.production.rawValue) }
             )
             TelemetryBinding.bind(selection)
@@ -133,14 +128,6 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(factory.slot.setCount, 1)
     }
 
-    /// R_16: the test record goes to the store directory when active and asked for.
-    func testActive_BoundWithTheTestRecord_StoresIt() throws {
-        TelemetryBinding.bind(select(), sendTestRecord: true)
-
-        let files = try FileManager.default.contentsOfDirectory(atPath: telemetryDirectory.path)
-        XCTAssertEqual(files.count, 1)
-    }
-
     func testSelect_EveryConditionHolds_CreatesOnce_AndGivesThatActiveTelemetryAsBothHandles() throws {
         let selection = select()
 
@@ -151,16 +138,13 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertTrue(telemetry === created)
         XCTAssertTrue(telemetry === runtime)
         XCTAssertTrue(telemetry.isActive)
-        XCTAssertEqual(telemetry.credentials, TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization))
-        XCTAssertEqual(telemetry.level, .all)
+        XCTAssertEqual(telemetry.endpoint, Self.endpoint)
     }
 
-    func testSelect_PassesTheCredentialsAndLevelToTheFactory() {
-        select(level: .errors)
+    func testSelect_PassesTheEndpointToTheFactory() {
+        select()
 
-        XCTAssertEqual(factory.arguments.map(\.credentials),
-                       [TelemetryCredentials(endpoint: Self.endpoint, authorization: Self.authorization)])
-        XCTAssertEqual(factory.arguments.map(\.level), [.errors])
+        XCTAssertEqual(factory.endpoints, [Self.endpoint])
     }
 
     func testSelect_ActiveThenBound_ReadsTheDeviceContextOnStart() throws {
@@ -196,61 +180,6 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertEqual(runtime.startCount, 0)
     }
 
-    func testBind_Active_WithTheTestRecord_SendsItOnce_AfterStart() {
-        let runtime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime), sendTestRecord: true)
-
-        XCTAssertEqual(runtime.calls, ["start", "sendTestRecord"])
-    }
-
-    /// R_13: the test crash is raised once, after start and the test record, only when active and asked for.
-    func testBind_Active_WithTheTestCrash_RaisesItOnce_AfterStart() {
-        let runtime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime),
-                              sendTestRecord: true, raiseTestCrash: true)
-
-        XCTAssertEqual(runtime.calls, ["start", "sendTestRecord", "raiseTestCrash"])
-    }
-
-    func testBind_Active_WithoutTheTestCrash_NeverRaisesIt() {
-        let runtime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime),
-                              raiseTestCrash: false)
-
-        XCTAssertEqual(runtime.calls, ["start"])
-    }
-
-    func testBind_Inactive_WithTheTestCrash_NeverRaisesIt() {
-        let runtime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: false), runtime: runtime),
-                              raiseTestCrash: true)
-
-        XCTAssertEqual(runtime.calls, [])
-    }
-
-    func testBind_ActiveWhileActiveIsBound_NeverRaisesTheSecondsTestCrash() {
-        let secondRuntime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: CountingRuntime()))
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: secondRuntime),
-                              raiseTestCrash: true)
-
-        XCTAssertEqual(secondRuntime.calls, [])
-    }
-
-    func testBind_Active_WithoutTheTestRecord_NeverSendsIt() {
-        let runtime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: runtime),
-                              sendTestRecord: false)
-
-        XCTAssertEqual(runtime.calls, ["start"])
-    }
-
     /// A second `configureMobileSDK` never starts a second runtime on the same store directory.
     func testBind_ActiveWhileActiveIsBound_KeepsTheFirst_AndNeverStartsTheSecond() {
         let first = FakeTelemetry(isActive: true)
@@ -258,8 +187,7 @@ final class TelemetryBindingTests: XCTestCase {
         let secondRuntime = CountingRuntime()
 
         TelemetryBinding.bind(TelemetrySelection(telemetry: first, runtime: firstRuntime))
-        let bound = TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: secondRuntime),
-                                          sendTestRecord: true)
+        let bound = TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: true), runtime: secondRuntime))
 
         XCTAssertTrue((bound as? FakeTelemetry) === first)
         XCTAssertTrue((TelemetryBinding.current as? FakeTelemetry) === first)
@@ -274,14 +202,6 @@ final class TelemetryBindingTests: XCTestCase {
         TelemetryBinding.bind(TelemetrySelection(telemetry: inactive, runtime: CountingRuntime()))
 
         XCTAssertTrue((TelemetryBinding.current as? FakeTelemetry) === inactive)
-    }
-
-    func testBind_Inactive_WithTheTestRecord_NeverSendsIt() {
-        let runtime = CountingRuntime()
-
-        TelemetryBinding.bind(TelemetrySelection(telemetry: FakeTelemetry(isActive: false), runtime: runtime), sendTestRecord: true)
-
-        XCTAssertEqual(runtime.calls, [])
     }
 
     func testBind_Rebinding_ReplacesTheFacade() {
@@ -313,13 +233,8 @@ final class TelemetryBindingTests: XCTestCase {
     // MARK: - Helpers
 
     @discardableResult
-    private func select(
-        provider: any TelemetryCredentialsProvider = StubCredentialsProvider(
-            value: TelemetryCredentials(endpoint: TelemetryBindingTests.endpoint, authorization: TelemetryBindingTests.authorization)
-        ),
-        level: TelemetryLevel = .all
-    ) -> TelemetrySelection {
-        selectTelemetry(credentialsProvider: provider, level: level, createActive: factory.make)
+    private func select(endpoint: String? = TelemetryBindingTests.endpoint) -> TelemetrySelection {
+        selectTelemetry(endpoint: endpoint, createActive: factory.make)
     }
 
     /// The process's uncaught-exception handler, as an address; nil when there is none.
@@ -332,18 +247,6 @@ final class TelemetryBindingTests: XCTestCase {
         XCTAssertTrue(selection.runtime is NoOpTelemetry, file: file, line: line)
         XCTAssertFalse(selection.telemetry.isActive, file: file, line: line)
     }
-}
-
-/// One way to be inactive; every other condition holds.
-private struct InactiveCondition {
-    let provider: any TelemetryCredentialsProvider
-    var level: TelemetryLevel = .all
-}
-
-private struct StubCredentialsProvider: TelemetryCredentialsProvider {
-    let value: TelemetryCredentials?
-
-    func credentials() -> TelemetryCredentials? { value }
 }
 
 private final class FakeTelemetry: Telemetry {
@@ -367,22 +270,21 @@ private final class CountingActiveFactory {
     let slot = CountingHandlerSlot()
     let exceptionHandlers: ExceptionHandlerChain
     private let applicationSupport: URL
-    private(set) var arguments: [(credentials: TelemetryCredentials, level: TelemetryLevel)] = []
+    private(set) var endpoints: [String] = []
     private(set) var created: ActiveTelemetry?
 
-    var callCount: Int { arguments.count }
+    var callCount: Int { endpoints.count }
 
     init(applicationSupport: URL) {
         self.applicationSupport = applicationSupport
         exceptionHandlers = ExceptionHandlerChain(slot: slot, entryPoint: { _ in })
     }
 
-    func make(credentials: TelemetryCredentials, level: TelemetryLevel) -> ActiveTelemetry {
-        arguments.append((credentials, level))
+    func make(endpoint: String) -> ActiveTelemetry {
+        endpoints.append(endpoint)
         let directory = applicationSupport.appendingPathComponent(FileDurableStore.directoryName, isDirectory: true)
         let telemetry = ActiveTelemetry(
-            credentials: credentials,
-            level: level,
+            endpoint: endpoint,
             deviceContextProvider: provider,
             dispatcher: ImmediateDispatcher(),
             ports: ActiveTelemetry.Ports(store: FileDurableStore(directory: { directory }), lifecycle: lifecycle,
@@ -489,7 +391,7 @@ private final class CountingHandlerSlot: ExceptionHandlerSlot, @unchecked Sendab
 }
 
 /// Records every call, in order.
-private final class CountingRuntime: TelemetryRuntime, TelemetryDebugHooks, @unchecked Sendable {
+private final class CountingRuntime: TelemetryRuntime, @unchecked Sendable {
     private let lock = NSLock()
     private var log: [String] = []
 
@@ -498,14 +400,6 @@ private final class CountingRuntime: TelemetryRuntime, TelemetryDebugHooks, @unc
 
     func start() {
         lock.withLock { log.append("start") }
-    }
-
-    func sendTestRecord() {
-        lock.withLock { log.append("sendTestRecord") }
-    }
-
-    func raiseTestCrash() {
-        lock.withLock { log.append("raiseTestCrash") }
     }
 }
 #endif
