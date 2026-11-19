@@ -171,6 +171,8 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         private(set) var hasEnded = false
         /// The open payment attempt (D24), from `makeUIView` until the flow's final outcome or failure.
         var payment: PaymentAttempt?
+        /// Intermediate flow seen per charge 3DS id, until its final event.
+        private var authenticationFlows: [String: Standalone3DSResult.AuthenticationFlow] = [:]
 
         init(completion: @escaping (Result<Standalone3DSResult, Standalone3DSError>) -> Void,
              loadingDelegate: WidgetLoadingDelegate? = nil,
@@ -268,9 +270,10 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         }
 
         private func handleEvent(_ event: Standalone3DSResult.EventType, charge3dsId: String?, details: Standalone3DSEventDetails) {
-            func result(_ charge3dsId: String) -> Standalone3DSResult {
+            func result(_ charge3dsId: String, _ flow: Standalone3DSResult.AuthenticationFlow? = nil) -> Standalone3DSResult {
                 Standalone3DSResult(event: event, charge3dsId: charge3dsId,
-                                    status: details.status, resultDescription: details.resultDescription)
+                                    status: details.status, resultDescription: details.resultDescription,
+                                    authenticationFlow: flow)
             }
             switch event {
             case .chargeAuthInfo:
@@ -279,7 +282,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             case .chargeError:
                 notifyLoadingFinish()
                 SdkTelemetry.finishPayment(&payment, .failedWithCode("CHARGE_ERROR"))
-                completion(.success(result(charge3dsId ?? lastCharge3dsId ?? "")))
+                let id = charge3dsId ?? lastCharge3dsId ?? ""
+                authenticationFlows[id] = nil
+                completion(.success(result(id)))
             case .chargeAuthChallenge, .chargeAuthDecoupled, .chargeAuthSuccess, .chargeAuthReject:
                 guard let charge3dsId else {
                     notifyLoadingFinish()
@@ -293,16 +298,19 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                 case .chargeAuthChallenge:
                     // Keep loading until the challenge page has loaded (`chargeAuthChallengeLoaded`).
                     notifyLoadingStart()
+                    authenticationFlows[charge3dsId] = .challenge
                     completion(.success(result(charge3dsId)))
                     onProgress?(.challengeStarted(charge3dsId: charge3dsId))
                 case .chargeAuthDecoupled:
                     notifyLoadingFinish()
+                    authenticationFlows[charge3dsId] = .decoupled
                     completion(.success(result(charge3dsId)))
                     onProgress?(.decoupled(charge3dsId: charge3dsId, description: details.rawDescription))
                 default:
                     notifyLoadingFinish()
                     SdkTelemetry.finishPayment(&payment, event == .chargeAuthSuccess ? .success : .declined)
-                    completion(.success(result(charge3dsId)))
+                    let flow = authenticationFlows.removeValue(forKey: charge3dsId) ?? .frictionless
+                    completion(.success(result(charge3dsId, flow)))
                 }
             }
         }
