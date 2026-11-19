@@ -60,6 +60,35 @@ release of the line to the stable alias in the client SDK pipeline. The release 
 job (`scripts/check-client-sdk-aliases.sh`) refuses the release until the stable alias serves a script and a version
 record of the line.
 
+## Standalone 3DS result
+
+`Standalone3DSWidget` delivers each event as a `Standalone3DSResult`. The final result, `chargeAuthSuccess` or
+`chargeAuthReject`, carries:
+
+| Property | Meaning |
+|---|---|
+| `event` | the event, `.chargeAuthSuccess` or `.chargeAuthReject` |
+| `charge3dsId` | the charge 3DS id the event is for |
+| `status` | the raw authentication status from the web SDK, informational only; may be `nil` |
+| `resultDescription` | the outcome description when provided, typically on frictionless outcomes; may be `nil` |
+| `authenticationFlow` | how the shopper was authenticated: `.frictionless`, `.challenge` or `.decoupled` |
+
+`authenticationFlow` is `.challenge` or `.decoupled` when a `chargeAuthChallenge` or `chargeAuthDecoupled` event came
+for the same `charge3dsId` before the final event (the most recent one wins), and `.frictionless` otherwise. It is set
+only on `chargeAuthSuccess` and `chargeAuthReject` and is `nil` on every other event.
+
+```swift
+Standalone3DSWidget(config: config) { result in
+    guard case .success(let threeDSResult) = result else { return }
+    switch threeDSResult.authenticationFlow {
+    case .frictionless: print("Authenticated without shopper interaction")
+    case .challenge: print("The shopper completed a challenge")
+    case .decoupled: print("The shopper approved in their banking app")
+    case nil: break // not a final event
+    }
+}
+```
+
 # Getting Started (Sample App)
 
 This repository includes a sample application (`ExampleApp/`) that demonstrates how to integrate and use the Paydock Mobile SDK.

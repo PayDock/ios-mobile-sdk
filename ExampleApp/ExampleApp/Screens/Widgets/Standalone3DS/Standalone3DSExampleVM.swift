@@ -43,6 +43,15 @@ enum Standalone3DSDemoFlow: String {
     case frictionless = "Frictionless"
     case challenge = "Challenge"
     case decoupled = "Decoupled"
+
+    /// The flow the SDK reported on the final result; frictionless when it reported none.
+    init(_ flow: Standalone3DSResult.AuthenticationFlow?) {
+        switch flow {
+        case .challenge: self = .challenge
+        case .decoupled: self = .decoupled
+        case .frictionless, nil: self = .frictionless
+        }
+    }
 }
 
 /// Summary of a successful authentication, shown in the success details card.
@@ -80,7 +89,6 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
     let loadingDelegate = SilentWidgetLoadingDelegate()
 
     private var attempt = 0
-    private var flow: Standalone3DSDemoFlow = .frictionless
     private var cardLast4: String?
     private var slowTask: Task<Void, Never>?
     private let slowAfter: Duration = .seconds(8)
@@ -121,7 +129,6 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
         let attempt = attempt
         token3DS = ""
         outcome = nil
-        flow = .frictionless
         challengeMounted = false
         setPhase(.preparing)
         isSheetPresented = true
@@ -219,7 +226,7 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
                     status: result.status,
                     resultDescription: result.resultDescription,
                     charge3dsId: result.charge3dsId,
-                    flow: flow,
+                    flow: Standalone3DSDemoFlow(result.authenticationFlow),
                     amount: "\(configManager.getGlobalConfig().totalAmount) \(configManager.getGlobalConfig().currency)",
                     cardLast4: cardLast4)
                 setPhase(.success)
@@ -238,7 +245,6 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
             guard isWidgetActive else { return }
             switch progress {
             case .challengeStarted:
-                flow = .challenge
                 challengeMounted = true
                 setPhase(.challengeLoading)
             case .challengeLoaded:
@@ -253,7 +259,6 @@ class Standalone3DSExampleVM: NSObject, ObservableObject {
                     break
                 }
             case let .decoupled(_, description):
-                flow = .decoupled
                 setPhase(.decoupled(description: description))
             }
         }

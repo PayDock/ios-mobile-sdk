@@ -28,6 +28,9 @@
 - Privacy manifests (`PrivacyInfo.xcprivacy`) for the telemetry and BIN-processing targets: no tracking; crash data
   and other diagnostic data, not linked, not tracking, for app functionality; the required-reason APIs UserDefaults
   (`CA92.1`) and system boot time (`35F9.1`).
+- `Standalone3DSResult.authenticationFlow` (`.frictionless`, `.challenge`, `.decoupled`): how the shopper was
+  authenticated, set on `chargeAuthSuccess` and `chargeAuthReject` and `nil` on every other event. Additive; events,
+  callbacks and loading are unchanged.
 
 ### Changed
 - The Mobile SDK no longer compiles an exact Client SDK version in. It supports the Client SDK line `v1.150` and,
