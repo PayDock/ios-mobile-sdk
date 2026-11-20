@@ -106,7 +106,8 @@ widget.
 ## Payment attempts
 
 When active, the SDK records each payment attempt in its payment widgets as two `INFO` records (D24, spec § 5.9),
-so conversion and duration can be read per widget. They carry no amount, token, card data, message text or real ID.
+so conversion and duration can be read per widget. They carry no amount, token, card data or message text, and no
+real ID but the 3DS charge ID of the two 3DS widgets (D25).
 
 - **`paydock.payment.started`** (`TelemetryEvent.paymentStarted`): `paydock.widget` and `paydock.payment.id`, a random
   lowercase UUID new per attempt. Body `paydock.payment.started · <widget>`.
@@ -114,6 +115,22 @@ so conversion and duration can be read per widget. They carry no amount, token, 
   `paydock.payment.outcome` (`PaymentOutcome`: `success`, `declined`, `error` or `cancelled`),
   `paydock.payment.duration_ms` and, for the `error` outcome only, `paydock.error.code`, the code the merchant
   receives. Body `paydock.payment.finished · <widget> · <outcome>[ · <paydock.error.code>]`.
+
+Two 3DS attributes (D25, § 5.9), last in the record, each absent when unknown:
+
+- **`paydock.3ds.charge_id`** (string, on both records of `Standalone3DSWidget` and `MPGS3DSWidget` only): the 3DS
+  charge ID Paydock issued, read from the widget's token at the start or, when the token has none, from the first
+  message of the flow that carries one. Once set it never changes for the attempt; an empty value counts as none. The
+  token itself is never sent. `Allowlist` checks it with the generic sensitive-value check.
+- **`paydock.3ds.flow`** (string, on `paydock.payment.finished` of `Standalone3DSWidget` only, for the `success` and
+  `declined` outcomes): how the shopper was authenticated, `TelemetryEvent.ThreeDSFlow` (`frictionless`, `challenge`
+  or `decoupled`), the same value as the delivered `Standalone3DSResult.authenticationFlow`. Never on an `error` or
+  `cancelled` finish, and never on `MPGS3DSWidget`. `Allowlist` accepts only the three values.
+
+The body is unchanged: the 3DS attributes never enter it. The SDK seam (`SdkTelemetry.startPayment(_:charge3dsId:)`,
+whose charge ID is read only when telemetry is active and only for the two 3DS widgets,
+`SdkTelemetry.notePaymentCharge3dsId(_:on:)` and `SdkTelemetry.finishPayment(_:_:flow:)`) sends neither key for any
+other widget.
 
 The reducer's rules:
 
@@ -127,8 +144,9 @@ The reducer's rules:
 - `paydock.payment.duration_ms` is measured by the reducer on the monotonic clock (`elapsed` at the finish minus at the
   start, at least 0); any duration a caller passes is replaced.
 
-`Allowlist` accepts the three payment keys, a payment ID only in the UUID shape (the card-number check would reject a
-random UUID with a long all-digit run) and an outcome only among the four values. `DuplicateGate` never merges payment
+`Allowlist` accepts the three payment keys and the two 3DS keys, a payment ID only in the UUID shape (the card-number
+check would reject a random UUID with a long all-digit run), an outcome only among the four values and a flow only
+among the three. `DuplicateGate` never merges payment
 records: each attempt is its own.
 
 ## Network failures

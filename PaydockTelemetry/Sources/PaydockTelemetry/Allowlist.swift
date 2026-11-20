@@ -41,7 +41,9 @@ package enum Allowlist {
         // Dropped
         ("paydock.dropped.reason", .string), ("paydock.dropped.count", .int),
         // Payment (D24)
-        ("paydock.payment.id", .string), ("paydock.payment.outcome", .string), ("paydock.payment.duration_ms", .int)
+        ("paydock.payment.id", .string), ("paydock.payment.outcome", .string), ("paydock.payment.duration_ms", .int),
+        // 3DS (D25)
+        ("paydock.3ds.charge_id", .string), ("paydock.3ds.flow", .string)
     ]
 
     // MARK: - Patterns
@@ -143,6 +145,8 @@ package enum Allowlist {
             return matches(uuidShape, text)
         case "paydock.payment.outcome":
             return TelemetryEvent.PaymentOutcome(rawValue: text) != nil
+        case "paydock.3ds.flow":
+            return TelemetryEvent.ThreeDSFlow(rawValue: text) != nil
         case "log.record.uid":
             guard let sessionId, text.hasPrefix("\(sessionId)-") else {
                 return false

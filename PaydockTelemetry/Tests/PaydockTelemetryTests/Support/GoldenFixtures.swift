@@ -64,6 +64,8 @@ enum GoldenFixtures {
         let paymentId: String?
         let outcome: String?
         let durationMs: Int64?
+        let charge3dsId: String?
+        let flow: String?
     }
 
     /// A class, so an error can hold its cause.
@@ -214,14 +216,17 @@ enum GoldenFixtures {
         case "WidgetOpened":
             return .widgetOpened(widget: try required(event.widget, "widget"))
         case "PaymentStarted":
-            return .paymentStarted(widget: try required(event.widget, "widget"), paymentId: try required(event.paymentId, "paymentId"))
+            return .paymentStarted(widget: try required(event.widget, "widget"), paymentId: try required(event.paymentId, "paymentId"),
+                                   charge3dsId: event.charge3dsId)
         case "PaymentFinished":
             return .paymentFinished(
                 widget: try required(event.widget, "widget"),
                 paymentId: try required(event.paymentId, "paymentId"),
                 outcome: try required(TelemetryEvent.PaymentOutcome(rawValue: event.outcome ?? ""), "outcome"),
                 errorCode: event.code,
-                durationMs: event.durationMs
+                durationMs: event.durationMs,
+                charge3dsId: event.charge3dsId,
+                flow: try event.flow.map { try required(TelemetryEvent.ThreeDSFlow(rawValue: $0), "flow") }
             )
         case "Dropped":
             return .dropped(reason: try required(TelemetryEvent.DroppedReason(rawValue: event.reason ?? ""), "dropped reason"),

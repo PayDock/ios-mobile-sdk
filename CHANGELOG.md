@@ -31,6 +31,8 @@
 - `Standalone3DSResult.authenticationFlow` (`.frictionless`, `.challenge`, `.decoupled`): how the shopper was
   authenticated, set on `chargeAuthSuccess` and `chargeAuthReject` and `nil` on every other event. Additive; events,
   callbacks and loading are unchanged.
+- Telemetry (D25): the standalone and MPGS 3DS payment records carry the 3DS charge ID when known, and the standalone
+  finish on success or declined the authentication flow. Merchant results, callbacks and errors are unchanged.
 
 ### Changed
 - The Mobile SDK no longer compiles an exact Client SDK version in. It supports the Client SDK line `v1.150` and,

@@ -181,9 +181,12 @@ app, debug and release: crashes in the app (marked when they come from the SDK),
 attempts of its Paydock API requests, the widgets a session opens and the payment attempts of five widgets (card
 details, standalone 3DS, MPGS 3DS, PayPal and Apple Pay): each attempt's start and its end, with the outcome
 (`success`, `declined`, `error` or `cancelled`), its duration and, on an error, the error code your app receives,
-never an amount, card data or a message. Records carry codes, types, a random per-install ID and a random ID per
-payment attempt, never card data, message text, request or response bodies, headers or real IDs. They go to the
-environment's Paydock collector over HTTPS, gzipped:
+never an amount, card data or a message. The two 3DS widgets' payment records also carry the 3DS charge ID Paydock
+issued, when known (`paydock.3ds.charge_id`), and the standalone 3DS widget's finish on a success or a decline the
+authentication flow (`paydock.3ds.flow`: `frictionless`, `challenge` or `decoupled`); the token itself is never sent.
+Records carry codes, types, a random per-install ID and a random ID per payment attempt, never card data, message
+text, request or response bodies, headers or real IDs other than that 3DS charge ID. They go to the environment's
+Paydock collector over HTTPS, gzipped:
 
 | Environment | Collector |
 |---|---|

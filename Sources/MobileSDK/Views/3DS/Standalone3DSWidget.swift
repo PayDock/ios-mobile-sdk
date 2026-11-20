@@ -84,7 +84,9 @@ public struct Standalone3DSWidget: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> UIView {
         SdkTelemetry.reportWidgetOpened(.standalone3ds)
-        if hasValidToken { context.coordinator.payment = SdkTelemetry.startPayment(.standalone3ds) }
+        if hasValidToken {
+            context.coordinator.payment = SdkTelemetry.startPayment(.standalone3ds, charge3dsId: context.coordinator.tokenCharge3dsId)
+        }
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -161,7 +163,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
         /// Last non-empty charge 3DS id received, used when an event arrives without one (e.g. `error`).
         private var lastCharge3dsId: String?
         /// Charge 3DS id read from the token, used to label failures that happen before any event.
-        private let tokenCharge3dsId: String?
+        let tokenCharge3dsId: String?
         /// Host of the Client SDK script, reported when it fails to load.
         private let clientSdkHost: String?
         /// Test seam for the app's background state; `nil` reads `UIApplication`.
@@ -232,6 +234,7 @@ public struct Standalone3DSWidget: UIViewRepresentable {
             let charge3dsId = data["charge3dsId"] as? String
             if let charge3dsId, !charge3dsId.isEmpty {
                 lastCharge3dsId = charge3dsId
+                SdkTelemetry.notePaymentCharge3dsId(charge3dsId, on: &payment)
             }
             let details = Standalone3DSEventDetails(status: Self.nonEmptyString(data["status"]),
                                                   resultDescription: Self.nonEmptyString(data["description"]),
@@ -308,8 +311,8 @@ public struct Standalone3DSWidget: UIViewRepresentable {
                     onProgress?(.decoupled(charge3dsId: charge3dsId, description: details.rawDescription))
                 default:
                     notifyLoadingFinish()
-                    SdkTelemetry.finishPayment(&payment, event == .chargeAuthSuccess ? .success : .declined)
                     let flow = authenticationFlows.removeValue(forKey: charge3dsId) ?? .frictionless
+                    SdkTelemetry.finishPayment(&payment, event == .chargeAuthSuccess ? .success : .declined, flow: flow)
                     completion(.success(result(charge3dsId, flow)))
                 }
             }

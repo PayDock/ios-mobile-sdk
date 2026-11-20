@@ -44,13 +44,15 @@ package enum TelemetryEvent: Sendable, Equatable {
     /// D19: the first time a widget appears on screen in an SDK session.
     case widgetOpened(widget: String)
 
-    /// D24, § 5.9: an attempt started in a payment widget. `paymentId`: a random lowercase UUID, new per attempt.
-    case paymentStarted(widget: String, paymentId: String)
+    /// D24, D25, § 5.9: an attempt started in a payment widget. `paymentId`: a random lowercase UUID, new per attempt.
+    /// `charge3dsId`: 3DS widgets only, when known.
+    case paymentStarted(widget: String, paymentId: String, charge3dsId: String? = nil)
 
-    /// D24, § 5.9. `errorCode` only for `.error`: the code the merchant receives. `durationMs` is the reducer's: any value
-    /// a caller passes is replaced by the measured duration.
+    /// D24, D25, § 5.9. `errorCode` only for `.error`: the code the merchant receives. `durationMs` is the reducer's: any
+    /// value a caller passes is replaced by the measured duration. `charge3dsId`: 3DS widgets only, when known. `flow`:
+    /// `Standalone3DSWidget` only, on `.success` and `.declined`.
     case paymentFinished(widget: String, paymentId: String, outcome: PaymentOutcome, errorCode: String? = nil,
-                         durationMs: Int64? = nil)
+                         durationMs: Int64? = nil, charge3dsId: String? = nil, flow: ThreeDSFlow? = nil)
 
     /// Spec § 5.8. Only the telemetry target creates it (I7); SDK code never reports it.
     case dropped(reason: DroppedReason, count: Int)
@@ -151,6 +153,9 @@ package enum TelemetryEvent: Sendable, Equatable {
 
     /// Raw values are the wire names (`paydock.payment.outcome`).
     package enum PaymentOutcome: String, Sendable, Equatable, CaseIterable { case success, declined, error, cancelled }
+
+    /// Raw values are the wire names (`paydock.3ds.flow`).
+    package enum ThreeDSFlow: String, Sendable, Equatable, CaseIterable { case frictionless, challenge, decoupled }
 
     /// Raw values are the wire names (`paydock.dropped.reason`).
     package enum DroppedReason: String, Sendable, Equatable {

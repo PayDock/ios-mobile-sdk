@@ -41,6 +41,11 @@ public struct MPGS3DSWidget: UIViewRepresentable {
         return decodedToken.format == .html || decodedToken.format == .url
     }
 
+    /// D25: the token's 3DS charge id, decoded with the same decoder as `isValidToken`.
+    private static func charge3dsId(_ token: String, _ decoder: Base64Decoder) -> String? {
+        decoder.decodeBase64(token, to: Decoded3DSToken.self)?.resolvedCharge3dsId
+    }
+
     private func validateToken() {
         guard hasValidToken else {
             let failure = MPGS3dsError.invalidToken
@@ -54,7 +59,9 @@ public struct MPGS3DSWidget: UIViewRepresentable {
 
     public func makeUIView(context: Context) -> UIView {
         SdkTelemetry.reportWidgetOpened(.mpgs3ds)
-        if hasValidToken { context.coordinator.payment = SdkTelemetry.startPayment(.mpgs3ds) }
+        if hasValidToken {
+            context.coordinator.payment = SdkTelemetry.startPayment(.mpgs3ds, charge3dsId: Self.charge3dsId(config.token, base64Decoder))
+        }
         let containerView = UIView()
 
         let configuration = WKWebViewConfiguration()
@@ -152,6 +159,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
                 completion(.failure(failure))
                 return
             }
+            SdkTelemetry.notePaymentCharge3dsId((body as? [String: Any])?["charge3dsId"] as? String, on: &payment)
             guard let data = body as? [String: Any],
                   let eventRaw = data["event"] as? String,
                   let event = MPGS3dsResult.EventType(rawValue: eventRaw),

@@ -59,14 +59,15 @@ package enum TelemetryReducer {
         if case let .widgetOpened(widget) = event, state.openedWidgets.contains(widget) {
             return [.drop(.alreadyOpened)]
         }
-        if case let .paymentFinished(widget, paymentId, outcome, errorCode, _) = event {
+        if case let .paymentFinished(widget, paymentId, outcome, errorCode, _, charge3dsId, flow) = event {
             guard let index = state.openPayments.firstIndex(where: { $0.id == paymentId }) else {
                 return [.drop(.paymentNotOpen)]
             }
             let attempt = state.openPayments.remove(at: index)
             roll(&state, elapsed: elapsed)
             let finished = TelemetryEvent.paymentFinished(widget: widget, paymentId: paymentId, outcome: outcome,
-                                                          errorCode: errorCode, durationMs: max(0, elapsed - attempt.startedAt))
+                                                          errorCode: errorCode, durationMs: max(0, elapsed - attempt.startedAt),
+                                                          charge3dsId: charge3dsId, flow: flow)
             return created(finished, &state, now: now, sequence: sequence)
         }
 
@@ -77,7 +78,7 @@ package enum TelemetryReducer {
         if case let .widgetOpened(widget) = event {
             state.openedWidgets.insert(widget)
         }
-        if case let .paymentStarted(_, paymentId) = event {
+        if case let .paymentStarted(_, paymentId, _) = event {
             state.openPayments.append(TelemetryState.OpenPayment(id: paymentId, startedAt: elapsed))
             if state.openPayments.count > Limits.maxOpenPayments {
                 state.openPayments.removeFirst(state.openPayments.count - Limits.maxOpenPayments)

@@ -214,9 +214,10 @@ final class AllowlistTests: XCTestCase {
     // MARK: - Payments (D24)
 
     func testThePaymentKeys_EndTheRecordKeys_WithTheirKinds() {
-        XCTAssertEqual(Array(Allowlist.recordKeys.suffix(5)), [
+        XCTAssertEqual(Array(Allowlist.recordKeys.suffix(7)), [
             "paydock.dropped.reason", "paydock.dropped.count",
-            "paydock.payment.id", "paydock.payment.outcome", "paydock.payment.duration_ms"
+            "paydock.payment.id", "paydock.payment.outcome", "paydock.payment.duration_ms",
+            "paydock.3ds.charge_id", "paydock.3ds.flow"
         ])
         XCTAssertEqual(Allowlist.recordKinds["paydock.payment.id"], .string)
         XCTAssertEqual(Allowlist.recordKinds["paydock.payment.outcome"], .string)

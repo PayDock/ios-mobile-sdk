@@ -50,18 +50,35 @@ enum SdkTelemetry {
     }
 
     /// D24: nil while inactive; else reports `.paymentStarted` with a new id and returns the attempt.
-    static func startPayment(_ widget: SdkWidget, telemetry: any Telemetry = TelemetryBinding.current) -> PaymentAttempt? {
+    /// D25: `charge3dsId` is evaluated only when telemetry is active and `widget` is `.standalone3ds` or `.mpgs3ds`;
+    /// an empty value counts as none.
+    static func startPayment(_ widget: SdkWidget, charge3dsId: @autoclosure () -> String? = nil,
+                             telemetry: any Telemetry = TelemetryBinding.current) -> PaymentAttempt? {
         guard telemetry.isActive else {
             return nil
         }
-        let attempt = PaymentAttempt(widget: widget, id: UUID().uuidString.lowercased())
-        telemetry.report(.paymentStarted(widget: widget.rawValue, paymentId: attempt.id))
+        let known = isThreeDS(widget) ? nonEmpty(charge3dsId()) : nil
+        let attempt = PaymentAttempt(widget: widget, id: UUID().uuidString.lowercased(), charge3dsId: known)
+        telemetry.report(.paymentStarted(widget: widget.rawValue, paymentId: attempt.id, charge3dsId: attempt.charge3dsId))
         return attempt
+    }
+
+    /// D25: sets `attempt.charge3dsId` when the attempt is open, holds none yet, and `charge3dsId` is non-empty.
+    /// Reports nothing.
+    static func notePaymentCharge3dsId(_ charge3dsId: String?, on attempt: inout PaymentAttempt?) {
+        guard var open = attempt, open.charge3dsId == nil, let known = nonEmpty(charge3dsId) else {
+            return
+        }
+        open.charge3dsId = known
+        attempt = open
     }
 
     /// D24: returns at once for a nil attempt. Sets it to nil, then, when active, reports `.paymentFinished` with the
     /// end's outcome and, for `.failed` and `.failedWithCode`, its code. A second call on the same variable does nothing.
+    /// D25: sends the attempt's `charge3dsId`. `flow` is sent only for `.standalone3ds` and an end of `.success` or
+    /// `.declined` (mapped by raw value to `TelemetryEvent.ThreeDSFlow`); otherwise dropped.
     static func finishPayment(_ attempt: inout PaymentAttempt?, _ end: PaymentEnd,
+                              flow: Standalone3DSResult.AuthenticationFlow? = nil,
                               telemetry: any Telemetry = TelemetryBinding.current) {
         guard let finished = attempt else {
             return
@@ -86,8 +103,10 @@ enum SdkTelemetry {
             outcome = .error
             errorCode = code
         }
+        let sentFlow = finished.widget == .standalone3ds && (outcome == .success || outcome == .declined)
+            ? flow.flatMap { TelemetryEvent.ThreeDSFlow(rawValue: $0.rawValue) } : nil
         telemetry.report(.paymentFinished(widget: finished.widget.rawValue, paymentId: finished.id, outcome: outcome,
-                                          errorCode: errorCode))
+                                          errorCode: errorCode, charge3dsId: finished.charge3dsId, flow: sentFlow))
     }
 
     /// D24: an attempt that fails before its widget loads (an invalid 3DS token): when active and the key is new in
@@ -99,5 +118,17 @@ enum SdkTelemetry {
         }
         var attempt = startPayment(widget, telemetry: telemetry)
         finishPayment(&attempt, .failed(error), telemetry: telemetry)
+    }
+
+    /// D25: the two widgets whose payment records may carry the 3DS charge id.
+    private static func isThreeDS(_ widget: SdkWidget) -> Bool {
+        widget == .standalone3ds || widget == .mpgs3ds
+    }
+
+    private static func nonEmpty(_ text: String?) -> String? {
+        guard let text, !text.isEmpty else {
+            return nil
+        }
+        return text
     }
 }

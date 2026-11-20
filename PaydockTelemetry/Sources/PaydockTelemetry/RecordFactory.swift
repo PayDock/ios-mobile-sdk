@@ -80,20 +80,23 @@ package enum RecordFactory {
         }
     }
 
-    /// D24: a payment record's fields; `paydock.error.code` only for the `error` outcome.
+    /// D24, D25: a payment record's fields; `paydock.error.code` only for the `error` outcome; the 3DS fields when present.
     private static func addPayment(_ event: TelemetryEvent, to fields: inout Fields) {
         switch event {
-        case let .paymentStarted(widget, paymentId):
+        case let .paymentStarted(widget, paymentId, charge3dsId):
             fields.put("event.name", "paydock.payment.started")
             fields.put("paydock.widget", widget)
             fields.put("paydock.payment.id", paymentId)
-        case let .paymentFinished(widget, paymentId, outcome, errorCode, durationMs):
+            fields.put("paydock.3ds.charge_id", charge3dsId)
+        case let .paymentFinished(widget, paymentId, outcome, errorCode, durationMs, charge3dsId, flow):
             fields.put("event.name", "paydock.payment.finished")
             fields.put("paydock.widget", widget)
             fields.put("paydock.error.code", outcome == .error ? errorCode : nil)
             fields.put("paydock.payment.id", paymentId)
             fields.put("paydock.payment.outcome", outcome.rawValue)
             fields.put("paydock.payment.duration_ms", durationMs)
+            fields.put("paydock.3ds.charge_id", charge3dsId)
+            fields.put("paydock.3ds.flow", flow?.rawValue)
         default:
             break
         }

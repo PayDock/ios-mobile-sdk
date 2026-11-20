@@ -8,6 +8,8 @@
 struct PaymentAttempt: Equatable {
     let widget: SdkWidget
     let id: String            // UUID().uuidString.lowercased()
+    /// D25: the 3DS charge id, once known; never changed after.
+    var charge3dsId: String?
 }
 
 /// How an attempt ended, as the widget sees it.

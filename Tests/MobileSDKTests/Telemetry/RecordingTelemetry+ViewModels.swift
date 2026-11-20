@@ -36,9 +36,9 @@ extension RecordingTelemetry {
     var payments: [PaymentReport] {
         events.compactMap { event in
             switch event {
-            case let .paymentStarted(widget, _):
+            case let .paymentStarted(widget, _, _):
                 return .started(SdkWidget(rawValue: widget))
-            case let .paymentFinished(widget, _, outcome, errorCode, _):
+            case let .paymentFinished(widget, _, outcome, errorCode, _, _, _):
                 return .finished(SdkWidget(rawValue: widget), outcome, errorCode)
             default:
                 return nil
@@ -51,7 +51,7 @@ extension RecordingTelemetry {
     var paymentIds: [String] {
         events.compactMap { event in
             switch event {
-            case let .paymentStarted(_, paymentId), let .paymentFinished(_, paymentId, _, _, _):
+            case let .paymentStarted(_, paymentId, _), let .paymentFinished(_, paymentId, _, _, _, _, _):
                 return paymentId
             default:
                 return nil

@@ -13,10 +13,10 @@ import XCTest
 /// order. A mismatch is fixed in the builder or the encoder, never in the copied fixture.
 final class GoldenFixturesTests: XCTestCase {
 
-    func testThereAreExactlyFourteenInputs() throws {
+    func testThereAreExactlySixteenInputs() throws {
         let names = try GoldenFixtures.all().map(\.name)
 
-        XCTAssertEqual(names.count, 14, "\(names)")
+        XCTAssertEqual(names.count, 16, "\(names)")
         XCTAssertEqual(Set(names.map { $0.components(separatedBy: "/")[0] }), Set(GoldenFixtures.folders))
     }
 
@@ -80,7 +80,7 @@ final class GoldenFixturesTests: XCTestCase {
             XCTAssertEqual(record.value("paydock.group.key").flatMap(Self.text),
                            try Self.androidGroupKey(fixture), name)
         }
-        XCTAssertEqual(try GoldenFixtures.all().count, 14)
+        XCTAssertEqual(try GoldenFixtures.all().count, 16)
     }
 
     func testContext_MatchesTheResourceConstants() throws {
