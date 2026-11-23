@@ -58,6 +58,7 @@ extension PayPalVMTests {
             return XCTFail("Expected initialisingWalletToken, got: \(String(describing: completionResult))")
         }
         XCTAssertEqual(telemetry.payments, [.started(.payPal), .finished(.payPal, .error, "PAYPAL_WALLET_TOKEN_ERROR")])
+        XCTAssertEqual(telemetry.sdkErrors, [])
         XCTAssertTrue(telemetry.paymentsArePaired)
         XCTAssertNil(viewModel.payment)
     }

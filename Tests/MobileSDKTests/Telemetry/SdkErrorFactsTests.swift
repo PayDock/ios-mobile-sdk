@@ -234,7 +234,7 @@ final class SdkErrorFactsTests: XCTestCase {
         Facts(AfterpayError.errorCapturingCharge(error: errorRes), request: true),
         Facts(AfterpayError.errorCancelingTransaction(error: errorRes), request: true),
         Facts(AfterpayError.transactionCanceled, outcome: true),
-        Facts(AfterpayError.initialisingWalletToken(reason: "r")),
+        Facts(AfterpayError.initialisingWalletToken(reason: "r"), outcome: true),
         Facts(AfterpayError.unknownError(requestError), cause: requestType, request: true),
         Facts(ApplePayError.notSupported),
         Facts(ApplePayError.noSupportedCardsInWallet),
@@ -247,7 +247,7 @@ final class SdkErrorFactsTests: XCTestCase {
         Facts(ColesPayError.colesPayUrlError),
         Facts(ColesPayError.webViewFailed(error: nsError), cause: nsErrorType),
         Facts(ColesPayError.transactionCanceled, outcome: true),
-        Facts(ColesPayError.initialisingWalletToken(reason: "r")),
+        Facts(ColesPayError.initialisingWalletToken(reason: "r"), outcome: true),
         Facts(ColesPayError.unknownError(requestError), cause: requestType, request: true)
     ]
 
@@ -256,7 +256,7 @@ final class SdkErrorFactsTests: XCTestCase {
         Facts(PayPalError.errorFetchingOrderId(error: errorRes), request: true),
         Facts(PayPalError.errorCapturingCharge(error: errorRes), request: true),
         Facts(PayPalError.userCancelled, outcome: true),
-        Facts(PayPalError.initialisingWalletToken(reason: "r")),
+        Facts(PayPalError.initialisingWalletToken(reason: "r"), outcome: true),
         Facts(PayPalError.sdkException(description: "d")),
         Facts(PayPalError.unknownError(requestError), cause: requestType, request: true),
         Facts(PayPalVaultError.createSetupToken(error: errorRes), request: true),
@@ -287,7 +287,7 @@ final class SdkErrorFactsTests: XCTestCase {
         Facts(ZipError.transactionDeclined(checkoutId: nil), outcome: true),
         Facts(ZipError.transactionReferred(checkoutId: nil), outcome: true),
         Facts(ZipError.unexpectedStatus(status: nil, checkoutId: nil)),
-        Facts(ZipError.initialisingWalletToken(reason: "r")),
+        Facts(ZipError.initialisingWalletToken(reason: "r"), outcome: true),
         Facts(ZipError.unknownError(requestError), cause: requestType, request: true)
     ]
 }

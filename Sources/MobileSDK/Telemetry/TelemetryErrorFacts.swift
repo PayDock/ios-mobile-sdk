@@ -13,7 +13,7 @@ protocol TelemetryErrorFacts: Error {
     var telemetryCause: (any Error)? { get }
     /// A failed API request caused it: a case holding an `ErrorRes`, or a non-nil `RequestError`.
     var isRequestCaused: Bool { get }
-    /// A user cancellation or a provider's outcome (R_05).
+    /// A user cancellation, a provider's outcome (R_05), or a failure in the merchant's own wallet-token callback.
     var isOutcome: Bool { get }
 }
 

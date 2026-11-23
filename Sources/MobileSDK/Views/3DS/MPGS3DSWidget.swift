@@ -63,6 +63,7 @@ public struct MPGS3DSWidget: UIViewRepresentable {
             context.coordinator.payment = SdkTelemetry.startPayment(.mpgs3ds, charge3dsId: Self.charge3dsId(config.token, base64Decoder))
         }
         let containerView = UIView()
+        guard hasValidToken else { return containerView }
 
         let configuration = WKWebViewConfiguration()
         configuration.userContentController.add(context.coordinator, name: "PayDockMobileSDK")

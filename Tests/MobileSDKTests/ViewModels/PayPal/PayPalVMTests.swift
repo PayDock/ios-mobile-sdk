@@ -507,7 +507,7 @@ class PayPalVMTests: XCTestCase {
         )
     }
 
-    func testTelemetry_WalletTokenFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+    func testTelemetry_WalletTokenFailure_DeliversAsBefore_AndReportsNoSdkError() async {
         telemetry.bindAsCurrent()
         let expectation = XCTestExpectation(description: "failure")
         viewModel = makeTelemetryVM(tokenResult: .failure(.initialisingWalletToken(reason: "Token error")),
@@ -520,7 +520,7 @@ class PayPalVMTests: XCTestCase {
             return XCTFail("Expected initialisingWalletToken, got: \(String(describing: completionResult))")
         }
         XCTAssertEqual(reason, "Token error")
-        XCTAssertEqual(telemetry.sdkErrors, [.reported("PAYPAL_WALLET_TOKEN_ERROR", .payPal)])
+        XCTAssertEqual(telemetry.sdkErrors, [])
     }
 
     func testTelemetry_CaptureWithoutToken_ReportsOneSdkError_AndDeliversAsBefore() {

@@ -106,7 +106,7 @@ extension AfterPayVMTests {
         XCTAssertEqual(telemetry.reports, [])
     }
 
-    func testTelemetry_WalletTokenFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+    func testTelemetry_WalletTokenFailure_DeliversAsBefore_AndReportsNoSdkError() async {
         let telemetry = RecordingTelemetry()
         telemetry.bindAsCurrent()
         let expectation = XCTestExpectation(description: "failure")
@@ -123,7 +123,7 @@ extension AfterPayVMTests {
             return XCTFail("Expected initialisingWalletToken, got: \(String(describing: completionResult))")
         }
         XCTAssertEqual(reason, "Token error")
-        XCTAssertEqual(telemetry.sdkErrors, [.reported("AFTERPAY_WALLET_TOKEN_ERROR", .afterpay)])
+        XCTAssertEqual(telemetry.sdkErrors, [])
     }
 
     func testTelemetry_CancelWithoutChargeId_ReportsOneSdkError_AndDeliversNothing() async {

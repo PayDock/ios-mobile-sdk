@@ -50,6 +50,14 @@
   `PAYDOCK_TELEMETRY_TEST_CRASH`) are no longer read; every build sends to its environment's collector.
 - SDK development only: `scripts/check-crash-in-sdk.sh`, the crash-check script.
 
+### Fixed
+- `Standalone3DSWidget` and `MPGS3DSWidget` no longer show a loader that never goes away after an invalid token: they
+  report `invalidToken` and show nothing, and `Standalone3DSWidget` no longer calls `loadingDidStart()` on your
+  `loadingDelegate` for an invalid token.
+- Telemetry no longer reports a failure in your wallet-token callback (`initialisingWalletToken`, in PayPal,
+  Afterpay, Coles Pay and Zip) as a Mobile SDK error. Your completion still receives the same error, and a PayPal
+  payment attempt still ends as an error.
+
 ### Release
 - A release requires the supported line's aliases: the release pipeline's `check_client_sdk_aliases` job refuses it
   until a `v1.150` release has been promoted to the stable alias.

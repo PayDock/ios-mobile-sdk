@@ -75,9 +75,8 @@ extension AfterpayError: TelemetryErrorFacts {
 
     var isOutcome: Bool {
         switch self {
-        case .transactionCanceled: return true
-        case .errorFetchingAfterpayUrl, .errorCapturingCharge, .errorCancelingTransaction, .initialisingWalletToken,
-             .unknownError:
+        case .transactionCanceled, .initialisingWalletToken: return true
+        case .errorFetchingAfterpayUrl, .errorCapturingCharge, .errorCancelingTransaction, .unknownError:
             return false
         }
     }
@@ -153,8 +152,8 @@ extension ColesPayError: TelemetryErrorFacts {
 
     var isOutcome: Bool {
         switch self {
-        case .transactionCanceled: return true
-        case .errorFetchingColesPayOrder, .colesPayUrlError, .webViewFailed, .initialisingWalletToken, .unknownError:
+        case .transactionCanceled, .initialisingWalletToken: return true
+        case .errorFetchingColesPayOrder, .colesPayUrlError, .webViewFailed, .unknownError:
             return false
         }
     }
@@ -222,9 +221,8 @@ extension PayPalError: TelemetryErrorFacts {
 
     var isOutcome: Bool {
         switch self {
-        case .userCancelled: return true
-        case .getPayPalClientId, .errorFetchingOrderId, .errorCapturingCharge, .initialisingWalletToken, .sdkException,
-             .unknownError:
+        case .userCancelled, .initialisingWalletToken: return true
+        case .getPayPalClientId, .errorFetchingOrderId, .errorCapturingCharge, .sdkException, .unknownError:
             return false
         }
     }
@@ -277,9 +275,9 @@ extension ZipError: TelemetryErrorFacts {
 
     var isOutcome: Bool {
         switch self {
-        case .transactionCanceled, .transactionDeclined, .transactionReferred: return true
+        case .transactionCanceled, .transactionDeclined, .transactionReferred, .initialisingWalletToken: return true
         case .errorFetchingZipUrl, .errorCapturingCharge, .invalidCheckoutUrl, .webViewFailed, .unexpectedStatus,
-             .initialisingWalletToken, .unknownError:
+             .unknownError:
             return false
         }
     }

@@ -66,7 +66,7 @@ extension ColesPayVMTests {
         XCTAssertEqual(telemetry.reports, [])
     }
 
-    func testTelemetry_WalletTokenFailure_ReportsOneSdkError_AndDeliversAsBefore() async {
+    func testTelemetry_WalletTokenFailure_DeliversAsBefore_AndReportsNoSdkError() async {
         let telemetry = RecordingTelemetry()
         telemetry.bindAsCurrent()
         let expectation = XCTestExpectation(description: "failure")
@@ -81,7 +81,7 @@ extension ColesPayVMTests {
             return XCTFail("Expected initialisingWalletToken, got: \(String(describing: completionResult))")
         }
         XCTAssertEqual(reason, "Token error")
-        XCTAssertEqual(telemetry.sdkErrors, [.reported("COLES_PAY_WALLET_TOKEN_ERROR", .colesPay)])
+        XCTAssertEqual(telemetry.sdkErrors, [])
     }
 
     func testTelemetry_WebViewFailure_ReportsOneSdkError_AndDeliversAsBefore() {
