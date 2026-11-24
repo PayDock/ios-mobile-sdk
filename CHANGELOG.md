@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.10.0] - Unreleased
+## [4.10.0] - 2026-11-24
 
 ### Added
 - `MobileSDKConfig(environment:theme:enableTestMode:clientSdkVersion:) throws`: optionally pin the exact Client SDK
@@ -55,7 +55,7 @@
   report `invalidToken` and show nothing, and `Standalone3DSWidget` no longer calls `loadingDidStart()` on your
   `loadingDelegate` for an invalid token.
 - Telemetry no longer reports a failure in your wallet-token callback (`initialisingWalletToken`, in PayPal,
-  Afterpay, Coles Pay and Zip) as a Mobile SDK error. Your completion still receives the same error, and a PayPal
+  Afterpay and Zip) as a Mobile SDK error. Your completion still receives the same error, and a PayPal
   payment attempt still ends as an error.
 
 ### Release
